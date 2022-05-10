@@ -1,0 +1,1 @@
+recursive-include netbox_inventory/templates *.html

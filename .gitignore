@@ -1,0 +1,8 @@
+dist/
+*.egg-info/
+*.pyc
+*.swp
+.DS_Store
+.idea
+.coverage
+.vscode

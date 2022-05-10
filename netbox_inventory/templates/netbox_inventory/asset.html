@@ -1,0 +1,56 @@
+{% extends 'generic/object.html' %}
+
+{% block extra_controls %}
+<a class="btn btn-sm btn-orange" href="{% url "plugins:netbox_inventory:asset_assign" object.pk %}"><span class="mdi mdi-vector-link"></span> Assign</a>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-3">
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Asset</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Name</th>
+              <td>{{ object.name }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Asset tag</th>
+              <td>{{ object.asset_tag }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Serial Number</th>
+              <td>{{ object.serial }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Hardware Kind</th>
+              <td>{{ object.kind }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Hardware Type</th>
+              <td>{{ object.hardware_type.manufacturer }} {{ object.hardware_type|linkify }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Status</th>
+              <td>{{ object.get_status_display }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Used as</th>
+              <td>{{ object.hardware|linkify }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Used by</th>
+              <td>{{ object.used_by|linkify }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      {% include 'inc/panels/custom_fields.html' %}
+    </div>
+    <div class="col col-md-6">
+      {% include 'inc/panels/tags.html' %}
+      {% include 'inc/panels/comments.html' %}
+    </div>
+  </div>
+{% endblock content %}

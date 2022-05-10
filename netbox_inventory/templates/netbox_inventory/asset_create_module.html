@@ -1,0 +1,10 @@
+{% extends 'generic/object_edit.html' %}
+
+{% block title %}Add a new module and associate with asset {{ asset }}{% endblock %}
+
+{% block buttons %}
+<a class="btn btn-outline-danger" href="{{ return_url }}">Cancel</a>
+<button type="submit" name="_create" class="btn btn-primary">
+Create
+</button>
+{% endblock buttons %}
