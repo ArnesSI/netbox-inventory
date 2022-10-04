@@ -10,6 +10,7 @@ __all__ = (
     'InventoryItemTypeTable',
 )
 
+
 class AssetTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
@@ -56,11 +57,11 @@ class AssetTable(NetBoxTable):
             manufacturer=Coalesce(
                 'device_type__manufacturer',
                 'module_type__manufacturer',
-                'inventoryitem_type__manufacturer'
+                'inventoryitem_type__manufacturer',
             )
         ).order_by(
             ('-' if is_descending else '') + 'manufacturer',
-            ('-' if is_descending else '') + 'serial'
+            ('-' if is_descending else '') + 'serial',
         )
         return (queryset, True)
 
@@ -68,37 +69,65 @@ class AssetTable(NetBoxTable):
         queryset, _ = self.order_manufacturer(queryset, is_descending)
         queryset = queryset.annotate(
             model=Coalesce(
-                'device_type__model',
-                'module_type__model',
-                'inventoryitem_type__model'
+                'device_type__model', 'module_type__model', 'inventoryitem_type__model'
             )
         ).order_by(
             ('-' if is_descending else '') + 'manufacturer',
             ('-' if is_descending else '') + 'model',
-            ('-' if is_descending else '') + 'serial'
+            ('-' if is_descending else '') + 'serial',
         )
         return (queryset, True)
 
     def order_hardware(self, queryset, is_descending):
         queryset = queryset.annotate(
-            hw=Coalesce('device__name', 'module__device__name', 'inventoryitem__device__name')
+            hw=Coalesce(
+                'device__name', 'module__device__name', 'inventoryitem__device__name'
+            )
         ).order_by(
             ('-' if is_descending else '') + 'hw',
             ('-' if is_descending else '') + 'module__module_bay',
-            ('-' if is_descending else '') + 'serial'
+            ('-' if is_descending else '') + 'serial',
         )
         return (queryset, True)
 
     class Meta(NetBoxTable.Meta):
         model = Asset
         fields = (
-            'pk', 'id', 'name', 'asset_tag', 'serial', 'status',
-            'kind', 'manufacturer', 'hardware_type', 'hardware',
-            'tenant', 'contact', 'storage_location',
-            'owner', 'supplier', 'order_number', 'purchase_date', 'warranty_start', 'warranty_end',
-            'tags', 'created', 'last_updated',  'actions'
+            'pk',
+            'id',
+            'name',
+            'asset_tag',
+            'serial',
+            'status',
+            'kind',
+            'manufacturer',
+            'hardware_type',
+            'hardware',
+            'tenant',
+            'contact',
+            'storage_location',
+            'owner',
+            'supplier',
+            'order_number',
+            'purchase_date',
+            'warranty_start',
+            'warranty_end',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
         )
-        default_columns = ('name', 'serial', 'kind', 'manufacturer', 'hardware_type', 'asset_tag', 'status', 'hardware')
+        default_columns = (
+            'name',
+            'serial',
+            'kind',
+            'manufacturer',
+            'hardware_type',
+            'asset_tag',
+            'status',
+            'hardware',
+            'tags',
+        )
 
 
 class SupplierTable(NetBoxTable):
