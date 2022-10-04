@@ -29,3 +29,44 @@ def get_status_for(status):
     if status_name not in dict(InventoryStatusChoices):
         raise ImproperlyConfigured(f'Configuration defines status {status_name}, but not defined in InventoryStatusChoices')
     return status_name
+
+
+def get_tags_that_protect_asset_from_deletion():
+    """Return a list of tags that prevent an asset from being deleted.
+
+    Which tags prevent deletion is defined in the plugin configuration,
+    under the key ``asset_disable_deletion_for_tags``.
+
+    Returns:
+        list: list of tag slug strings
+    """
+    tags = settings.PLUGINS_CONFIG['netbox_inventory'][
+        'asset_disable_deletion_for_tags'
+    ]
+    if not tags:
+        return []
+    return tags
+
+
+def get_tags_and_edit_protected_asset_fields():
+    """Return a dict of tags and fields that prevent editing specified fields.
+
+    Which tags prevent editing is defined in the plugin configuration,
+    under the key ``asset_disable_editing_fields_for_tags``.
+
+    Structure of the dict is::
+
+        {
+            'tag_slug': ['field1', 'field2'],
+            'tag_slug2': ['field1', 'field4'],
+        }
+
+    Returns:
+        dict: dict of tag slug strings and list of field names
+    """
+    tags = settings.PLUGINS_CONFIG['netbox_inventory'][
+        'asset_disable_editing_fields_for_tags'
+    ]
+    if not tags:
+        return []
+    return tags
