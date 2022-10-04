@@ -145,10 +145,21 @@ class SupplierTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Supplier
         fields = (
-            'pk', 'id', 'name', 'description', 'comments', 'asset_count',
-            'tags', 'created', 'last_updated',  'actions'
+            'pk',
+            'id',
+            'name',
+            'description',
+            'comments',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
         )
-        default_columns = ('name', 'asset_count',)
+        default_columns = (
+            'name',
+            'asset_count',
+        )
 
 
 class InventoryItemTypeTable(NetBoxTable):
@@ -169,7 +180,22 @@ class InventoryItemTypeTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = InventoryItemType
         fields = (
-            'pk', 'id', 'manufacturer', 'model', 'slug', 'part_number',
-            'comments', 'tags', 'created', 'last_updated',  'actions', 'asset_count'
+            'pk',
+            'id',
+            'manufacturer',
+            'model',
+            'slug',
+            'part_number',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+            'asset_count',
         )
-        default_columns = ('name', 'manufacturer', 'model', 'asset_count',)
+        default_columns = (
+            'name',
+            'manufacturer',
+            'model',
+            'asset_count',
+        )

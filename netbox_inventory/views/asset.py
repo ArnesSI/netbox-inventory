@@ -1,10 +1,11 @@
 import logging
+
+from dcim.models import Device, InventoryItem, Module
 from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-
 from extras.signals import clear_webhooks
 from netbox.views import generic
 from utilities.exceptions import PermissionsViolation
@@ -205,14 +206,15 @@ class AssetAssignView(generic.ObjectEditView):
 
 class AssetCreateHardwareView(generic.ObjectEditView):
     """
-        Creates device/module/inventory item and assigns it to selected asset
+    Creates device/module/inventory item and assigns it to selected asset
 
-        Dynamically sets queryset, template and form, based on asset.kind
+    Dynamically sets queryset, template and form, based on asset.kind
 
-        Creates a new device/module/inventory item instance and assigns its
-        attr assigned_asset so it is accessible in form.
+    Creates a new device/module/inventory item instance and assigns its
+    attr assigned_asset so it is accessible in form.
 
     """
+
     queryset = models.Asset.objects.all()
     default_return_url = 'plugins:netbox_inventory:asset_list'
 
@@ -239,7 +241,7 @@ class AssetCreateHardwareView(generic.ObjectEditView):
             self.queryset = InventoryItem.objects.all()
             self.form = forms.AssetCreateInventoryItemForm
             self.template_name = 'netbox_inventory/asset_create_inventoryitem.html'
-        ret =  super().dispatch(request, *args, **kwargs)
+        ret = super().dispatch(request, *args, **kwargs)
         self._permission_action = 'add'
         return ret
 
@@ -254,7 +256,9 @@ class AssetCreateHardwareView(generic.ObjectEditView):
 
         Assigns created obj to asset after obj saved
         """
-        logger = logging.getLogger('netbox.netbox_inventory.views.AssetCreateHardwareView')
+        logger = logging.getLogger(
+            'netbox.netbox_inventory.views.AssetCreateHardwareView'
+        )
         obj = self.get_object(**kwargs)
 
         # Take a snapshot for change logging (if editing an existing object)
@@ -262,7 +266,7 @@ class AssetCreateHardwareView(generic.ObjectEditView):
             obj.snapshot()
 
         obj = self.alter_object(obj, request, args, kwargs)
-        
+
         form = self.form(data=request.POST, files=request.FILES, instance=obj)
         restrict_form_fields(form, request.user)
 
@@ -286,11 +290,13 @@ class AssetCreateHardwareView(generic.ObjectEditView):
 
                 msg = '{} {}'.format(
                     'Created' if object_created else 'Modified',
-                    self.queryset.model._meta.verbose_name
+                    self.queryset.model._meta.verbose_name,
                 )
                 logger.info(f"{msg} {obj} (PK: {obj.pk})")
                 if hasattr(obj, 'get_absolute_url'):
-                    msg = '{} <a href="{}">{}</a>'.format(msg, obj.get_absolute_url(), escape(obj))
+                    msg = '{} <a href="{}">{}</a>'.format(
+                        msg, obj.get_absolute_url(), escape(obj)
+                    )
                 else:
                     msg = '{} {}'.format(msg, escape(obj))
                 messages.success(request, mark_safe(msg))
@@ -308,9 +314,13 @@ class AssetCreateHardwareView(generic.ObjectEditView):
         else:
             logger.debug("Form validation failed")
 
-        return render(request, self.template_name, {
-            'object': obj,
-            'form': form,
-            'return_url': self.get_return_url(request, obj),
-            **self.get_extra_context(request, obj),
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                'object': obj,
+                'form': form,
+                'return_url': self.get_return_url(request, obj),
+                **self.get_extra_context(request, obj),
+            },
+        )

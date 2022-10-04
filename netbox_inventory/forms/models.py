@@ -11,14 +11,16 @@ __all__ = (
     'InventoryItemTypeForm',
 )
 
+
 class AssetForm(NetBoxModelForm):
+
     manufacturer = DynamicModelChoiceField(
         queryset=Manufacturer.objects.all(),
         required=False,
         initial_params={
             'device_types': '$device_type',
             'module_types': '$module_type',
-        }
+        },
     )
     device_type = DynamicModelChoiceField(
         queryset=DeviceType.objects.all(),
@@ -40,7 +42,7 @@ class AssetForm(NetBoxModelForm):
         query_params={
             'manufacturer_id': '$manufacturer',
         },
-        label='Inventory item type'
+        label='Inventory item type',
     )
     owner = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -57,7 +59,7 @@ class AssetForm(NetBoxModelForm):
         required=False,
         initial_params={
             'locations': '$storage_location',
-        }
+        },
     )
     storage_location = DynamicModelChoiceField(
         queryset=Location.objects.all(),
@@ -70,19 +72,58 @@ class AssetForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        ('General', ('name', 'asset_tag', 'status')),
-        ('Hardware', ('serial', 'manufacturer', 'device_type', 'module_type', 'inventoryitem_type')),
-        ('Purchase', ('owner', 'supplier', 'order_number', 'purchase_date', 'warranty_start', 'warranty_end')),
-        ('Location', ('storage_site', 'storage_location',)),
+        ('General', ('name', 'asset_tag', 'tags', 'status')),
+        (
+            'Hardware',
+            (
+                'serial',
+                'manufacturer',
+                'device_type',
+                'module_type',
+                'inventoryitem_type',
+            ),
+        ),
+        (
+            'Purchase',
+            (
+                'owner',
+                'supplier',
+                'order_number',
+                'purchase_date',
+                'warranty_start',
+                'warranty_end',
+            ),
+        ),
+        (
+            'Location',
+            (
+                'storage_site',
+                'storage_location',
+            ),
+        ),
     )
 
     class Meta:
         model = Asset
         fields = (
-            'name', 'asset_tag', 'serial', 'status', 'manufacturer',
-            'device_type', 'module_type', 'inventoryitem_type', 'storage_location',
-            'owner', 'supplier', 'order_number', 'purchase_date', 'warranty_start',
-            'warranty_end', 'tags', 'comments', 'storage_site',
+            'name',
+            'asset_tag',
+            'serial',
+            'status',
+            'manufacturer',
+            'device_type',
+            'module_type',
+            'inventoryitem_type',
+            'storage_location',
+            'owner',
+            'supplier',
+            'order_number',
+            'purchase_date',
+            'warranty_start',
+            'warranty_end',
+            'tags',
+            'comments',
+            'storage_site',
         )
         widgets = {
             'purchase_date': DatePicker(),
@@ -117,14 +158,15 @@ class SupplierForm(NetBoxModelForm):
     slug = SlugField()
     comments = CommentField()
 
-    fieldsets = (
-        ('Supplier', ('name', 'description', 'tags')),
-    )
+    fieldsets = (('Supplier', ('name', 'description', 'tags')),)
 
     class Meta:
         model = Supplier
         fields = (
-            'name', 'description', 'comments', 'tags',
+            'name',
+            'description',
+            'comments',
+            'tags',
         )
 
 
@@ -133,11 +175,19 @@ class InventoryItemTypeForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        ('Inventory Item Type', ('manufacturer', 'model', 'slug', 'part_number', 'tags')),
+        (
+            'Inventory Item Type',
+            ('manufacturer', 'model', 'slug', 'part_number', 'tags'),
+        ),
     )
 
     class Meta:
         model = InventoryItemType
         fields = (
-            'manufacturer', 'model', 'slug', 'part_number', 'tags', 'comments',
+            'manufacturer',
+            'model',
+            'slug',
+            'part_number',
+            'tags',
+            'comments',
         )
