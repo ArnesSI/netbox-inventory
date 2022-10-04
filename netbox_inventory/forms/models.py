@@ -3,6 +3,7 @@ from netbox.forms import NetBoxModelForm
 from utilities.forms import CommentField, DatePicker, DynamicModelChoiceField, SlugField
 from tenancy.models import Tenant
 from ..models import Asset, InventoryItemType, Supplier
+from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
     'AssetForm',
@@ -88,6 +89,28 @@ class AssetForm(NetBoxModelForm):
             'warranty_start': DatePicker(),
             'warranty_end': DatePicker(),
         }
+
+    def __init__(self, *args, **kwargs):
+        """Override the default __init__ method to add custom logic to the form.
+        We need to disable fields that are not editable based on the tags that are assigned to the asset.
+        """
+        super().__init__(*args, **kwargs)
+
+        if not self.instance.pk:
+            # If we are creating a new asset we can't disable fields
+            return
+
+        # Disable fields that should not be edited
+        tags = self.instance.tags.all().values_list('slug', flat=True)
+        tags_and_disabled_fields = get_tags_and_edit_protected_asset_fields()
+
+        for tag in tags:
+            if tag not in tags_and_disabled_fields:
+                continue
+
+            for field in tags_and_disabled_fields[tag]:
+                if field in self.fields:
+                    self.fields[field].disabled = True
 
 
 class SupplierForm(NetBoxModelForm):
