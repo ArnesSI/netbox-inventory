@@ -59,7 +59,7 @@ class AssetDeleteView(generic.ObjectDeleteView):
 
         if intersection_of_tags:
             error_msg = "Cannot delete asset {} protected by tags: {}.".format(
-                asset.name,
+                asset,
                 ", ".join(intersection_of_tags),
             )
             logger.info(error_msg)
@@ -105,7 +105,7 @@ class AssetBulkEditView(generic.BulkEditView):
         protected_fields_by_tags = get_tags_and_edit_protected_asset_fields()
 
         errors = []
-        protected_asset_names = []
+        protected_assets = []
 
         if '_apply' in request.POST:
             form = self.form(request.POST, initial=initial_data)
@@ -116,9 +116,9 @@ class AssetBulkEditView(generic.BulkEditView):
 
                 queryset = self.queryset.filter(pk__in=pk_list)
 
-                for obj in queryset:
-                    obj_tags = set(obj.tags.all().values_list('slug', flat=True))
-                    intersection_of_tags = set(obj_tags).intersection(
+                for asset in queryset:
+                    asset_tags = set(asset.tags.all().values_list("slug", flat=True))
+                    intersection_of_tags = set(asset_tags).intersection(
                         protected_fields_by_tags.keys()
                     )
 
@@ -135,22 +135,22 @@ class AssetBulkEditView(generic.BulkEditView):
                         if modified_fields.intersection(
                             protected_fields
                         ) or nullable.intersection(protected_fields):
-                            protected_asset_names.append(obj.name)
+                            protected_assets.append(asset)
 
                             fields = modified_fields.intersection(
                                 protected_fields
                             ).union(nullable.intersection(protected_fields))
                             errors.append(
-                                "Cannot edit asset '{}' fields protected by tag '{}': {}.".format(
-                                    obj.name,
+                                "Cannot edit asset {} fields protected by tag {}: {}.".format(
+                                    asset,
                                     tag,
-                                    ','.join(fields),
+                                    ",".join(fields),
                                 )
                             )
                 if errors:
-                    error_msg_protected_assets = f"Edit failed for all assets. Because of trying to modify protected fields on assets: {', '.join(set(protected_asset_names))}."
+                    error_msg_protected_assets = f"Edit failed for all assets. Because of trying to modify protected fields on assets: {', '.join(map(str, set(protected_assets)))}."
                     logger.info(errors + [error_msg_protected_assets])
-                    messages.warning(request, ' '.join(errors))
+                    messages.warning(request, " ".join(errors))
                     messages.warning(request, error_msg_protected_assets)
                     return redirect(self.get_return_url(request))
         return super().post(request, **kwargs)
@@ -178,9 +178,8 @@ class AssetBulkDeleteView(generic.BulkDeleteView):
         protected_assets = queryset.filter(tags__slug__in=protected_tags)
 
         if protected_assets:
-            protected_asset_names = protected_assets.values_list('name', flat=True)
             error_msg = "Cannot delete assets protected by tags: {}. Assets that can't be deleted: {}".format(
-                ', '.join(protected_tags), ', '.join(protected_asset_names)
+                ", ".join(protected_tags), ", ".join(map(str, protected_assets))
             )
             logger.info(error_msg)
             messages.warning(request, error_msg)
