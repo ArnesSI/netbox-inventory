@@ -41,12 +41,9 @@ def get_tags_that_protect_asset_from_deletion():
     Returns:
         list: list of tag slug strings
     """
-    tags = settings.PLUGINS_CONFIG['netbox_inventory'][
+    return settings.PLUGINS_CONFIG['netbox_inventory'][
         'asset_disable_deletion_for_tags'
     ]
-    if not tags:
-        return []
-    return tags
 
 
 def get_tags_and_edit_protected_asset_fields():
@@ -65,9 +62,8 @@ def get_tags_and_edit_protected_asset_fields():
     Returns:
         dict: dict of tag slug strings and list of field names
     """
-    tags = settings.PLUGINS_CONFIG['netbox_inventory'][
+    return settings.PLUGINS_CONFIG['netbox_inventory'][
         'asset_disable_editing_fields_for_tags'
     ]
-    if not tags:
-        return []
-    return tags
+
+
