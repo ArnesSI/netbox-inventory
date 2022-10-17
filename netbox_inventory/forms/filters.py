@@ -5,12 +5,13 @@ from utilities.forms import (
     DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
 )
 from ..choices import InventoryStatusChoices
-from ..models import Asset, InventoryItemType, Supplier
+from ..models import Asset, InventoryItemType, Purchase, Supplier
 
 
 __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
+    'PurchaseFilterForm',
 )
 
 
@@ -56,4 +57,9 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
 
 class SupplierFilterForm(NetBoxModelFilterSetForm):
     model = Supplier
+    tag = TagFilterField(model)
+
+
+class PurchaseFilterForm(NetBoxModelFilterSetForm):
+    model = Purchase
     tag = TagFilterField(model)
