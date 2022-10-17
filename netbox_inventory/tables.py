@@ -148,6 +148,7 @@ class SupplierTable(NetBoxTable):
             'pk',
             'id',
             'name',
+            'slug',
             'description',
             'comments',
             'asset_count',

@@ -2,7 +2,7 @@ from cProfile import label
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import (
-    DynamicModelMultipleChoiceField, MultipleChoiceField
+    DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
 )
 from ..choices import InventoryStatusChoices
 from ..models import Asset, InventoryItemType, Supplier
@@ -10,6 +10,7 @@ from ..models import Asset, InventoryItemType, Supplier
 
 __all__ = (
     'AssetFilterForm',
+    'SupplierFilterForm',
 )
 
 
@@ -51,3 +52,8 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label='Supplier',
     )
+
+
+class SupplierFilterForm(NetBoxModelFilterSetForm):
+    model = Supplier
+    tag = TagFilterField(model)
