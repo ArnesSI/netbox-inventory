@@ -5,7 +5,7 @@ from dcim.filtersets import DeviceFilterSet
 from dcim.models import Manufacturer
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
-from .models import Asset, InventoryItemType, Supplier
+from .models import Asset, InventoryItemType, Purchase, Supplier
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
@@ -21,12 +21,12 @@ class AssetFilterSet(NetBoxModelFilterSet):
         label='Inventory item type (slug)',
     )
     supplier_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='supplier',
+        field_name='purchase__supplier',
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
     )
     supplier = django_filters.ModelMultipleChoiceFilter(
-        field_name='supplier__name',
+        field_name='purchase__supplier__name',
         queryset=Supplier.objects.all(),
         label='Supplier (name)',
     )
@@ -82,6 +82,22 @@ class SupplierFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value) |
             Q(slug__icontains=value) |
             Q(description__icontains=value)
+        )
+        return queryset.filter(query)
+
+
+class PurchaseFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = Purchase
+        fields = (
+            'id', 'supplier', 'name', 'description'
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(name__icontains=value) |
+            Q(description__icontains=value) |
+            Q(supplier__name__icontains=value)
         )
         return queryset.filter(query)
 

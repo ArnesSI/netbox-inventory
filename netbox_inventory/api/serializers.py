@@ -7,7 +7,7 @@ from dcim.api.serializers import (
 )
 from netbox.api.serializers import NetBoxModelSerializer
 from .nested_serializers import *
-from ..models import Asset, InventoryItemType, Supplier
+from ..models import Asset, InventoryItemType, Purchase, Supplier
 
 
 
@@ -20,15 +20,15 @@ class AssetSerializer(NetBoxModelSerializer):
     module_type = NestedModuleTypeSerializer()
     module = NestedModuleSerializer()
     storage_location = NestedModuleSerializer()
-    supplier = NestedSupplierSerializer()
+    purchase = NestedPurchaseSerializer()
 
     class Meta:
         model = Asset
         fields = (
             'id', 'url', 'display', 'name', 'asset_tag', 'serial', 'status',
             'kind', 'device_type', 'device', 'module_type', 'module',
-            'tenant', 'contact', 'storage_location', 'owner', 'supplier',
-            'order_number', 'purchase_date', 'warranty_start', 'warranty_end',
+            'tenant', 'contact', 'storage_location', 'owner', 'purchase',
+            'warranty_start', 'warranty_end',
             'comments', 'tags', 'custom_fields', 'created', 'last_updated'
         )
 
@@ -38,11 +38,28 @@ class SupplierSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:supplier-detail'
     )
     asset_count = serializers.IntegerField(read_only=True)
+    purchase_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Supplier
         fields = (
             'id', 'url', 'display', 'name', 'slug', 'description', 'comments',
+            'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
+            'purchase_count',
+        )
+
+
+class PurchaseSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:purchase-detail'
+    )
+    supplier = NestedSupplierSerializer()
+    asset_count = serializers.IntegerField(read_only=True)
+    
+    class Meta:
+        model = Purchase
+        fields = (
+            'id', 'url', 'display', 'supplier', 'name', 'date', 'description', 'comments',
             'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
         )
 
