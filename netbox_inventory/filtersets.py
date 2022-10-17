@@ -74,12 +74,13 @@ class SupplierFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Supplier
         fields = (
-            'id', 'name', 'description',
+            'id', 'name', 'slug', 'description',
         )
 
     def search(self, queryset, name, value):
         query = Q(
             Q(name__icontains=value) |
+            Q(slug__icontains=value) |
             Q(description__icontains=value)
         )
         return queryset.filter(query)

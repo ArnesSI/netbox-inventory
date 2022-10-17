@@ -28,7 +28,7 @@ class NestedSupplierSerializer(WritableNestedSerializer):
 
     class Meta:
         model = Supplier
-        fields = ('id', 'url', 'display', 'name')
+        fields = ('id', 'url', 'display', 'name', 'slug')
 
 
 class NestedInventoryItemTypeSerializer(WritableNestedSerializer):

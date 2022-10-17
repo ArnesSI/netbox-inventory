@@ -42,7 +42,7 @@ class SupplierSerializer(NetBoxModelSerializer):
     class Meta:
         model = Supplier
         fields = (
-            'id', 'url', 'display', 'name', 'description', 'comments',
+            'id', 'url', 'display', 'name', 'slug', 'description', 'comments',
             'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
         )
 

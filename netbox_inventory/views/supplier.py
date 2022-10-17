@@ -15,6 +15,18 @@ __all__ = (
 class SupplierView(generic.ObjectView):
     queryset = models.Supplier.objects.all()
 
+    def get_extra_context(self, request, instance):
+        supplier_assets = models.Asset.objects.restrict(request.user, 'view').filter(
+            supplier=instance
+        )
+        asset_table = tables.AssetTable(supplier_assets, user=request.user)
+        asset_table.columns.hide('supplier')
+        asset_table.configure(request)
+
+        return {
+            'asset_table': asset_table,
+            'asset_count': models.Asset.objects.filter(supplier=instance).count(),
+        }
 
 class SupplierListView(generic.ObjectListView):
     queryset = models.Supplier.objects.annotate(
@@ -22,7 +34,7 @@ class SupplierListView(generic.ObjectListView):
     )
     table = tables.SupplierTable
     filterset = filtersets.SupplierFilterSet
-    #filterset_form = forms.SupplierFilterForm
+    filterset_form = forms.SupplierFilterForm
 
 
 class SupplierEditView(generic.ObjectEditView):

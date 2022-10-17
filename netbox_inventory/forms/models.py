@@ -155,15 +155,16 @@ class AssetForm(NetBoxModelForm):
 
 
 class SupplierForm(NetBoxModelForm):
-    slug = SlugField()
+    slug = SlugField(slug_source='name')
     comments = CommentField()
 
-    fieldsets = (('Supplier', ('name', 'description', 'tags')),)
+    fieldsets = (('Supplier', ('name', 'slug', 'description', 'tags')),)
 
     class Meta:
         model = Supplier
         fields = (
             'name',
+            'slug',
             'description',
             'comments',
             'tags',
