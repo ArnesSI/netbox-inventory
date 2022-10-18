@@ -6,7 +6,7 @@ A [Netbox](https://github.com/netbox-community/netbox) plugin for hardware inven
 
 Current v0.1.x model:
 
-![Asset - Individual View](docs/img/data_model-v0.1.x.png
+![Working Model](docs/img/data_model-v0.1.x.png)
 
 ## Features
 
