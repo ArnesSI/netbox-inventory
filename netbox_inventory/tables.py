@@ -142,6 +142,11 @@ class SupplierTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
+    purchase_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:purchase_list',
+        url_params={'supplier_id': 'pk'},
+        verbose_name='Purchases',
+    )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
         url_params={'supplier_id': 'pk'},
@@ -159,6 +164,7 @@ class SupplierTable(NetBoxTable):
             'slug',
             'description',
             'comments',
+            'purchase_count',
             'asset_count',
             'tags',
             'created',

@@ -26,10 +26,12 @@ class SupplierView(generic.ObjectView):
         return {
             'asset_table': asset_table,
             'asset_count': models.Asset.objects.filter(purchase__supplier=instance).count(),
+            'purchase_count': models.Purchase.objects.filter(supplier=instance).count(),
         }
 
 class SupplierListView(generic.ObjectListView):
     queryset = models.Supplier.objects.annotate(
+        purchase_count=count_related(models.Purchase, 'supplier'),
         asset_count=count_related(models.Asset, 'purchase__supplier'),
     )
     table = tables.SupplierTable
