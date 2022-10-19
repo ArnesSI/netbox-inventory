@@ -42,7 +42,7 @@ class AssetTable(NetBoxTable):
     purchase = tables.Column(
         linkify=True,
     )
-    purchase_date = tables.Column(
+    purchase_date = columns.DateColumn(
         verbose_name='Purchase date',
         accessor='purchase__date',
     )
