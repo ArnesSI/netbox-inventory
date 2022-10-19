@@ -15,7 +15,7 @@ class NetBoxInventoryConfig(PluginConfig):
         'used_status_name': 'used',
         'stored_status_name': 'stored',
         'sync_hardware_serial_asset_tag': False,
-        'asset_import_create_supplier': False,
+        'asset_import_create_purchase': False,
         'asset_import_create_device_type': False,
         'asset_import_create_module_type': False,
         'asset_import_create_inventoryitem_type': False,
