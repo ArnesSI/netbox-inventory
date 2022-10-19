@@ -87,10 +87,17 @@ class SupplierFilterSet(NetBoxModelFilterSet):
 
 
 class PurchaseFilterSet(NetBoxModelFilterSet):
+    supplier_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='supplier',
+        queryset=Supplier.objects.all(),
+        label='Supplier (ID)',
+    )
+    date = django_filters.DateFromToRangeFilter()
+
     class Meta:
         model = Purchase
         fields = (
-            'id', 'supplier', 'name', 'description'
+            'id', 'supplier', 'name', 'date', 'description'
         )
 
     def search(self, queryset, name, value):
