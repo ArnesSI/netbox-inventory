@@ -20,6 +20,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         queryset=InventoryItemType.objects.all(),
         label='Inventory item type (slug)',
     )
+    purchase_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='purchase',
+        queryset=Purchase.objects.all(),
+        label='Purchase (ID)',
+    )
     supplier_id = django_filters.ModelMultipleChoiceFilter(
         field_name='purchase__supplier',
         queryset=Supplier.objects.all(),
@@ -35,7 +40,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
         model = Asset
         fields = (
             'id', 'serial', 'status', 'manufacturer', 'device_type', 'module_type',
-            'inventoryitem_type_id', 'inventoryitem_type', 'supplier_id', 'supplier',
+            'inventoryitem_type_id', 'inventoryitem_type', 'purchase_id', 'supplier_id', 'supplier',
         )
 
     def search(self, queryset, name, value):

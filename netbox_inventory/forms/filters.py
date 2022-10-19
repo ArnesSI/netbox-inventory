@@ -49,6 +49,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         },
         label='Inventory item type'
     )
+    purchase_id = DynamicModelMultipleChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
+    )
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
