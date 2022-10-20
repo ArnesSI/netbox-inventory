@@ -103,6 +103,7 @@ class Asset(NetBoxModel):
         null=True,
     )
     tenant = models.ForeignKey(
+        help_text='Tenant using this asset',
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
         related_name='+',
@@ -110,6 +111,7 @@ class Asset(NetBoxModel):
         null=True,
     )
     contact = models.ForeignKey(
+        help_text='Contact using this asset',
         to='tenancy.Contact',
         on_delete=models.PROTECT,
         related_name='+',
