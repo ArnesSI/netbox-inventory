@@ -35,7 +35,17 @@ class AssetView(generic.ObjectView):
 
 
 class AssetListView(generic.ObjectListView):
-    queryset = models.Asset.objects.all()
+    queryset = models.Asset.objects.prefetch_related(
+        'device_type__manufacturer',
+        'module_type__manufacturer',
+        'inventoryitem_type__manufacturer',
+        'device',
+        'module',
+        'inventoryitem',
+        'owner',
+        'purchase__supplier',
+        'storage_location',
+    )
     table = tables.AssetTable
     filterset = filtersets.AssetFilterSet
     filterset_form = forms.AssetFilterForm

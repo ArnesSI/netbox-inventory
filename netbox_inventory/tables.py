@@ -35,6 +35,18 @@ class AssetTable(NetBoxTable):
         linkify=True,
         order_by=('device', 'module'),
     )
+    tenant = tables.Column(
+        linkify=True,
+    )
+    contact = tables.Column(
+        linkify=True,
+    )
+    storage_location = tables.Column(
+        linkify=True,
+    )
+    owner = tables.Column(
+        linkify=True,
+    )
     supplier = tables.Column(
         accessor='purchase__supplier',
         linkify=True,
@@ -49,12 +61,16 @@ class AssetTable(NetBoxTable):
     tags = columns.TagColumn()
     actions = columns.ActionsColumn(
         extra_buttons="""
-            {% if not record.device_id %}
-            <a href="{% url 'plugins:netbox_inventory:asset_create' record.pk %}" class="btn btn-sm btn-green" title="Create from asset">
+            {% if record.device_id %}
+            <a href="#" class="btn btn-sm btn-outline-dark disabled">
+                <i class="mdi mdi-vector-difference-ba" aria-hidden="true"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'plugins:netbox_inventory:asset_create' record.pk %}" class="btn btn-sm btn-green" title="Create hardware from asset">
                 <i class="mdi mdi-vector-difference-ba"></i>
             </a>
             {% endif %}
-            <a href="{% url 'plugins:netbox_inventory:asset_assign' record.pk %}" class="btn btn-sm btn-orange" title="Edit assignment">
+            <a href="{% url 'plugins:netbox_inventory:asset_assign' record.pk %}" class="btn btn-sm btn-orange" title="Edit hardware assignment">
                 <i class="mdi mdi-vector-link"></i>
             </a>
         """
