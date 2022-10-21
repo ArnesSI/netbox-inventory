@@ -212,7 +212,7 @@ class Asset(NetBoxModel):
         # e.g.: self.device_type and self.device.device_type must match
         # InventoryItem does not have FK to InventoryItemType
         if kind != 'inventoryitem' and hw and _type != getattr(hw, kind+'_type'):
-            raise ValidationError({kind: '{kind} type of {kind} does not match asset {kind} type'})
+            raise ValidationError({kind: f'{kind} type of {kind} does not match {kind} type of asset'})
         # ensure only one hardware is set and that it is correct kind
         # e.g. if self.device_type is set, we cannot have self.module or self.inventoryitem set
         for hw_other in hw_others:

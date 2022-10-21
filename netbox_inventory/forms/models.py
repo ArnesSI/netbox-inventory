@@ -1,5 +1,6 @@
 from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
 from netbox.forms import NetBoxModelForm
+from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms import CommentField, DatePicker, DynamicModelChoiceField, SlugField
 from tenancy.models import Tenant
 from ..models import Asset, InventoryItemType, Purchase, Supplier
@@ -148,6 +149,15 @@ class AssetForm(NetBoxModelForm):
             for field in tags_and_disabled_fields[tag]:
                 if field in self.fields:
                     self.fields[field].disabled = True
+
+        # if assigned to device/module/inventoryitem we can't change device_type/...
+        if (
+            self.instance.device or self.instance.module
+            or self.instance.inventoryitem
+        ):
+            self.fields['manufacturer'].disabled = True
+            for kind in HardwareKindChoices.values():
+                self.fields[f'{kind}_type'].disabled = True
 
 
 class SupplierForm(NetBoxModelForm):
