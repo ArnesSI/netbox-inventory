@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 purchase, new_purchase = Purchase.objects.get_or_create(name=asset.order_number, supplier=asset.supplier)
             elif asset.order_number:
                 supplier, _ = Supplier.objects.get_or_create(name='Unknown')
-                purchase, new_purchase = Purchase.object.get_or_create(name=asset.order_number, supplier=supplier)
+                purchase, new_purchase = Purchase.objects.get_or_create(name=asset.order_number, supplier=supplier)
             elif asset.supplier:
                 purchase, new_purchase = Purchase.objects.get_or_create(name='Unknown', supplier=asset.supplier)
             else:
