@@ -177,6 +177,9 @@ class Asset(NetBoxModel):
             return 'inventoryitem'
         assert False, f'Invalid hardware kind detected for asset {self.pk}'
 
+    def get_kind_display(self):
+        return dict(HardwareKindChoices)[self.kind]
+
     @property
     def hardware_type(self):
         return self.device_type or self.module_type or self.inventoryitem_type or None

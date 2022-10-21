@@ -19,6 +19,7 @@ class AssetTable(NetBoxTable):
         linkify=True,
     )
     kind = tables.Column(
+        accessor='get_kind_display',
         orderable=False,
     )
     manufacturer = tables.Column(
