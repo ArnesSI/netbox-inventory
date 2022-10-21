@@ -3,7 +3,10 @@
 {% load render_table from django_tables2 %}
 
 {% block breadcrumbs %}
-  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_inventory:supplier_list' %}">Purchases</a></li>
+  {{ block.super }}
+  <li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_inventory:purchase_list' %}?supplier_id={{ object.supplier.pk }}">{{ object.supplier }}</a>
+  </li>
 {% endblock %}
 
 {% block content %}
