@@ -62,7 +62,7 @@ class AssetTable(NetBoxTable):
     tags = columns.TagColumn()
     actions = columns.ActionsColumn(
         extra_buttons="""
-            {% if record.device_id %}
+            {% if record.hardware %}
             <a href="#" class="btn btn-sm btn-outline-dark disabled">
                 <i class="mdi mdi-vector-difference-ba" aria-hidden="true"></i>
             </a>
