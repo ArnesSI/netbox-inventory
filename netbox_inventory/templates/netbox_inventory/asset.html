@@ -1,7 +1,11 @@
 {% extends 'generic/object.html' %}
+{% load helpers %}
 
-{% block extra_controls %}
-<a class="btn btn-sm btn-orange" href="{% url "plugins:netbox_inventory:asset_assign" object.pk %}"><span class="mdi mdi-vector-link"></span> Assign</a>
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{ object.kind }}_type_id={{ object.hardware_type.pk }}">{{ object.hardware_type }}</a>
+  </li>
 {% endblock %}
 
 {% block content %}
@@ -13,42 +17,103 @@
           <table class="table table-hover attr-table">
             <tr>
               <th scope="row">Name</th>
-              <td>{{ object.name }}</td>
+              <td>{{ object.name|placeholder }}</td>
             </tr>
             <tr>
-              <th scope="row">Asset tag</th>
-              <td>{{ object.asset_tag }}</td>
+              <th scope="row">Asset Tag</th>
+              <td>{{ object.asset_tag|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">Serial Number</th>
               <td>{{ object.serial }}</td>
             </tr>
             <tr>
-              <th scope="row">Hardware Kind</th>
-              <td>{{ object.kind }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Hardware Type</th>
-              <td>{{ object.hardware_type.manufacturer }} {{ object.hardware_type|linkify }}</td>
-            </tr>
-            <tr>
               <th scope="row">Status</th>
-              <td>{{ object.get_status_display }}</td>
+              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
             </tr>
             <tr>
-              <th scope="row">Used as</th>
-              <td>{{ object.hardware|linkify }}</td>
+              <th scope="row">{{ object.get_kind_display }} Type</th>
+              <td><a href="{{object.hardware_type.get_absolute_url}}">{{ object.hardware_type.manufacturer }} {{ object.hardware_type }}</a></td>
             </tr>
             <tr>
-              <th scope="row">Used by</th>
-              <td>{{ object.used_by|linkify }}</td>
+              <th scope="row">Storage Location</th>
+              <td>
+                {% if object.storage_location %}
+                  {{ object.storage_location.site }} /
+                {% endif %}
+                {{ object.storage_location|linkify|placeholder }}</td>
             </tr>
           </table>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-header">Assigned To</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Tenant</th>
+              <td>
+                {% if object.tenant.group %}
+                  {{ object.tenant.group|linkify }} /
+                {% endif %}
+                {{ object.tenant|linkify|placeholder }}
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Contact</th>
+              <td>{{ object.contact|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">{{ object.get_kind_display }}</th>
+              <td>{{ object.hardware|linkify|placeholder }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="card-footer text-end noprint">
+          {% if object.hardware %}
+          <a href="#" class="btn btn-sm btn-outline-dark disabled">
+            <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
+          </a>
+          {% else %}
+          <a href="{% url 'plugins:netbox_inventory:asset_create' object.pk %}" class="btn btn-sm btn-green" title="Create a new {{ object.get_kind_display }} from this asset">
+            <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
+          </a>
+          {% endif %}
+          <a href="{% url 'plugins:netbox_inventory:asset_assign' object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-orange">
+            <span class="mdi mdi-vector-link" aria-hidden="true"></span> Edit Assignment
+          </a>
         </div>
       </div>
       {% include 'inc/panels/custom_fields.html' %}
     </div>
     <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Purchase</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Owner</th>
+              <td>{{ object.owner|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Purchase</th>
+              <td>{{ object.purchase|linkify|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Purchase date</th>
+              <td>{{ object.purchase.date|annotated_date|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Warranty start</th>
+              <td>{{ object.warranty_start|annotated_date|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Warranty end</th>
+              <td>{{ object.warranty_end|annotated_date|placeholder }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
     </div>
