@@ -1,6 +1,6 @@
-{% extends 'generic/object_edit.html' %}
+{% extends template_extends|default:'generic/object_edit.html' %}
 
-{% block title %}Add a new module and associate with asset {{ asset }}{% endblock %}
+{% block title %}Add a new {{ asset.get_kind_display }} and associate with asset {{ asset }}{% endblock %}
 
 {% block buttons %}
 <a class="btn btn-outline-danger" href="{{ return_url }}">Cancel</a>

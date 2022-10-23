@@ -67,7 +67,7 @@ class AssetTable(NetBoxTable):
                 <i class="mdi mdi-vector-difference-ba" aria-hidden="true"></i>
             </a>
             {% else %}
-            <a href="{% url 'plugins:netbox_inventory:asset_create' record.pk %}" class="btn btn-sm btn-green" title="Create hardware from asset">
+            <a href="{% url 'plugins:netbox_inventory:asset_'|add:record.kind|add:'_create' %}?asset_id={{ record.pk }}" class="btn btn-sm btn-green" title="Create hardware from asset">
                 <i class="mdi mdi-vector-difference-ba"></i>
             </a>
             {% endif %}
