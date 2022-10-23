@@ -262,9 +262,16 @@ class Asset(NetBoxModel):
                 old_hw.serial = ''
                 old_hw.asset_tag = None
                 old_hw.save()
-            new_hw.serial = self.serial
-            new_hw.asset_tag = new_asset_tag
-            new_hw.save()
+            # if new_hw already has correct values, don't save it again
+            new_hw_save = False
+            if new_hw.serial != self.serial:
+                new_hw.serial = self.serial
+                new_hw_save = True
+            if new_hw.asset_tag != new_asset_tag:
+                new_hw.asset_tag = new_asset_tag
+                new_hw_save = True
+            if new_hw_save:
+                new_hw.save()
         elif self.serial != old_serial or self.asset_tag != old_asset_tag:
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:
