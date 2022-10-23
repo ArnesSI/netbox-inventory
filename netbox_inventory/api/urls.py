@@ -9,6 +9,8 @@ router.register('assets', views.AssetViewSet)
 router.register('inventory-item-types', views.InventoryItemTypeViewSet)
 router.register('suppliers', views.SupplierViewSet)
 router.register('purchases', views.PurchaseViewSet)
-router.register('devices', views.DeviceAssetViewSet)
+router.register('dcim/devices', views.DeviceAssetViewSet)
+router.register('dcim/modules', views.ModuleAssetViewSet)
+router.register('dcim/inventory-items', views.InventoryItemAssetViewSet)
 
 urlpatterns = router.urls

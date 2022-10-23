@@ -1,4 +1,4 @@
-from dcim.api.views import DeviceViewSet
+from dcim.api.views import DeviceViewSet, InventoryItemViewSet, ModuleViewSet
 from netbox.api.viewsets import NetBoxModelViewSet
 from utilities.utils import count_related
 from .. import filtersets, models
@@ -11,11 +11,6 @@ class AssetViewSet(NetBoxModelViewSet):
     )
     serializer_class = AssetSerializer
     filterset_class = filtersets.AssetFilterSet
-
-
-class DeviceAssetViewSet(DeviceViewSet):
-    """Adds option to filter on asset assignemnet"""
-    filterset_class = filtersets.DeviceAssetFilterSet
 
 
 class SupplierViewSet(NetBoxModelViewSet):
@@ -41,3 +36,18 @@ class InventoryItemTypeViewSet(NetBoxModelViewSet):
     )
     serializer_class = InventoryItemTypeSerializer
     filterset_class = filtersets.InventoryItemTypeFilterSet
+
+
+class DeviceAssetViewSet(DeviceViewSet):
+    """Adds option to filter on asset assignemnet"""
+    filterset_class = filtersets.DeviceAssetFilterSet
+
+
+class ModuleAssetViewSet(ModuleViewSet):
+    """Adds option to filter on asset assignemnet"""
+    filterset_class = filtersets.ModuleAssetFilterSet
+
+
+class InventoryItemAssetViewSet(InventoryItemViewSet):
+    """Adds option to filter on asset assignemnet"""
+    filterset_class = filtersets.InventoryItemAssetFilterSet

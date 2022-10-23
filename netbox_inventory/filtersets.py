@@ -1,7 +1,7 @@
 from django.db.models import Q
 import django_filters
 
-from dcim.filtersets import DeviceFilterSet
+from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
 from dcim.models import Manufacturer, DeviceType, ModuleType, Site, Location
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
@@ -157,19 +157,6 @@ class AssetFilterSet(NetBoxModelFilterSet):
             )
 
 
-class DeviceAssetFilterSet(DeviceFilterSet):
-    has_asset_assigned = django_filters.BooleanFilter(
-        method='_has_asset_assigned',
-        label='Has an asset assigned',
-    )
-
-    def _has_asset_assigned(self, queryset, name, value):
-        params = Q(assigned_asset__isnull=False)
-        if value:
-            return queryset.filter(params)
-        return queryset.exclude(params)
-
-
 class SupplierFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Supplier
@@ -233,3 +220,26 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
             Q(part_number__icontains=value)
         )
         return queryset.filter(query)
+
+
+class HasAssetFilterMixin(NetBoxModelFilterSet):
+    has_asset_assigned = django_filters.BooleanFilter(
+        method='_has_asset_assigned',
+        label='Has an asset assigned',
+    )
+
+    def _has_asset_assigned(self, queryset, name, value):
+        params = Q(assigned_asset__isnull=False)
+        if value:
+            return queryset.filter(params)
+        return queryset.exclude(params)
+
+
+class DeviceAssetFilterSet(HasAssetFilterMixin, DeviceFilterSet):
+    pass
+
+class ModuleAssetFilterSet(HasAssetFilterMixin, ModuleFilterSet):
+    pass
+
+class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
+    pass
