@@ -35,8 +35,8 @@ class Asset(NetBoxModel):
         help_text='Identifier assigned by owner',
         max_length=50,
         blank=True,
-        null=False,
-        default='',
+        null=True,
+        default=None,
     )
     serial = models.CharField(
         help_text='Identifier assigned by manufacturer',
