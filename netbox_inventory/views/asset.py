@@ -19,7 +19,6 @@ __all__ = (
     'AssetBulkImportView',
     'AssetBulkEditView',
     'AssetBulkDeleteView',
-    'AssetAssignView',
 )
 
 
@@ -190,18 +189,3 @@ class AssetBulkDeleteView(generic.BulkDeleteView):
             return redirect(self.get_return_url(request))
 
         return super().post(request, *args, **kwargs)
-
-
-class AssetAssignView(generic.ObjectEditView):
-    queryset = models.Asset.objects.all()
-    template_name = 'netbox_inventory/asset_assign.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        # Set the form class based on the type of hardware being assigned
-        obj = self.get_object(**kwargs)
-        self.form = {
-            'device': forms.AssetAssignDeviceForm,
-            'module': forms.AssetAssignModuleForm,
-            'inventoryitem': forms.AssetAssignInventoryItemForm,
-        }[obj.kind]
-        return super().dispatch(request, *args, **kwargs)
