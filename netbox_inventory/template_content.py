@@ -1,13 +1,16 @@
 from extras.plugins import PluginTemplateExtension
+
 from .models import Asset
+from .utils import get_asset_warranty_context
+
 
 class AssetInfoExtension(PluginTemplateExtension):
     def left_page(self):
         object = self.context.get('object')
         asset = Asset.objects.filter(**{self.kind:object}).first()
-        return self.render('netbox_inventory/inc/asset_info.html', extra_context={
-            'asset': asset,
-        })
+        context = {'asset': asset}
+        context.update(get_asset_warranty_context(asset))
+        return self.render('netbox_inventory/inc/asset_info.html', extra_context=context)
 
 
 class DeviceAssetInfo(AssetInfoExtension):

@@ -18,12 +18,10 @@
         <td>{{ asset.owner|linkify|placeholder }}</td>
       </tr>
       <tr>
-        <th scope="row">Warranty start</th>
-        <td>{{ asset.warranty_start|annotated_date|placeholder }}</td>
-      </tr>
-      <tr>
-        <th scope="row">Warranty end</th>
-        <td>{{ asset.warranty_end|annotated_date|placeholder }}</td>
+        <th>Warranty remaining</th>
+        <td>
+          {% include "netbox_inventory/inc/asset_warranty.html" with asset=asset %}
+        </td>
       </tr>
     </table>
   {% else %}

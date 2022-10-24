@@ -7,6 +7,7 @@ from utilities.forms import ConfirmationForm, restrict_form_fields
 
 from .. import filtersets, forms, models, tables
 from ..utils import (
+    get_asset_warranty_context,
     get_tags_and_edit_protected_asset_fields,
     get_tags_that_protect_asset_from_deletion,
 )
@@ -24,6 +25,11 @@ __all__ = (
 
 class AssetView(generic.ObjectView):
     queryset = models.Asset.objects.all()
+
+    def get_extra_context(self, request, instance):
+        context = super().get_extra_context(request, instance)
+        context.update(get_asset_warranty_context(instance))
+        return context
 
 
 class AssetListView(generic.ObjectListView):

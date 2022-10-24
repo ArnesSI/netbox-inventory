@@ -1,5 +1,6 @@
 {% extends 'generic/object.html' %}
 {% load helpers %}
+{% load humanize %}
 
 {% block breadcrumbs %}
   {{ block.super }}
@@ -110,6 +111,12 @@
             <tr>
               <th scope="row">Warranty end</th>
               <td>{{ object.warranty_end|annotated_date|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Warranty remaining</th>
+              <td>
+                {% include "netbox_inventory/inc/asset_warranty.html" with asset=object %}
+              </td>
             </tr>
           </table>
         </div>

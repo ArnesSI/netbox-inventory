@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.conf import settings
 from django.db import models
 from django.forms import ValidationError
@@ -187,6 +189,37 @@ class Asset(NetBoxModel):
     @property
     def hardware(self):
         return self.device or self.module or self.inventoryitem or None
+
+    @property
+    def warranty_remaining(self):
+        """
+            How many days are left in warranty period.
+            Returns negative duration if period has not started yet
+            Return None if warranty_end not defined
+        """
+        if self.warranty_end:
+            if self.warranty_start and self.warranty_start > date.today():
+                return date.today() - self.warranty_start
+            else:
+                return self.warranty_end - date.today()
+        return None
+
+    @property
+    def warranty_elapsed(self):
+        """
+            How many days have passed in warranty period.
+            Returns negative duration if period has not started yet
+            Return None if warranty_start not defined
+        """
+        if self.warranty_start:
+            return date.today() - self.warranty_start
+        return None
+
+    @property
+    def warranty_total(self):
+        if self.warranty_end and self.warranty_start:
+            return self.warranty_end - self.warranty_start
+        return None
 
     def clean(self):
         self.validate_hardware_types()
