@@ -30,17 +30,4 @@
     <div class="text-muted">None</div>
   {% endif %}
   </div>
-  {% if asset %}
-  <div class="card-footer text-end noprint">
-    <a href="{% url 'plugins:netbox_inventory:asset' asset.pk %}?content_type={{ object|content_type_id }}&object_id={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
-      <i class="mdi mdi-vector-link" aria-hidden="true"></i> Edit assignment
-    </a>
-  </div>
-  {% else %}
-  <div class="card-footer text-end noprint">
-    <a href="{% url 'plugins:netbox_inventory:asset_list' %}?content_type={{ object|content_type_id }}&object_id={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
-      <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Assign asset
-    </a>
-  </div>
-  {% endif %}
 </div>
