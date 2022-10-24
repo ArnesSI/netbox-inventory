@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='netbox-inventory',
-    version='0.1.3',
+    version='0.9.0',
     description='Inventory asset management in NetBox',
     install_requires=[],
     packages=find_packages(),
