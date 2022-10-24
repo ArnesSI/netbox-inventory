@@ -2,12 +2,13 @@ from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
 from netbox.forms import NetBoxModelForm
 from utilities.forms import CommentField, DatePicker, DynamicModelChoiceField, SlugField
 from tenancy.models import Tenant
-from ..models import Asset, InventoryItemType, Supplier
+from ..models import Asset, InventoryItemType, Purchase, Supplier
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
     'AssetForm',
     'SupplierForm',
+    'PurchaseForm',
     'InventoryItemTypeForm',
 )
 
@@ -49,10 +50,10 @@ class AssetForm(NetBoxModelForm):
         help_text=Asset._meta.get_field('owner').help_text,
         required=not Asset._meta.get_field('owner').blank,
     )
-    supplier = DynamicModelChoiceField(
-        queryset=Supplier.objects.all(),
-        help_text=Asset._meta.get_field('supplier').help_text,
-        required=not Asset._meta.get_field('supplier').blank,
+    purchase = DynamicModelChoiceField(
+        queryset=Purchase.objects.all(),
+        help_text=Asset._meta.get_field('purchase').help_text,
+        required=not Asset._meta.get_field('purchase').blank,
     )
     storage_site = DynamicModelChoiceField(
         queryset=Site.objects.all(),
@@ -87,9 +88,7 @@ class AssetForm(NetBoxModelForm):
             'Purchase',
             (
                 'owner',
-                'supplier',
-                'order_number',
-                'purchase_date',
+                'purchase',
                 'warranty_start',
                 'warranty_end',
             ),
@@ -116,9 +115,7 @@ class AssetForm(NetBoxModelForm):
             'inventoryitem_type',
             'storage_location',
             'owner',
-            'supplier',
-            'order_number',
-            'purchase_date',
+            'purchase',
             'warranty_start',
             'warranty_end',
             'tags',
@@ -126,7 +123,6 @@ class AssetForm(NetBoxModelForm):
             'storage_site',
         )
         widgets = {
-            'purchase_date': DatePicker(),
             'warranty_start': DatePicker(),
             'warranty_end': DatePicker(),
         }
@@ -169,6 +165,26 @@ class SupplierForm(NetBoxModelForm):
             'comments',
             'tags',
         )
+
+
+class PurchaseForm(NetBoxModelForm):
+    comments = CommentField()
+
+    fieldsets = (('Purchase', ('supplier', 'name', 'date', 'description', 'tags')),)
+
+    class Meta:
+        model = Purchase
+        fields = (
+            'supplier',
+            'name',
+            'date',
+            'description',
+            'comments',
+            'tags',
+        )
+        widgets = {
+            'date': DatePicker(),
+        }
 
 
 class InventoryItemTypeForm(NetBoxModelForm):

@@ -5,7 +5,7 @@ from dcim.filtersets import DeviceFilterSet
 from dcim.models import Manufacturer
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
-from .models import Asset, InventoryItemType, Supplier
+from .models import Asset, InventoryItemType, Purchase, Supplier
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
@@ -20,13 +20,18 @@ class AssetFilterSet(NetBoxModelFilterSet):
         queryset=InventoryItemType.objects.all(),
         label='Inventory item type (slug)',
     )
+    purchase_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='purchase',
+        queryset=Purchase.objects.all(),
+        label='Purchase (ID)',
+    )
     supplier_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='supplier',
+        field_name='purchase__supplier',
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
     )
     supplier = django_filters.ModelMultipleChoiceFilter(
-        field_name='supplier__name',
+        field_name='purchase__supplier__name',
         queryset=Supplier.objects.all(),
         label='Supplier (name)',
     )
@@ -35,7 +40,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
         model = Asset
         fields = (
             'id', 'serial', 'status', 'manufacturer', 'device_type', 'module_type',
-            'inventoryitem_type_id', 'inventoryitem_type', 'supplier_id', 'supplier',
+            'inventoryitem_type_id', 'inventoryitem_type', 'purchase_id', 'supplier_id', 'supplier',
         )
 
     def search(self, queryset, name, value):
@@ -82,6 +87,29 @@ class SupplierFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value) |
             Q(slug__icontains=value) |
             Q(description__icontains=value)
+        )
+        return queryset.filter(query)
+
+
+class PurchaseFilterSet(NetBoxModelFilterSet):
+    supplier_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='supplier',
+        queryset=Supplier.objects.all(),
+        label='Supplier (ID)',
+    )
+    date = django_filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = Purchase
+        fields = (
+            'id', 'supplier', 'name', 'date', 'description'
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(name__icontains=value) |
+            Q(description__icontains=value) |
+            Q(supplier__name__icontains=value)
         )
         return queryset.filter(query)
 

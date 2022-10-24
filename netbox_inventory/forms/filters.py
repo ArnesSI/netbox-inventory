@@ -1,16 +1,18 @@
-from cProfile import label
+from django import forms
+
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import (
-    DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
+    DatePicker, DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
 )
 from ..choices import InventoryStatusChoices
-from ..models import Asset, InventoryItemType, Supplier
+from ..models import Asset, InventoryItemType, Purchase, Supplier
 
 
 __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
+    'PurchaseFilterForm',
 )
 
 
@@ -47,6 +49,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         },
         label='Inventory item type'
     )
+    purchase_id = DynamicModelMultipleChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
+    )
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
@@ -56,4 +63,25 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
 
 class SupplierFilterForm(NetBoxModelFilterSetForm):
     model = Supplier
+    tag = TagFilterField(model)
+
+
+class PurchaseFilterForm(NetBoxModelFilterSetForm):
+    model = Purchase
+
+    supplier_id = DynamicModelMultipleChoiceField(
+        queryset=Supplier.objects.all(),
+        required=False,
+        label='Supplier',
+    )
+    date_after = forms.DateField(
+        required=False,
+        label='Purchased on or after',
+        widget=DatePicker,
+    )
+    date_before = forms.DateField(
+        required=False,
+        label='Purchased on or before',
+        widget=DatePicker,
+    )
     tag = TagFilterField(model)

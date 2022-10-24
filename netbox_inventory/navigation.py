@@ -1,4 +1,3 @@
-import imp
 from extras.plugins import PluginMenuButton, PluginMenuItem
 from utilities.choices import ButtonColorChoices
 
@@ -33,6 +32,21 @@ supplier_buttons = [
     # )
 ]
 
+purchase_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:purchase_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        color=ButtonColorChoices.GREEN
+    ),
+    # PluginMenuButton(
+    #     link='plugins:netbox_inventory:purchase_import',
+    #     title='Import',
+    #     icon_class='mdi mdi-upload',
+    #     color=ButtonColorChoices.CYAN,
+    # )
+]
+
 inventoryitemtype_buttons = [
     PluginMenuButton(
         link='plugins:netbox_inventory:inventoryitemtype_add',
@@ -58,6 +72,11 @@ menu_items = (
         link='plugins:netbox_inventory:supplier_list',
         link_text='Suppliers',
         buttons=supplier_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:purchase_list',
+        link_text='Purchases',
+        buttons=purchase_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:inventoryitemtype_list',

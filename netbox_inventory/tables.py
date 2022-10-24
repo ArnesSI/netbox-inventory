@@ -2,7 +2,7 @@ from django.db.models.functions import Coalesce
 import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
-from .models import Asset, InventoryItemType, Supplier
+from .models import Asset, InventoryItemType, Purchase, Supplier
 
 __all__ = (
     'AssetTable',
@@ -36,7 +36,15 @@ class AssetTable(NetBoxTable):
         order_by=('device', 'module'),
     )
     supplier = tables.Column(
+        accessor='purchase__supplier',
         linkify=True,
+    )
+    purchase = tables.Column(
+        linkify=True,
+    )
+    purchase_date = columns.DateColumn(
+        verbose_name='Purchase date',
+        accessor='purchase__date',
     )
     tags = columns.TagColumn()
     actions = columns.ActionsColumn(
@@ -108,7 +116,7 @@ class AssetTable(NetBoxTable):
             'storage_location',
             'owner',
             'supplier',
-            'order_number',
+            'purchase',
             'purchase_date',
             'warranty_start',
             'warranty_end',
@@ -134,6 +142,11 @@ class SupplierTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
+    purchase_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:purchase_list',
+        url_params={'supplier_id': 'pk'},
+        verbose_name='Purchases',
+    )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
         url_params={'supplier_id': 'pk'},
@@ -151,6 +164,7 @@ class SupplierTable(NetBoxTable):
             'slug',
             'description',
             'comments',
+            'purchase_count',
             'asset_count',
             'tags',
             'created',
@@ -159,6 +173,45 @@ class SupplierTable(NetBoxTable):
         )
         default_columns = (
             'name',
+            'asset_count',
+        )
+
+
+class PurchaseTable(NetBoxTable):
+    supplier = tables.Column(
+        linkify=True,
+    )
+    name = tables.Column(
+        linkify=True,
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'purchase_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Purchase
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'supplier',
+            'date',
+            'description',
+            'comments',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'supplier',
+            'date',
             'asset_count',
         )
 

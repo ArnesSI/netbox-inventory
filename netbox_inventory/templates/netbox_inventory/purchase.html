@@ -1,15 +1,16 @@
 {% extends 'generic/object.html' %}
+{% load helpers %}
 {% load render_table from django_tables2 %}
 
 {% block breadcrumbs %}
-  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_inventory:supplier_list' %}">Suppliers</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_inventory:supplier_list' %}">Purchases</a></li>
 {% endblock %}
 
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
       <div class="card">
-        <h5 class="card-header">Supplier</h5>
+        <h5 class="card-header">Purchase</h5>
         <div class="card-body">
           <table class="table table-hover attr-table">
             <tr>
@@ -17,14 +18,16 @@
               <td>{{ object.name }}</td>
             </tr>
             <tr>
-              <th scope="row">Description</th>
-              <td>{{ object.description }}</td>
+              <th scope="row">Supplier</th>
+              <td>{{ object.supplier|linkify }}</td>
             </tr>
             <tr>
-              <th scope="row">Purchases</th>
-              <td>
-                <a href="{% url 'plugins:netbox_inventory:purchase_list' %}?supplier_id={{ object.pk }}">{{ purchase_count }}</a>
-              </td>
+              <th scope="row">Date</th>
+              <td>{{ object.date|annotated_date|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Description</th>
+              <td>{{ object.description|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">Assets</th>
@@ -45,7 +48,7 @@
   <div class="row mb-3">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Supplied Assets</h5>
+        <h5 class="card-header">Purchased Assets</h5>
         <div class="card-body table-responsive">
           {% render_table asset_table 'inc/table.html' %}
           {% include 'inc/paginator.html' with paginator=asset_table.paginator page=asset_table.page %}

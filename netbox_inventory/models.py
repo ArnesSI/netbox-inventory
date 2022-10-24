@@ -137,22 +137,11 @@ class Asset(NetBoxModel):
         blank=True,
         null=True,
     )
-    supplier = models.ForeignKey(
-        help_text='Legal entity that sold this asset',
-        to='netbox_inventory.Supplier',
+    purchase = models.ForeignKey(
+        help_text='Purchase through which this asset was purchased',
+        to='netbox_inventory.Purchase',
         on_delete=models.PROTECT,
         related_name='assets',
-        blank=True,
-        null=True,
-    )
-    order_number = models.CharField(
-        help_text='Purchase order or invoice number or simmilar',
-        max_length=128,
-        blank=True,
-        null=False,
-    )
-    purchase_date = models.DateField(
-        help_text='Date when this asset was purchased',
         blank=True,
         null=True,
     )
@@ -173,8 +162,7 @@ class Asset(NetBoxModel):
 
     clone_fields = [
         'status', 'device_type', 'module_type', 'inventoryitem_type', 'tenant', 'contact',
-        'storage_location', 'owner', 'supplier', 'order_number', 'purchase_date',
-        'warranty_start', 'warranty_end', 'comments'
+        'storage_location', 'owner', 'purchase', 'warranty_start', 'warranty_end', 'comments'
     ]
 
     @property
@@ -332,6 +320,51 @@ class Supplier(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:supplier', args=[self.pk])
+
+
+class Purchase(NetBoxModel):
+    """
+    Represents a purchase of a set of Assets from a Supplier.
+    """
+    name = models.CharField(
+        max_length=100
+    )
+    supplier = models.ForeignKey(
+        help_text='Legal entity this purchase was made at',
+        to='netbox_inventory.Supplier',
+        on_delete=models.PROTECT,
+        related_name='purchases',
+        blank=False,
+        null=False,
+    )
+    date = models.DateField(
+        help_text='Date when this purchase was made',
+        blank=True,
+        null=True,
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    comments = models.TextField(
+        blank=True
+    )
+
+    clone_fields = [
+        'supplier', 'date', 'description', 'comments'
+    ]
+
+    class Meta:
+        ordering = ['supplier', 'name']
+        unique_together = (
+            ('supplier', 'name'),
+        )
+
+    def __str__(self):
+        return f'{self.supplier} {self.name}'
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:purchase', args=[self.pk])
 
 
 class InventoryItemType(NetBoxModel):

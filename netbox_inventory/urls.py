@@ -32,6 +32,18 @@ urlpatterns = (
     path('suppliers/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='supplier_changelog', kwargs={'model': models.Supplier}),
     path('suppliers/<int:pk>/journal/', ObjectJournalView.as_view(), name='supplier_journal', kwargs={'model': models.Supplier}),
 
+    # Purchases
+    path('purchases/', views.PurchaseListView.as_view(), name='purchase_list'),
+    path('purchases/add/', views.PurchaseEditView.as_view(), name='purchase_add'),
+    #path('purchases/import/', views.PurchaseBulkImportView.as_view(), name='purchase_import'),
+    #path('purchases/edit/', views.PurchaseBulkEditView.as_view(), name='purchase_bulk_edit'),
+    path('purchases/delete/', views.PurchaseBulkDeleteView.as_view(), name='purchase_bulk_delete'),
+    path('purchases/<int:pk>', views.PurchaseView.as_view(), name='purchase'),
+    path('purchases/<int:pk>/edit/', views.PurchaseEditView.as_view(), name='purchase_edit'),
+    path('purchases/<int:pk>/delete/', views.PurchaseDeleteView.as_view(), name='purchase_delete'),
+    path('purchases/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='purchase_changelog', kwargs={'model': models.Purchase}),
+    path('purchases/<int:pk>/journal/', ObjectJournalView.as_view(), name='purchase_journal', kwargs={'model': models.Purchase}),
+
     # InventoryItemTypes
     path('inventory-item-types/', views.InventoryItemTypeListView.as_view(), name='inventoryitemtype_list'),
     path('inventory-item-types/add/', views.InventoryItemTypeEditView.as_view(), name='inventoryitemtype_add'),
