@@ -8,8 +8,6 @@ import taggit.managers
 
 class Migration(migrations.Migration):
 
-    replaces = [('netbox_inventory', '0001_initial'), ('netbox_inventory', '0002_supplier_slug'), ('netbox_inventory', '0003_alter_supplier_slug'), ('netbox_inventory', '0004_add_purchase'), ('netbox_inventory', '0005_alter_asset_asset_tag')]
-
     initial = True
 
     dependencies = [
