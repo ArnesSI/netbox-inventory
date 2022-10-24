@@ -35,8 +35,8 @@ class Asset(NetBoxModel):
         help_text='Identifier assigned by owner',
         max_length=50,
         blank=True,
-        null=False,
-        default='',
+        null=True,
+        default=None,
     )
     serial = models.CharField(
         help_text='Identifier assigned by manufacturer',
@@ -103,6 +103,7 @@ class Asset(NetBoxModel):
         null=True,
     )
     tenant = models.ForeignKey(
+        help_text='Tenant using this asset',
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
         related_name='+',
@@ -110,6 +111,7 @@ class Asset(NetBoxModel):
         null=True,
     )
     contact = models.ForeignKey(
+        help_text='Contact using this asset',
         to='tenancy.Contact',
         on_delete=models.PROTECT,
         related_name='+',
@@ -175,6 +177,9 @@ class Asset(NetBoxModel):
             return 'inventoryitem'
         assert False, f'Invalid hardware kind detected for asset {self.pk}'
 
+    def get_kind_display(self):
+        return dict(HardwareKindChoices)[self.kind]
+
     @property
     def hardware_type(self):
         return self.device_type or self.module_type or self.inventoryitem_type or None
@@ -210,7 +215,7 @@ class Asset(NetBoxModel):
         # e.g.: self.device_type and self.device.device_type must match
         # InventoryItem does not have FK to InventoryItemType
         if kind != 'inventoryitem' and hw and _type != getattr(hw, kind+'_type'):
-            raise ValidationError({kind: '{kind} type of {kind} does not match asset {kind} type'})
+            raise ValidationError({kind: f'{kind} type of {kind} does not match {kind} type of asset'})
         # ensure only one hardware is set and that it is correct kind
         # e.g. if self.device_type is set, we cannot have self.module or self.inventoryitem set
         for hw_other in hw_others:
@@ -257,9 +262,16 @@ class Asset(NetBoxModel):
                 old_hw.serial = ''
                 old_hw.asset_tag = None
                 old_hw.save()
-            new_hw.serial = self.serial
-            new_hw.asset_tag = new_asset_tag
-            new_hw.save()
+            # if new_hw already has correct values, don't save it again
+            new_hw_save = False
+            if new_hw.serial != self.serial:
+                new_hw.serial = self.serial
+                new_hw_save = True
+            if new_hw.asset_tag != new_asset_tag:
+                new_hw.asset_tag = new_asset_tag
+                new_hw_save = True
+            if new_hw_save:
+                new_hw.save()
         elif self.serial != old_serial or self.asset_tag != old_asset_tag:
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:

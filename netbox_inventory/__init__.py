@@ -23,5 +23,8 @@ class NetBoxInventoryConfig(PluginConfig):
         'asset_disable_deletion_for_tags': [],
     }
 
+    def ready(self):
+        super().ready()
+        import netbox_inventory.signals
 
 config = NetBoxInventoryConfig

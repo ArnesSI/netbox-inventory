@@ -18,7 +18,9 @@ urlpatterns = (
     path('assets/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='asset_changelog', kwargs={'model': models.Asset}),
     path('assets/<int:pk>/journal/', ObjectJournalView.as_view(), name='asset_journal', kwargs={'model': models.Asset}),
     path('assets/<int:pk>/assign/', views.AssetAssignView.as_view(), name='asset_assign'),
-    path('assets/<int:pk>/create/', views.AssetCreateHardwareView.as_view(), name='asset_create'),
+    path('assets/device/create/', views.AssetDeviceCreateView.as_view(), name='asset_device_create'),
+    path('assets/module/create/', views.AssetModuleCreateView.as_view(), name='asset_module_create'),
+    path('assets/inventory-item/create/', views.AssetInventoryItemCreateView.as_view(), name='asset_inventoryitem_create'),
 
     # Suppliers
     path('suppliers/', views.SupplierListView.as_view(), name='supplier_list'),
