@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.conf import settings
 from django.db import models
 from django.forms import ValidationError
@@ -35,8 +37,8 @@ class Asset(NetBoxModel):
         help_text='Identifier assigned by owner',
         max_length=50,
         blank=True,
-        null=False,
-        default='',
+        null=True,
+        default=None,
     )
     serial = models.CharField(
         help_text='Identifier assigned by manufacturer',
@@ -103,6 +105,7 @@ class Asset(NetBoxModel):
         null=True,
     )
     tenant = models.ForeignKey(
+        help_text='Tenant using this asset',
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
         related_name='+',
@@ -110,6 +113,7 @@ class Asset(NetBoxModel):
         null=True,
     )
     contact = models.ForeignKey(
+        help_text='Contact using this asset',
         to='tenancy.Contact',
         on_delete=models.PROTECT,
         related_name='+',
@@ -137,22 +141,11 @@ class Asset(NetBoxModel):
         blank=True,
         null=True,
     )
-    supplier = models.ForeignKey(
-        help_text='Legal entity that sold this asset',
-        to='netbox_inventory.Supplier',
+    purchase = models.ForeignKey(
+        help_text='Purchase through which this asset was purchased',
+        to='netbox_inventory.Purchase',
         on_delete=models.PROTECT,
         related_name='assets',
-        blank=True,
-        null=True,
-    )
-    order_number = models.CharField(
-        help_text='Purchase order or invoice number or simmilar',
-        max_length=128,
-        blank=True,
-        null=False,
-    )
-    purchase_date = models.DateField(
-        help_text='Date when this asset was purchased',
         blank=True,
         null=True,
     )
@@ -173,8 +166,7 @@ class Asset(NetBoxModel):
 
     clone_fields = [
         'status', 'device_type', 'module_type', 'inventoryitem_type', 'tenant', 'contact',
-        'storage_location', 'owner', 'supplier', 'order_number', 'purchase_date',
-        'warranty_start', 'warranty_end', 'comments'
+        'storage_location', 'owner', 'purchase', 'warranty_start', 'warranty_end', 'comments'
     ]
 
     @property
@@ -187,6 +179,9 @@ class Asset(NetBoxModel):
             return 'inventoryitem'
         assert False, f'Invalid hardware kind detected for asset {self.pk}'
 
+    def get_kind_display(self):
+        return dict(HardwareKindChoices)[self.kind]
+
     @property
     def hardware_type(self):
         return self.device_type or self.module_type or self.inventoryitem_type or None
@@ -194,6 +189,37 @@ class Asset(NetBoxModel):
     @property
     def hardware(self):
         return self.device or self.module or self.inventoryitem or None
+
+    @property
+    def warranty_remaining(self):
+        """
+            How many days are left in warranty period.
+            Returns negative duration if period has not started yet
+            Return None if warranty_end not defined
+        """
+        if self.warranty_end:
+            if self.warranty_start and self.warranty_start > date.today():
+                return date.today() - self.warranty_start
+            else:
+                return self.warranty_end - date.today()
+        return None
+
+    @property
+    def warranty_elapsed(self):
+        """
+            How many days have passed in warranty period.
+            Returns negative duration if period has not started yet
+            Return None if warranty_start not defined
+        """
+        if self.warranty_start:
+            return date.today() - self.warranty_start
+        return None
+
+    @property
+    def warranty_total(self):
+        if self.warranty_end and self.warranty_start:
+            return self.warranty_end - self.warranty_start
+        return None
 
     def clean(self):
         self.validate_hardware_types()
@@ -222,7 +248,7 @@ class Asset(NetBoxModel):
         # e.g.: self.device_type and self.device.device_type must match
         # InventoryItem does not have FK to InventoryItemType
         if kind != 'inventoryitem' and hw and _type != getattr(hw, kind+'_type'):
-            raise ValidationError({kind: '{kind} type of {kind} does not match asset {kind} type'})
+            raise ValidationError({kind: f'{kind} type of {kind} does not match {kind} type of asset'})
         # ensure only one hardware is set and that it is correct kind
         # e.g. if self.device_type is set, we cannot have self.module or self.inventoryitem set
         for hw_other in hw_others:
@@ -269,9 +295,16 @@ class Asset(NetBoxModel):
                 old_hw.serial = ''
                 old_hw.asset_tag = None
                 old_hw.save()
-            new_hw.serial = self.serial
-            new_hw.asset_tag = new_asset_tag
-            new_hw.save()
+            # if new_hw already has correct values, don't save it again
+            new_hw_save = False
+            if new_hw.serial != self.serial:
+                new_hw.serial = self.serial
+                new_hw_save = True
+            if new_hw.asset_tag != new_asset_tag:
+                new_hw.asset_tag = new_asset_tag
+                new_hw_save = True
+            if new_hw_save:
+                new_hw.save()
         elif self.serial != old_serial or self.asset_tag != old_asset_tag:
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:
@@ -332,6 +365,51 @@ class Supplier(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:supplier', args=[self.pk])
+
+
+class Purchase(NetBoxModel):
+    """
+    Represents a purchase of a set of Assets from a Supplier.
+    """
+    name = models.CharField(
+        max_length=100
+    )
+    supplier = models.ForeignKey(
+        help_text='Legal entity this purchase was made at',
+        to='netbox_inventory.Supplier',
+        on_delete=models.PROTECT,
+        related_name='purchases',
+        blank=False,
+        null=False,
+    )
+    date = models.DateField(
+        help_text='Date when this purchase was made',
+        blank=True,
+        null=True,
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    comments = models.TextField(
+        blank=True
+    )
+
+    clone_fields = [
+        'supplier', 'date', 'description', 'comments'
+    ]
+
+    class Meta:
+        ordering = ['supplier', 'name']
+        unique_together = (
+            ('supplier', 'name'),
+        )
+
+    def __str__(self):
+        return f'{self.supplier} {self.name}'
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:purchase', args=[self.pk])
 
 
 class InventoryItemType(NetBoxModel):

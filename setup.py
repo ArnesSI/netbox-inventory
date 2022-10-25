@@ -15,7 +15,7 @@ def read(rel_path):
 
 setup(
     name='netbox-inventory',
-    version='0.1.3',
+    version='1.0.0',
     description='Inventory asset management in NetBox',
     long_description=long_description,
     long_description_content_type='text/markdown',

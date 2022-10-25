@@ -1,0 +1,26 @@
+{% if warranty_progress %}
+<div class="progress">
+  <div
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="{{ warranty_progress }}"
+    class="progress-bar {{ bar_class }}"
+    style="width: {{ warranty_progress }}%;"
+  >
+  {% if warranty_progress >= 35 %}
+    {{ asset.warranty_end|timeuntil }}
+  {% endif %}
+  </div>
+  {% if warranty_progress < 35 %}
+    <span class="ps-1">{{ asset.warranty_end|timeuntil }}</span>
+  {% endif %}
+</div>
+
+{% elif asset.warranty_remaining.days >= 0 %}
+    {{ asset.warranty_end|timeuntil }}
+{% elif asset.warranty_remaining.days < 0 %}
+    Starts in {{ asset.warranty_start|timeuntil }}
+{% else %}
+    <span class="text-muted">No data</span>
+{% endif %}

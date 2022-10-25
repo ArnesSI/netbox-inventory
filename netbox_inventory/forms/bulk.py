@@ -11,7 +11,7 @@ from utilities.forms import (
 )
 from tenancy.models import Tenant
 from ..choices import InventoryStatusChoices, HardwareKindChoices
-from ..models import Asset, InventoryItemType, Supplier
+from ..models import Asset, InventoryItemType, Purchase, Supplier
 
 __all__ = (
     'AssetBulkEditForm',
@@ -53,10 +53,10 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('owner').help_text,
         required=not Asset._meta.get_field('owner').blank,
     )
-    supplier = DynamicModelChoiceField(
-        queryset=Supplier.objects.all(),
-        help_text=Asset._meta.get_field('supplier').help_text,
-        required=not Asset._meta.get_field('supplier').blank,
+    purchase = DynamicModelChoiceField(
+        queryset=Purchase.objects.all(),
+        help_text=Asset._meta.get_field('purchase').help_text,
+        required=not Asset._meta.get_field('purchase').blank,
     )
     order_number = forms.CharField(
         required=False,
@@ -84,12 +84,12 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         ('General', ('name', 'status')),
         ('Hardware', ('device_type', 'device', 'module_type', 'module')),
-        ('Purchase', ('owner', 'supplier', 'order_number', 'purchase_date', 'warranty_start', 'warranty_end')), 
+        ('Purchase', ('owner', 'purchase', 'warranty_start', 'warranty_end')), 
         ('Location', ('storage_location',)),
     )
     nullable_fields = (
-        'name', 'device', 'module', 'owner', 'supplier', 'order_number',
-        'purchase_date', 'warranty_start', 'warranty_end',
+        'name', 'device', 'module', 'owner', 'purchase', 'warranty_start',
+        'warranty_end',
     )
 
 
@@ -131,11 +131,21 @@ class AssetCSVForm(NetBoxModelCSVForm):
         help_text='Tenant that owns this asset',
         required=not Asset._meta.get_field('owner').blank,
     )
+    purchase = CSVModelChoiceField(
+        queryset=Purchase.objects.all(),
+        to_field_name='name',
+        help_text=Asset._meta.get_field('purchase').help_text,
+        required=not Asset._meta.get_field('purchase').blank,
+    )
+    purchase_date = forms.CharField(
+        help_text='Required if purchase was given',
+        required=False,
+    )
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
-        help_text=Asset._meta.get_field('supplier').help_text,
-        required=not Asset._meta.get_field('supplier').blank,
+        help_text='Required if purchase was given',
+        required=False,
     )
 
     class Meta:
@@ -144,8 +154,8 @@ class AssetCSVForm(NetBoxModelCSVForm):
             'name', 'asset_tag', 'serial', 'status',
             'hardware_kind', 'manufacturer', 'hardware_type',
             'storage_site', 'storage_location',
-            'owner', 'supplier', 'order_number',
-            'purchase_date', 'warranty_start', 'warranty_end', 'comments',
+            'owner', 'purchase', 'purchase_date', 'supplier',
+            'warranty_start', 'warranty_end', 'comments',
         )
 
     def clean_hardware_type(self):
@@ -176,9 +186,13 @@ class AssetCSVForm(NetBoxModelCSVForm):
             self.fields['storage_location'].queryset = self.fields['storage_location'].queryset.filter(**params)
 
             # handle creating related resources if they don't exist and enabled in settings
-            if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_supplier']
-                and data.get('supplier')):
-                Supplier.objects.get_or_create(name=data.get('supplier'))
+            if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_purchase']
+                and data.get('purchase') and data.get('supplier')):
+                Purchase.objects.get_or_create(
+                    name=data.get('purchase'),
+                    supplier=self._get_or_create_supplier(data),
+                    defaults={'date': data.get('purchase_date')}
+                )
             if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_device_type']
                 and data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
@@ -209,3 +223,13 @@ class AssetCSVForm(NetBoxModelCSVForm):
             },
         )
         return manufacturer
+
+    def _get_or_create_supplier(self, data):
+        supplier, _ = Supplier.objects.get_or_create(
+            name__iexact=data.get('supplier'),
+            defaults={
+                'name': data.get('supplier'),
+                'slug': slugify(data.get('supplier'))
+            }
+        )
+        return supplier

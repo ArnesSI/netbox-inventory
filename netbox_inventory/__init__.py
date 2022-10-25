@@ -10,12 +10,12 @@ class NetBoxInventoryConfig(PluginConfig):
     author = 'Matej Vadnjal'
     author_email = 'matej.vadnjal@arnes.si'
     base_url = 'inventory'
-    min_version = '3.2.0'
+    min_version = '3.3.0'
     default_settings = {
         'used_status_name': 'used',
         'stored_status_name': 'stored',
         'sync_hardware_serial_asset_tag': False,
-        'asset_import_create_supplier': False,
+        'asset_import_create_purchase': False,
         'asset_import_create_device_type': False,
         'asset_import_create_module_type': False,
         'asset_import_create_inventoryitem_type': False,
@@ -23,5 +23,8 @@ class NetBoxInventoryConfig(PluginConfig):
         'asset_disable_deletion_for_tags': [],
     }
 
+    def ready(self):
+        super().ready()
+        import netbox_inventory.signals
 
 config = NetBoxInventoryConfig

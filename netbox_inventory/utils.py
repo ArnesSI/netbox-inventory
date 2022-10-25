@@ -4,6 +4,23 @@ from django.core.exceptions import ImproperlyConfigured
 from .choices import InventoryStatusChoices
 
 
+def get_asset_warranty_context(asset):
+    warranty_progress = None
+    bar_class = 'bg-success'
+    if asset.warranty_elapsed and asset.warranty_elapsed.total_seconds() > 0 and asset.warranty_total:
+        warranty_progress = asset.warranty_elapsed / asset.warranty_total
+    if warranty_progress is not None:
+        warranty_progress = warranty_progress * 100
+        if asset.warranty_remaining.days < 7:
+            bar_class = 'bg-danger'
+        elif asset.warranty_remaining.days < 30:
+            bar_class = 'bg-warning'
+    return dict(
+        warranty_progress=warranty_progress,
+        bar_class=bar_class
+    )
+
+
 def get_prechange_field(obj, field_name):
     """Get value from obj._prechange_snapshot. If field is a relation,
     return object instance.
