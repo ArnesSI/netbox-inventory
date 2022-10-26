@@ -1,20 +1,26 @@
-import os
-from django.apps import apps
-from django.test import TestCase, override_settings
+from django.urls import reverse
+from django.test import SimpleTestCase
+
+from netbox_inventory import __version__
+from netbox_inventory.tests.custom import APITestCase
 
 
-class PluginLoadTestCase(TestCase):
+class NetboxDnsVersionTestCase(SimpleTestCase):
+    """
+    Test for netbox_inventory package
+    """
 
-    @classmethod
-    def setUpTestData(cls):
-        override_settings(PLUGINS=['netbox_inventory',])
+    def test_version(self):
+        assert __version__ == "1.0.0"
 
-    def test_version_match(self):
-        """ Make sure version of plugin matches string in setup.py """
-        plugin = apps.get_app_config('netbox_inventory')
-        import netbox_inventory
-        setup_path = os.path.join(os.path.dirname(os.path.dirname(netbox_inventory.__file__)), 'setup.py')
-        setup_lines = open(setup_path).readlines()
-        version_lines = list(filter(lambda l: 'version=' in l, setup_lines))
-        self.assertGreater(len(version_lines), 0)
-        self.assertTrue(all([lambda l: plugin.version in l for l in version_lines]))
+
+class AppTest(APITestCase):
+    """
+    Test the availability of the plugin API root
+    """
+
+    def test_root(self):
+        url = reverse("plugins-api:netbox_inventory-api:api-root")
+        response = self.client.get(f"{url}?format=api", **self.header)
+
+        self.assertEqual(response.status_code, 200)
