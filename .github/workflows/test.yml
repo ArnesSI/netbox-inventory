@@ -3,6 +3,10 @@ on: [push, pull_request]
 jobs:
   test-netbox:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        netbox-version: ["v3.3.6", "develop"]
     services:
       redis:
         image: redis
@@ -23,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: netbox-inventory
 
@@ -32,10 +36,11 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Checkout netbox
-        uses: actions/checkout@v2
+      - name: Checkout netbox ${{ matrix.netbox-version }}
+        uses: actions/checkout@v3
         with:
           repository: "netbox-community/netbox"
+          ref: ${{ matrix.netbox-version }}
           path: netbox
 
       - name: install netbox_inventory
