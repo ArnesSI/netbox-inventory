@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netbox-inventory"
+version = "1.0.0"
+authors = [
+  { name="Matej Vadnjal", email="matej.vadnjal@arnes.si" },
+]
+description = "Inventory asset management in NetBox"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["netbox", "netbox-plugin", "dns"]
+
+[project.urls]
+"Homepage" = "https://github.com/ArnesSI/netbox-inventory/"
+"Bug Tracker" = "https://github.com/ArnesSI/netbox-inventory/issues/"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["netbox_inventory"]
