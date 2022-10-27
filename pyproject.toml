@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-inventory"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Matej Vadnjal", email="matej.vadnjal@arnes.si" },
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-keywords = ["netbox", "netbox-plugin", "dns"]
+keywords = ["netbox", "netbox-plugin", "inventory"]
 
 [project.urls]
 "Homepage" = "https://github.com/ArnesSI/netbox-inventory/"
@@ -26,4 +26,4 @@ keywords = ["netbox", "netbox-plugin", "dns"]
 include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ["netbox_inventory"]
+include = ["netbox_inventory*"]
