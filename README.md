@@ -47,18 +47,3 @@ To disable automatically changing status, set these two config parameters to `No
 | `asset_import_create_inventoryitem_type` | `False` | When importing an inventory type asset, automatically create manufacturer and/or device type if it doesn't exist |
 | `asset_disable_editing_fields_for_tags` | `{}` | A dictionary of tags and fields that should be disabled for editing. This is useful if you want to prevent editing of certain fields for certain assets. The dictionary is in the form of `{tag: [field1, field2]}`. Example: `{'no-edit': ['serial_number', 'asset_tag']}`. This only affects the UI, the API can still be used to edit the fields. |
 | `asset_disable_deletion_for_tags` | `[]` | List of tags that will disable deletion of assets. This only affects the UI, not the API. |
-
-
-### Future development ideas
-
-- location report
-- supplier detail - show assets
-- device on_delete update asset.status (if asset assigned)
-- prevent device.device_type/serial/asset_tag change if asset assigned (and sync_hardware_serial_asset_tag=true?) see [AbortRequest](https://github.com/netbox-community/netbox/issues/9075)
-- inject asset list on manufacturer detail?
-- inventoryitem detail - show asset info
-- inventoryitem_type - assign existing, bulk, show assets, more testing
-- bootstrap scripts to generate assets from existing device/module S/N data
-- from device details view -> to change asset, assign asset
-- supplier import, bulk edit
-- how to assign MACs to device/module interfaces that is created from Asset
