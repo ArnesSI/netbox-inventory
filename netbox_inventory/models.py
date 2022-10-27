@@ -43,7 +43,10 @@ class Asset(NetBoxModel):
     serial = models.CharField(
         help_text='Identifier assigned by manufacturer',
         max_length=60,
-        verbose_name='Serial number'
+        verbose_name='Serial number',
+        blank=True,
+        null=True,
+        default=None,
     )
 
     #
@@ -284,6 +287,8 @@ class Asset(NetBoxModel):
         old_asset_tag = get_prechange_field(self, 'asset_tag')
         # device, module... needs None for unset asset_tag to enforce uniqness at DB level
         new_asset_tag = self.asset_tag if self.asset_tag else None
+        # device, module... does not allow serial to be null
+        new_serial = self.serial if self.serial else ''
         if not new_hw and old_hw:
             old_hw.serial = ''
             old_hw.asset_tag = None
@@ -297,8 +302,8 @@ class Asset(NetBoxModel):
                 old_hw.save()
             # if new_hw already has correct values, don't save it again
             new_hw_save = False
-            if new_hw.serial != self.serial:
-                new_hw.serial = self.serial
+            if new_hw.serial != new_serial:
+                new_hw.serial = new_serial
                 new_hw_save = True
             if new_hw.asset_tag != new_asset_tag:
                 new_hw.asset_tag = new_asset_tag
@@ -308,7 +313,7 @@ class Asset(NetBoxModel):
         elif self.serial != old_serial or self.asset_tag != old_asset_tag:
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:
-                new_hw.serial = self.serial
+                new_hw.serial = new_serial
                 new_hw.asset_tag = new_asset_tag
                 new_hw.save()
 
