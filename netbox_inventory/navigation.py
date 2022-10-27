@@ -66,21 +66,25 @@ menu_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
         link_text='Assets',
+        permissions=["netbox_inventory.view_asset"],
         buttons=asset_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:supplier_list',
         link_text='Suppliers',
+        permissions=["netbox_inventory.view_supplier"],
         buttons=supplier_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:purchase_list',
         link_text='Purchases',
+        permissions=["netbox_inventory.view_purchase"],
         buttons=purchase_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:inventoryitemtype_list',
         link_text='Inventory Item Types',
+        permissions=["netbox_inventory.view_inventoryitemtype"],
         buttons=inventoryitemtype_buttons,
     ),
 )
