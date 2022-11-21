@@ -16,7 +16,7 @@ To properly support inventory items (that are used in NetBox to model SFP and
 similar modules) the plugin defines inventory item types that are equivalent to
 device types and module types.
 
-## Automatic management of asset status
+### Automatic management of asset status
 
 Each asset has a status attribute that can indicate use of the asset. These
 statuses can be set as needed by each NetBox installation.
@@ -33,30 +33,42 @@ asset status to `stored_status_name` configuration item.
 
 To disable automatically changing status, set these two config parameters to `None`.
 
+### Prevent unwanted changes for tagged assets
+
+With `asset_disable_editing_fields_for_tags` and `asset_disable_deletion_for_tags` you can prevent changes to specified asset data for assets that have certain tags attached. Changes are only prevented via web interface. API modifications are allowed.
+
+The idea is that an external system uses some assets stored in netbox_inventory, and you want to prevent accidental changes to data directly in NetBox web interface. Only that external system should modify the data.
+
 ## Compatibility
 
-This plugin was first developed using 3.2.5, and tested with all of 3.2.
+This plugin requires netbox version 3.3 to work.
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
-|       3.2      |      0.1.3     |
-|       3.3      |      0.1.3     |
+|       3.3      |      1.0.x     |
+|       3.4      |    (none yet)  |
 
 ## Installing
 
 For adding to a NetBox Docker setup see
 [the general instructions for using netbox-docker with plugins](https://github.com/netbox-community/netbox-docker/wiki/Using-Netbox-Plugins).
 
-While this is still in development and not yet on pypi you can install with pip:
+Install the plugin from pypi with pip:
 
 ```bash
-pip install git+https://github.com/ArnesSI/netbox-inventory.git@dev
+pip install netbox-inventory
+```
+
+You can install a development version directly from github:
+
+```bash
+pip install git+https://github.com/ArnesSI/netbox-inventory.git@master
 ```
 
 or by adding to your `local_requirements.txt` or `plugin_requirements.txt` (netbox-docker):
 
 ```bash
-git+https://github.com/ArnesSI/netbox-inventory.git@dev
+git+https://github.com/ArnesSI/netbox-inventory.git@master
 ```
 
 Enable the plugin in `/opt/netbox/netbox/netbox/configuration.py`,
@@ -92,6 +104,8 @@ PLUGINS_CONFIG = {
     },
 }
 ```
+
+Available settings:
 
 | Setting | Default value | Description |
 |---------|---------------|-------------|
