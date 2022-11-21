@@ -127,7 +127,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     )
     warranty_start_before = forms.DateField(
         required=False,
-        label='Warranty starts or before',
+        label='Warranty starts on or before',
         widget=DatePicker,
     )
     warranty_end_after = forms.DateField(
@@ -137,7 +137,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     )
     warranty_end_before = forms.DateField(
         required=False,
-        label='Warranty ends or before',
+        label='Warranty ends on or before',
         widget=DatePicker,
     )
     storage_site_id = DynamicModelMultipleChoiceField(
