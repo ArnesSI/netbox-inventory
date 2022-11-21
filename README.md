@@ -127,29 +127,26 @@ Current plugin data model:
 
 ## Screenshots
 
-Asset  - List View
-![Asset - List View](docs/img/assets.png)
+Asset - List View
+
+![Asset - List View](docs/img/asset_list.png)
 
 Asset - Individual View
+
 ![Asset - Individual View](docs/img/asset.png)
 
-Asset - Edit View / Add View
-![Asset - Individual View](docs/img/asset_edit.png)
+Asset - Edit / Add View
 
-Suppliers  - List View
-![Asset - List View](docs/img/suppliers.png)
+![Asset - Edit / Add View](docs/img/asset_edit.png)
+
+Asset - Lots of filtering options
+
+![Asset - Filters](docs/img/asset_filters.png)
 
 Suppliers - Individual View
+
 ![Asset - Individual View](docs/img/supplier.png)
 
-Suppliers - Edit View / Add View
-![Asset - Individual View](docs/img/supplier_edit.png)
+Inventory Item Type - List View
 
-Inventory Item Type  - List View
-![Asset - List View](docs/img/inventoryitem_types.png)
-
-Inventory Item Type - Individual View
-![Asset - Individual View](docs/img/inventoryitem_type.png)
-
-Inventory Item Type - Edit View / Add View
-![Asset - Individual View](docs/img/inventoryitem_type_edit.png)
+![Asset - List View](docs/img/inventoryitem_type_list.png)
