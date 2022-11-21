@@ -2,12 +2,6 @@
 
 A [Netbox](https://github.com/netbox-community/netbox) plugin for hardware inventory.
 
-## Models
-
-Current v0.1.x model:
-
-![Working Model](docs/img/data_model-v0.1.x.png)
-
 ## Features
 
 Keep track of your hardware, whether it is installed or in storage. You can
@@ -110,6 +104,12 @@ PLUGINS_CONFIG = {
 | `asset_import_create_inventoryitem_type` | `False` | When importing an inventory type asset, automatically create manufacturer and/or device type if it doesn't exist |
 | `asset_disable_editing_fields_for_tags` | `{}` | A dictionary of tags and fields that should be disabled for editing. This is useful if you want to prevent editing of certain fields for certain assets. The dictionary is in the form of `{tag: [field1, field2]}`. Example: `{'no-edit': ['serial_number', 'asset_tag']}`. This only affects the UI, the API can still be used to edit the fields. |
 | `asset_disable_deletion_for_tags` | `[]` | List of tags that will disable deletion of assets. This only affects the UI, not the API. |
+
+## Models
+
+Current plugin data model:
+
+![Working Model](docs/img/data_model.drawio.png)
 
 ## Screenshots
 
