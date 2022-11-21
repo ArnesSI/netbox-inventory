@@ -9,7 +9,8 @@ class AssetInfoExtension(PluginTemplateExtension):
         object = self.context.get('object')
         asset = Asset.objects.filter(**{self.kind:object}).first()
         context = {'asset': asset}
-        context.update(get_asset_warranty_context(asset))
+        if asset:
+            context.update(get_asset_warranty_context(asset))
         return self.render('netbox_inventory/inc/asset_info.html', extra_context=context)
 
 
