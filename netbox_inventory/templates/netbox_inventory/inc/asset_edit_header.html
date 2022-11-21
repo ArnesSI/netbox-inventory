@@ -1,0 +1,22 @@
+{% load helpers %}
+
+<ul class="nav nav-tabs px-3">
+  <li class="nav-item">
+      <a
+          class="nav-link {% if active_tab == 'add' %}active{% endif %}"
+          href="{% url 'plugins:netbox_inventory:asset_add' %}{% querystring request %}"
+      >
+          {% if object.pk %}Edit{% else %}Create{% endif %}
+      </a>
+  </li>
+  {% if not object.pk %}
+  <li class="nav-item">
+      <a
+          class="nav-link {% if active_tab == 'bulk_add' %}active{% endif %}"
+          href="{% url 'plugins:netbox_inventory:asset_bulk_add' %}{% querystring request %}"
+      >
+          Bulk Create
+      </a>
+  </li>
+  {% endif %}
+</ul>
