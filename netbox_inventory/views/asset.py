@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import messages
+from django.db import IntegrityError
 from django.shortcuts import redirect
 from netbox.views import generic
 from utilities.forms import ConfirmationForm, restrict_form_fields
@@ -15,6 +16,7 @@ from ..utils import (
 __all__ = (
     'AssetView',
     'AssetListView',
+    'AssetBulkCreateView',
     'AssetEditView',
     'AssetDeleteView',
     'AssetBulkImportView',
@@ -50,9 +52,36 @@ class AssetListView(generic.ObjectListView):
     filterset_form = forms.AssetFilterForm
 
 
+class AssetBulkCreateView(generic.BulkCreateView):
+    queryset = models.Asset.objects.all()
+    form = forms.AssetBulkAddForm
+    model_form = forms.AssetForm
+    pattern_target = None
+    template_name = 'netbox_inventory/asset_bulk_add.html'
+
+    def _create_objects(self, form, request):
+        new_objects = []
+        for _ in range(form.cleaned_data['count']):
+            # Reinstantiate the model form each time to avoid overwriting the same instance. Use a mutable
+            # copy of the POST QueryDict so that we can update the target field value.
+            model_form = self.model_form(request.POST.copy())
+            del(model_form.data['count'])
+
+            # Validate each new object independently.
+            if model_form.is_valid():
+                obj = model_form.save()
+                new_objects.append(obj)
+            else:
+                # Raise an IntegrityError to break the for loop and abort the transaction.
+                raise IntegrityError()
+
+        return new_objects
+
+
 class AssetEditView(generic.ObjectEditView):
     queryset = models.Asset.objects.all()
     form = forms.AssetForm
+    template_name = 'netbox_inventory/asset_edit.html'
 
 
 class AssetDeleteView(generic.ObjectDeleteView):

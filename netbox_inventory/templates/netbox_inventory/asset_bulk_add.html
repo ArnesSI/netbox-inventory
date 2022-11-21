@@ -1,0 +1,66 @@
+
+{% extends 'generic/object_edit.html' %}
+{% load static %}
+{% load form_helpers %}
+
+{% block title %}Add multiple assets{% endblock %}
+
+{% block tabs %}
+  {% include 'netbox_inventory/inc/asset_edit_header.html' with active_tab='bulk_add' %}
+{% endblock %}
+
+
+{% block form %}
+    <div class="field-group my-5">
+        <div class="row mb-2">
+          <h5 class="offset-sm-3">General</h5>
+        </div>
+        {% render_field form.count %}
+        {% render_field model_form.name %}
+        {% render_field model_form.tags %}
+        {% render_field model_form.status %}
+    </div>
+
+    <div class="field-group my-5">
+        <div class="row mb-2">
+          <h5 class="offset-sm-3">Hardware</h5>
+        </div>
+        {% render_field model_form.manufacturer %}
+        {% render_field model_form.device_type %}
+        {% render_field model_form.module_type %}
+        {% render_field model_form.inventoryitem_type %}
+    </div>
+
+    <div class="field-group my-5">
+        <div class="row mb-2">
+          <h5 class="offset-sm-3">Purchase</h5>
+        </div>
+        {% render_field model_form.owner %}
+        {% render_field model_form.purchase %}
+        {% render_field model_form.warranty_start %}
+        {% render_field model_form.warranty_end %}
+    </div>
+
+    <div class="field-group my-5">
+        <div class="row mb-2">
+          <h5 class="offset-sm-3">Location</h5>
+        </div>
+        {% render_field model_form.storage_site %}
+        {% render_field model_form.storage_location %}
+    </div>
+
+    {% if model_form.custom_fields %}
+        <div class="field-group my-5">
+            <div class="row mb-2">
+              <h5 class="offset-sm-3">Custom Fields</h5>
+            </div>
+            {% render_custom_fields model_form %}
+        </div>
+    {% endif %}
+
+    <div class="field-group mb-5">
+        <h5 class="text-center">Comments</h5>
+        {% render_field model_form.comments %}
+    </div>
+
+{% endblock %}

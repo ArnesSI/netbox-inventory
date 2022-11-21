@@ -9,6 +9,7 @@ urlpatterns = (
     # Assets
     path('assets/', views.AssetListView.as_view(), name='asset_list'),
     path('assets/add/', views.AssetEditView.as_view(), name='asset_add'),
+    path('assets/bulk-add/', views.AssetBulkCreateView.as_view(), name='asset_bulk_add'),
     path('assets/import/', views.AssetBulkImportView.as_view(), name='asset_import'),
     path('assets/edit/', views.AssetBulkEditView.as_view(), name='asset_bulk_edit'),
     path('assets/delete/', views.AssetBulkDeleteView.as_view(), name='asset_bulk_delete'),

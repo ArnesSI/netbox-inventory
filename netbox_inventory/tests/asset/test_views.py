@@ -162,3 +162,35 @@ class AssetTestCase(
     @override_settings(PLUGINS_CONFIG=CONFIG_ALLOW_CREATE_DEVICE_TYPE)
     def test_bulk_import_objects_with_constrained_permission(self):
         return super().test_bulk_import_objects_with_constrained_permission()
+
+
+class AssetBulkAddTestCase(
+    ModelViewTestCase,
+    ViewTestCases.CreateMultipleObjectsViewTestCase,
+):
+    model = Asset
+
+    @classmethod
+    def setUpTestData(cls):
+        manufacturer1 = Manufacturer.objects.create(
+            name='manufacturer1',
+            slug='manufacturer1',
+        )
+        device_type1 = DeviceType.objects.create(
+            model='device_type1',
+            slug='device_type1',
+            manufacturer=manufacturer1,
+            u_height=1,
+        )
+
+        cls.bulk_create_data = {
+            'count': 3,
+            'status': 'stored',
+            'device_type': device_type1.pk,
+        }
+
+    def _get_url(self, action, instance=None):
+        # fix - CreateMultipleObjectsViewTestCase assumes view names contains only 'add' but we need 'bulk_add'
+        if action == 'add':
+            action = 'bulk_add'
+        return super()._get_url(action, instance)
