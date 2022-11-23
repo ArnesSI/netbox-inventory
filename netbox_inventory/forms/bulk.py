@@ -105,9 +105,9 @@ class AssetCSVForm(NetBoxModelCSVForm):
         required=True,
         help_text='Hardware manufacturer'
     )
-    hardware_type = forms.CharField(
+    model_name = forms.CharField(
         required=True,
-        help_text='Hardware type (model)',
+        help_text='Model of this device/model/inventory item type',
     )
     status = CSVChoiceField(
         choices=AssetStatusChoices,
@@ -152,16 +152,16 @@ class AssetCSVForm(NetBoxModelCSVForm):
         model = Asset
         fields = (
             'name', 'asset_tag', 'serial', 'status',
-            'hardware_kind', 'manufacturer', 'hardware_type',
+            'hardware_kind', 'manufacturer', 'model_name',
             'storage_site', 'storage_location',
             'owner', 'purchase', 'purchase_date', 'supplier',
             'warranty_start', 'warranty_end', 'comments',
         )
 
-    def clean_hardware_type(self):
+    def clean_model_name(self):
         hardware_kind = self.cleaned_data.get('hardware_kind')
         manufacturer = self.cleaned_data.get('manufacturer')
-        model = self.cleaned_data.get('hardware_type')
+        model = self.cleaned_data.get('model_name')
         if not hardware_kind or not manufacturer:
             # clean on manufacturer or hardware_kind already raises
             return None
@@ -197,22 +197,22 @@ class AssetCSVForm(NetBoxModelCSVForm):
             if (get_plugin_setting('asset_import_create_device_type')
                 and data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
-                    model=data.get('hardware_type'),
+                    model=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
-                    defaults={'slug': slugify(data.get('hardware_type'))},
+                    defaults={'slug': slugify(data.get('model_name'))},
                 )
             if (get_plugin_setting('asset_import_create_module_type')
                 and data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
-                    model=data.get('hardware_type'),
+                    model=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
                 )
             if (get_plugin_setting('asset_import_create_inventoryitem_type')
                 and data.get('hardware_kind') == 'inventoryitem'):
                 InventoryItemType.objects.get_or_create(
-                    model__iexact=data.get('hardware_type'),
+                    model__iexact=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
-                    defaults={'slug': slugify(data.get('hardware_type'))},
+                    defaults={'slug': slugify(data.get('model_name'))},
                 )
 
     def _get_or_create_manufacturer(self, data):
