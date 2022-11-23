@@ -43,6 +43,19 @@ class AssetCreateMixin:
             # we set value later in clean_*_type() anyway
             self.fields[kind_type].required = False
 
+    def save(self, *args):
+        """
+        After we save new hardware (Device, Module, InventortyItem), we must update
+        asset.device/.module/.intentory_item to reffer to this new hardware instance
+        """
+        instance = super().save(*args)
+        asset = instance.assigned_asset
+        asset.snapshot()
+        setattr(asset, asset.kind, instance)
+        asset.full_clean()
+        asset.save()
+        return instance
+
 
 class AssetDeviceCreateForm(AssetCreateMixin, DeviceForm):
     """
