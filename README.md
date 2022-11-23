@@ -50,16 +50,20 @@ This plugin requires netbox version 3.3 to work.
 
 ## Installing
 
+Review [official Netbox plugin documentation](https://docs.netbox.dev/en/stable/plugins/#installing-plugins) for installation instructions.
+
+You install the plugin from pypi with pip. Make sure you activate Netbox's virtual
+environment first:
+
+```bash
+$ source /opt/netbox/venv/bin/activate
+(venv) $ pip install netbox-inventory
+```
+
 For adding to a NetBox Docker setup see
 [the general instructions for using netbox-docker with plugins](https://github.com/netbox-community/netbox-docker/wiki/Using-Netbox-Plugins).
 
-Install the plugin from pypi with pip:
-
-```bash
-pip install netbox-inventory
-```
-
-You can install a development version directly from github:
+You can install a development version directly from GitHub:
 
 ```bash
 pip install git+https://github.com/ArnesSI/netbox-inventory.git@master
@@ -71,7 +75,7 @@ or by adding to your `local_requirements.txt` or `plugin_requirements.txt` (netb
 git+https://github.com/ArnesSI/netbox-inventory.git@master
 ```
 
-Enable the plugin in `/opt/netbox/netbox/netbox/configuration.py`,
+After installation, enable the plugin in `/opt/netbox/netbox/netbox/configuration.py`,
  or if you use netbox-docker, your `/configuration/plugins.py` file :
 
 ```python
@@ -83,6 +87,18 @@ PLUGINS_CONFIG = {
     "netbox_inventory": {},
 }
 ```
+
+Available configuration settings you can use in `PLUGINS_CONFIG` are described
+below under [settings](#settings).
+
+The last step is to apply database migrations:
+
+```bash
+(venv) $ cd /opt/netbox/netbox/
+(venv) $ python3 manage.py migrate
+```
+
+If you're running under netbox-docker, you can skip this as migrations are applied if needed automatically when you bring up the containers.
 
 ### Settings
 
@@ -97,8 +113,8 @@ PLUGINS = [
 PLUGINS_CONFIG = {
     "netbox_inventory": {
         # Example settings below
-        "used_status_name": "In use",
-        "stored_status_name": "In storage",
+        "used_status_name": "used",
+        "stored_status_name": "stored",
         "sync_serial_number": True,
         "sync_asset_tag": True,
     },
