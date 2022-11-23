@@ -137,7 +137,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
         help_text=Asset._meta.get_field('purchase').help_text,
         required=not Asset._meta.get_field('purchase').blank,
     )
-    purchase_date = forms.CharField(
+    purchase_date = forms.DateField(
         help_text='Required if purchase was given',
         required=False,
     )
@@ -191,7 +191,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
                 Purchase.objects.get_or_create(
                     name=data.get('purchase'),
                     supplier=self._get_or_create_supplier(data),
-                    defaults={'date': data.get('purchase_date')}
+                    defaults={'date': self._get_clean_value(data, 'purchase_date')}
                 )
             if (get_plugin_setting('asset_import_create_device_type')
                 and data.get('hardware_kind') == 'device'):
@@ -233,3 +233,13 @@ class AssetCSVForm(NetBoxModelCSVForm):
             }
         )
         return supplier
+
+    def _get_clean_value(self, data, field_name):
+        """
+        Returns cleaned value for a given field from data
+        Used when creating additional related objects on import, since the values
+        are otherwise not validated by forms.
+        Used for DateTime, Boolean and similar fields. If used on ModelField and
+        instance does not exist it raises Exception but no feedback is given to user.
+        """
+        return self.fields[field_name].clean(data.get(field_name))
