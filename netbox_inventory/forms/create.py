@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
@@ -21,6 +23,8 @@ COMPONENT_FIELDS = (
     'powerport',
     'rearport',
 )
+
+logger = logging.getLogger('netbox.netbox_inventory.forms.create')
 
 
 class AssetCreateMixin:
@@ -54,6 +58,7 @@ class AssetCreateMixin:
         setattr(asset, asset.kind, instance)
         asset.full_clean()
         asset.save()
+        logger.info(f'Assigned newly created hardware ({instance}) to asset {asset}')
         return instance
 
 
