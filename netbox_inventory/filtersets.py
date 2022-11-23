@@ -6,13 +6,13 @@ from dcim.models import Manufacturer, DeviceType, ModuleType, Site, Location
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.models import Contact, Tenant
-from .choices import HardwareKindChoices, InventoryStatusChoices
+from .choices import HardwareKindChoices, AssetStatusChoices
 from .models import Asset, InventoryItemType, Purchase, Supplier
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
-        choices=InventoryStatusChoices,
+        choices=AssetStatusChoices,
     )
     kind = filters.MultiValueCharFilter(
         method='filter_kind',

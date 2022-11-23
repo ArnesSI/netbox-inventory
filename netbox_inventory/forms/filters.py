@@ -8,7 +8,7 @@ from utilities.forms import (
     StaticSelect, TagFilterField, BOOLEAN_WITH_BLANK_CHOICES
 )
 from tenancy.models import Contact, Tenant
-from ..choices import HardwareKindChoices, InventoryStatusChoices
+from ..choices import HardwareKindChoices, AssetStatusChoices
 from ..models import Asset, InventoryItemType, Purchase, Supplier
 
 
@@ -37,7 +37,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     )
 
     status = MultipleChoiceField(
-        choices=InventoryStatusChoices,
+        choices=AssetStatusChoices,
         required=False,
     )
     kind = MultipleChoiceField(

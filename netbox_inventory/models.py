@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
-from .choices import HardwareKindChoices, InventoryStatusChoices
+from .choices import HardwareKindChoices, AssetStatusChoices
 from .utils import get_prechange_field, get_status_for
 
 
@@ -54,7 +54,7 @@ class Asset(NetBoxModel):
     #
     status = models.CharField(
         max_length=30,
-        choices=InventoryStatusChoices,
+        choices=AssetStatusChoices,
         help_text='Asset lifecycle status',
     )
 
@@ -321,7 +321,7 @@ class Asset(NetBoxModel):
         return reverse('plugins:netbox_inventory:asset', args=[self.pk])
     
     def get_status_color(self):
-        return InventoryStatusChoices.colors.get(self.status)
+        return AssetStatusChoices.colors.get(self.status)
 
     def __str__(self):
         return f'{self.hardware_type} {self.serial}'

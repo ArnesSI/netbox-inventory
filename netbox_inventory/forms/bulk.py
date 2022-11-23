@@ -10,7 +10,7 @@ from utilities.forms import (
     CSVModelChoiceField, DynamicModelChoiceField
 )
 from tenancy.models import Tenant
-from ..choices import InventoryStatusChoices, HardwareKindChoices
+from ..choices import AssetStatusChoices, HardwareKindChoices
 from ..models import Asset, InventoryItemType, Purchase, Supplier
 
 __all__ = (
@@ -24,7 +24,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
     )
     status = ChoiceField(
-        choices=add_blank_choice(InventoryStatusChoices),
+        choices=add_blank_choice(AssetStatusChoices),
         required=False,
         initial='',
     )
@@ -110,7 +110,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
         help_text='Hardware type (model)',
     )
     status = CSVChoiceField(
-        choices=InventoryStatusChoices,
+        choices=AssetStatusChoices,
         help_text='Asset lifecycle status',
     )
     storage_site = CSVModelChoiceField(
