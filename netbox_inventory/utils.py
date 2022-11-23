@@ -38,8 +38,14 @@ def get_prechange_field(obj, field_name):
     return value
 
 
+def get_plugin_setting(setting_name):
+    plugin_settings = settings.PLUGINS_CONFIG['netbox_inventory']
+    assert setting_name in plugin_settings, f'Setting {setting_name} not supported'
+    return plugin_settings[setting_name]
+
+
 def get_status_for(status):
-    status_name = settings.PLUGINS_CONFIG['netbox_inventory'][status + '_status_name']
+    status_name = get_plugin_setting(status + '_status_name')
     if status_name is None:
         return None
     if status_name not in dict(AssetStatusChoices):
@@ -58,9 +64,7 @@ def get_tags_that_protect_asset_from_deletion():
     Returns:
         list: list of tag slug strings
     """
-    return settings.PLUGINS_CONFIG['netbox_inventory'][
-        'asset_disable_deletion_for_tags'
-    ]
+    return get_plugin_setting('asset_disable_deletion_for_tags')
 
 
 def get_tags_and_edit_protected_asset_fields():
@@ -79,8 +83,4 @@ def get_tags_and_edit_protected_asset_fields():
     Returns:
         dict: dict of tag slug strings and list of field names
     """
-    return settings.PLUGINS_CONFIG['netbox_inventory'][
-        'asset_disable_editing_fields_for_tags'
-    ]
-
-
+    return get_plugin_setting('asset_disable_editing_fields_for_tags')

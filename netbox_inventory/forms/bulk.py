@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 
@@ -12,6 +11,7 @@ from utilities.forms import (
 from tenancy.models import Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices
 from ..models import Asset, InventoryItemType, Purchase, Supplier
+from ..utils import get_plugin_setting
 
 __all__ = (
     'AssetBulkEditForm',
@@ -186,27 +186,27 @@ class AssetCSVForm(NetBoxModelCSVForm):
             self.fields['storage_location'].queryset = self.fields['storage_location'].queryset.filter(**params)
 
             # handle creating related resources if they don't exist and enabled in settings
-            if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_purchase']
+            if (get_plugin_setting('asset_import_create_purchase')
                 and data.get('purchase') and data.get('supplier')):
                 Purchase.objects.get_or_create(
                     name=data.get('purchase'),
                     supplier=self._get_or_create_supplier(data),
                     defaults={'date': data.get('purchase_date')}
                 )
-            if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_device_type']
+            if (get_plugin_setting('asset_import_create_device_type')
                 and data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
                     model=data.get('hardware_type'),
                     manufacturer=self._get_or_create_manufacturer(data),
                     defaults={'slug': slugify(data.get('hardware_type'))},
                 )
-            if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_module_type']
+            if (get_plugin_setting('asset_import_create_module_type')
                 and data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
                     model=data.get('hardware_type'),
                     manufacturer=self._get_or_create_manufacturer(data),
                 )
-            if (settings.PLUGINS_CONFIG['netbox_inventory']['asset_import_create_inventoryitem_type']
+            if (get_plugin_setting('asset_import_create_inventoryitem_type')
                 and data.get('hardware_kind') == 'inventoryitem'):
                 InventoryItemType.objects.get_or_create(
                     model__iexact=data.get('hardware_type'),

@@ -1,13 +1,12 @@
 from datetime import date
 
-from django.conf import settings
 from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .utils import get_prechange_field, get_status_for
+from .utils import get_prechange_field, get_plugin_setting, get_status_for
 
 
 class Asset(NetBoxModel):
@@ -279,7 +278,7 @@ class Asset(NetBoxModel):
         """ If assigning as device, module or inventoryitem set serial and
             asset_tag on it. Also remove them if unasigning.
         """
-        if not settings.PLUGINS_CONFIG['netbox_inventory']['sync_hardware_serial_asset_tag']:
+        if not get_plugin_setting('sync_hardware_serial_asset_tag'):
             return None
         old_hw = get_prechange_field(self, self.kind)
         new_hw = getattr(self, self.kind)
