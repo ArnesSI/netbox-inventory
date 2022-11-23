@@ -97,54 +97,58 @@ class AssetCSVForm(NetBoxModelCSVForm):
     hardware_kind = CSVChoiceField(
         choices=HardwareKindChoices,
         required=True,
-        help_text='What kind of hardware is this',
+        help_text='What kind of hardware is this.',
     )
     manufacturer = CSVModelChoiceField(
         queryset=Manufacturer.objects.all(),
         to_field_name='name',
         required=True,
-        help_text='Hardware manufacturer'
+        help_text='Hardware manufacturer.'
     )
-    hardware_type = forms.CharField(
+    model_name = forms.CharField(
         required=True,
-        help_text='Hardware type (model)',
+        help_text='Model of this device/model/inventory item type. See "Import settings" below for more info.',
+    )
+    part_number = forms.CharField(
+        required=False,
+        help_text='Discrete part number for model. Only used if creating new model.',
     )
     status = CSVChoiceField(
         choices=AssetStatusChoices,
-        help_text='Asset lifecycle status',
+        help_text='Asset lifecycle status.',
     )
     storage_site = CSVModelChoiceField(
         queryset=Site.objects.all(),
         to_field_name='name',
-        help_text='Site that contains Location asset is stored in',
+        help_text='Site that contains storage_location asset will be stored in.',
         required=False,
     )
     storage_location = CSVModelChoiceField(
         queryset=Location.objects.all(),
         to_field_name='name',
-        help_text=Asset._meta.get_field('storage_location').help_text,
-        required=not Asset._meta.get_field('storage_location').blank,
+        help_text='Location where is this asset stored when not in use. It must exist before import.',
+        required=False,
     )
     owner = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name='name',
-        help_text='Tenant that owns this asset',
-        required=not Asset._meta.get_field('owner').blank,
+        help_text='Tenant that owns this asset. It must exist before import.',
+        required=False,
     )
     purchase = CSVModelChoiceField(
         queryset=Purchase.objects.all(),
         to_field_name='name',
-        help_text=Asset._meta.get_field('purchase').help_text,
-        required=not Asset._meta.get_field('purchase').blank,
+        help_text='Purchase through which this asset was purchased. See "Import settings" below for more info.',
+        required=False,
     )
-    purchase_date = forms.CharField(
-        help_text='Required if purchase was given',
+    purchase_date = forms.DateField(
+        help_text='Date when this purchase was made.',
         required=False,
     )
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
-        help_text='Required if purchase was given',
+        help_text='Legal entity this purchase was made from. Required if a new purchase was given.',
         required=False,
     )
 
@@ -152,16 +156,16 @@ class AssetCSVForm(NetBoxModelCSVForm):
         model = Asset
         fields = (
             'name', 'asset_tag', 'serial', 'status',
-            'hardware_kind', 'manufacturer', 'hardware_type',
+            'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'storage_site', 'storage_location',
             'owner', 'purchase', 'purchase_date', 'supplier',
             'warranty_start', 'warranty_end', 'comments',
         )
 
-    def clean_hardware_type(self):
+    def clean_model_name(self):
         hardware_kind = self.cleaned_data.get('hardware_kind')
         manufacturer = self.cleaned_data.get('manufacturer')
-        model = self.cleaned_data.get('hardware_type')
+        model = self.cleaned_data.get('model_name')
         if not hardware_kind or not manufacturer:
             # clean on manufacturer or hardware_kind already raises
             return None
@@ -182,6 +186,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
         super().__init__(data, *args, **kwargs)
 
         if data:
+            # filter storage_location queryset on selected storage_site
             params = {f"site__{self.fields['storage_site'].to_field_name}": data.get('storage_site')}
             self.fields['storage_location'].queryset = self.fields['storage_location'].queryset.filter(**params)
 
@@ -191,27 +196,36 @@ class AssetCSVForm(NetBoxModelCSVForm):
                 Purchase.objects.get_or_create(
                     name=data.get('purchase'),
                     supplier=self._get_or_create_supplier(data),
-                    defaults={'date': data.get('purchase_date')}
+                    defaults={'date': self._get_clean_value(data, 'purchase_date')}
                 )
             if (get_plugin_setting('asset_import_create_device_type')
                 and data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
-                    model=data.get('hardware_type'),
+                    model=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
-                    defaults={'slug': slugify(data.get('hardware_type'))},
+                    defaults={
+                        'slug': slugify(data.get('model_name')),
+                        'part_number': self._get_clean_value(data, 'part_number'),
+                    },
                 )
             if (get_plugin_setting('asset_import_create_module_type')
                 and data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
-                    model=data.get('hardware_type'),
+                    model=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
+                    defaults={
+                        'part_number': self._get_clean_value(data, 'part_number'),
+                    },
                 )
             if (get_plugin_setting('asset_import_create_inventoryitem_type')
                 and data.get('hardware_kind') == 'inventoryitem'):
                 InventoryItemType.objects.get_or_create(
-                    model__iexact=data.get('hardware_type'),
+                    model__iexact=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
-                    defaults={'slug': slugify(data.get('hardware_type'))},
+                    defaults={
+                        'slug': slugify(data.get('model_name')),
+                        'part_number': self._get_clean_value(data, 'part_number'),
+                    },
                 )
 
     def _get_or_create_manufacturer(self, data):
@@ -233,3 +247,13 @@ class AssetCSVForm(NetBoxModelCSVForm):
             }
         )
         return supplier
+
+    def _get_clean_value(self, data, field_name):
+        """
+        Returns cleaned value for a given field from data
+        Used when creating additional related objects on import, since the values
+        are otherwise not validated by forms.
+        Used for DateTime, Boolean and similar fields. If used on ModelField and
+        instance does not exist it raises Exception but no feedback is given to user.
+        """
+        return self.fields[field_name].clean(data.get(field_name))

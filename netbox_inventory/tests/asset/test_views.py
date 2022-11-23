@@ -66,7 +66,7 @@ class AssetTestCase(
             'device_type': device_type1.pk,
         }
         cls.csv_data = (
-            'serial,status,hardware_kind,manufacturer,hardware_type',
+            'serial,status,hardware_kind,manufacturer,model_name',
             'csv1,stored,device,manufacturer1,device_type1',
             'csv2,stored,device,manufacturer1,device_type1',
             'csv3,stored,device,manufacturer_csv,device_type_csv',
