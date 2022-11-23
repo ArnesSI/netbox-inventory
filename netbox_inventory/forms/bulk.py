@@ -116,20 +116,20 @@ class AssetCSVForm(NetBoxModelCSVForm):
     storage_site = CSVModelChoiceField(
         queryset=Site.objects.all(),
         to_field_name='name',
-        help_text='Site that contains Location asset is stored in',
+        help_text='Site that contains storage_location asset will be stored in',
         required=False,
     )
     storage_location = CSVModelChoiceField(
         queryset=Location.objects.all(),
         to_field_name='name',
-        help_text=Asset._meta.get_field('storage_location').help_text,
-        required=not Asset._meta.get_field('storage_location').blank,
+        help_text='Location where is this asset stored when not in use. It must exist before import.',
+        required=False,
     )
     owner = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name='name',
-        help_text='Tenant that owns this asset',
-        required=not Asset._meta.get_field('owner').blank,
+        help_text='Tenant that owns this asset. It must exist before import.',
+        required=False,
     )
     purchase = CSVModelChoiceField(
         queryset=Purchase.objects.all(),
@@ -138,13 +138,13 @@ class AssetCSVForm(NetBoxModelCSVForm):
         required=not Asset._meta.get_field('purchase').blank,
     )
     purchase_date = forms.DateField(
-        help_text='Required if purchase was given',
+        help_text='Date when this purchase was made.',
         required=False,
     )
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
-        help_text='Required if purchase was given',
+        help_text='Legal entity this purchase was made at. Required if purchase was given.',
         required=False,
     )
 
@@ -182,6 +182,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
         super().__init__(data, *args, **kwargs)
 
         if data:
+            # filter storage_location queryset on selected storage_site
             params = {f"site__{self.fields['storage_site'].to_field_name}": data.get('storage_site')}
             self.fields['storage_location'].queryset = self.fields['storage_location'].queryset.filter(**params)
 
