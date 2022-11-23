@@ -1,7 +1,7 @@
 from utilities.choices import ChoiceSet
 
-class InventoryStatusChoices(ChoiceSet):
-    key = 'Inventory.status'
+class AssetStatusChoices(ChoiceSet):
+    key = 'Asset.status'
 
     CHOICES = [
         ('stored', 'Stored', 'green'),

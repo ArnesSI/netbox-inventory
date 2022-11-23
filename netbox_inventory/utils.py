@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from .choices import InventoryStatusChoices
+from .choices import AssetStatusChoices
 
 
 def get_asset_warranty_context(asset):
@@ -42,7 +42,7 @@ def get_status_for(status):
     status_name = settings.PLUGINS_CONFIG['netbox_inventory'][status + '_status_name']
     if status_name is None:
         return None
-    if status_name not in dict(InventoryStatusChoices):
+    if status_name not in dict(AssetStatusChoices):
         raise ImproperlyConfigured(
             f'Configuration defines status {status_name}, but not defined in InventoryStatusChoices'
         )
