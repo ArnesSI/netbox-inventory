@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
@@ -22,6 +24,8 @@ COMPONENT_FIELDS = (
     'rearport',
 )
 
+logger = logging.getLogger('netbox.netbox_inventory.forms.create')
+
 
 class AssetCreateMixin:
     def update_hardware_fields(self, kind_type):
@@ -42,6 +46,20 @@ class AssetCreateMixin:
             # disabled Select field will not be POSTed so clean() complains if field is required
             # we set value later in clean_*_type() anyway
             self.fields[kind_type].required = False
+
+    def save(self, *args):
+        """
+        After we save new hardware (Device, Module, InventortyItem), we must update
+        asset.device/.module/.intentory_item to reffer to this new hardware instance
+        """
+        instance = super().save(*args)
+        asset = instance.assigned_asset
+        asset.snapshot()
+        setattr(asset, asset.kind, instance)
+        asset.full_clean()
+        asset.save()
+        logger.info(f'Assigned newly created hardware ({instance}) to asset {asset}')
+        return instance
 
 
 class AssetDeviceCreateForm(AssetCreateMixin, DeviceForm):
