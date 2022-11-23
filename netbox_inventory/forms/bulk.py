@@ -107,7 +107,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
     )
     model_name = forms.CharField(
         required=True,
-        help_text='Model of this device/model/inventory item type',
+        help_text='Model of this device/model/inventory item type. See "Import settings" below for more info.',
     )
     status = CSVChoiceField(
         choices=AssetStatusChoices,
@@ -134,8 +134,8 @@ class AssetCSVForm(NetBoxModelCSVForm):
     purchase = CSVModelChoiceField(
         queryset=Purchase.objects.all(),
         to_field_name='name',
-        help_text=Asset._meta.get_field('purchase').help_text,
-        required=not Asset._meta.get_field('purchase').blank,
+        help_text='Purchase through which this asset was purchased. See "Import settings" below for more info.',
+        required=False,
     )
     purchase_date = forms.DateField(
         help_text='Date when this purchase was made.',
@@ -144,7 +144,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
-        help_text='Legal entity this purchase was made at. Required if purchase was given.',
+        help_text='Legal entity this purchase was made from. Required if a new purchase was given.',
         required=False,
     )
 

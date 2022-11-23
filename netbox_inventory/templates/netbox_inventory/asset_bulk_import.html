@@ -1,0 +1,60 @@
+{% extends "generic/bulk_import.html" %}
+
+{% load helpers %}
+{% load form_helpers %}
+
+{% block content %}
+{{ block.super }}
+
+        <div class="row">
+            <div class="col col-md-12 col-lg-10 offset-lg-1">
+                <div class="row my-3">
+                    <div class="col col-md-12">
+                        <div class="card">
+                            <h5 class="card-header">
+                                Import settings
+                            </h5>
+                            <div class="card-body">
+                                <p>
+                                CSV import can automatically create objects related to each Asset being imported.
+                                This is controlled via plugin's <a href="https://github.com/ArnesSI/netbox-inventory#settings" target="_blank">settings</a>.
+                                If a related object is missing and is not allowed to be created autmatically, import will fail.
+                                </p>
+                                <p>
+                                Values bellow show your current config values.
+                                </p>
+                                <table class="table">
+                                    <tr>
+                                        <th>Object name</th>
+                                        <th>Created if missing?</th>
+                                        <th>Plugin setting name</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Manufacturer & Device Type</td>
+                                        <td>{% checkmark settings.PLUGINS_CONFIG.netbox_inventory.asset_import_create_device_type %}</td>
+                                        <td><code>asset_import_create_device_type</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Manufacturer & Module Type</td>
+                                        <td>{% checkmark settings.PLUGINS_CONFIG.netbox_inventory.asset_import_create_module_type %}</td>
+                                        <td><code>asset_import_create_module_type</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Manufacturer & InventoryItem Type</td>
+                                        <td>{% checkmark settings.PLUGINS_CONFIG.netbox_inventory.asset_import_create_inventoryitem_type %}</td>
+                                        <td><code>asset_import_create_inventoryitem_type</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Supplier & Purchase</td>
+                                        <td>{% checkmark settings.PLUGINS_CONFIG.netbox_inventory.asset_import_create_purchase %}</td>
+                                        <td><code>asset_import_create_purchase</code></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock content %}
+
