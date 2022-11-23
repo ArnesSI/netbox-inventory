@@ -97,26 +97,30 @@ class AssetCSVForm(NetBoxModelCSVForm):
     hardware_kind = CSVChoiceField(
         choices=HardwareKindChoices,
         required=True,
-        help_text='What kind of hardware is this',
+        help_text='What kind of hardware is this.',
     )
     manufacturer = CSVModelChoiceField(
         queryset=Manufacturer.objects.all(),
         to_field_name='name',
         required=True,
-        help_text='Hardware manufacturer'
+        help_text='Hardware manufacturer.'
     )
     model_name = forms.CharField(
         required=True,
         help_text='Model of this device/model/inventory item type. See "Import settings" below for more info.',
     )
+    part_number = forms.CharField(
+        required=False,
+        help_text='Discrete part number for model. Only used if creating new model.',
+    )
     status = CSVChoiceField(
         choices=AssetStatusChoices,
-        help_text='Asset lifecycle status',
+        help_text='Asset lifecycle status.',
     )
     storage_site = CSVModelChoiceField(
         queryset=Site.objects.all(),
         to_field_name='name',
-        help_text='Site that contains storage_location asset will be stored in',
+        help_text='Site that contains storage_location asset will be stored in.',
         required=False,
     )
     storage_location = CSVModelChoiceField(
@@ -152,7 +156,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
         model = Asset
         fields = (
             'name', 'asset_tag', 'serial', 'status',
-            'hardware_kind', 'manufacturer', 'model_name',
+            'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'storage_site', 'storage_location',
             'owner', 'purchase', 'purchase_date', 'supplier',
             'warranty_start', 'warranty_end', 'comments',
@@ -199,20 +203,29 @@ class AssetCSVForm(NetBoxModelCSVForm):
                 DeviceType.objects.get_or_create(
                     model=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
-                    defaults={'slug': slugify(data.get('model_name'))},
+                    defaults={
+                        'slug': slugify(data.get('model_name')),
+                        'part_number': self._get_clean_value(data, 'part_number'),
+                    },
                 )
             if (get_plugin_setting('asset_import_create_module_type')
                 and data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
                     model=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
+                    defaults={
+                        'part_number': self._get_clean_value(data, 'part_number'),
+                    },
                 )
             if (get_plugin_setting('asset_import_create_inventoryitem_type')
                 and data.get('hardware_kind') == 'inventoryitem'):
                 InventoryItemType.objects.get_or_create(
                     model__iexact=data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(data),
-                    defaults={'slug': slugify(data.get('model_name'))},
+                    defaults={
+                        'slug': slugify(data.get('model_name')),
+                        'part_number': self._get_clean_value(data, 'part_number'),
+                    },
                 )
 
     def _get_or_create_manufacturer(self, data):
