@@ -199,6 +199,20 @@ class AssetCSVForm(NetBoxModelCSVForm):
         self._create_related_objects()
         return super()._clean_fields()
 
+    def _get_validation_exclusions(self):
+        """
+        Form's validate_unique calls this method to determine what atributes to
+        exclude from uniqness check. Parent method excludes any fields that are
+        not present on form. In our case we have model_name field we assign to
+        device_type, module_type or inventory_item dinamically. So we remove those
+        fields from exclusions.
+        """
+        exclude = super()._get_validation_exclusions()
+        exclude.remove('device_type')
+        exclude.remove('module_type')
+        exclude.remove('inventoryitem_type')
+        return exclude
+
     def _create_related_objects(self):
         """
         Create missing related objects (Purchase, DeviceType...). Based on plugin
