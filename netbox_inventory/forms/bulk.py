@@ -190,70 +190,113 @@ class AssetCSVForm(NetBoxModelCSVForm):
             params = {f"site__{self.fields['storage_site'].to_field_name}": data.get('storage_site')}
             self.fields['storage_location'].queryset = self.fields['storage_location'].queryset.filter(**params)
 
+    def _clean_fields(self):
+        """
+        _clean_fields is the first step where form cleanup and validation takes place.
+        We use this point to analyze CSV data and create related objects if needed.
+        Last we call super()._clean_fields and form validation continues as usual.
+        """
+        self._create_related_objects()
+        return super()._clean_fields()
+
+    def _get_validation_exclusions(self):
+        """
+        Form's validate_unique calls this method to determine what atributes to
+        exclude from uniqness check. Parent method excludes any fields that are
+        not present on form. In our case we have model_name field we assign to
+        device_type, module_type or inventory_item dinamically. So we remove those
+        fields from exclusions.
+        """
+        exclude = super()._get_validation_exclusions()
+        exclude.remove('device_type')
+        exclude.remove('module_type')
+        exclude.remove('inventoryitem_type')
+        return exclude
+
+    def _create_related_objects(self):
+        """
+        Create missing related objects (Purchase, DeviceType...). Based on plugin
+        settings.
+        On exceptions we add to form errors so user gets correct feedback that
+        something is wrong. 
+        """
+        try:
             # handle creating related resources if they don't exist and enabled in settings
             if (get_plugin_setting('asset_import_create_purchase')
-                and data.get('purchase') and data.get('supplier')):
+                and self.data.get('purchase') and self.data.get('supplier')):
                 Purchase.objects.get_or_create(
-                    name=data.get('purchase'),
-                    supplier=self._get_or_create_supplier(data),
-                    defaults={'date': self._get_clean_value(data, 'purchase_date')}
+                    name=self.data.get('purchase'),
+                    supplier=self._get_or_create_supplier(),
+                    defaults={'date': self._get_clean_value('purchase_date')}
                 )
             if (get_plugin_setting('asset_import_create_device_type')
-                and data.get('hardware_kind') == 'device'):
+                and self.data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
-                    model=data.get('model_name'),
-                    manufacturer=self._get_or_create_manufacturer(data),
+                    model=self.data.get('model_name'),
+                    manufacturer=self._get_or_create_manufacturer(),
                     defaults={
-                        'slug': slugify(data.get('model_name')),
-                        'part_number': self._get_clean_value(data, 'part_number'),
+                        'slug': slugify(self.data.get('model_name')),
+                        'part_number': self._get_clean_value('part_number'),
                     },
                 )
             if (get_plugin_setting('asset_import_create_module_type')
-                and data.get('hardware_kind') == 'module'):
+                and self.data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
-                    model=data.get('model_name'),
-                    manufacturer=self._get_or_create_manufacturer(data),
+                    model=self.data.get('model_name'),
+                    manufacturer=self._get_or_create_manufacturer(),
                     defaults={
-                        'part_number': self._get_clean_value(data, 'part_number'),
+                        'part_number': self._get_clean_value('part_number'),
                     },
                 )
             if (get_plugin_setting('asset_import_create_inventoryitem_type')
-                and data.get('hardware_kind') == 'inventoryitem'):
+                and self.data.get('hardware_kind') == 'inventoryitem'):
                 InventoryItemType.objects.get_or_create(
-                    model__iexact=data.get('model_name'),
-                    manufacturer=self._get_or_create_manufacturer(data),
+                    model__iexact=self.data.get('model_name'),
+                    manufacturer=self._get_or_create_manufacturer(),
                     defaults={
-                        'slug': slugify(data.get('model_name')),
-                        'part_number': self._get_clean_value(data, 'part_number'),
+                        'slug': slugify(self.data.get('model_name')),
+                        'part_number': self._get_clean_value('part_number'),
                     },
                 )
+        except forms.ValidationError as e:
+            # ValidationErrors are raised by _clean_fields() method
+            # this will be called later in the code and will be bound
+            # to correct field. So we skiup this kinds of errors here.
+            pass
+        except Exception as e:
+            # any other errors we add to non-field specific form errors
+            self.add_error(None, e)
 
-    def _get_or_create_manufacturer(self, data):
+    def _get_or_create_manufacturer(self):
         manufacturer, _ = Manufacturer.objects.get_or_create(
-            name__iexact=data.get('manufacturer'),
+            name__iexact=self.data.get('manufacturer'),
             defaults={
-                'name': data.get('manufacturer'),
-                'slug': slugify(data.get('manufacturer'))
+                'name': self.data.get('manufacturer'),
+                'slug': slugify(self.data.get('manufacturer'))
             },
         )
         return manufacturer
 
-    def _get_or_create_supplier(self, data):
+    def _get_or_create_supplier(self):
         supplier, _ = Supplier.objects.get_or_create(
-            name__iexact=data.get('supplier'),
+            name__iexact=self.data.get('supplier'),
             defaults={
-                'name': data.get('supplier'),
-                'slug': slugify(data.get('supplier'))
+                'name': self.data.get('supplier'),
+                'slug': slugify(self.data.get('supplier'))
             }
         )
         return supplier
 
-    def _get_clean_value(self, data, field_name):
+    def _get_clean_value(self, field_name):
         """
-        Returns cleaned value for a given field from data
+        Returns cleaned value for a given field from self.data
         Used when creating additional related objects on import, since the values
         are otherwise not validated by forms.
         Used for DateTime, Boolean and similar fields. If used on ModelField and
         instance does not exist it raises Exception but no feedback is given to user.
         """
-        return self.fields[field_name].clean(data.get(field_name))
+        try:
+            return self.fields[field_name].clean(self.data.get(field_name))
+        except forms.ValidationError as e:
+            self.add_error(field_name, e)
+            raise
