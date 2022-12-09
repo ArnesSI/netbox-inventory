@@ -107,7 +107,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
     )
     model_name = forms.CharField(
         required=True,
-        help_text='Model of this device/model/inventory item type. See "Import settings" below for more info.',
+        help_text='Model of this device/module/inventory item type. See "Import settings" below for more info.',
     )
     part_number = forms.CharField(
         required=False,
