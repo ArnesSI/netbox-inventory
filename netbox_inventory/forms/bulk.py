@@ -113,6 +113,10 @@ class AssetCSVForm(NetBoxModelCSVForm):
         required=False,
         help_text='Discrete part number for model. Only used if creating new model.',
     )
+    model_comments = forms.CharField(
+        required=False,
+        help_text='Comments for model. Only used if creating new model.',
+    )
     status = CSVChoiceField(
         choices=AssetStatusChoices,
         help_text='Asset lifecycle status.',
@@ -157,7 +161,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
         fields = (
             'name', 'asset_tag', 'serial', 'status',
             'hardware_kind', 'manufacturer', 'model_name', 'part_number',
-            'storage_site', 'storage_location',
+            'model_comments', 'storage_site', 'storage_location',
             'owner', 'purchase', 'purchase_date', 'supplier',
             'warranty_start', 'warranty_end', 'comments',
         )
@@ -237,6 +241,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
                     defaults={
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
+                        'comments': self._get_clean_value('model_comments'),
                     },
                 )
             if (get_plugin_setting('asset_import_create_module_type')
@@ -246,6 +251,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
                     manufacturer=self._get_or_create_manufacturer(),
                     defaults={
                         'part_number': self._get_clean_value('part_number'),
+                        'comments': self._get_clean_value('model_comments'),
                     },
                 )
             if (get_plugin_setting('asset_import_create_inventoryitem_type')
@@ -256,6 +262,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
                     defaults={
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
+                        'comments': self._get_clean_value('model_comments'),
                     },
                 )
         except forms.ValidationError as e:
