@@ -58,4 +58,15 @@ urlpatterns = (
     path('inventory-item-types/<int:pk>/delete/', views.InventoryItemTypeDeleteView.as_view(), name='inventoryitemtype_delete'),
     path('inventory-item-types/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='inventoryitemtype_changelog', kwargs={'model': models.InventoryItemType}),
 
+    # InventoryItemGroups
+    path('inventory-item-groups/', views.InventoryItemGroupListView.as_view(), name='inventoryitemgroup_list'),
+    path('inventory-item-groups/add/', views.InventoryItemGroupEditView.as_view(), name='inventoryitemgroup_add'),
+    #path('inventory-item-groups/import/', views.InventoryItemGroupBulkImportView.as_view(), name='inventoryitemgroup_import'),
+    #path('inventory-item-groups/edit/', views.InventoryItemGroupBulkEditView.as_view(), name='inventoryitemgroup_bulk_edit'),
+    path('inventory-item-groups/delete/', views.InventoryItemGroupBulkDeleteView.as_view(), name='inventoryitemgroup_bulk_delete'),
+    path('inventory-item-groups/<int:pk>', views.InventoryItemGroupView.as_view(), name='inventoryitemgroup'),
+    path('inventory-item-groups/<int:pk>/edit/', views.InventoryItemGroupEditView.as_view(), name='inventoryitemgroup_edit'),
+    path('inventory-item-groups/<int:pk>/delete/', views.InventoryItemGroupDeleteView.as_view(), name='inventoryitemgroup_delete'),
+    path('inventory-item-groups/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='inventoryitemgroup_changelog', kwargs={'model': models.InventoryItemGroup}),
+
 )

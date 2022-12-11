@@ -7,6 +7,7 @@ app_name = 'netbox_inventory'
 router = NetBoxRouter()
 router.register('assets', views.AssetViewSet)
 router.register('inventory-item-types', views.InventoryItemTypeViewSet)
+router.register('inventory-item-groups', views.InventoryItemGroupViewSet)
 router.register('suppliers', views.SupplierViewSet)
 router.register('purchases', views.PurchaseViewSet)
 router.register('dcim/devices', views.DeviceAssetViewSet)

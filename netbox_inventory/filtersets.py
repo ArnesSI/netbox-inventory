@@ -7,7 +7,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .models import Asset, InventoryItemType, Purchase, Supplier
+from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
@@ -219,6 +219,18 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
             Q(model__icontains=value) |
             Q(part_number__icontains=value)
         )
+        return queryset.filter(query)
+
+
+class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'id', 'name'
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(name__icontains=value) 
         return queryset.filter(query)
 
 

@@ -3,7 +3,7 @@ from netbox.forms import NetBoxModelForm
 from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms import CommentField, DatePicker, DynamicModelChoiceField, SlugField
 from tenancy.models import Tenant
-from ..models import Asset, InventoryItemType, Purchase, Supplier
+from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
@@ -11,6 +11,7 @@ __all__ = (
     'SupplierForm',
     'PurchaseForm',
     'InventoryItemTypeForm',
+    'InventoryItemGroupForm',
 )
 
 
@@ -204,7 +205,7 @@ class InventoryItemTypeForm(NetBoxModelForm):
     fieldsets = (
         (
             'Inventory Item Type',
-            ('manufacturer', 'model', 'slug', 'part_number', 'tags'),
+            ('manufacturer', 'model', 'slug', 'part_number', 'inventoryitem_group', 'tags'),
         ),
     )
 
@@ -215,6 +216,26 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'model',
             'slug',
             'part_number',
+            'inventoryitem_group',
+            'tags',
+            'comments',
+        )
+
+
+class InventoryItemGroupForm(NetBoxModelForm):
+    comments = CommentField()
+
+    fieldsets = (
+        (
+            'Inventory Item Group',
+            ('name', 'tags'),
+        ),
+    )
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'name',
             'tags',
             'comments',
         )

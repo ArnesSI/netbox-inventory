@@ -2,12 +2,13 @@ from django.db.models.functions import Coalesce
 import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
-from .models import Asset, InventoryItemType, Purchase, Supplier
+from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 __all__ = (
     'AssetTable',
     'SupplierTable',
     'InventoryItemTypeTable',
+    'InventoryItemGroupTable',
 )
 
 
@@ -268,5 +269,42 @@ class InventoryItemTypeTable(NetBoxTable):
             'name',
             'manufacturer',
             'model',
+            'asset_count',
+        )
+
+
+class InventoryItemGroupTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    inventoryitemtype_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:inventorytiemtype_list',
+        url_params={'inventoryitem_group_id': 'pk'},
+        verbose_name='Inventory Item Types',
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'inventoryitem_group_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = InventoryItemGroup
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+            'inventoryitemtype_count',
+            'asset_count',
+        )
+        default_columns = (
+            'name',
             'asset_count',
         )

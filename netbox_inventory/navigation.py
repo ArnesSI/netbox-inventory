@@ -62,6 +62,15 @@ inventoryitemtype_buttons = [
     # )
 ]
 
+inventoryitemgroup_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemgroup_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        color=ButtonColorChoices.GREEN
+    ),
+]
+
 menu_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
@@ -86,5 +95,11 @@ menu_items = (
         link_text='Inventory Item Types',
         permissions=["netbox_inventory.view_inventoryitemtype"],
         buttons=inventoryitemtype_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:inventoryitemgroup_list',
+        link_text='Inventory Item Groups',
+        permissions=["netbox_inventory.view_inventoryitemgroup"],
+        buttons=inventoryitemgroup_buttons,
     ),
 )

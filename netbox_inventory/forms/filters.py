@@ -9,13 +9,14 @@ from utilities.forms import (
 )
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..models import Asset, InventoryItemType, Purchase, Supplier
+from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
     'PurchaseFilterForm',
+    'InventoryItemGroupFilterForm',
 )
 
 
@@ -181,4 +182,9 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
         label='Purchased on or before',
         widget=DatePicker,
     )
+    tag = TagFilterField(model)
+
+
+class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemGroup
     tag = TagFilterField(model)
