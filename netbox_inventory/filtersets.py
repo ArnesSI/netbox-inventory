@@ -207,11 +207,17 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
         queryset=Manufacturer.objects.all(),
         label='Manufacturer (slug)',
     )
+    inventoryitem_group_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='inventoryitem_group',
+        queryset=InventoryItemGroup.objects.all(),
+        label='Inventory Item Group (ID)',
+    )
 
     class Meta:
         model = InventoryItemType
         fields = (
-            'id', 'manufacturer_id', 'manufacturer', 'model', 'slug', 'part_number'
+            'id', 'manufacturer_id', 'manufacturer', 'model', 'slug', 'part_number',
+            'inventoryitem_group_id',
         )
 
     def search(self, queryset, name, value):

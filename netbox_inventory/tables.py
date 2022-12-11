@@ -241,6 +241,9 @@ class InventoryItemTypeTable(NetBoxTable):
     model = tables.Column(
         linkify=True,
     )
+    inventoryitem_group = tables.Column(
+        linkify=True,
+    )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
         url_params={'inventoryitem_type_id': 'pk'},
@@ -258,6 +261,7 @@ class InventoryItemTypeTable(NetBoxTable):
             'model',
             'slug',
             'part_number',
+            'inventoryitem_group',
             'comments',
             'tags',
             'created',

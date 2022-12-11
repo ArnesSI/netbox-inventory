@@ -22,7 +22,7 @@ class InventoryItemTypeListView(generic.ObjectListView):
     )
     table = tables.InventoryItemTypeTable
     filterset = filtersets.InventoryItemTypeFilterSet
-    #filterset_form = forms.InventoryItemTypeFilterForm
+    filterset_form = forms.InventoryItemTypeFilterForm
 
 
 class InventoryItemTypeEditView(generic.ObjectEditView):

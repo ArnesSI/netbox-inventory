@@ -16,6 +16,7 @@ __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
     'PurchaseFilterForm',
+    'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
 )
 
@@ -181,6 +182,16 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label='Purchased on or before',
         widget=DatePicker,
+    )
+    tag = TagFilterField(model)
+
+
+class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemType
+    inventoryitem_group_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
     )
     tag = TagFilterField(model)
 
