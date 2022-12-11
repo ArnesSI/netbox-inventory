@@ -32,6 +32,10 @@ class AssetTable(NetBoxTable):
         linkify=True,
         verbose_name='Hardware type',
     )
+    inventoryitem_group = tables.Column(
+        accessor='inventoryitem_type__inventoryitem_group',
+        linkify=True,
+    )
     status = columns.ChoiceFieldColumn()
     hardware = tables.Column(
         linkify=True,
@@ -128,6 +132,7 @@ class AssetTable(NetBoxTable):
             'kind',
             'manufacturer',
             'hardware_type',
+            'inventoryitem_group'
             'hardware',
             'tenant',
             'contact',

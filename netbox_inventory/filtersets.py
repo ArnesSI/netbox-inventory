@@ -49,6 +49,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         to_field_name='slug',
         label='Inventory item type (slug)',
     )
+    inventoryitem_group_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='inventoryitem_type__inventoryitem_group',
+        queryset=InventoryItemGroup.objects.all(),
+        label='Inventory item group (ID)',
+    )
     is_assigned = django_filters.BooleanFilter(
         method='filter_is_assigned',
         label='Is assigned to hardware',

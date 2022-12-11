@@ -27,7 +27,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         (None, ('q', 'tag', 'status')),
         ('Hardware', (
             'kind', 'manufacturer_id', 'device_type_id', 'module_type_id',
-            'inventoryitem_type_id', 'is_assigned'
+            'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned'
         )),
         ('Usage', ('tenant_id', 'contact_id')),
         ('Purchase', (
@@ -75,6 +75,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'manufacturer_id': '$manufacturer',
         },
         label='Inventory item type'
+    )
+    inventoryitem_group_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
     )
     is_assigned = forms.NullBooleanField(
         required=False,
