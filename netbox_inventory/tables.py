@@ -266,7 +266,6 @@ class InventoryItemTypeTable(NetBoxTable):
             'asset_count',
         )
         default_columns = (
-            'name',
             'manufacturer',
             'model',
             'asset_count',
