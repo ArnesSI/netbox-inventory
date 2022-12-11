@@ -52,8 +52,8 @@ class AssetCreateMixin:
         After we save new hardware (Device, Module, InventortyItem), we must update
         asset.device/.module/.intentory_item to reffer to this new hardware instance
         """
+        asset = self.instance.assigned_asset
         instance = super().save(*args)
-        asset = instance.assigned_asset
         asset.snapshot()
         setattr(asset, asset.kind, instance)
         asset.full_clean()
