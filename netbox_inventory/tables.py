@@ -281,7 +281,7 @@ class InventoryItemGroupTable(NetBoxTable):
         linkify=True,
     )
     inventoryitemtype_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:inventorytiemtype_list',
+        viewname='plugins:netbox_inventory:inventoryitemtype_list',
         url_params={'inventoryitem_group_id': 'pk'},
         verbose_name='Inventory Item Types',
     )
