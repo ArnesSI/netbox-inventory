@@ -237,9 +237,10 @@ class AssetCSVForm(NetBoxModelCSVForm):
             if (get_plugin_setting('asset_import_create_device_type')
                 and self.data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
-                    model=self.data.get('model_name'),
+                    model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(),
                     defaults={
+                        'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
                         'comments': self._get_clean_value('model_comments'),
@@ -248,9 +249,10 @@ class AssetCSVForm(NetBoxModelCSVForm):
             if (get_plugin_setting('asset_import_create_module_type')
                 and self.data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
-                    model=self.data.get('model_name'),
+                    model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(),
                     defaults={
+                        'model': self.data.get('model_name'),
                         'part_number': self._get_clean_value('part_number'),
                         'comments': self._get_clean_value('model_comments'),
                     },
@@ -261,6 +263,7 @@ class AssetCSVForm(NetBoxModelCSVForm):
                     model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_manufacturer(),
                     defaults={
+                        'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
                         'comments': self._get_clean_value('model_comments'),
