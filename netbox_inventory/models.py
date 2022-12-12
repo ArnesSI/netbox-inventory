@@ -437,6 +437,13 @@ class InventoryItemType(NetBoxModel):
         blank=True,
         help_text='Discrete part number (optional)'
     )
+    inventoryitem_group = models.ForeignKey(
+        to='netbox_inventory.InventoryItemGroup',
+        on_delete=models.SET_NULL,
+        related_name='inventoryitem_types',
+        blank=True,
+        null=True,
+    )
     comments = models.TextField(
         blank=True
     )
@@ -457,3 +464,27 @@ class InventoryItemType(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:inventoryitemtype', args=[self.pk])
+
+
+class InventoryItemGroup(NetBoxModel):
+    """
+    Inventory Item Groups are groups fo simmilar InventoryItemTypes.
+    This allows you to, for example, have one Group for all your 10G-LR SFP
+    pluggables, from different manufacturers/with different part numbers.
+    """
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+    comments = models.TextField(
+        blank=True
+    )
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])

@@ -19,6 +19,10 @@
               <th scope="row">Part number</th>
               <td>{{ object.part_number }}</td>
             </tr>
+            <tr>
+              <th scope="row">Group</th>
+              <td>{{ object.inventoryitem_group|linkify|placeholder }}</td>
+            </tr>
           </table>
         </div>
       </div>

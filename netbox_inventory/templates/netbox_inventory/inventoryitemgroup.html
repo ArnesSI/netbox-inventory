@@ -1,0 +1,111 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+  <div class="row mb-3">
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Inventory Item Group</h5>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Name</th>
+              <td>{{ object.name }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Assets</th>
+              <td>
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}">{{ asset_total }}</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      {% include 'inc/panels/custom_fields.html' %}
+
+
+        <div class="card">
+        <h5 class="card-header">Asset count by status</h5>
+        <div class="card-body">
+          <table class="table table-hover object-list">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sc in status_counts.values %}
+            <tr>
+              <td>{% badge value=sc.label bg_color=sc.color %}</td>
+              <td>
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}&status={{ sc.value }}">
+                  {{ sc.count }}
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td class="text-center text-muted" colspan="2">— No assets found —</td></tr>
+            {% endfor %}
+          </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h5 class="card-header">Asset count by type & status</h5>
+        <div class="card-body">
+          <table class="table table-hover object-list table-striped">
+          <thead>
+            <tr>
+              <th>Inventory Item Type</th>
+              <th>Status</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ac in asset_counts %}
+            <tr>
+            {% ifchanged ac.inventoryitem_type %}
+              <td>
+                {{ ac.inventoryitem_type.manufacturer }} {{ ac.inventoryitem_type|linkify }}
+              </td>
+            {% else %}
+              <td>&nbsp;</td>
+            {% endifchanged %}
+              <td>
+                {% badge value=ac.label bg_color=ac.color %}
+              </td>
+              <td>
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_type_id={{ ac.inventoryitem_type.pk }}&status={{ ac.value }}">
+                  {{ ac.count }}
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td class="text-center text-muted" colspan="3">— No assets found —</td></tr>
+            {% endfor %}
+          </tbody>
+          </table>
+        </div>
+      </div>
+  
+    </div>
+    <div class="col col-md-6">
+      {% include 'inc/panels/tags.html' %}
+      {% include 'inc/panels/comments.html' %}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">Assets</h5>
+        <div class="card-body table-responsive">
+          {% render_table asset_table 'inc/table.html' %}
+          {% include 'inc/paginator.html' with paginator=asset_table.paginator page=asset_table.page %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

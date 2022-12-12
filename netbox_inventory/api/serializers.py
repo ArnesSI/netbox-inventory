@@ -7,7 +7,7 @@ from dcim.api.serializers import (
 )
 from netbox.api.serializers import NetBoxModelSerializer
 from .nested_serializers import *
-from ..models import Asset, InventoryItemType, Purchase, Supplier
+from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 
@@ -69,12 +69,28 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:inventoryitemtype-detail'
     )
     manufacturer = NestedManufacturerSerializer()
+    inventoryitem_group = NestedInventoryItemGroupSerializer()
     asset_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = InventoryItemType
         fields = (
             'id', 'url', 'display', 'model', 'slug', 'manufacturer', 'part_number',
-            'comments', 'tags', 'custom_fields', 'created', 'last_updated',
-            'asset_count',
+            'inventoryitem_group', 'comments', 'tags', 'custom_fields', 'created',
+            'last_updated', 'asset_count',
+        )
+
+
+class InventoryItemGroupSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:inventoryitemgroup-detail'
+    )
+    inventoryitemtype_count = serializers.IntegerField(read_only=True)
+    asset_count = serializers.IntegerField(read_only=True)
+    
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'id', 'url', 'display', 'name', 'comments', 'tags', 'custom_fields',
+            'created', 'last_updated', 'inventoryitemtype_count', 'asset_count',
         )

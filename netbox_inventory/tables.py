@@ -2,12 +2,13 @@ from django.db.models.functions import Coalesce
 import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
-from .models import Asset, InventoryItemType, Purchase, Supplier
+from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 __all__ = (
     'AssetTable',
     'SupplierTable',
     'InventoryItemTypeTable',
+    'InventoryItemGroupTable',
 )
 
 
@@ -30,6 +31,10 @@ class AssetTable(NetBoxTable):
     hardware_type = tables.Column(
         linkify=True,
         verbose_name='Hardware type',
+    )
+    inventoryitem_group = tables.Column(
+        accessor='inventoryitem_type__inventoryitem_group',
+        linkify=True,
     )
     status = columns.ChoiceFieldColumn()
     hardware = tables.Column(
@@ -127,6 +132,7 @@ class AssetTable(NetBoxTable):
             'kind',
             'manufacturer',
             'hardware_type',
+            'inventoryitem_group'
             'hardware',
             'tenant',
             'contact',
@@ -240,6 +246,9 @@ class InventoryItemTypeTable(NetBoxTable):
     model = tables.Column(
         linkify=True,
     )
+    inventoryitem_group = tables.Column(
+        linkify=True,
+    )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
         url_params={'inventoryitem_type_id': 'pk'},
@@ -257,6 +266,7 @@ class InventoryItemTypeTable(NetBoxTable):
             'model',
             'slug',
             'part_number',
+            'inventoryitem_group',
             'comments',
             'tags',
             'created',
@@ -265,8 +275,44 @@ class InventoryItemTypeTable(NetBoxTable):
             'asset_count',
         )
         default_columns = (
-            'name',
             'manufacturer',
             'model',
+            'asset_count',
+        )
+
+
+class InventoryItemGroupTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    inventoryitemtype_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:inventoryitemtype_list',
+        url_params={'inventoryitem_group_id': 'pk'},
+        verbose_name='Inventory Item Types',
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'inventoryitem_group_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = InventoryItemGroup
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+            'inventoryitemtype_count',
+            'asset_count',
+        )
+        default_columns = (
+            'name',
             'asset_count',
         )

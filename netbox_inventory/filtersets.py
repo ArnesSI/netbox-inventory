@@ -7,7 +7,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .models import Asset, InventoryItemType, Purchase, Supplier
+from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
@@ -48,6 +48,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         queryset=InventoryItemType.objects.all(),
         to_field_name='slug',
         label='Inventory item type (slug)',
+    )
+    inventoryitem_group_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='inventoryitem_type__inventoryitem_group',
+        queryset=InventoryItemGroup.objects.all(),
+        label='Inventory item group (ID)',
     )
     is_assigned = django_filters.BooleanFilter(
         method='filter_is_assigned',
@@ -207,11 +212,17 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
         queryset=Manufacturer.objects.all(),
         label='Manufacturer (slug)',
     )
+    inventoryitem_group_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='inventoryitem_group',
+        queryset=InventoryItemGroup.objects.all(),
+        label='Inventory Item Group (ID)',
+    )
 
     class Meta:
         model = InventoryItemType
         fields = (
-            'id', 'manufacturer_id', 'manufacturer', 'model', 'slug', 'part_number'
+            'id', 'manufacturer_id', 'manufacturer', 'model', 'slug', 'part_number',
+            'inventoryitem_group_id',
         )
 
     def search(self, queryset, name, value):
@@ -219,6 +230,18 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
             Q(model__icontains=value) |
             Q(part_number__icontains=value)
         )
+        return queryset.filter(query)
+
+
+class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'id', 'name'
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(name__icontains=value) 
         return queryset.filter(query)
 
 

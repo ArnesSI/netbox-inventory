@@ -10,12 +10,13 @@ from utilities.forms import (
 )
 from tenancy.models import Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices
-from ..models import Asset, InventoryItemType, Purchase, Supplier
+from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_plugin_setting
 
 __all__ = (
     'AssetBulkEditForm',
     'AssetCSVForm',
+    'InventoryItemTypeBulkEditForm',
 )
 
 
@@ -307,3 +308,27 @@ class AssetCSVForm(NetBoxModelCSVForm):
         except forms.ValidationError as e:
             self.add_error(field_name, e)
             raise
+
+
+class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
+    manufacturer = DynamicModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    inventoryitem_group = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = InventoryItemType
+    fieldsets = (
+        ('Inventory Item Type', ('manufacturer', 'inventoryitem_group')),
+    )
+    nullable_fields = (
+        'inventoryitem_group',
+    )

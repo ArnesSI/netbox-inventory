@@ -2,7 +2,10 @@ from dcim.api.views import DeviceViewSet, InventoryItemViewSet, ModuleViewSet
 from netbox.api.viewsets import NetBoxModelViewSet
 from utilities.utils import count_related
 from .. import filtersets, models
-from .serializers import AssetSerializer, InventoryItemTypeSerializer, PurchaseSerializer, SupplierSerializer
+from .serializers import (
+    AssetSerializer, InventoryItemTypeSerializer, InventoryItemGroupSerializer,
+    PurchaseSerializer, SupplierSerializer
+)
 
 
 class AssetViewSet(NetBoxModelViewSet):
@@ -36,6 +39,15 @@ class InventoryItemTypeViewSet(NetBoxModelViewSet):
     )
     serializer_class = InventoryItemTypeSerializer
     filterset_class = filtersets.InventoryItemTypeFilterSet
+
+
+class InventoryItemGroupViewSet(NetBoxModelViewSet):
+    queryset = models.InventoryItemGroup.objects.prefetch_related('tags').annotate(
+        inventoryitemtype_count=count_related(models.InventoryItemType, 'inventoryitem_group'),
+        asset_count=count_related(models.Asset, 'inventoryitem_type__inventoryitem_group')
+    )
+    serializer_class = InventoryItemGroupSerializer
+    filterset_class = filtersets.InventoryItemGroupFilterSet
 
 
 class DeviceAssetViewSet(DeviceViewSet):

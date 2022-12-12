@@ -9,13 +9,15 @@ from utilities.forms import (
 )
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..models import Asset, InventoryItemType, Purchase, Supplier
+from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
     'PurchaseFilterForm',
+    'InventoryItemTypeFilterForm',
+    'InventoryItemGroupFilterForm',
 )
 
 
@@ -25,7 +27,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         (None, ('q', 'tag', 'status')),
         ('Hardware', (
             'kind', 'manufacturer_id', 'device_type_id', 'module_type_id',
-            'inventoryitem_type_id', 'is_assigned'
+            'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned'
         )),
         ('Usage', ('tenant_id', 'contact_id')),
         ('Purchase', (
@@ -73,6 +75,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'manufacturer_id': '$manufacturer',
         },
         label='Inventory item type'
+    )
+    inventoryitem_group_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
     )
     is_assigned = forms.NullBooleanField(
         required=False,
@@ -181,4 +188,19 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
         label='Purchased on or before',
         widget=DatePicker,
     )
+    tag = TagFilterField(model)
+
+
+class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemType
+    inventoryitem_group_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
+    )
+    tag = TagFilterField(model)
+
+
+class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemGroup
     tag = TagFilterField(model)
