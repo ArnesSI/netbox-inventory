@@ -38,6 +38,7 @@ class Asset(NetBoxModel):
         blank=True,
         null=True,
         default=None,
+        verbose_name='Asset Tag',
     )
     serial = models.CharField(
         help_text='Identifier assigned by manufacturer',
@@ -66,6 +67,7 @@ class Asset(NetBoxModel):
         related_name='+',
         blank=True,
         null=True,
+        verbose_name='Device Type',
     )
     module_type = models.ForeignKey(
         to='dcim.ModuleType',
@@ -73,6 +75,7 @@ class Asset(NetBoxModel):
         related_name='+',
         blank=True,
         null=True,
+        verbose_name='Module Type',
     )
     inventoryitem_type = models.ForeignKey(
         to='netbox_inventory.InventoryItemType',
@@ -80,6 +83,7 @@ class Asset(NetBoxModel):
         related_name='+',
         blank=True,
         null=True,
+        verbose_name='Inventory Item Type',
     )
 
     #
@@ -105,6 +109,7 @@ class Asset(NetBoxModel):
         related_name='assigned_asset',
         blank=True,
         null=True,
+        verbose_name='Inventory Item',
     )
     tenant = models.ForeignKey(
         help_text='Tenant using this asset',
@@ -130,6 +135,7 @@ class Asset(NetBoxModel):
         related_name='+',
         blank=True,
         null=True,
+        verbose_name='Storage Location',
     )
 
     #
@@ -155,11 +161,13 @@ class Asset(NetBoxModel):
         help_text='First date warranty for this asset is valid',
         blank=True,
         null=True,
+        verbose_name='Warranty Start',
     )
     warranty_end = models.DateField(
         help_text='Last date warranty for this asset is valid',
         blank=True,
         null=True,
+        verbose_name='Warranty End',
     )
 
     comments = models.TextField(
@@ -318,7 +326,7 @@ class Asset(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:asset', args=[self.pk])
-    
+
     def get_status_color(self):
         return AssetStatusChoices.colors.get(self.status)
 
@@ -435,7 +443,8 @@ class InventoryItemType(NetBoxModel):
     part_number = models.CharField(
         max_length=50,
         blank=True,
-        help_text='Discrete part number (optional)'
+        help_text='Discrete part number (optional)',
+        verbose_name='Part Number',
     )
     inventoryitem_group = models.ForeignKey(
         to='netbox_inventory.InventoryItemGroup',
@@ -443,6 +452,7 @@ class InventoryItemType(NetBoxModel):
         related_name='inventoryitem_types',
         blank=True,
         null=True,
+        verbose_name='Inventory Item Group',
     )
     comments = models.TextField(
         blank=True
