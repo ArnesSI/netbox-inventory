@@ -61,7 +61,6 @@ class AssetTable(NetBoxTable):
         linkify=True,
     )
     purchase_date = columns.DateColumn(
-        verbose_name='Purchase date',
         accessor='purchase__date',
         verbose_name='Purchase Date',
     )
