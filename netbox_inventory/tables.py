@@ -132,7 +132,7 @@ class AssetTable(NetBoxTable):
             'kind',
             'manufacturer',
             'hardware_type',
-            'inventoryitem_group'
+            'inventoryitem_group',
             'hardware',
             'tenant',
             'contact',
