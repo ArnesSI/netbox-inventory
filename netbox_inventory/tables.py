@@ -25,16 +25,16 @@ class AssetTable(NetBoxTable):
     )
     manufacturer = tables.Column(
         accessor='hardware_type__manufacturer',
-        verbose_name='Manufacturer',
         linkify=True,
     )
     hardware_type = tables.Column(
         linkify=True,
-        verbose_name='Hardware type',
+        verbose_name='Hardware Type',
     )
     inventoryitem_group = tables.Column(
         accessor='inventoryitem_type__inventoryitem_group',
         linkify=True,
+        verbose_name='Inventory Item Group',
     )
     status = columns.ChoiceFieldColumn()
     hardware = tables.Column(
@@ -61,8 +61,8 @@ class AssetTable(NetBoxTable):
         linkify=True,
     )
     purchase_date = columns.DateColumn(
-        verbose_name='Purchase date',
         accessor='purchase__date',
+        verbose_name='Purchase Date',
     )
     tags = columns.TagColumn()
     actions = columns.ActionsColumn(
