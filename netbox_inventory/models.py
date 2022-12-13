@@ -43,7 +43,7 @@ class Asset(NetBoxModel):
     serial = models.CharField(
         help_text='Identifier assigned by manufacturer',
         max_length=60,
-        verbose_name='Serial number',
+        verbose_name='Serial Number',
         blank=True,
         null=True,
         default=None,
