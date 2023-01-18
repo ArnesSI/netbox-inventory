@@ -71,6 +71,12 @@ class AssetTestCase(
             'csv2,stored,device,manufacturer1,device_type1',
             'csv3,stored,device,manufacturer_csv,device_type_csv',
         )
+        cls.csv_update_data = (
+            'id,serial,status',
+            f'{asset1.pk},133,stored',
+            f'{asset2.pk},233,stored',
+            f'{asset3.pk},333,stored',
+        )
         cls.bulk_edit_data = {
             'status': 'retired',
         }
