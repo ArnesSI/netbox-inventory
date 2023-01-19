@@ -1,4 +1,4 @@
-from extras.plugins import PluginMenuButton, PluginMenuItem
+from extras.plugins import PluginMenuItem, PluginMenu, PluginMenuButton
 from utilities.choices import ButtonColorChoices
 
 
@@ -71,7 +71,7 @@ inventoryitemgroup_buttons = [
     ),
 ]
 
-menu_items = (
+menu = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
         link_text='Assets',
@@ -102,4 +102,12 @@ menu_items = (
         permissions=["netbox_inventory.view_inventoryitemgroup"],
         buttons=inventoryitemgroup_buttons,
     ),
+)
+
+menu = PluginMenu(
+    label='Inventory',
+    groups=(
+        ('Asset Management', menu),
+    ),
+    icon_class='mdi mdi-clipboard-text-multiple-outline'
 )
