@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from netbox.models import NetBoxModel
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .utils import get_prechange_field, get_plugin_setting, get_status_for
+from .utils import asset_clear_old_hw, get_prechange_field, get_plugin_setting, get_status_for
 
 
 class Asset(NetBoxModel):
@@ -297,16 +297,13 @@ class Asset(NetBoxModel):
         # device, module... does not allow serial to be null
         new_serial = self.serial if self.serial else ''
         if not new_hw and old_hw:
-            old_hw.serial = ''
-            old_hw.asset_tag = None
-            old_hw.save()
+            # unassigned
+            asset_clear_old_hw(old_hw)
         elif new_hw and old_hw != new_hw:
             # assigned something, set its serial
             if old_hw:
                 # but first clear previous hw data
-                old_hw.serial = ''
-                old_hw.asset_tag = None
-                old_hw.save()
+                asset_clear_old_hw(old_hw)
             # if new_hw already has correct values, don't save it again
             new_hw_save = False
             if new_hw.serial != new_serial:
