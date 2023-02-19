@@ -32,7 +32,7 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
         # don't enforce if sync not enabled
         return
     if asset.serial != instance.serial or asset.asset_tag != instance.asset_tag:
-        raise AbortRequest(f'Cannot change {asset.kind} serial and asset tag if asset is asigned. Please update via inventory > asset instead.')
+        raise AbortRequest(f'Cannot change {asset.kind} serial and asset tag if asset is assigned. Please update via inventory > asset instead.')
 
 
 @receiver(pre_delete, sender=Device)
