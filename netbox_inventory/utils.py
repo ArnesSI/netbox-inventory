@@ -52,7 +52,7 @@ def get_status_for(status):
         return None
     if status_name not in dict(AssetStatusChoices):
         raise ImproperlyConfigured(
-            f'Configuration defines status {status_name}, but not defined in InventoryStatusChoices'
+            f'Configuration defines status {status_name}, but not defined in AssetStatusChoices'
         )
     return status_name
 

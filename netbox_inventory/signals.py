@@ -41,7 +41,7 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
 def free_assigned_asset(instance, **kwargs):
     """
     If a hardware (Device, Module or InventoryItem) has an Asset assigned and
-    that hardware is deleted, uspdate Asset.status to stored_status.
+    that hardware is deleted, update Asset.status to stored_status.
 
     Netbox handles deletion in a DB transaction, so if deletion failes for any
     reason, this status change will also be reverted.
