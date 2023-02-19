@@ -153,3 +153,26 @@ class TestAssetModel(TestCase):
         self.assertEqual(self.device1.asset_tag, None)
         self.assertEqual(self.device2.serial, '')
         self.assertEqual(self.device2.asset_tag, None)
+
+    def test_update_status(self):
+        self.asset1.snapshot()
+        self.asset1.device = self.device1
+        self.asset1.full_clean()
+        self.asset1.save()
+        self.asset1.refresh_from_db()
+        self.assertEqual(self.asset1.status, 'used')
+        self.asset1.snapshot()
+        self.asset1.device = None
+        self.asset1.full_clean()
+        self.asset1.save()
+        self.assertEqual(self.asset1.status, 'stored')
+
+    def test_status_device_deleted(self):
+        self.asset1.snapshot()
+        self.asset1.device = self.device1
+        self.asset1.full_clean()
+        self.asset1.save()
+        self.assertEqual(self.asset1.status, 'used')
+        self.device1.delete()
+        self.asset1.refresh_from_db()
+        self.assertEqual(self.asset1.status, 'stored')

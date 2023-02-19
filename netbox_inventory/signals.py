@@ -54,7 +54,10 @@ def free_assigned_asset(instance, **kwargs):
         asset = instance.assigned_asset
     except Asset.DoesNotExist:
         return
+    asset.snapshot()
     asset.status = stored_status
+    # also unassign that item from asset
+    setattr(asset, asset.kind, None)
     asset.full_clean()
     asset.save()
     logger.info(f'Asset marked as stored {asset}')
