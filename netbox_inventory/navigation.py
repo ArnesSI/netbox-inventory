@@ -1,8 +1,16 @@
 from packaging import version
 
 from django.conf import settings
-from extras.plugins import PluginMenuItem, PluginMenu, PluginMenuButton
+from extras.plugins import PluginMenuItem, PluginMenuButton
 from utilities.choices import ButtonColorChoices
+
+# compatibility with netbox v3.3 that does not have PluginMenu
+try:
+    from extras.plugins import PluginMenu
+    HAVE_MENU = True
+except ImportError:
+    HAVE_MENU = False
+    PluginMenu = PluginMenuItem
 
 
 asset_buttons = [
@@ -107,10 +115,8 @@ menu_buttons = (
     ),
 )
 
-current_version = version.parse(settings.VERSION)
-REQUIRED_VERSION = version.Version('3.4')
 # can't use utils.get_plugin_setting() here, get value manually
-if (current_version >= REQUIRED_VERSION and settings.PLUGINS_CONFIG['netbox_inventory']['top_level_menu']):
+if (HAVE_MENU and settings.PLUGINS_CONFIG['netbox_inventory']['top_level_menu']):
     # add a top level entry
     menu = PluginMenu(
         label=f'Inventory',
