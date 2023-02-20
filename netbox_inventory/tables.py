@@ -149,6 +149,7 @@ class AssetTable(NetBoxTable):
             'actions',
         )
         default_columns = (
+            'id',
             'name',
             'serial',
             'kind',
