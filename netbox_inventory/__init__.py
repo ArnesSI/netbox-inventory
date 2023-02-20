@@ -12,6 +12,7 @@ class NetBoxInventoryConfig(PluginConfig):
     base_url = 'inventory'
     min_version = '3.3.0'
     default_settings = {
+        'top_level_menu': True,
         'used_status_name': 'used',
         'stored_status_name': 'stored',
         'sync_hardware_serial_asset_tag': False,
