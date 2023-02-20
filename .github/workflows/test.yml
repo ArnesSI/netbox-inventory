@@ -1,12 +1,12 @@
 name: Run tests under netbox
-on: [push, pull_request]
+on: [push]
 jobs:
   test-netbox:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        netbox-version: ["v3.4.2", "v3.3.6", "develop"]
+        netbox-version: ["v3.4.4", "v3.3.10", "develop"]
     services:
       redis:
         image: redis
