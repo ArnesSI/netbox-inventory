@@ -1,3 +1,6 @@
+from packaging import version
+
+from django.conf import settings
 from extras.plugins import PluginMenuItem, PluginMenu, PluginMenuButton
 from utilities.choices import ButtonColorChoices
 
@@ -71,7 +74,7 @@ inventoryitemgroup_buttons = [
     ),
 ]
 
-menu = (
+menu_buttons = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
         link_text='Assets',
@@ -104,10 +107,18 @@ menu = (
     ),
 )
 
-menu = PluginMenu(
-    label='Inventory',
-    groups=(
-        ('Asset Management', menu),
-    ),
-    icon_class='mdi mdi-clipboard-text-multiple-outline'
-)
+current_version = version.parse(settings.VERSION)
+REQUIRED_VERSION = version.Version('3.4')
+# can't use utils.get_plugin_setting() here, get value manually
+if (current_version >= REQUIRED_VERSION and settings.PLUGINS_CONFIG['netbox_inventory']['top_level_menu']):
+    # add a top level entry
+    menu = PluginMenu(
+        label=f'Inventory',
+        groups=(
+            ('Asset Management', menu_buttons),
+        ),
+        icon_class='mdi mdi-clipboard-text-multiple-outline'
+    )
+else:
+    # display under plugins
+    menu_items = menu_buttons
