@@ -158,18 +158,17 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.fields['manufacturer'].choices = [(asset.inventoryitem_type.manufacturer.pk, asset.inventoryitem_type.manufacturer)]
 
     def clean(self):
-        cleaned_data = super().clean()
+        super().clean()
         component_set = None
         for field_name in COMPONENT_FIELDS:
-            field_value = cleaned_data.get(field_name)
+            field_value = self.cleaned_data.get(field_name)
             if field_value and component_set:
                 raise ValidationError('Only a single component can be selected')
             if field_value:
                 component_set = field_name
-                cleaned_data['component_type'] = ContentType.objects.get(app_label='dcim', model=field_name)
-                cleaned_data['component_id'] = field_value.pk
-                cleaned_data.pop(field_name)
-        return cleaned_data
+                self.cleaned_data['component_type'] = ContentType.objects.get(app_label='dcim', model=field_name)
+                self.cleaned_data['component_id'] = field_value.pk
+                self.cleaned_data.pop(field_name)
 
     def clean_manufacturer(self):
         return self.instance.assigned_asset.inventoryitem_type.manufacturer

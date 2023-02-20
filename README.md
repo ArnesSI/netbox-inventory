@@ -41,12 +41,12 @@ The idea is that an external system uses some assets stored in netbox_inventory,
 
 ## Compatibility
 
-This plugin requires netbox version 3.3 to work.
+This plugin requires netbox version 3.3 or more to work.
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
-|       3.3      |      1.0.x     |
-|       3.4      |    (none yet)  |
+|       3.3      |      1.1.x     |
+|       3.4      |   (none yet)   |
 
 ## Installing
 

@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models.signals import pre_save
 
+from dcim.models import Device, Module, InventoryItem
 from .choices import AssetStatusChoices
 
 
@@ -50,7 +52,7 @@ def get_status_for(status):
         return None
     if status_name not in dict(AssetStatusChoices):
         raise ImproperlyConfigured(
-            f'Configuration defines status {status_name}, but not defined in InventoryStatusChoices'
+            f'Configuration defines status {status_name}, but not defined in AssetStatusChoices'
         )
     return status_name
 
@@ -84,3 +86,17 @@ def get_tags_and_edit_protected_asset_fields():
         dict: dict of tag slug strings and list of field names
     """
     return get_plugin_setting('asset_disable_editing_fields_for_tags')
+
+
+def asset_clear_old_hw(old_hw):
+    # need to temporarily disconnect signal receiver that prevents update of device serial if asset assigned
+    from .signals import prevent_update_serial_asset_tag
+    pre_save.disconnect(prevent_update_serial_asset_tag, sender=Device)
+    pre_save.disconnect(prevent_update_serial_asset_tag, sender=Module)
+    pre_save.disconnect(prevent_update_serial_asset_tag, sender=InventoryItem)
+    old_hw.serial = ''
+    old_hw.asset_tag = None
+    old_hw.save()
+    pre_save.connect(prevent_update_serial_asset_tag, sender=Device)
+    pre_save.connect(prevent_update_serial_asset_tag, sender=Module)
+    pre_save.connect(prevent_update_serial_asset_tag, sender=InventoryItem)

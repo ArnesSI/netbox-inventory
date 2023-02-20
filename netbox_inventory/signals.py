@@ -32,7 +32,7 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
         # don't enforce if sync not enabled
         return
     if asset.serial != instance.serial or asset.asset_tag != instance.asset_tag:
-        raise AbortRequest(f'Cannot change {asset.kind} serial and asset tag if asset is asigned. Please update via inventory > asset instead.')
+        raise AbortRequest(f'Cannot change {asset.kind} serial and asset tag if asset is assigned. Please update via inventory > asset instead.')
 
 
 @receiver(pre_delete, sender=Device)
@@ -41,7 +41,7 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
 def free_assigned_asset(instance, **kwargs):
     """
     If a hardware (Device, Module or InventoryItem) has an Asset assigned and
-    that hardware is deleted, uspdate Asset.status to stored_status.
+    that hardware is deleted, update Asset.status to stored_status.
 
     Netbox handles deletion in a DB transaction, so if deletion failes for any
     reason, this status change will also be reverted.
@@ -54,7 +54,10 @@ def free_assigned_asset(instance, **kwargs):
         asset = instance.assigned_asset
     except Asset.DoesNotExist:
         return
+    asset.snapshot()
     asset.status = stored_status
+    # also unassign that item from asset
+    setattr(asset, asset.kind, None)
     asset.full_clean()
     asset.save()
     logger.info(f'Asset marked as stored {asset}')
