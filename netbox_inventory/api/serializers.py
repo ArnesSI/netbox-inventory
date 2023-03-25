@@ -82,7 +82,7 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:inventoryitemtype-detail'
     )
     manufacturer = NestedManufacturerSerializer()
-    inventoryitem_group = NestedInventoryItemGroupSerializer()
+    inventoryitem_group = NestedInventoryItemGroupSerializer(required=False)
     asset_count = serializers.IntegerField(read_only=True)
     
     class Meta:
