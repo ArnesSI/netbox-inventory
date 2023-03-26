@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 
 from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
-from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelCSVForm
+from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms import (
     add_blank_choice, ChoiceField, CommentField, CSVChoiceField,
     CSVModelChoiceField, DynamicModelChoiceField
@@ -15,7 +15,7 @@ from ..utils import get_plugin_setting
 
 __all__ = (
     'AssetBulkEditForm',
-    'AssetCSVForm',
+    'AssetImportForm',
     'InventoryItemTypeBulkEditForm',
 )
 
@@ -94,7 +94,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     )
 
 
-class AssetCSVForm(NetBoxModelCSVForm):
+class AssetImportForm(NetBoxModelImportForm):
     hardware_kind = CSVChoiceField(
         choices=HardwareKindChoices,
         required=True,

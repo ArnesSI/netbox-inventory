@@ -174,6 +174,9 @@ class AssetBulkAddTestCase(
     ModelViewTestCase,
     ViewTestCases.CreateMultipleObjectsViewTestCase,
 ):
+    """
+    test for /plugins/inventory/assets/bulk-add/
+    """
     model = Asset
 
     @classmethod
