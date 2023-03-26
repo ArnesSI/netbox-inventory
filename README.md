@@ -41,12 +41,13 @@ The idea is that an external system uses some assets stored in netbox_inventory,
 
 ## Compatibility
 
-This plugin requires netbox version 3.3 or more to work.
+This plugin requires netbox version 3.4.x to work. Older versions of the plugin
+support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
 |       3.3      |      1.1.x     |
-|       3.4      |   (none yet)   |
+|       3.4      |      1.2.x     |
 
 ## Installing
 
@@ -91,14 +92,15 @@ PLUGINS_CONFIG = {
 Available configuration settings you can use in `PLUGINS_CONFIG` are described
 below under [settings](#settings).
 
-The last step is to apply database migrations:
+The last step is to apply database migrations and update netbox search index:
 
 ```bash
 (venv) $ cd /opt/netbox/netbox/
 (venv) $ python3 manage.py migrate
+(venv) $ python3 manage.py reindex --lazy
 ```
 
-If you're running under netbox-docker, you can skip this as migrations are applied if needed automatically when you bring up the containers.
+If you're running under netbox-docker, you can skip this as migrations and index updates are applied if needed automatically when you bring up the containers.
 
 ### Settings
 
