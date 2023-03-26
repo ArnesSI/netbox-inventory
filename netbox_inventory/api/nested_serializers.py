@@ -37,7 +37,7 @@ class NestedPurchaseSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:purchase-detail'
     )
-    supplier = NestedSupplierSerializer()
+    supplier = NestedSupplierSerializer(read_only=True)
 
     class Meta:
         model = Purchase
@@ -48,7 +48,7 @@ class NestedInventoryItemTypeSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:inventoryitemtype-detail'
     )
-    manufacturer = NestedManufacturerSerializer()
+    manufacturer = NestedManufacturerSerializer(read_only=True)
 
     class Meta:
         model = InventoryItemType
