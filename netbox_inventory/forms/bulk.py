@@ -16,7 +16,14 @@ from ..utils import get_plugin_setting
 __all__ = (
     'AssetBulkEditForm',
     'AssetImportForm',
+    'SupplierImportForm',
+    'SupplierBulkEditForm',
+    'PurchaseImportForm',
+    'PurchaseBulkEditForm',
+    'InventoryItemTypeImportForm',
     'InventoryItemTypeBulkEditForm',
+    'InventoryItemGroupImportForm',
+    'InventoryItemGroupBulkEditForm',
 )
 
 
@@ -313,6 +320,88 @@ class AssetImportForm(NetBoxModelImportForm):
             raise
 
 
+class SupplierImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = Supplier
+        fields = (
+            'name', 'slug', 'description', 'comments', 'tags'
+        )
+
+
+class SupplierBulkEditForm(NetBoxModelBulkEditForm):
+    description = forms.CharField(
+        required=False,
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = Supplier
+    fieldsets = (
+        ('General', ('description',)),
+    )
+    nullable_fields = ('description',)
+
+
+class PurchaseImportForm(NetBoxModelImportForm):
+    supplier = CSVModelChoiceField(
+        queryset=Supplier.objects.all(),
+        to_field_name='name',
+        help_text=' Legal entity this purchase was made at. It must exist when importing.',
+        required=True,
+    )
+    
+    class Meta:
+        model = Purchase
+        fields = (
+            'name', 'date', 'supplier', 'description', 'comments', 'tags'
+        )
+
+
+class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
+    date = forms.CharField(
+        required=False,
+    )
+    supplier = DynamicModelChoiceField(
+        queryset=Supplier.objects.all(),
+        required=False,
+        label='Supplier',
+    )
+    description = forms.CharField(
+        required=False,
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = Purchase
+    fieldsets = (
+        ('General', ('date', 'supplier', 'description',)),
+    )
+    nullable_fields = ('date', 'description',)
+
+
+class InventoryItemTypeImportForm(NetBoxModelImportForm):
+    manufacturer = CSVModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        to_field_name='name',
+        help_text='Manufacturer. It must exist before import.',
+        required=True,
+    )
+    inventoryitem_group = CSVModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        to_field_name='name',
+        help_text='Group of inventory item types. It must exist before import.',
+        required=False,
+    )
+
+    class Meta:
+        model = InventoryItemType
+        fields = (
+            'model', 'slug', 'manufacturer', 'part_number', 'inventoryitem_group', 'comments', 'tags'
+        )
+
+
 class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
     manufacturer = DynamicModelChoiceField(
         queryset=Manufacturer.objects.all(),
@@ -335,3 +424,19 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
     nullable_fields = (
         'inventoryitem_group',
     )
+
+
+class InventoryItemGroupImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'name', 'comments', 'tags'
+        )
+
+
+class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
+    comments = CommentField(
+        required=False,
+    )
+
+    model = InventoryItemGroup

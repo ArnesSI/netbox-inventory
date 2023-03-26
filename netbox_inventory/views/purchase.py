@@ -7,8 +7,8 @@ __all__ = (
     'PurchaseListView',
     'PurchaseEditView',
     'PurchaseDeleteView',
-    #'PurchaseBulkImportView',
-    #'PurchaseBulkEditView',
+    'PurchaseBulkImportView',
+    'PurchaseBulkEditView',
     'PurchaseBulkDeleteView',
 )
 
@@ -48,17 +48,17 @@ class PurchaseDeleteView(generic.ObjectDeleteView):
     queryset = models.Purchase.objects.all()
 
 
-# class PurchaseBulkImportView(generic.BulkImportView):
-#     queryset = models.Purchase.objects.all()   
-#     table = tables.PurchaseTable 
-#     model_form = forms.PurchaseCSVForm
+class PurchaseBulkImportView(generic.BulkImportView):
+    queryset = models.Purchase.objects.all()   
+    table = tables.PurchaseTable 
+    model_form = forms.PurchaseImportForm
 
 
-# class PurchaseBulkEditView(generic.BulkEditView):
-#     queryset = models.Purchase.objects.all()
-#     filterset = filtersets.PurchaseFilterSet
-#     table = tables.PurchaseTable
-#     form = forms.PurchaseBulkEditForm
+class PurchaseBulkEditView(generic.BulkEditView):
+    queryset = models.Purchase.objects.all()
+    filterset = filtersets.PurchaseFilterSet
+    table = tables.PurchaseTable
+    form = forms.PurchaseBulkEditForm
 
 
 class PurchaseBulkDeleteView(generic.BulkDeleteView):

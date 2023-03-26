@@ -7,7 +7,7 @@ __all__ = (
     'InventoryItemTypeListView',
     'InventoryItemTypeEditView',
     'InventoryItemTypeDeleteView',
-    #'InventoryItemTypeBulkImportView',
+    'InventoryItemTypeBulkImportView',
     'InventoryItemTypeBulkEditView',
     'InventoryItemTypeBulkDeleteView',
 )
@@ -34,10 +34,10 @@ class InventoryItemTypeDeleteView(generic.ObjectDeleteView):
     queryset = models.InventoryItemType.objects.all()
 
 
-# class InventoryItemTypeBulkImportView(generic.BulkImportView):
-#     queryset = models.InventoryItemType.objects.all()   
-#     table = tables.InventoryItemTypeTable 
-#     model_form = forms.InventoryItemTypeCSVForm
+class InventoryItemTypeBulkImportView(generic.BulkImportView):
+    queryset = models.InventoryItemType.objects.all()   
+    table = tables.InventoryItemTypeTable 
+    model_form = forms.InventoryItemTypeImportForm
 
 
 class InventoryItemTypeBulkEditView(generic.BulkEditView):
