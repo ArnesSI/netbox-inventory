@@ -7,8 +7,8 @@ __all__ = (
     'SupplierListView',
     'SupplierEditView',
     'SupplierDeleteView',
-    #'SupplierBulkImportView',
-    #'SupplierBulkEditView',
+    'SupplierBulkImportView',
+    'SupplierBulkEditView',
     'SupplierBulkDeleteView',
 )
 
@@ -48,17 +48,17 @@ class SupplierDeleteView(generic.ObjectDeleteView):
     queryset = models.Supplier.objects.all()
 
 
-# class SupplierBulkImportView(generic.BulkImportView):
-#     queryset = models.Supplier.objects.all()   
-#     table = tables.SupplierTable 
-#     model_form = forms.SupplierCSVForm
+class SupplierBulkImportView(generic.BulkImportView):
+    queryset = models.Supplier.objects.all()   
+    table = tables.SupplierTable 
+    model_form = forms.SupplierImportForm
 
 
-# class SupplierBulkEditView(generic.BulkEditView):
-#     queryset = models.Supplier.objects.all()
-#     filterset = filtersets.SupplierFilterSet
-#     table = tables.SupplierTable
-#     form = forms.SupplierBulkEditForm
+class SupplierBulkEditView(generic.BulkEditView):
+    queryset = models.Supplier.objects.all()
+    filterset = filtersets.SupplierFilterSet
+    table = tables.SupplierTable
+    form = forms.SupplierBulkEditForm
 
 
 class SupplierBulkDeleteView(generic.BulkDeleteView):

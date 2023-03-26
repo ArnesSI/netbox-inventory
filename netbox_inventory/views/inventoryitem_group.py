@@ -11,8 +11,8 @@ __all__ = (
     'InventoryItemGroupListView',
     'InventoryItemGroupEditView',
     'InventoryItemGroupDeleteView',
-    #'InventoryItemGroupBulkImportView',
-    #'InventoryItemGroupBulkEditView',
+    'InventoryItemGroupBulkImportView',
+    'InventoryItemGroupBulkEditView',
     'InventoryItemGroupBulkDeleteView',
 )
 
@@ -99,17 +99,17 @@ class InventoryItemGroupDeleteView(generic.ObjectDeleteView):
     queryset = models.InventoryItemGroup.objects.all()
 
 
-# class InventoryItemGroupBulkImportView(generic.BulkImportView):
-#     queryset = models.InventoryItemGroup.objects.all()   
-#     table = tables.InventoryItemGroupTable 
-#     model_form = forms.InventoryItemGroupCSVForm
+class InventoryItemGroupBulkImportView(generic.BulkImportView):
+    queryset = models.InventoryItemGroup.objects.all()   
+    table = tables.InventoryItemGroupTable 
+    model_form = forms.InventoryItemGroupImportForm
 
 
-# class InventoryItemGroupBulkEditView(generic.BulkEditView):
-#     queryset = models.InventoryItemGroup.objects.all()
-#     filterset = filtersets.InventoryItemGroupFilterSet
-#     table = tables.InventoryItemGroupTable
-#     form = forms.InventoryItemGroupBulkEditForm
+class InventoryItemGroupBulkEditView(generic.BulkEditView):
+    queryset = models.InventoryItemGroup.objects.all()
+    filterset = filtersets.InventoryItemGroupFilterSet
+    table = tables.InventoryItemGroupTable
+    form = forms.InventoryItemGroupBulkEditForm
 
 
 class InventoryItemGroupBulkDeleteView(generic.BulkDeleteView):

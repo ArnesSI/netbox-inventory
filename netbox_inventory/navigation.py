@@ -35,12 +35,12 @@ supplier_buttons = [
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
     ),
-    # PluginMenuButton(
-    #     link='plugins:netbox_inventory:asset_import',
-    #     title='Import',
-    #     icon_class='mdi mdi-upload',
-    #     color=ButtonColorChoices.CYAN,
-    # )
+    PluginMenuButton(
+        link='plugins:netbox_inventory:supplier_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
 ]
 
 purchase_buttons = [
@@ -50,12 +50,12 @@ purchase_buttons = [
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
     ),
-    # PluginMenuButton(
-    #     link='plugins:netbox_inventory:purchase_import',
-    #     title='Import',
-    #     icon_class='mdi mdi-upload',
-    #     color=ButtonColorChoices.CYAN,
-    # )
+    PluginMenuButton(
+        link='plugins:netbox_inventory:purchase_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
 ]
 
 inventoryitemtype_buttons = [
@@ -65,12 +65,12 @@ inventoryitemtype_buttons = [
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
     ),
-    # PluginMenuButton(
-    #     link='plugins:netbox_inventory:asset_import',
-    #     title='Import',
-    #     icon_class='mdi mdi-upload',
-    #     color=ButtonColorChoices.CYAN,
-    # )
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemtype_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
 ]
 
 inventoryitemgroup_buttons = [
@@ -80,6 +80,12 @@ inventoryitemgroup_buttons = [
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
     ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemgroup_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
 ]
 
 menu_buttons = (
