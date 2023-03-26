@@ -4,7 +4,7 @@ from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
 
-from netbox.models import NetBoxModel
+from netbox.models import NetBoxModel, NestedGroupModel
 from .choices import HardwareKindChoices, AssetStatusChoices
 from .utils import asset_clear_old_hw, get_prechange_field, get_plugin_setting, get_status_for
 
@@ -473,25 +473,33 @@ class InventoryItemType(NetBoxModel):
         return reverse('plugins:netbox_inventory:inventoryitemtype', args=[self.pk])
 
 
-class InventoryItemGroup(NetBoxModel):
+class InventoryItemGroup(NestedGroupModel):
     """
-    Inventory Item Groups are groups fo simmilar InventoryItemTypes.
+    Inventory Item Groups are groups of simmilar InventoryItemTypes.
     This allows you to, for example, have one Group for all your 10G-LR SFP
     pluggables, from different manufacturers/with different part numbers.
+    Inventory Item Groups can be nested.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True,
-    )
+    slug = None # remove field that is defined on NestedGroupModel
+
     comments = models.TextField(
         blank=True
     )
 
     class Meta:
         ordering = ['name']
-
-    def __str__(self):
-        return self.name
+        constraints = (
+            models.UniqueConstraint(
+                fields=('parent', 'name'),
+                name='%(app_label)s_%(class)s_parent_name'
+            ),
+            models.UniqueConstraint(
+                fields=('name',),
+                name='%(app_label)s_%(class)s_name',
+                condition=models.Q(parent__isnull=True),
+                violation_error_message="A top-level group with this name already exists."
+            ),
+        )
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])

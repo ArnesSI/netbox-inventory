@@ -28,10 +28,10 @@ class InventoryItemGroupTestCase(
         iig3 = InventoryItemGroup.objects.create(name='IIG3')
 
         cls.csv_update_data = (
-            'id,name',
-            f'{iig1.pk},IIG1_update',
-            f'{iig2.pk},IIG2_update',
-            f'{iig3.pk},IIG3_update',
+            'id,name,parent',
+            f'{iig1.pk},IIG1_update,InventoryItemGroup',
+            f'{iig2.pk},IIG2_update,InventoryItemGroup',
+            f'{iig3.pk},IIG3_update,InventoryItemGroup',
         )
         cls.bulk_edit_data = {
             'comments': 'updated',

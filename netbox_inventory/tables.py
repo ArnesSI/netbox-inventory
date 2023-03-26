@@ -283,13 +283,8 @@ class InventoryItemTypeTable(NetBoxTable):
 
 
 class InventoryItemGroupTable(NetBoxTable):
-    name = tables.Column(
+    name = columns.MPTTColumn(
         linkify=True,
-    )
-    inventoryitemtype_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:inventoryitemtype_list',
-        url_params={'inventoryitem_group_id': 'pk'},
-        verbose_name='Inventory Item Types',
     )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
@@ -310,7 +305,6 @@ class InventoryItemGroupTable(NetBoxTable):
             'created',
             'last_updated',
             'actions',
-            'inventoryitemtype_count',
             'asset_count',
         )
         default_columns = (

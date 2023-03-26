@@ -427,16 +427,30 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class InventoryItemGroupImportForm(NetBoxModelImportForm):
+    parent = CSVModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        to_field_name='name',
+        help_text='Name of parent group'
+    )
     class Meta:
         model = InventoryItemGroup
         fields = (
-            'name', 'comments', 'tags'
+            'name', 'parent', 'comments', 'tags'
         )
 
 
 class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
+    parent = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False
+    )
     comments = CommentField(
         required=False,
     )
 
     model = InventoryItemGroup
+    fieldsets = (
+        (None, ('parent',)),
+    )
+    nullable_fields = ('parent',)

@@ -49,9 +49,10 @@ class AssetFilterSet(NetBoxModelFilterSet):
         to_field_name='slug',
         label='Inventory item type (slug)',
     )
-    inventoryitem_group_id = django_filters.ModelMultipleChoiceFilter(
+    inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
         field_name='inventoryitem_type__inventoryitem_group',
         queryset=InventoryItemGroup.objects.all(),
+        lookup_expr='in',
         label='Inventory item group (ID)',
     )
     is_assigned = django_filters.BooleanFilter(
@@ -212,10 +213,11 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
         queryset=Manufacturer.objects.all(),
         label='Manufacturer (slug)',
     )
-    inventoryitem_group_id = django_filters.ModelMultipleChoiceFilter(
+    inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
         field_name='inventoryitem_group',
         queryset=InventoryItemGroup.objects.all(),
-        label='Inventory Item Group (ID)',
+        lookup_expr='in',
+        label='Inventory item group (ID)',
     )
 
     class Meta:
@@ -234,6 +236,11 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
 
 
 class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
+    parent_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=InventoryItemGroup.objects.all(),
+        label='Parent group (ID)',
+    )
+
     class Meta:
         model = InventoryItemGroup
         fields = (

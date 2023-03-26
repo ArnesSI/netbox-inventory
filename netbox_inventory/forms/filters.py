@@ -203,4 +203,9 @@ class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
 
 class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     model = InventoryItemGroup
+    parent_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Parent group'
+    )
     tag = TagFilterField(model)

@@ -14,9 +14,13 @@
               <td>{{ object.name }}</td>
             </tr>
             <tr>
+              <th scope="row">Parent</th>
+              <td>{{ object.parent|linkify|placeholder }}</td>
+            </tr>
+            <tr>
               <th scope="row">Assets</th>
               <td>
-                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}">{{ asset_total }}</a>
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}">{{ asset_table.rows|length }}</a>
               </td>
             </tr>
           </table>
@@ -93,6 +97,21 @@
   
     </div>
     <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">
+          Child Groups
+        </h5>
+        <div class="card-body table-responsive">
+          {% render_table child_groups_table 'inc/table.html' %}
+        </div>
+        {% if perms.netbox_inventory.add_inventoryitem_group %}
+          <div class="card-footer text-end noprint">
+            <a href="{% url 'plugins:netbox_inventory:inventoryitemgroup_add' %}?parent={{ object.pk }}" class="btn btn-sm btn-primary">
+              <span class="mdi mdi-plus-thick" aria-hidden="true"></span> Add Group
+            </a>
+          </div>
+        {% endif %}
+      </div>
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
     </div>
