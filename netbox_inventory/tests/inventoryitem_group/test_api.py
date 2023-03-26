@@ -11,7 +11,7 @@ class InventoryItemGroupTest(
         APIViewTestCases.UpdateObjectViewTestCase,
         APIViewTestCases.DeleteObjectViewTestCase):
     model = InventoryItemGroup
-    brief_fields = ['display', 'id', 'name', 'url']
+    brief_fields = ['_depth', 'display', 'id', 'name', 'url']
     create_data = [
         {
             'name': 'InventoryItemGroup 4',
@@ -29,5 +29,3 @@ class InventoryItemGroupTest(
         InventoryItemGroup.objects.create(name='InventoryItemGroup 1')
         InventoryItemGroup.objects.create(name='InventoryItemGroup 2')
         InventoryItemGroup.objects.create(name='InventoryItemGroup 3')
-
-

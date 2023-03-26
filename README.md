@@ -14,7 +14,12 @@ between asset and device or module in sync if enabled in settings.
 
 To properly support inventory items (that are used in NetBox to model SFP and
 similar modules) the plugin defines inventory item types that are equivalent to
-device types and module types.
+device types and module types. 
+
+Inventory item types can be assigned into inventory item groups. On a group detail
+view you have an overview of the number of contained assets broken down by asset
+status or inventory item type and status. This way you can quickly see how many
+of a certain type of hardware you still have spare.
 
 ### Automatic management of asset status
 

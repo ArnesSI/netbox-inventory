@@ -98,12 +98,12 @@ class InventoryItemGroupSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:inventoryitemgroup-detail'
     )
-    inventoryitemtype_count = serializers.IntegerField(read_only=True)
+    parent = NestedInventoryItemGroupSerializer(required=False, allow_null=True, default=None)
     asset_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = InventoryItemGroup
         fields = (
-            'id', 'url', 'display', 'name', 'comments', 'tags', 'custom_fields',
-            'created', 'last_updated', 'inventoryitemtype_count', 'asset_count',
+            'id', 'url', 'display', 'name', 'parent', 'comments', 'tags', 'custom_fields',
+            'created', 'last_updated', 'asset_count',
         )

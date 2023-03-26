@@ -228,7 +228,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
     fieldsets = (
         (
             'Inventory Item Group',
-            ('name', 'tags'),
+            ('name', 'parent', 'tags'),
         ),
     )
 
@@ -236,6 +236,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
         model = InventoryItemGroup
         fields = (
             'name',
+            'parent',
             'tags',
             'comments',
         )
