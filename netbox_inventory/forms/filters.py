@@ -1,7 +1,7 @@
 from cProfile import label
 from django import forms
 
-from dcim.models import DeviceType, Manufacturer, ModuleType, Site, Location
+from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Location, Rack
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import (
     DatePicker, DynamicModelMultipleChoiceField, MultipleChoiceField,
@@ -36,7 +36,10 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'purchase_date_before', 'warranty_start_after', 'warranty_start_before',
             'warranty_end_after', 'warranty_end_before'
         )),
-        ('Location', ('storage_site_id', 'storage_location_id')),
+        ('Location', (
+            'storage_site_id', 'storage_location_id', 'installed_site_id', 
+            'installed_location_id', 'installed_rack_id', 'installed_device_id',
+        )),
     )
 
     status = MultipleChoiceField(
@@ -161,7 +164,41 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'site_id': '$storage_site_id',
         },
         label='Storage location',
-
+    )
+    installed_site_id = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label='Installed at site',
+    )
+    installed_location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'site_id': '$installed_site_id',
+        },
+        label='Installed at location',
+    )
+    installed_rack_id = DynamicModelMultipleChoiceField(
+        queryset=Rack.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'site_id': '$installed_site_id',
+            'location_id': '$installed_location_id',
+        },
+        label='Installed in rack',
+    )
+    installed_device_id = DynamicModelMultipleChoiceField(
+        queryset=Device.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'site_id': '$installed_site_id',
+            'location_id': '$installed_location_id',
+            'rack_id': '$installed_rack_id',
+        },
+        label='Installed in device',
     )
     tag = TagFilterField(model)
 

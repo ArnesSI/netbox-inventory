@@ -206,6 +206,33 @@ class Asset(NetBoxModel):
         return self.device or self.module or self.inventoryitem or None
 
     @property
+    def installed_site(self):
+        device = self.installed_device
+        if device:
+            return device.site
+
+    @property
+    def installed_location(self):
+        device = self.installed_device
+        if device:
+            return device.location
+
+    @property
+    def installed_rack(self):
+        device = self.installed_device
+        if device:
+            return device.rack
+
+    @property
+    def installed_device(self):
+        if self.kind == 'device':
+            return self.device
+        elif self.hardware:
+            return self.hardware.device
+        else:
+            return None
+
+    @property
     def warranty_remaining(self):
         """
             How many days are left in warranty period.

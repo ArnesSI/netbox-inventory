@@ -42,6 +42,22 @@ class AssetTable(NetBoxTable):
         linkify=True,
         order_by=('device', 'module'),
     )
+    installed_site = tables.Column(
+        linkify=True,
+        verbose_name='Installed Site',
+    )
+    installed_location = tables.Column(
+        linkify=True,
+        verbose_name='Installed Location',
+    )
+    installed_rack = tables.Column(
+        linkify=True,
+        verbose_name='Installed Rack',
+    )
+    installed_device = tables.Column(
+        linkify=True,
+        verbose_name='Installed Device',
+    )
     tenant = tables.Column(
         linkify=True,
     )
@@ -120,6 +136,60 @@ class AssetTable(NetBoxTable):
             ('-' if is_descending else '') + 'serial',
         )
         return (queryset, True)
+    
+    def _order_annotate_installed(self, queryset):
+        return queryset.annotate(
+            site_name=Coalesce(
+                'device__site__name', 'module__device__site__name', 'inventoryitem__device__site__name'
+            ),
+            location_name=Coalesce(
+                'device__location__name', 'module__device__location__name', 'inventoryitem__device__location__name'
+            ),
+            rack_name=Coalesce(
+                'device__rack__name', 'module__device__rack__name', 'inventoryitem__device__rack__name'
+            ),
+            device_name=Coalesce(
+                'device__name', 'module__device__name', 'inventoryitem__device__name'
+            )
+        )
+
+    def order_installed_site(self, queryset, is_descending):
+        queryset = self._order_annotate_installed(queryset).order_by(
+            ('-' if is_descending else '') + 'site_name',
+            ('-' if is_descending else '') + 'device_name',
+            ('-' if is_descending else '') + 'module__module_bay',
+            ('-' if is_descending else '') + 'serial',
+        )
+        return (queryset, True)
+
+    def order_installed_location(self, queryset, is_descending):
+        queryset = self._order_annotate_installed(queryset).order_by(
+            ('-' if is_descending else '') + 'site_name',
+            ('-' if is_descending else '') + 'location_name',
+            ('-' if is_descending else '') + 'device_name',
+            ('-' if is_descending else '') + 'module__module_bay',
+            ('-' if is_descending else '') + 'serial',
+        )
+        return (queryset, True)
+
+    def order_installed_rack(self, queryset, is_descending):
+        queryset = self._order_annotate_installed(queryset).order_by(
+            ('-' if is_descending else '') + 'site_name',
+            ('-' if is_descending else '') + 'location_name',
+            ('-' if is_descending else '') + 'rack_name',
+            ('-' if is_descending else '') + 'device_name',
+            ('-' if is_descending else '') + 'module__module_bay',
+            ('-' if is_descending else '') + 'serial',
+        )
+        return (queryset, True)
+
+    def order_installed_device(self, queryset, is_descending):
+        queryset = self._order_annotate_installed(queryset).order_by(
+            ('-' if is_descending else '') + 'device_name',
+            ('-' if is_descending else '') + 'module__module_bay',
+            ('-' if is_descending else '') + 'serial',
+        )
+        return (queryset, True)
 
     class Meta(NetBoxTable.Meta):
         model = Asset
@@ -135,6 +205,10 @@ class AssetTable(NetBoxTable):
             'hardware_type',
             'inventoryitem_group',
             'hardware',
+            'installed_site',
+            'installed_location',
+            'installed_rack',
+            'installed_device',
             'tenant',
             'contact',
             'storage_location',
