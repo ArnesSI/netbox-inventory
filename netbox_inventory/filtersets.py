@@ -5,6 +5,7 @@ from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilte
 from dcim.models import Manufacturer, DeviceType, ModuleType, Site, Location
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
+from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
 from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
@@ -163,7 +164,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
             )
 
 
-class SupplierFilterSet(NetBoxModelFilterSet):
+class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
     class Meta:
         model = Supplier
         fields = (

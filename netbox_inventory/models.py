@@ -363,6 +363,9 @@ class Supplier(NetBoxModel):
         max_length=200,
         blank=True
     )
+    contacts = GenericRelation(
+        to='tenancy.ContactAssignment'
+    )
     comments = models.TextField(
         blank=True
     )

@@ -2,6 +2,7 @@ from django.db.models.functions import Coalesce
 import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
+from tenancy.tables import ContactsColumnMixin
 from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 __all__ = (
@@ -162,7 +163,7 @@ class AssetTable(NetBoxTable):
         )
 
 
-class SupplierTable(NetBoxTable):
+class SupplierTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
@@ -188,6 +189,7 @@ class SupplierTable(NetBoxTable):
             'slug',
             'description',
             'comments',
+            'contacts',
             'purchase_count',
             'asset_count',
             'tags',
