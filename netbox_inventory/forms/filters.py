@@ -7,6 +7,7 @@ from utilities.forms import (
     DatePicker, DynamicModelMultipleChoiceField, MultipleChoiceField,
     StaticSelect, TagFilterField, BOOLEAN_WITH_BLANK_CHOICES
 )
+from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
 from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
@@ -165,8 +166,13 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
 
-class SupplierFilterForm(NetBoxModelFilterSetForm):
+class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
     model = Supplier
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Contacts', ('contact', 'contact_role', 'contact_group')),
+    )
+
     tag = TagFilterField(model)
 
 
