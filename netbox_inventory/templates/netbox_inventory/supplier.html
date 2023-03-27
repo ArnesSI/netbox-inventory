@@ -5,6 +5,14 @@
   <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_inventory:supplier_list' %}">Suppliers</a></li>
 {% endblock %}
 
+{% block extra_controls %}
+  {% if perms.netbox_inventory.add_purchase %}
+    <a href="{% url 'plugins:netbox_inventory:purchase_add' %}?supplier={{ object.pk }}" class="btn btn-sm btn-primary">
+      <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add purchase
+    </a>
+  {% endif %}
+{% endblock extra_controls %}
+
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
