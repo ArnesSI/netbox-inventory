@@ -38,6 +38,21 @@
               <th scope="row">{{ object.get_kind_display }} Type</th>
               <td><a href="{{object.hardware_type.get_absolute_url}}">{{ object.hardware_type.manufacturer }} {{ object.hardware_type }}</a></td>
             </tr>
+            {% if object.kind == 'inventoryitem' %}
+            <tr>
+              <th scope="row">Inventory Item Group</th>
+              <td>
+                {% if object.inventoryitem_type.inventoryitem_group %}
+                  {% for group in object.inventoryitem_type.inventoryitem_group.get_ancestors %}
+                    {{ group|linkify }} /
+                  {% endfor %}
+                  {{ object.inventoryitem_type.inventoryitem_group|linkify }}
+                {% else %}
+                  {{ ''|placeholder }}
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
             <tr>
               <th scope="row" title="Where is this asset stored when not in use">Storage Location</th>
               <td>
