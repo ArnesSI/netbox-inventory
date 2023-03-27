@@ -2,10 +2,12 @@
 {% load helpers %}
 {% load humanize %}
 
+{% block title %}{{ object.hardware_type.manufacturer }} {{ object }}{% endblock %}
+
 {% block breadcrumbs %}
   {{ block.super }}
   <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{ object.kind }}_type_id={{ object.hardware_type.pk }}">{{ object.hardware_type }}</a>
+    <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{ object.kind }}_type_id={{ object.hardware_type.pk }}">{{ object.hardware_type.manufacturer }} {{ object.hardware_type }}</a>
   </li>
 {% endblock %}
 
