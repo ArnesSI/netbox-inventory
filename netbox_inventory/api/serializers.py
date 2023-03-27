@@ -16,17 +16,17 @@ class AssetSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:asset-detail'
     )
-    device_type = NestedDeviceTypeSerializer(required=False)
-    device = NestedDeviceSerializer(required=False)
-    module_type = NestedModuleTypeSerializer(required=False)
-    module = NestedModuleSerializer(required=False)
-    inventoryitem_type = NestedInventoryItemTypeSerializer(required=False) 
-    inventoryitem = NestedInventoryItemSerializer(required=False)
-    storage_location = NestedModuleSerializer(required=False)
-    purchase = NestedPurchaseSerializer(required=False)
-    tenant = NestedTenantSerializer(required=False)
-    contact = NestedContactSerializer(required=False)
-    owner = NestedTenantSerializer(required=False)
+    device_type = NestedDeviceTypeSerializer(required=False, allow_null=True, default=None)
+    device = NestedDeviceSerializer(required=False, allow_null=True, default=None)
+    module_type = NestedModuleTypeSerializer(required=False, allow_null=True, default=None)
+    module = NestedModuleSerializer(required=False, allow_null=True, default=None)
+    inventoryitem_type = NestedInventoryItemTypeSerializer(required=False, allow_null=True, default=None) 
+    inventoryitem = NestedInventoryItemSerializer(required=False, allow_null=True, default=None)
+    storage_location = NestedModuleSerializer(required=False, allow_null=True, default=None)
+    purchase = NestedPurchaseSerializer(required=False, allow_null=True, default=None)
+    tenant = NestedTenantSerializer(required=False, allow_null=True, default=None)
+    contact = NestedContactSerializer(required=False, allow_null=True, default=None)
+    owner = NestedTenantSerializer(required=False, allow_null=True, default=None)
 
 
     class Meta:
@@ -82,7 +82,7 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:inventoryitemtype-detail'
     )
     manufacturer = NestedManufacturerSerializer()
-    inventoryitem_group = NestedInventoryItemGroupSerializer(required=False)
+    inventoryitem_group = NestedInventoryItemGroupSerializer(required=False, allow_null=True, default=None)
     asset_count = serializers.IntegerField(read_only=True)
     
     class Meta:

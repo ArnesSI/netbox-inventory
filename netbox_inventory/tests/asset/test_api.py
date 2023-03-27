@@ -117,17 +117,22 @@ class AssetTest(
                 'serial': 'asset4',
                 'status': 'stored',
                 'device_type': device_type1.pk,
+                'device': None,
             },
             {
                 'name': 'Asset 5',
                 'serial': 'asset5',
                 'status': 'stored',
+                'device_type': None,
+                'device': None,
                 'module_type': module_type1.pk,
+                'module': None,
             },
             {
                 'name': 'Asset 6',
                 'serial': 'asset6',
                 'status': 'stored',
                 'inventoryitem_type': inventoryitem_type1.pk,
+                'inventoryitem': cls.inventoryitem1.pk,
             },
         ]
