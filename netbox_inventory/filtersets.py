@@ -110,6 +110,36 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='storage_location',
         label='Storage location (ID)',
     )
+    installed_site_slug = filters.MultiValueCharFilter(
+        method='filter_installed_site_slug',
+        label='Installed site (slug)',
+    )
+    installed_site_id = filters.MultiValueCharFilter(
+        method='filter_installed',
+        field_name='site',
+        label='Installed site (ID)',
+    )
+    installed_location_id = filters.MultiValueCharFilter(
+        method='filter_installed',
+        field_name='location',
+        label='Installed location (ID)',
+    )
+    installed_rack_id = filters.MultiValueCharFilter(
+        method='filter_installed',
+        field_name='rack',
+        label='Installed rack (ID)',
+    )
+    installed_device_id = filters.MultiValueCharFilter(
+        method='filter_installed_device',
+        field_name='id',
+        label='Installed device (ID)',
+    )
+    installed_device_name = filters.MultiValueCharFilter(
+        method='filter_installed_device',
+        field_name='name',
+        label='Installed device (name)',
+    )
+
 
     class Meta:
         model = Asset
@@ -162,6 +192,36 @@ class AssetFilterSet(NetBoxModelFilterSet):
                 Q(module__isnull=True)&
                 Q(inventoryitem__isnull=True)
             )
+
+    def filter_installed(self, queryset, name, value):
+        if value[0] == 'null':
+            # selected location type must be unset
+            # eg: location of device is null
+            return queryset.filter(
+                Q(**{f'device__{name}__isnull':True})&
+                Q(**{f'module__device__{name}__isnull':True})&
+                Q(**{f'inventoryitem__device__{name}__isnull':True})
+            )
+        else:
+            return queryset.filter(
+                Q(**{f'device__{name}__in':value})|
+                Q(**{f'module__device__{name}__in':value})|
+                Q(**{f'inventoryitem__device__{name}__in':value})
+            )
+
+    def filter_installed_site_slug(self, queryset, name, value):
+        return queryset.filter(
+            Q(**{f'device__site__slug__in':value})|
+            Q(**{f'module__device__site__slug__in':value})|
+            Q(**{f'inventoryitem__device__site__slug__in':value})
+        )
+
+    def filter_installed_device(self, queryset, name, value):
+        return queryset.filter(
+            Q(**{f'device__{name}__in':value})|
+            Q(**{f'module__device__{name}__in':value})|
+            Q(**{f'inventoryitem__device__{name}__in':value})
+        )
 
 
 class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
