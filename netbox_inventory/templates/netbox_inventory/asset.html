@@ -38,8 +38,23 @@
               <th scope="row">{{ object.get_kind_display }} Type</th>
               <td><a href="{{object.hardware_type.get_absolute_url}}">{{ object.hardware_type.manufacturer }} {{ object.hardware_type }}</a></td>
             </tr>
+            {% if object.kind == 'inventoryitem' %}
             <tr>
-              <th scope="row">Storage Location</th>
+              <th scope="row">Inventory Item Group</th>
+              <td>
+                {% if object.inventoryitem_type.inventoryitem_group %}
+                  {% for group in object.inventoryitem_type.inventoryitem_group.get_ancestors %}
+                    {{ group|linkify }} /
+                  {% endfor %}
+                  {{ object.inventoryitem_type.inventoryitem_group|linkify }}
+                {% else %}
+                  {{ ''|placeholder }}
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th scope="row" title="Where is this asset stored when not in use">Storage Location</th>
               <td>
                 {% if object.storage_location %}
                   {{ object.storage_location.site }} /
@@ -73,18 +88,24 @@
           </table>
         </div>
         <div class="card-footer text-end noprint">
-          {% if object.hardware %}
-          <a href="#" class="btn btn-sm btn-outline-dark disabled">
-            <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
+          {# only show create button if use has add permissions for the kind of hardware being created #}
+          {% if object.kind == 'device' and perms.dcim.add_device or object.kind == 'module' and perms.dcim.add_module or object.kind == 'inventoryitem' and perms.dcim.add_inventoryitem %}
+            {% if object.hardware %}
+            <a href="#" class="btn btn-sm btn-outline-dark disabled">
+              <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
           </a>
           {% else %}
-          <a href="{% url 'plugins:netbox_inventory:asset_'|add:object.kind|add:'_create' %}?asset_id={{ object.pk }}" class="btn btn-sm btn-green" title="Create a new {{ object.get_kind_display }} from this asset">
-            <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
-          </a>
+            <a href="{% url 'plugins:netbox_inventory:asset_'|add:object.kind|add:'_create' %}?asset_id={{ object.pk }}" class="btn btn-sm btn-green" title="Create a new {{ object.get_kind_display }} from this asset">
+              <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
+            </a>
+            {% endif %}
           {% endif %}
-          <a href="{% url 'plugins:netbox_inventory:asset_assign' object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-orange">
-            <span class="mdi mdi-vector-link" aria-hidden="true"></span> Edit Assignment
-          </a>
+          {# only show edit button if user has change permission on asset #}
+          {% if perms.netbox_inventory.change_asset %}
+            <a href="{% url 'plugins:netbox_inventory:asset_assign' object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-orange">
+              <span class="mdi mdi-vector-link" aria-hidden="true"></span> Edit Assignment
+            </a>
+          {% endif %}
         </div>
       </div>
       {% include 'inc/panels/custom_fields.html' %}
