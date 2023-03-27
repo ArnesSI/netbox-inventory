@@ -199,6 +199,11 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
 
 class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
     model = InventoryItemType
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
     inventoryitem_group_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
