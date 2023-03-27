@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
@@ -172,6 +173,10 @@ class Asset(NetBoxModel):
 
     comments = models.TextField(
         blank=True
+    )
+
+    images = GenericRelation(
+        to='extras.ImageAttachment'
     )
 
     clone_fields = [
@@ -453,6 +458,9 @@ class InventoryItemType(NetBoxModel):
     )
     comments = models.TextField(
         blank=True
+    )
+    images = GenericRelation(
+        to='extras.ImageAttachment'
     )
 
     clone_fields = [
