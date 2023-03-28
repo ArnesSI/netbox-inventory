@@ -88,7 +88,9 @@
             <tr>
             {% ifchanged ac.inventoryitem_type %}
               <td>
-                {{ ac.inventoryitem_type.manufacturer }} {{ ac.inventoryitem_type|linkify }}
+                <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' ac.inventoryitem_type %}">
+                  {{ ac.inventoryitem_type__manufacturer__name }} {{ ac.inventoryitem_type__model }}
+                </a>
               </td>
             {% else %}
               <td>&nbsp;</td>
