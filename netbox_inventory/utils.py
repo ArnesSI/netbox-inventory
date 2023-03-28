@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Q
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.signals import pre_save
 
@@ -100,3 +101,43 @@ def asset_clear_old_hw(old_hw):
     pre_save.connect(prevent_update_serial_asset_tag, sender=Device)
     pre_save.connect(prevent_update_serial_asset_tag, sender=Module)
     pre_save.connect(prevent_update_serial_asset_tag, sender=InventoryItem)
+
+
+def query_located(queryset, field_name, values, assets_shown='all'):
+    """
+    Filters queryset on located values. Can filter for installed
+    location/site and/or stored location/site for assets makred as stored.
+    Args:
+        * queryset - queryset of Asset model
+        * field_name - 'site' or 'location' or 'rack'
+        * values - list of PKs of location types to filter on
+        * assets_shown - 'all' or 'installd' or 'stored'
+    """
+    q_installed = (
+        Q(**{f'device__{field_name}__in':values})|
+        Q(**{f'module__device__{field_name}__in':values})|
+        Q(**{f'inventoryitem__device__{field_name}__in':values})
+    )
+    if field_name == 'rack':
+        # storage in rack is not supported
+        # generate Q() that matches none
+        q_stored = Q(pk__in=[])
+    elif field_name == 'location':
+        q_stored = (
+            Q(**{f'storage_location__in':values})&
+            Q(status=get_status_for('stored'))
+        )
+    else:
+        q_stored = (
+            Q(**{f'storage_location__{field_name}__in':values})&
+            Q(status=get_status_for('stored'))
+        )
+    if assets_shown == 'all':
+        q = q_installed | q_stored
+    elif assets_shown == 'installed':
+        q = q_installed
+    elif assets_shown == 'stored':
+        q = q_stored
+    else:
+        raise Exception('unsupported')
+    return queryset.filter(q)

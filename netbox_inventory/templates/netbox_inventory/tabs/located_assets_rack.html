@@ -1,0 +1,17 @@
+{% extends 'netbox_inventory/tabs/located_assets_base.html' %}
+{% load helpers %}
+
+{% block asset_controls %}
+<div class="controls">
+    <div class="control-group">
+        <a href="{% url 'plugins:netbox_inventory:asset_list' %}?installed_rack_id={{ object.pk }}" class="btn btn-sm btn-primary">
+            <i class="mdi mdi-format-list-checkbox"></i> View Asset List
+        </a>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="{% url 'dcim:rack_inventory_assets' object.pk %}{% querystring request assets_shown='all' %}" class="btn btn-outline-secondary{% if assets_shown == 'all' %} active{% endif %}">All</a>
+            <a href="{% url 'dcim:rack_inventory_assets' object.pk %}{% querystring request assets_shown='installed' %}" class="btn btn-outline-secondary{% if assets_shown == 'installed' %} active{% endif %}">Installed</a>
+            <a href="{% url 'dcim:rack_inventory_assets' object.pk %}{% querystring request assets_shown='stored' %}" class="btn btn-outline-secondary{% if assets_shown == 'stored' %} active{% endif %}">Stored</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

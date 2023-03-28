@@ -9,6 +9,7 @@ from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
 from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .utils import query_located
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
@@ -139,7 +140,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='name',
         label='Installed device (name)',
     )
-
+    located_site_id = filters.MultiValueCharFilter(
+        method='filter_located',
+        field_name='site',
+        label='Located site (ID)',
+    )
+    located_location_id = filters.MultiValueCharFilter(
+        method='filter_located',
+        field_name='location',
+        label='Located location (ID)',
+    )
 
     class Meta:
         model = Asset
@@ -194,34 +204,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
             )
 
     def filter_installed(self, queryset, name, value):
-        if value[0] == 'null':
-            # selected location type must be unset
-            # eg: location of device is null
-            return queryset.filter(
-                Q(**{f'device__{name}__isnull':True})&
-                Q(**{f'module__device__{name}__isnull':True})&
-                Q(**{f'inventoryitem__device__{name}__isnull':True})
-            )
-        else:
-            return queryset.filter(
-                Q(**{f'device__{name}__in':value})|
-                Q(**{f'module__device__{name}__in':value})|
-                Q(**{f'inventoryitem__device__{name}__in':value})
-            )
+        return query_located(queryset, name, value, assets_shown='installed')
 
     def filter_installed_site_slug(self, queryset, name, value):
-        return queryset.filter(
-            Q(**{f'device__site__slug__in':value})|
-            Q(**{f'module__device__site__slug__in':value})|
-            Q(**{f'inventoryitem__device__site__slug__in':value})
-        )
+        return query_located(queryset, 'site__slug', value, assets_shown='installed')
 
     def filter_installed_device(self, queryset, name, value):
-        return queryset.filter(
-            Q(**{f'device__{name}__in':value})|
-            Q(**{f'module__device__{name}__in':value})|
-            Q(**{f'inventoryitem__device__{name}__in':value})
-        )
+        return query_located(queryset, name, value, assets_shown='installed')
+
+    def filter_located(self, queryset, name, value):
+        return query_located(queryset, name, value)
 
 
 class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
