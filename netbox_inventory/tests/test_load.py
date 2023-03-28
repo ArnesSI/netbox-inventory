@@ -11,7 +11,7 @@ class NetboxDnsVersionTestCase(SimpleTestCase):
     """
 
     def test_version(self):
-        assert __version__ == "1.1.2"
+        assert __version__ == "1.2.0"
 
 
 class AppTest(APITestCase):
