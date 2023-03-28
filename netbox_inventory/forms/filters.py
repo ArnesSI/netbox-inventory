@@ -39,6 +39,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         ('Location', (
             'storage_site_id', 'storage_location_id', 'installed_site_id', 
             'installed_location_id', 'installed_rack_id', 'installed_device_id',
+            'located_site_id', 'located_location_id',
         )),
     )
 
@@ -155,6 +156,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Site.objects.all(),
         required=False,
         label='Storage site',
+        help_text="When not in use asset is stored here",
     )
     storage_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
@@ -164,11 +166,13 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'site_id': '$storage_site_id',
         },
         label='Storage location',
+        help_text="When not in use asset is stored here",
     )
     installed_site_id = DynamicModelMultipleChoiceField(
         queryset=Site.objects.all(),
         required=False,
         label='Installed at site',
+        help_text="Currently installed here",
     )
     installed_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
@@ -178,6 +182,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'site_id': '$installed_site_id',
         },
         label='Installed at location',
+        help_text="Currently installed here",
     )
     installed_rack_id = DynamicModelMultipleChoiceField(
         queryset=Rack.objects.all(),
@@ -188,6 +193,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'location_id': '$installed_location_id',
         },
         label='Installed in rack',
+        help_text="Currently installed here",
     )
     installed_device_id = DynamicModelMultipleChoiceField(
         queryset=Device.objects.all(),
@@ -199,6 +205,22 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'rack_id': '$installed_rack_id',
         },
         label='Installed in device',
+    )
+    located_site_id = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label='Located at site',
+        help_text="Currently installed or stored here",
+    )
+    located_location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'site_id': '$located_site_id',
+        },
+        label='Located at location',
+        help_text="Currently installed or stored here",
     )
     tag = TagFilterField(model)
 

@@ -1,0 +1,59 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load render_table from django_tables2 %}
+{% load perms %}
+
+
+{% block content %}
+
+    {% block asset_controls %}
+    <div class="controls">
+        <div class="control-group">
+            <a href="{% url 'plugins:netbox_inventory:asset_list' %}" class="btn btn-sm btn-primary">
+                <i class="mdi mdi-format-list-checkbox"></i> View Asset List
+            </a>
+            <div class="btn-group btn-group-sm" role="group">
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% include 'inc/table_controls_htmx.html' with table_modal="AssetTable_config" %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="return_url" value="{% if return_url %}{{ return_url }}{% else %}{{ request.path }}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}{% endif %}" />
+
+        <div class="card">
+            <div class="card-body" id="object_list">
+                {% include 'htmx/table.html' %}
+            </div>
+        </div>
+
+        {% if perms.netbox_inventory.change_asset or perms.netbox_inventory.delete_asset %}
+             {% with bulk_edit_url="plugins:netbox_inventory:asset_bulk_edit" bulk_delete_url="plugins:netbox_inventory:asset_bulk_delete" %}
+                 <div class="noprint bulk-buttons">
+                     <div class="bulk-button-group">
+                         {% block bulk_buttons %}{% endblock %}
+                         {% if bulk_edit_url and perms.netbox_inventory.change_asset %}
+                             <button type="submit" name="_edit" formaction="{% url bulk_edit_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-warning btn-sm">
+                                 <i class="mdi mdi-pencil" aria-hidden="true"></i> Edit Selected
+                             </button>
+                         {% endif %}
+                         {% if bulk_delete_url and perms.netbox_inventory.delete_asset %}
+                             <button type="submit" name="_delete" formaction="{% url bulk_delete_url %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-danger btn-sm">
+                                 <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i> Delete Selected
+                             </button>
+                         {% endif %}
+                     </div>
+                 </div>
+             {% endwith %}
+        {% endif %}
+    </form>
+
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% table_config_form table %}
+{% endblock modals %}
