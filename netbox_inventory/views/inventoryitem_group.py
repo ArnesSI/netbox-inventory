@@ -1,10 +1,8 @@
-from collections import OrderedDict
-from django.db.models import Count
-
 from netbox.views import generic
-from utilities.utils import count_related
+
 from .. import filtersets, forms, models, tables
 from ..choices import AssetStatusChoices
+from ..analyzers import asset_counts_type_status, asset_counts_status
 
 __all__ = (
     'InventoryItemGroupView',
@@ -16,6 +14,7 @@ __all__ = (
     'InventoryItemGroupBulkDeleteView',
 )
 
+
 class InventoryItemGroupView(generic.ObjectView):
     queryset = models.InventoryItemGroup.objects.all()
 
@@ -26,6 +25,13 @@ class InventoryItemGroupView(generic.ObjectView):
             models.Asset,
             'inventoryitem_type__inventoryitem_group',
             'asset_count',
+            cumulative=True
+        )
+        child_groups = models.InventoryItemGroup.objects.add_related_count(
+            child_groups,
+            models.InventoryItemType,
+            'inventoryitem_group',
+            'inventoryitem_type_count',
             cumulative=True
         ).restrict(request.user, 'view').filter(
             parent__in=instance.get_descendants(include_self=True)
@@ -40,49 +46,18 @@ class InventoryItemGroupView(generic.ObjectView):
         asset_table = tables.AssetTable(assets, user=request.user)
         asset_table.columns.hide('kind')
         asset_table.configure(request)
-        # generate counts of assets grouped by type and status
-        asset_counts_qs = assets.values(
-            "inventoryitem_type", "status",
-        ).annotate(
-            count=Count("status")
-        ).order_by("inventoryitem_type__manufacturer__name", "inventoryitem_type__model", "status")
+
+        # get counts for each inventoryitem type and status combination
+        type_status_counts = asset_counts_type_status(instance, assets)
+        
         # counts by status, ignoring different inventoryitem_types
-        # asset_counts_qs queryset is missing combinations where count is 0
-        # so we generate a list with all combinations
-        status_counts = {
-            k: {'value': k, 'label': l, 'color': AssetStatusChoices.colors[k], 'count': 0}
-            for k,l in list(AssetStatusChoices)
-        }
-        items_by_status = OrderedDict()
-        for ac in asset_counts_qs:
-            if ac['inventoryitem_type'] not in items_by_status:
-                it = models.InventoryItemType.objects.get(id=ac['inventoryitem_type'])
-                items_by_status[ac['inventoryitem_type']] = dict(
-                            inventoryitem_type=it,
-                )
-                items_by_status[ac['inventoryitem_type']]['statuses'] = {
-                            k: {'value': k, 'label': l, 'color': AssetStatusChoices.colors[k], 'count': 0}
-                            for k,l in list(AssetStatusChoices)
-                }
-            items_by_status[ac['inventoryitem_type']]['statuses'][ac['status']]['count'] = ac['count']
-            status_counts[ac['status']]['count'] += ac['count']
-        # flatten nested dicts into list of dicts
-        asset_counts = list()
-        for i in items_by_status.values():
-            for status in AssetStatusChoices:
-                line = dict(
-                    inventoryitem_type=i['inventoryitem_type'],
-                )
-                line.update(i['statuses'][status[0]])
-                asset_counts.append(line)
+        status_counts = asset_counts_status(type_status_counts)
 
         return {
             'child_groups_table': child_groups_table,
             'asset_table': asset_table,
-            'asset_counts': asset_counts,
+            'type_status_counts': type_status_counts,
             'status_counts': status_counts,
-            'status_text': dict(AssetStatusChoices),
-            'status_color': AssetStatusChoices.colors,
         }
 
 
@@ -92,6 +67,13 @@ class InventoryItemGroupListView(generic.ObjectListView):
         models.Asset,
         'inventoryitem_type__inventoryitem_group',
         'asset_count',
+        cumulative=True
+    )
+    queryset = models.InventoryItemGroup.objects.add_related_count(
+        queryset,
+        models.InventoryItemType,
+        'inventoryitem_group',
+        'inventoryitem_type_count',
         cumulative=True
     )
     table = tables.InventoryItemGroupTable

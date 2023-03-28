@@ -84,21 +84,23 @@
             </tr>
           </thead>
           <tbody>
-            {% for ac in asset_counts %}
+            {% for tsc in type_status_counts %}
             <tr>
-            {% ifchanged ac.inventoryitem_type %}
+            {% ifchanged tsc.inventoryitem_type %}
               <td>
-                {{ ac.inventoryitem_type.manufacturer }} {{ ac.inventoryitem_type|linkify }}
+                <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' tsc.inventoryitem_type %}">
+                  {{ tsc.inventoryitem_type__manufacturer__name }} {{ tsc.inventoryitem_type__model }}
+                </a>
               </td>
             {% else %}
               <td>&nbsp;</td>
             {% endifchanged %}
               <td>
-                {% badge value=ac.label bg_color=ac.color %}
+                {% badge value=tsc.label bg_color=tsc.color %}
               </td>
               <td>
-                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_type_id={{ ac.inventoryitem_type.pk }}&status={{ ac.value }}">
-                  {{ ac.count }}
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_type_id={{ tsc.inventoryitem_type }}&status={{ tsc.status }}">
+                  {{ tsc.count }}
                 </a>
               </td>
             </tr>
