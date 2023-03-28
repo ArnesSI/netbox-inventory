@@ -48,15 +48,15 @@ class InventoryItemGroupView(generic.ObjectView):
         asset_table.configure(request)
 
         # get counts for each inventoryitem type and status combination
-        asset_counts = asset_counts_type_status(instance, assets)
+        type_status_counts = asset_counts_type_status(instance, assets)
         
         # counts by status, ignoring different inventoryitem_types
-        status_counts = asset_counts_status(asset_counts)
+        status_counts = asset_counts_status(type_status_counts)
 
         return {
             'child_groups_table': child_groups_table,
             'asset_table': asset_table,
-            'asset_counts': asset_counts,
+            'type_status_counts': type_status_counts,
             'status_counts': status_counts,
         }
 
