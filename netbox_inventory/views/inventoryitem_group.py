@@ -26,6 +26,13 @@ class InventoryItemGroupView(generic.ObjectView):
             'inventoryitem_type__inventoryitem_group',
             'asset_count',
             cumulative=True
+        )
+        child_groups = models.InventoryItemGroup.objects.add_related_count(
+            child_groups,
+            models.InventoryItemType,
+            'inventoryitem_group',
+            'inventoryitem_type_count',
+            cumulative=True
         ).restrict(request.user, 'view').filter(
             parent__in=instance.get_descendants(include_self=True)
         )
@@ -60,6 +67,13 @@ class InventoryItemGroupListView(generic.ObjectListView):
         models.Asset,
         'inventoryitem_type__inventoryitem_group',
         'asset_count',
+        cumulative=True
+    )
+    queryset = models.InventoryItemGroup.objects.add_related_count(
+        queryset,
+        models.InventoryItemType,
+        'inventoryitem_group',
+        'inventoryitem_type_count',
         cumulative=True
     )
     table = tables.InventoryItemGroupTable
