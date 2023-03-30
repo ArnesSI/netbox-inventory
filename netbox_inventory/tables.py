@@ -81,6 +81,7 @@ class AssetTable(NetBoxTable):
         accessor='purchase__date',
         verbose_name='Purchase Date',
     )
+    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
     actions = columns.ActionsColumn(
         extra_buttons="""
@@ -218,6 +219,7 @@ class AssetTable(NetBoxTable):
             'purchase_date',
             'warranty_start',
             'warranty_end',
+            'comments',
             'tags',
             'created',
             'last_updated',
