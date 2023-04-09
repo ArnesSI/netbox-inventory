@@ -119,16 +119,16 @@ PLUGINS = [
 
 PLUGINS_CONFIG = {
     "netbox_inventory": {
-        # Example settings below
+        # Example settings below, see "Available settings"
+        # in README.md for all possible settings
         "used_status_name": "used",
         "stored_status_name": "stored",
-        "sync_serial_number": True,
-        "sync_asset_tag": True,
+        "sync_hardware_serial_asset_tag": True,
     },
 }
 ```
 
-Available settings:
+#### Available settings
 
 | Setting | Default value | Description |
 |---------|---------------|-------------|
