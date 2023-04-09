@@ -103,6 +103,13 @@ def asset_clear_old_hw(old_hw):
     pre_save.connect(prevent_update_serial_asset_tag, sender=InventoryItem)
 
 
+def is_equal_none(a, b):
+    """ Compare a and b as string. None is considered the same as empty string. """
+    if a is None or b is None:
+        return a == b or a == '' or b == ''
+    return a == b
+
+
 def query_located(queryset, field_name, values, assets_shown='all'):
     """
     Filters queryset on located values. Can filter for installed

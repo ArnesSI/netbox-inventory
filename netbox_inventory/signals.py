@@ -6,7 +6,7 @@ from django.db.models.signals import pre_save, pre_delete
 from dcim.models import Device, Module, InventoryItem
 from utilities.exceptions import AbortRequest
 from .models import Asset
-from .utils import get_plugin_setting, get_status_for
+from .utils import get_plugin_setting, get_status_for, is_equal_none
 
 
 logger = logging.getLogger('netbox.netbox_inventory.signals')
@@ -31,8 +31,13 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
     if not get_plugin_setting('sync_hardware_serial_asset_tag'):
         # don't enforce if sync not enabled
         return
-    if asset.serial != instance.serial or asset.asset_tag != instance.asset_tag:
-        raise AbortRequest(f'Cannot change {asset.kind} serial and asset tag if asset is assigned. Please update via inventory > asset instead.')
+    if instance.pk and (
+        not is_equal_none(asset.serial, instance.serial)
+        or not is_equal_none(asset.asset_tag, instance.asset_tag)
+    ):
+        raise AbortRequest(
+            f'Cannot change {asset.kind} serial and asset tag if asset is assigned. Please update via inventory > asset instead.'
+        )
 
 
 @receiver(pre_delete, sender=Device)
