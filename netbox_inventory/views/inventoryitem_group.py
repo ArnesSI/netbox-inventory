@@ -91,8 +91,7 @@ class InventoryItemGroupDeleteView(generic.ObjectDeleteView):
 
 
 class InventoryItemGroupBulkImportView(generic.BulkImportView):
-    queryset = models.InventoryItemGroup.objects.all()   
-    table = tables.InventoryItemGroupTable 
+    queryset = models.InventoryItemGroup.objects.all()
     model_form = forms.InventoryItemGroupImportForm
 
 

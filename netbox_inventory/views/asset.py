@@ -115,7 +115,6 @@ class AssetDeleteView(generic.ObjectDeleteView):
 
 class AssetBulkImportView(generic.BulkImportView):
     queryset = models.Asset.objects.all()
-    table = tables.AssetTable
     model_form = forms.AssetImportForm
     template_name = 'netbox_inventory/asset_bulk_import.html'
 

@@ -40,8 +40,7 @@ class InventoryItemTypeDeleteView(generic.ObjectDeleteView):
 
 
 class InventoryItemTypeBulkImportView(generic.BulkImportView):
-    queryset = models.InventoryItemType.objects.all()   
-    table = tables.InventoryItemTypeTable 
+    queryset = models.InventoryItemType.objects.all()
     model_form = forms.InventoryItemTypeImportForm
 
 

@@ -49,8 +49,7 @@ class SupplierDeleteView(generic.ObjectDeleteView):
 
 
 class SupplierBulkImportView(generic.BulkImportView):
-    queryset = models.Supplier.objects.all()   
-    table = tables.SupplierTable 
+    queryset = models.Supplier.objects.all()
     model_form = forms.SupplierImportForm
 
 
