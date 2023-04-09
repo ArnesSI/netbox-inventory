@@ -1,4 +1,3 @@
-from cProfile import label
 from django import forms
 
 from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Location, Rack
