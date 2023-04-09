@@ -1,11 +1,12 @@
 import logging
 
+from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
 from dcim.models.device_components import ConsolePort, ConsoleServerPort, FrontPort, Interface, PowerOutlet, PowerPort, RearPort
-from utilities.forms import DynamicModelChoiceField, StaticSelect
+from utilities.forms import DynamicModelChoiceField
 from ..utils import get_plugin_setting
 
 __all__ = (
@@ -37,16 +38,10 @@ class AssetCreateMixin:
             asset = self.instance.assigned_asset
             self.fields['serial'].disabled = True
             self.fields['asset_tag'].disabled = True
+            self.fields[kind_type].disabled = True
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
-
-            self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
-            self.fields['manufacturer'].choices = [(asset.hardware_type.manufacturer.pk, asset.hardware_type.manufacturer)]
-            self.fields[kind_type].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
-            self.fields[kind_type].choices = [(asset.hardware_type.pk, asset.hardware_type)]
-            # disabled Select field will not be POSTed so clean() complains if field is required
-            # we set value later in clean_*_type() anyway
-            self.fields[kind_type].required = False
+            self.initial[kind_type] = asset.hardware_type.id
 
     def save(self, *args):
         """
@@ -151,17 +146,16 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.fields['serial'].disabled = True
             self.fields['asset_tag'].disabled = True
             self.fields['part_id'].disabled = True
+            self.fields['manufacturer'].disabled = True
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial['part_id'] = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
+            self.initial['manufacturer'] = asset.inventoryitem_type.manufacturer_id
 
             if get_plugin_setting('prefill_asset_name_create_inventoryitem'):
                 self.initial['name'] = asset.name if asset.name else None
             if get_plugin_setting('prefill_asset_tag_create_inventoryitem'):
                 self.initial['tags'] = asset.tags.all() if asset.tags else None
-
-            self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
-            self.fields['manufacturer'].choices = [(asset.inventoryitem_type.manufacturer.pk, asset.inventoryitem_type.manufacturer)]
 
     def clean(self):
         super().clean()

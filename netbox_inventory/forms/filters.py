@@ -4,7 +4,7 @@ from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Loca
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import (
     DatePicker, DynamicModelMultipleChoiceField, MultipleChoiceField,
-    StaticSelect, TagFilterField, BOOLEAN_WITH_BLANK_CHOICES
+    TagFilterField, BOOLEAN_WITH_BLANK_CHOICES
 )
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
@@ -88,7 +88,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     is_assigned = forms.NullBooleanField(
         required=False,
         label='Is assigned to hardware',
-        widget=StaticSelect(
+        widget=forms.Select(
             choices=BOOLEAN_WITH_BLANK_CHOICES
         )
     )
