@@ -159,7 +159,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
         query = Q(
             Q(serial__icontains=value)|
             Q(name__icontains=value)|
-            Q(asset_tag__iexact=value)|
+            Q(asset_tag__icontains=value)|
             Q(device_type__model__icontains=value)|
             Q(module_type__model__icontains=value)|
             Q(inventoryitem_type__model__icontains=value)
