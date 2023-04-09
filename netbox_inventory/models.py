@@ -360,7 +360,10 @@ class Asset(NetBoxModel):
         return AssetStatusChoices.colors.get(self.status)
 
     def __str__(self):
-        return f'{self.hardware_type} {self.serial}'
+        if self.serial:
+            return f'{self.hardware_type} {self.serial}'
+        else:
+            return f'{self.hardware_type} (id:{self.id})'
 
     class Meta:
         ordering = ('device_type', 'module_type', 'inventoryitem_type', 'serial',)
