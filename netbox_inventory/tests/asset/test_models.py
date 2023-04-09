@@ -1,16 +1,9 @@
-from copy import deepcopy
-from django.conf import settings
 from django.test import override_settings, TestCase
 
 from dcim.models import Device, DeviceType, DeviceRole, Manufacturer, Site
 from utilities.exceptions import AbortRequest
 from netbox_inventory.models import Asset
-
-
-CONFIG_SYNC_ON = deepcopy(settings.PLUGINS_CONFIG)
-CONFIG_SYNC_ON['netbox_inventory']['sync_hardware_serial_asset_tag']=True
-CONFIG_SYNC_OFF = deepcopy(settings.PLUGINS_CONFIG)
-CONFIG_SYNC_OFF['netbox_inventory']['sync_hardware_serial_asset_tag']=False
+from ..settings import CONFIG_SYNC_OFF, CONFIG_SYNC_ON
 
 
 class TestAssetModel(TestCase):
