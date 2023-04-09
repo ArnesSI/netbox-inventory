@@ -25,7 +25,7 @@ __all__ = (
 class AssetFilterForm(NetBoxModelFilterSetForm):
     model = Asset
     fieldsets = (
-        (None, ('q', 'tag', 'status')),
+        (None, ('q', 'filter_id', 'tag', 'status')),
         ('Hardware', (
             'kind', 'manufacturer_id', 'device_type_id', 'module_type_id',
             'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned'
@@ -237,6 +237,10 @@ class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
 
 class PurchaseFilterForm(NetBoxModelFilterSetForm):
     model = Purchase
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Purchase', ('supplier_id', 'date_after', 'date_before')),
+    )
 
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
@@ -258,6 +262,10 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
 
 class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
     model = InventoryItemType
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Inventory Item Type', ('manufacturer_id', 'inventoryitem_group_id')),
+    )
     manufacturer_id = DynamicModelMultipleChoiceField(
         queryset=Manufacturer.objects.all(),
         required=False,
@@ -273,6 +281,9 @@ class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
 
 class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     model = InventoryItemGroup
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag', 'parent_id')),
+    )
     parent_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
