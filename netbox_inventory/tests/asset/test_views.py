@@ -82,7 +82,7 @@ class AssetTestCase(
         }
 
     @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
-    def test_create_devcie_from_asset(self):
+    def test_create_device_from_asset(self):
 
         # Assign unconstrained permission
         obj_perm = ObjectPermission(
@@ -120,7 +120,7 @@ class AssetTestCase(
         self.assertEqual(devices.first().assigned_asset, asset)
 
     @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
-    def test_assign_devcie_from_asset(self):
+    def test_assign_device_from_asset(self):
 
         # Assign unconstrained permission
         obj_perm = ObjectPermission(
