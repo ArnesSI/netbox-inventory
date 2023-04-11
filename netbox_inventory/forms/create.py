@@ -152,7 +152,7 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.fields['part_id'].disabled = True
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
-            self.initial['part_id'] = asset.inventoryitem_type.part_number
+            self.initial['part_id'] = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
 
             self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
             self.fields['manufacturer'].choices = [(asset.inventoryitem_type.manufacturer.pk, asset.inventoryitem_type.manufacturer)]

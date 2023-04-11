@@ -1,0 +1,18 @@
+{% extends 'generic/object_edit.html' %}
+
+{% block title %}Assign to {{ object.manufacturer }} {{ object }}{% endblock %}
+
+{% block tabs %}
+  <ul class="nav nav-tabs px-3">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="edit-form-tab" data-bs-toggle="tab" data-bs-target="#edit-form" type="button" role="tab" aria-controls="edit-form" aria-selected="true">
+        Asset
+      </button>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block form %}
+<div class="field-group mb-5">Select a different asset to assign to {{ object }}</div>
+{{ block.super }}
+{% endblock %}
