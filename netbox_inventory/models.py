@@ -269,8 +269,8 @@ class Asset(NetBoxModel):
         self.update_status()
         return super().clean()
 
-    def save(self, *args, **kwargs):
-        self.update_hardware_used()
+    def save(self, clear_old_hw=True, *args, **kwargs):
+        self.update_hardware_used(clear_old_hw)
         return super().save(*args, **kwargs)
 
     def validate_hardware_types(self):
@@ -314,7 +314,7 @@ class Asset(NetBoxModel):
         elif stored_status and not new_hw and old_hw:
             self.status = stored_status
 
-    def update_hardware_used(self):
+    def update_hardware_used(self, clear_old_hw=True):
         """ If assigning as device, module or inventoryitem set serial and
             asset_tag on it. Also remove them if unasigning.
         """
@@ -328,12 +328,12 @@ class Asset(NetBoxModel):
         new_asset_tag = self.asset_tag if self.asset_tag else None
         # device, module... does not allow serial to be null
         new_serial = self.serial if self.serial else ''
-        if not new_hw and old_hw:
+        if not new_hw and old_hw and clear_old_hw:
             # unassigned
             asset_clear_old_hw(old_hw)
         elif new_hw and old_hw != new_hw:
             # assigned something, set its serial
-            if old_hw:
+            if old_hw and clear_old_hw:
                 # but first clear previous hw data
                 asset_clear_old_hw(old_hw)
             # if new_hw already has correct values, don't save it again
