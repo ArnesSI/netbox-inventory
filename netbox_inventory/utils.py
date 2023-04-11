@@ -103,6 +103,36 @@ def asset_clear_old_hw(old_hw):
     pre_save.connect(prevent_update_serial_asset_tag, sender=InventoryItem)
 
 
+def asset_set_new_hw(asset, hw):
+    """
+    Asset was assigned to hardware (device/module/inventory item) and we want to
+    sync some field values from asset to hardware
+    Validation if asset can be assigned to hw should be done before calling this function.
+    """
+    # device, module... needs None for blank asset_tag to enforce uniqness at DB level
+    new_asset_tag = asset.asset_tag or None
+    # device, module... does not allow serial to be null
+    new_serial = asset.serial or ''
+    hw_save = False
+    if hw.serial != new_serial:
+        hw.serial = new_serial
+        hw_save = True
+    if hw.asset_tag != new_asset_tag:
+        hw.asset_tag = new_asset_tag
+        hw_save = True
+    # for inventory items also set manufacturer and part_number
+    if asset.inventoryitem_type:
+        if hw.manufacturer != asset.inventoryitem_type.manufacturer:
+            hw.manufacturer = asset.inventoryitem_type.manufacturer
+            hw_save = True
+        part_id = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
+        if hw.part_id != part_id:
+            hw.part_id = part_id
+            hw_save = True
+    if hw_save:
+        hw.save()
+
+
 def is_equal_none(a, b):
     """ Compare a and b as string. None is considered the same as empty string. """
     if a is None or b is None:

@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from netbox.models import NetBoxModel, NestedGroupModel
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .utils import asset_clear_old_hw, get_prechange_field, get_plugin_setting, get_status_for
+from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
 
 
 class Asset(NetBoxModel):
@@ -324,34 +324,19 @@ class Asset(NetBoxModel):
         new_hw = getattr(self, self.kind)
         old_serial = get_prechange_field(self, 'serial')
         old_asset_tag = get_prechange_field(self, 'asset_tag')
-        # device, module... needs None for unset asset_tag to enforce uniqness at DB level
-        new_asset_tag = self.asset_tag if self.asset_tag else None
-        # device, module... does not allow serial to be null
-        new_serial = self.serial if self.serial else ''
         if not new_hw and old_hw and clear_old_hw:
-            # unassigned
+            # unassigned existing asset, nothing asssigned now
             asset_clear_old_hw(old_hw)
         elif new_hw and old_hw != new_hw:
-            # assigned something, set its serial
+            # assigned something new
             if old_hw and clear_old_hw:
                 # but first clear previous hw data
                 asset_clear_old_hw(old_hw)
-            # if new_hw already has correct values, don't save it again
-            new_hw_save = False
-            if new_hw.serial != new_serial:
-                new_hw.serial = new_serial
-                new_hw_save = True
-            if new_hw.asset_tag != new_asset_tag:
-                new_hw.asset_tag = new_asset_tag
-                new_hw_save = True
-            if new_hw_save:
-                new_hw.save()
+            asset_set_new_hw(asset=self, hw=new_hw)
         elif self.serial != old_serial or self.asset_tag != old_asset_tag:
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:
-                new_hw.serial = new_serial
-                new_hw.asset_tag = new_asset_tag
-                new_hw.save()
+                asset_set_new_hw(asset=self, hw=new_hw)
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:asset', args=[self.pk])
