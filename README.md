@@ -9,8 +9,14 @@ define assets that represent hardware that can be used as a device, module or
 inventory item in NetBox.
 
 Each asset can have a storage location defined, when not in use. You can assign
-an asset to a device or module. The plugin can keep serial number and asset tag
-between asset and device or module in sync if enabled in settings.
+an asset to a device, module or inventory item. The plugin can keep serial number
+and asset tag between asset and device, module or inventory item in sync if
+enabled in settings.
+
+On Site and Location detail views there is a new tab Assets that can show assets
+that are stored or installed at that location or both. Rack details view also has
+a tab for installed Assets. This provides a unified view of all assets at a given
+location.
 
 To properly support inventory items (that are used in NetBox to model SFP and
 similar modules) the plugin defines inventory item types that are equivalent to
@@ -20,6 +26,10 @@ Inventory item types can be assigned into inventory item groups. On a group deta
 view you have an overview of the number of contained assets broken down by asset
 status or inventory item type and status. This way you can quickly see how many
 of a certain type of hardware you still have spare.
+
+Inventory item groups can be nested, so you can for example model all pluggables
+as one top-level group with child groups for SFP+ modules, SFP28 modules and so
+on.
 
 ### Automatic management of asset status
 
