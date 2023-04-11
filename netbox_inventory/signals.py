@@ -64,5 +64,5 @@ def free_assigned_asset(instance, **kwargs):
     # also unassign that item from asset
     setattr(asset, asset.kind, None)
     asset.full_clean()
-    asset.save()
+    asset.save(clear_old_hw=False)
     logger.info(f'Asset marked as stored {asset}')
