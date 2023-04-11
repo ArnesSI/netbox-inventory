@@ -5,4 +5,5 @@ from .supplier import *
 from .purchase import *
 from .asset_create import *
 from .asset_assign import *
+from .asset_reassign import *
 from .tabs import *

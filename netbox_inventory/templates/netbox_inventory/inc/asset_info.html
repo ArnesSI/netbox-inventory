@@ -32,4 +32,20 @@
     <div class="text-muted">None assigned</div>
   {% endif %}
   </div>
+  <div class="card-footer text-end noprint">
+    {# only show reassign button if user has change permissions on asset #}
+    {% if perms.netbox_inventory.change_asset %}
+      {% with object|meta:"model_name" as object_type %}
+      {% if object_type == "device" %}
+      <a href="{% url 'plugins:netbox_inventory:asset_device_reassign' object.pk %}" class="btn btn-sm btn-orange">
+      {% elif object_type == "module" %}
+      <a href="{% url 'plugins:netbox_inventory:asset_module_reassign' object.pk %}" class="btn btn-sm btn-orange">
+      {% elif object_type == "inventoryitem" %}
+      <a href="{% url 'plugins:netbox_inventory:asset_inventoryitem_reassign' object.pk %}" class="btn btn-sm btn-orange">
+      {% endif %}
+      {% endwith %}
+        <span class="mdi mdi-vector-link" aria-hidden="true"></span> Edit Assignment
+      </a>
+    {% endif %}
+  </div>
 </div>
