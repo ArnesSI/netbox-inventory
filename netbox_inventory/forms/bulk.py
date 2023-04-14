@@ -8,7 +8,7 @@ from utilities.forms import (
     add_blank_choice, ChoiceField, CommentField, CSVChoiceField,
     CSVModelChoiceField, DynamicModelChoiceField
 )
-from tenancy.models import Tenant
+from tenancy.models import Contact, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices
 from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_plugin_setting
@@ -115,7 +115,7 @@ class AssetImportForm(NetBoxModelImportForm):
     )
     model_name = forms.CharField(
         required=True,
-        help_text='Model of this device/module/inventory item type. See "Import settings" below for more info.',
+        help_text='Model of this device/module/inventory item type. See "Import settings" for more info.',
     )
     part_number = forms.CharField(
         required=False,
@@ -150,7 +150,7 @@ class AssetImportForm(NetBoxModelImportForm):
     purchase = CSVModelChoiceField(
         queryset=Purchase.objects.all(),
         to_field_name='name',
-        help_text='Purchase through which this asset was purchased. See "Import settings" below for more info.',
+        help_text='Purchase through which this asset was purchased. See "Import settings" for more info.',
         required=False,
     )
     purchase_date = forms.DateField(
@@ -163,6 +163,18 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Legal entity this purchase was made from. Required if a new purchase was given.',
         required=False,
     )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        to_field_name='name',
+        help_text='Tenant using this asset. See "Import settings" for more info.',
+        required=False,
+    )
+    contact = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        to_field_name='name',
+        help_text='Contact using this asset. It must exist before import.',
+        required=False,
+    )
 
     class Meta:
         model = Asset
@@ -171,7 +183,7 @@ class AssetImportForm(NetBoxModelImportForm):
             'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'model_comments', 'storage_site', 'storage_location',
             'owner', 'purchase', 'purchase_date', 'supplier',
-            'warranty_start', 'warranty_end', 'comments',
+            'warranty_start', 'warranty_end', 'comments', 'tenant', 'contact',
         )
 
     def clean_model_name(self):
@@ -238,14 +250,14 @@ class AssetImportForm(NetBoxModelImportForm):
                 and self.data.get('purchase') and self.data.get('supplier')):
                 Purchase.objects.get_or_create(
                     name=self.data.get('purchase'),
-                    supplier=self._get_or_create_supplier(),
+                    supplier=self._get_or_create_related('supplier'),
                     defaults={'date': self._get_clean_value('purchase_date')}
                 )
             if (get_plugin_setting('asset_import_create_device_type')
                 and self.data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
-                    manufacturer=self._get_or_create_manufacturer(),
+                    manufacturer=self._get_or_create_related('manufacturer'),
                     defaults={
                         'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
@@ -257,7 +269,7 @@ class AssetImportForm(NetBoxModelImportForm):
                 and self.data.get('hardware_kind') == 'module'):
                 ModuleType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
-                    manufacturer=self._get_or_create_manufacturer(),
+                    manufacturer=self._get_or_create_related('manufacturer'),
                     defaults={
                         'model': self.data.get('model_name'),
                         'part_number': self._get_clean_value('part_number'),
@@ -268,7 +280,7 @@ class AssetImportForm(NetBoxModelImportForm):
                 and self.data.get('hardware_kind') == 'inventoryitem'):
                 InventoryItemType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
-                    manufacturer=self._get_or_create_manufacturer(),
+                    manufacturer=self._get_or_create_related('manufacturer'),
                     defaults={
                         'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
@@ -276,6 +288,12 @@ class AssetImportForm(NetBoxModelImportForm):
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
+            if (get_plugin_setting('asset_import_create_tenant')
+                and self.data.get('tenant')):
+                self._get_or_create_related('tenant')
+            if (get_plugin_setting('asset_import_create_tenant')
+                and self.data.get('owner')):
+                self._get_or_create_related('owner')
         except forms.ValidationError as e:
             # ValidationErrors are raised by _clean_fields() method
             # this will be called later in the code and will be bound
@@ -285,25 +303,27 @@ class AssetImportForm(NetBoxModelImportForm):
             # any other errors we add to non-field specific form errors
             self.add_error(None, e)
 
-    def _get_or_create_manufacturer(self):
-        manufacturer, _ = Manufacturer.objects.get_or_create(
-            name__iexact=self.data.get('manufacturer'),
-            defaults={
-                'name': self.data.get('manufacturer'),
-                'slug': slugify(self.data.get('manufacturer'))
-            },
+    def _get_or_create_related(self, field_name):
+        """
+        Create instance of related object if it doesn't exist.
+        Supports specifiying related object by name or slug.
+        """
+        klass = self.fields[field_name].queryset.model
+        # user could have specified alternative field (tenant name or tenant slug)
+        to_field_name = self.fields[field_name].to_field_name
+        # create sensible default data if we'll need to create object
+        instance_defaults = {
+            'name': self.data.get(field_name),
+            'slug': slugify(self.data.get(field_name)),
+        }
+        # whatever field was in import data is used as is
+        instance_defaults.update({to_field_name: self.data.get(field_name)})
+        instance, _ = klass.objects.get_or_create(
+            # filter on field specified in column header
+            **{to_field_name+'__iexact':self.data.get(field_name)},
+            defaults=instance_defaults
         )
-        return manufacturer
-
-    def _get_or_create_supplier(self):
-        supplier, _ = Supplier.objects.get_or_create(
-            name__iexact=self.data.get('supplier'),
-            defaults={
-                'name': self.data.get('supplier'),
-                'slug': slugify(self.data.get('supplier'))
-            }
-        )
-        return supplier
+        return instance
 
     def _get_clean_value(self, field_name):
         """
