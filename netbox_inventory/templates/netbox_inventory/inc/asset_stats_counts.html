@@ -1,0 +1,15 @@
+{% load helpers %}
+
+<div class="card">
+  <h5 class="card-header">Assets</h5>
+  <div class="card-body">
+    <table class="table table-hover attr-table">
+    {% for asset_stat in asset_stats %}
+      <tr>
+        <td>{{ asset_stat.label }}</td>
+        <td><a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{ asset_stat.filter_field }}={{ object.pk }}{{ asset_stat.extra_filter }}">{{ asset_stat.count }}</a></td>
+      </tr>
+    {% endfor %}
+    </table>
+  </div>
+</div>

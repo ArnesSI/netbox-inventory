@@ -15,6 +15,11 @@ __all__ = (
 class InventoryItemTypeView(generic.ObjectView):
     queryset = models.InventoryItemType.objects.all()
 
+    def get_extra_context(self, request, instance):
+        context = super().get_extra_context(request, instance)
+        context['asset_count'] = models.Asset.objects.restrict(request.user, 'view').filter(inventoryitem_type=instance).count()
+        return context
+
 
 class InventoryItemTypeListView(generic.ObjectListView):
     queryset = models.InventoryItemType.objects.annotate(

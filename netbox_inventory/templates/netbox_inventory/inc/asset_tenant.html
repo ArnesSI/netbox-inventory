@@ -1,0 +1,15 @@
+{% load helpers %}
+
+<div class="card">
+  <h5 class="card-header">Assets</h5>
+  <div class="row card-body">
+    <div class="col col-md-4 text-center">
+      <h2><a href="{% url 'plugins:netbox_inventory:asset_list' %}?owner_id={{ object.pk }}" class="stat-btn btn {% if asset_owned_count %}btn-primary{% else %}btn-outline-dark{% endif %} btn-lg">{{ asset_owned_count }}</a></h2>
+      <p>Owned</p>
+    </div>
+    <div class="col col-md-4 text-center">
+      <h2><a href="{% url 'plugins:netbox_inventory:asset_list' %}?tenant_id={{ object.pk }}" class="stat-btn btn {% if asset_assigned_count %}btn-primary{% else %}btn-outline-dark{% endif %} btn-lg">{{ asset_assigned_count }}</a></h2>
+      <p>Assigned</p>
+    </div>
+  </div>
+</div>
