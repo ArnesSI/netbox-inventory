@@ -29,8 +29,21 @@ class InventoryItemAssetInfo(AssetInfoExtension):
     kind = 'inventoryitem'
 
 
+class TenantAssetInfo(PluginTemplateExtension):
+    model = 'tenancy.tenant'
+    def right_page(self):
+        object = self.context.get('object')
+        user = self.context['request'].user
+        context = {
+            'asset_assigned_count': Asset.objects.restrict(user, 'view').filter(tenant=object).count(),
+            'asset_owned_count': Asset.objects.restrict(user, 'view').filter(owner=object).count(),
+        }
+        return self.render('netbox_inventory/inc/asset_tenant.html', extra_context=context)
+
+
 template_extensions = (
     DeviceAssetInfo,
     ModuleAssetInfo,
     InventoryItemAssetInfo,
+    TenantAssetInfo,
 )
