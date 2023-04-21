@@ -334,7 +334,7 @@ class AssetImportForm(NetBoxModelImportForm):
         instance does not exist it raises Exception but no feedback is given to user.
         """
         try:
-            return self.fields[field_name].clean(self.data.get(field_name))
+            return self.base_fields[field_name].clean(self.data.get(field_name))
         except forms.ValidationError as e:
             self.add_error(field_name, e)
             raise
