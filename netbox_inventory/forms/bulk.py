@@ -183,7 +183,7 @@ class AssetImportForm(NetBoxModelImportForm):
             'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'model_comments', 'storage_site', 'storage_location',
             'owner', 'purchase', 'purchase_date', 'supplier',
-            'warranty_start', 'warranty_end', 'comments', 'tenant', 'contact',
+            'warranty_start', 'warranty_end', 'comments', 'tenant', 'contact', 'tags',
         )
 
     def clean_model_name(self):
