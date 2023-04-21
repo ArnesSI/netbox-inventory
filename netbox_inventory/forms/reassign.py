@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from dcim.models import Device, InventoryItem, Module, Site, Location, Manufacturer
 from netbox.forms import NetBoxModelForm
-from utilities.forms import DynamicModelChoiceField, ChoiceField
+from utilities.forms.fields import DynamicModelChoiceField, ChoiceField
 from ..choices import AssetStatusChoices
 from ..models import Asset, InventoryItemType, InventoryItemGroup
 from ..utils import get_status_for

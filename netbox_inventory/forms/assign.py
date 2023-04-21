@@ -2,7 +2,8 @@ from django import forms
 
 from dcim.models import Device, InventoryItem, Module, Site
 from netbox.forms import NetBoxModelForm
-from utilities.forms import APISelect, DynamicModelChoiceField
+from utilities.forms.fields import DynamicModelChoiceField
+from utilities.forms.widgets import APISelect
 from ..models import Asset
 
 __all__ = (

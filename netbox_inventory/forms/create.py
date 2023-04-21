@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
 from dcim.models.device_components import ConsolePort, ConsoleServerPort, FrontPort, Interface, PowerOutlet, PowerPort, RearPort
-from utilities.forms import DynamicModelChoiceField
+from utilities.forms.fields import DynamicModelChoiceField
 from ..utils import get_plugin_setting
 
 __all__ = (

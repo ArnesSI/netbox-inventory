@@ -2,10 +2,9 @@ from django import forms
 
 from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Location, Rack
 from netbox.forms import NetBoxModelFilterSetForm
-from utilities.forms import (
-    DatePicker, DynamicModelMultipleChoiceField, MultipleChoiceField,
-    TagFilterField, BOOLEAN_WITH_BLANK_CHOICES
-)
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
+from utilities.forms.fields import DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
+from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
