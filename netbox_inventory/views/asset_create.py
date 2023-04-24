@@ -60,3 +60,8 @@ class AssetInventoryItemCreateView(AssetCreateView):
 
     def get_object(self, **kwargs):
         return InventoryItem(assigned_asset=self.asset)
+
+    def get_extra_context(self, request, instance):
+        context = super().get_extra_context(request, instance)
+        context['template_extends'] = 'dcim/inventoryitem_edit.html'
+        return context

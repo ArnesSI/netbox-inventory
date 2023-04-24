@@ -23,6 +23,7 @@ class AssetForm(NetBoxModelForm):
         initial_params={
             'device_types': '$device_type',
             'module_types': '$module_type',
+            'inventoryitem_types': '$inventoryitem_type',
         },
     )
     device_type = DynamicModelChoiceField(
@@ -130,11 +131,30 @@ class AssetForm(NetBoxModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        """Override the default __init__ method to add custom logic to the form.
-        We need to disable fields that are not editable based on the tags that are assigned to the asset.
-        """
         super().__init__(*args, **kwargs)
 
+        self._disable_fields_by_tags()
+
+        # Used for picking the default active tab for hardware type selection
+        self.no_hardware_type = True
+        if self.instance:
+            if (self.instance.device_type or self.instance.module_type
+                or self.instance.inventoryitem_type):
+                self.no_hardware_type = False
+
+        # if assigned to device/module/inventoryitem we can't change device_type/...
+        if (
+            self.instance.device or self.instance.module
+            or self.instance.inventoryitem
+        ):
+            self.fields['manufacturer'].disabled = True
+            for kind in HardwareKindChoices.values():
+                self.fields[f'{kind}_type'].disabled = True
+
+    def _disable_fields_by_tags(self):
+        """
+        We need to disable fields that are not editable based on the tags that are assigned to the asset.
+        """
         if not self.instance.pk:
             # If we are creating a new asset we can't disable fields
             return
@@ -150,15 +170,6 @@ class AssetForm(NetBoxModelForm):
             for field in tags_and_disabled_fields[tag]:
                 if field in self.fields:
                     self.fields[field].disabled = True
-
-        # if assigned to device/module/inventoryitem we can't change device_type/...
-        if (
-            self.instance.device or self.instance.module
-            or self.instance.inventoryitem
-        ):
-            self.fields['manufacturer'].disabled = True
-            for kind in HardwareKindChoices.values():
-                self.fields[f'{kind}_type'].disabled = True
 
 
 class SupplierForm(NetBoxModelForm):

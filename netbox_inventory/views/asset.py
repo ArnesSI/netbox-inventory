@@ -55,7 +55,7 @@ class AssetListView(generic.ObjectListView):
 class AssetBulkCreateView(generic.BulkCreateView):
     queryset = models.Asset.objects.all()
     form = forms.AssetBulkAddForm
-    model_form = forms.AssetForm
+    model_form = forms.AssetBulkAddModelForm
     pattern_target = None
     template_name = 'netbox_inventory/asset_bulk_add.html'
 
