@@ -79,6 +79,16 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     warranty_end = forms.CharField(
         required=False,
     )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        help_text=Asset._meta.get_field('tenant').help_text,
+        required=not Asset._meta.get_field('tenant').blank,
+    )
+    contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Asset._meta.get_field('contact').help_text,
+        required=not Asset._meta.get_field('contact').blank,
+    )
     storage_location = DynamicModelChoiceField(
         queryset=Location.objects.all(),
         help_text=Asset._meta.get_field('storage_location').help_text,
@@ -93,11 +103,12 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         ('General', ('name', 'status')),
         ('Hardware', ('device_type', 'device', 'module_type', 'module')),
         ('Purchase', ('owner', 'purchase', 'warranty_start', 'warranty_end')), 
+        ('Assigned to', ('tenant', 'contact')), 
         ('Location', ('storage_location',)),
     )
     nullable_fields = (
-        'name', 'device', 'module', 'owner', 'purchase', 'warranty_start',
-        'warranty_end',
+        'name', 'device', 'module', 'owner', 'purchase', 'tenant', 'contact',
+        'warranty_start', 'warranty_end',
     )
 
 

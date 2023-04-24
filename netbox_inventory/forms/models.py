@@ -2,7 +2,7 @@ from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
 from netbox.forms import NetBoxModelForm
 from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms import CommentField, DatePicker, DynamicModelChoiceField, SlugField
-from tenancy.models import Tenant
+from tenancy.models import Contact, Tenant
 from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_tags_and_edit_protected_asset_fields
 
@@ -58,6 +58,16 @@ class AssetForm(NetBoxModelForm):
         help_text=Asset._meta.get_field('purchase').help_text,
         required=not Asset._meta.get_field('purchase').blank,
     )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        help_text=Asset._meta.get_field('tenant').help_text,
+        required=not Asset._meta.get_field('tenant').blank,
+    )
+    contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Asset._meta.get_field('contact').help_text,
+        required=not Asset._meta.get_field('contact').blank,
+    )
     storage_site = DynamicModelChoiceField(
         queryset=Site.objects.all(),
         required=False,
@@ -97,6 +107,13 @@ class AssetForm(NetBoxModelForm):
             ),
         ),
         (
+            'Assigned to',
+            (
+                'tenant',
+                'contact',
+            ),
+        ),
+        (
             'Location',
             (
                 'storage_site',
@@ -121,6 +138,8 @@ class AssetForm(NetBoxModelForm):
             'purchase',
             'warranty_start',
             'warranty_end',
+            'tenant',
+            'contact',
             'tags',
             'comments',
             'storage_site',
