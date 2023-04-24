@@ -68,6 +68,14 @@
 
     <div class="field-group my-5">
         <div class="row mb-2">
+          <h5 class="offset-sm-3">Assigned to</h5>
+        </div>
+        {% render_field form.tenant %}
+        {% render_field form.contact %}
+    </div>
+
+    <div class="field-group my-5">
+        <div class="row mb-2">
           <h5 class="offset-sm-3">Location</h5>
         </div>
         {% render_field form.storage_site %}
