@@ -23,6 +23,7 @@ class AssetForm(NetBoxModelForm):
         initial_params={
             'device_types': '$device_type',
             'module_types': '$module_type',
+            'inventoryitem_types': '$inventoryitem_type',
         },
     )
     device_type = DynamicModelChoiceField(
