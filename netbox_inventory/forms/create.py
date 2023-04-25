@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
 from dcim.models.device_components import ConsolePort, ConsoleServerPort, FrontPort, Interface, PowerOutlet, PowerPort, RearPort
 from utilities.forms import DynamicModelChoiceField, StaticSelect
+from ..utils import get_plugin_setting
 
 __all__ = (
     'AssetDeviceCreateForm',
@@ -153,6 +154,10 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial['part_id'] = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
+
+            if get_plugin_setting('prefill_asset_name_tag_create_inventoryitem'):
+                self.initial['name'] = asset.name if asset.name else None
+                self.initial['tags'] = asset.tags.all() if asset.tags else None
 
             self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
             self.fields['manufacturer'].choices = [(asset.inventoryitem_type.manufacturer.pk, asset.inventoryitem_type.manufacturer)]
