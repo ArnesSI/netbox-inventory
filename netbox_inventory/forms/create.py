@@ -155,8 +155,9 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial['part_id'] = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
 
-            if get_plugin_setting('prefill_asset_name_tag_create_inventoryitem'):
+            if get_plugin_setting('prefill_asset_name_create_inventoryitem'):
                 self.initial['name'] = asset.name if asset.name else None
+            if get_plugin_setting('prefill_asset_tag_create_inventoryitem'):
                 self.initial['tags'] = asset.tags.all() if asset.tags else None
 
             self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})

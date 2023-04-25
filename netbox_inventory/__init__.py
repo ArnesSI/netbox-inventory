@@ -23,7 +23,8 @@ class NetBoxInventoryConfig(PluginConfig):
         'asset_import_create_tenant': False,
         'asset_disable_editing_fields_for_tags': {},
         'asset_disable_deletion_for_tags': [],
-        'prefill_asset_name_tag_create_inventoryitem': False,
+        'prefill_asset_name_create_inventoryitem': False,
+        'prefill_asset_tag_create_inventoryitem': False,
     }
 
     def ready(self):
