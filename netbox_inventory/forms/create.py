@@ -5,7 +5,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
-from dcim.models.device_components import ConsolePort, ConsoleServerPort, FrontPort, Interface, PowerOutlet, PowerPort, RearPort
 from utilities.forms.fields import DynamicModelChoiceField
 from ..utils import get_plugin_setting
 
@@ -89,55 +88,6 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
         Offers selection of device components and maps selected component
         to component_type and component_id fields
     """
-
-    consoleport = DynamicModelChoiceField(
-        queryset=ConsolePort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Console port',
-        required=False,
-    )
-    consoleserverport = DynamicModelChoiceField(
-        queryset=ConsoleServerPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Console server port',
-        required=False,
-    )
-    frontport = DynamicModelChoiceField(
-        queryset=FrontPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Front port',
-        required=False,
-    )
-    interface = DynamicModelChoiceField(
-        queryset=Interface.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Interface',
-        required=False,
-    )
-    poweroutlet = DynamicModelChoiceField(
-        queryset=PowerOutlet.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Power outlet',
-        required=False,
-    )
-    powerport = DynamicModelChoiceField(
-        queryset=PowerPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Power port',
-        required=False,
-    )
-    rearport = DynamicModelChoiceField(
-        queryset=RearPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Rear port',
-        required=False,
-    )
-
-    fieldsets = (
-        InventoryItemForm.fieldsets[0],
-        ('Component', ('interface', 'consoleport', 'consoleserverport', 'frontport', 'rearport', 'poweroutlet', 'powerport')),
-    ) + InventoryItemForm.fieldsets[1:]
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
