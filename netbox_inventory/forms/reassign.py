@@ -92,7 +92,7 @@ class AssetReassignMixin(forms.Form):
         try:
             # update hardware assignment and validate data
             setattr(asset, asset.kind, instance)
-            asset.clean()
+            asset.full_clean(exclude=(asset.kind,))
         except ValidationError as e:
             # ValidationError raised for device or module field
             # "remap" to error for whole form 
