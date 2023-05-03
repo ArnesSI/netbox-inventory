@@ -2,6 +2,7 @@ from django import forms
 
 from dcim.models import Device, InventoryItem, Module, Site
 from netbox.forms import NetBoxModelForm
+from tenancy.models import Contact, Tenant
 from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.widgets import APISelect
 from ..models import Asset
@@ -18,6 +19,18 @@ class AssetAssignMixin(forms.Form):
         required=False,
         label='Asset name',
         help_text=Asset._meta.get_field('name').help_text
+    )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        selector=True,
+        required=False,
+        help_text=Asset._meta.get_field('tenant').help_text,
+    )
+    contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        selector=True,
+        required=False,
+        help_text=Asset._meta.get_field('contact').help_text,
     )
     tags = None
 
@@ -72,7 +85,7 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
     fieldsets = (
         ('Asset', ('device_type', 'name')),
         ('Device', ('site', 'device')),
-        ('Tenancy', ('tenant', 'contact')),
+        ('Assigned to', ('tenant', 'contact')),
     )
 
     class Meta:
@@ -88,15 +101,9 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
 
 
 class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
-    site = DynamicModelChoiceField(
-        queryset=Site.objects.all(),
-        required=False,
-        initial_params={'devices': '$device'},
-    )
     device = DynamicModelChoiceField(
         queryset=Device.objects.all(),
-        query_params={'site_id': '$site'},
-        label='Device',
+        selector=True,
         required=False,
     )
     module = DynamicModelChoiceField(
@@ -115,13 +122,13 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
 
     fieldsets = (
         ('Asset', ('module_type', 'name')),
-        ('Module', ('site', 'device', 'module')),
+        ('Module', ('device', 'module',)),
         ('Tenancy', ('tenant', 'contact')),
     )
 
     class Meta:
         model = Asset
-        fields = ('module_type', 'name', 'site', 'device', 'module', 'tenant', 'contact')
+        fields = ('module_type', 'name', 'device', 'module', 'tenant', 'contact')
         widgets = {'module_type': forms.HiddenInput()}
 
     def clean_device(self):
@@ -136,15 +143,9 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
 
 
 class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
-    site = DynamicModelChoiceField(
-        queryset=Site.objects.all(),
-        required=False,
-        initial_params={'devices': '$device'},
-    )
     device = DynamicModelChoiceField(
         queryset=Device.objects.all(),
-        query_params={'site_id': '$site'},
-        label='Device',
+        selector=True,
         required=False,
     )
     inventoryitem = DynamicModelChoiceField(
@@ -165,13 +166,13 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
 
     fieldsets = (
         ('Asset', ('inventoryitem_type', 'name')),
-        ('Inventory Item', ('site', 'device', 'inventoryitem')),
+        ('Inventory Item', ('device', 'inventoryitem')),
         ('Tenancy', ('tenant', 'contact')),
     )
 
     class Meta:
         model = Asset
-        fields = ('inventoryitem_type', 'name', 'site', 'device', 'inventoryitem', 'tenant', 'contact')
+        fields = ('inventoryitem_type', 'name', 'device', 'inventoryitem', 'tenant', 'contact')
         widgets = {'inventoryitem_type': forms.HiddenInput()}
 
     def clean_device(self):

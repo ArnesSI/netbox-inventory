@@ -1,10 +1,10 @@
 import logging
 
-from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
+from dcim.models import Device
 from utilities.forms.fields import DynamicModelChoiceField
 from ..utils import get_plugin_setting
 
@@ -74,6 +74,14 @@ class AssetModuleCreateForm(AssetCreateMixin, ModuleForm):
     """
         Populates and disables editing of asset and module_type fields
     """
+    device = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        selector=True,
+        initial_params={
+            'modulebays': '$module_bay'
+        }
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.update_hardware_fields('module_type')

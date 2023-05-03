@@ -111,6 +111,7 @@ class AssetDeviceReassignForm(AssetReassignMixin, NetBoxModelForm):
     assigned_asset = DynamicModelChoiceField(
         queryset=Asset.objects.filter(device_type__isnull=False, device__isnull=True),
         required=False,
+        selector=True,
         query_params={
             'kind': 'device',
             'is_assigned': False,
@@ -140,6 +141,7 @@ class AssetModuleReassignForm(AssetReassignMixin, NetBoxModelForm):
     assigned_asset = DynamicModelChoiceField(
         queryset=Asset.objects.filter(module_type__isnull=False, module__isnull=True),
         required=False,
+        selector=True,
         query_params={
             'kind': 'module',
             'is_assigned': False,
@@ -190,6 +192,7 @@ class AssetInventoryItemReassignForm(AssetReassignMixin, NetBoxModelForm):
     assigned_asset = DynamicModelChoiceField(
         queryset=Asset.objects.filter(inventoryitem_type__isnull=False, inventoryitem__isnull=True),
         required=False,
+        selector=True,
         query_params={
             'kind': 'inventoryitem',
             'is_assigned': False,
