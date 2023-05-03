@@ -41,7 +41,7 @@ class AssetReassignMixin(forms.Form):
 
     def save(self, commit=True):
         # if existing assigned_asset, clear assignment before save
-        # handle snapshot for ald and new asset
+        # handle snapshot for old and new asset
         """
         Save this form's self.instance object if commit=True. Otherwise, add
         a save_m2m() method to the form which can be called after the instance
@@ -60,8 +60,8 @@ class AssetReassignMixin(forms.Form):
             if self.old_asset:
                 self.old_asset.status = self.cleaned_data['asset_status']
                 # if assigning another asset, don't clear data from device object
-                # will overwrite via net_asset.save later
-                # this is to avoind creating two changelog entries for device
+                # will overwrite via new_asset.save later
+                # this is to avoid creating two changelog entries for device
                 self.old_asset.save(clear_old_hw=not bool(self.new_asset))
             if self.new_asset:
                 self.new_asset.save()
