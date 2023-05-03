@@ -49,8 +49,7 @@ class PurchaseDeleteView(generic.ObjectDeleteView):
 
 
 class PurchaseBulkImportView(generic.BulkImportView):
-    queryset = models.Purchase.objects.all()   
-    table = tables.PurchaseTable 
+    queryset = models.Purchase.objects.all()
     model_form = forms.PurchaseImportForm
 
 

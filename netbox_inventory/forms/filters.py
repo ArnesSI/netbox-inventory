@@ -1,12 +1,10 @@
-from cProfile import label
 from django import forms
 
 from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Location, Rack
 from netbox.forms import NetBoxModelFilterSetForm
-from utilities.forms import (
-    DatePicker, DynamicModelMultipleChoiceField, MultipleChoiceField,
-    StaticSelect, TagFilterField, BOOLEAN_WITH_BLANK_CHOICES
-)
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
+from utilities.forms.fields import DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
+from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
@@ -89,7 +87,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     is_assigned = forms.NullBooleanField(
         required=False,
         label='Is assigned to hardware',
-        widget=StaticSelect(
+        widget=forms.Select(
             choices=BOOLEAN_WITH_BLANK_CHOICES
         )
     )

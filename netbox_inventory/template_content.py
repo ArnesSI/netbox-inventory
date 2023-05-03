@@ -99,10 +99,20 @@ class TenantAssetInfo(PluginTemplateExtension):
         object = self.context.get('object')
         user = self.context['request'].user
         context = {
-            'asset_assigned_count': Asset.objects.restrict(user, 'view').filter(tenant=object).count(),
-            'asset_owned_count': Asset.objects.restrict(user, 'view').filter(owner=object).count(),
+            'asset_stats': [
+                {
+                    'label': 'Assigned',
+                    'filter_field': 'tenant_id',
+                    'count': Asset.objects.restrict(user, 'view').filter(tenant=object).count(),
+                },
+                {
+                    'label': 'Owned',
+                    'filter_field': 'owner_id',
+                    'count': Asset.objects.restrict(user, 'view').filter(owner=object).count(),
+                },
+            ],
         }
-        return self.render('netbox_inventory/inc/asset_tenant.html', extra_context=context)
+        return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
 
 
 class ContactAssetInfo(PluginTemplateExtension):

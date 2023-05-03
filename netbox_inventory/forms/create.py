@@ -4,8 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
-from dcim.models.device_components import ConsolePort, ConsoleServerPort, FrontPort, Interface, PowerOutlet, PowerPort, RearPort
-from utilities.forms import DynamicModelChoiceField, StaticSelect
+from dcim.models import Device
+from utilities.forms.fields import DynamicModelChoiceField
 from ..utils import get_plugin_setting
 
 __all__ = (
@@ -37,16 +37,10 @@ class AssetCreateMixin:
             asset = self.instance.assigned_asset
             self.fields['serial'].disabled = True
             self.fields['asset_tag'].disabled = True
+            self.fields[kind_type].disabled = True
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
-
-            self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
-            self.fields['manufacturer'].choices = [(asset.hardware_type.manufacturer.pk, asset.hardware_type.manufacturer)]
-            self.fields[kind_type].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
-            self.fields[kind_type].choices = [(asset.hardware_type.pk, asset.hardware_type)]
-            # disabled Select field will not be POSTed so clean() complains if field is required
-            # we set value later in clean_*_type() anyway
-            self.fields[kind_type].required = False
+            self.initial[kind_type] = asset.hardware_type.id
 
     def save(self, *args):
         """
@@ -80,6 +74,14 @@ class AssetModuleCreateForm(AssetCreateMixin, ModuleForm):
     """
         Populates and disables editing of asset and module_type fields
     """
+    device = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        selector=True,
+        initial_params={
+            'modulebays': '$module_bay'
+        }
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.update_hardware_fields('module_type')
@@ -94,55 +96,6 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
         Offers selection of device components and maps selected component
         to component_type and component_id fields
     """
-
-    consoleport = DynamicModelChoiceField(
-        queryset=ConsolePort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Console port',
-        required=False,
-    )
-    consoleserverport = DynamicModelChoiceField(
-        queryset=ConsoleServerPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Console server port',
-        required=False,
-    )
-    frontport = DynamicModelChoiceField(
-        queryset=FrontPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Front port',
-        required=False,
-    )
-    interface = DynamicModelChoiceField(
-        queryset=Interface.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Interface',
-        required=False,
-    )
-    poweroutlet = DynamicModelChoiceField(
-        queryset=PowerOutlet.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Power outlet',
-        required=False,
-    )
-    powerport = DynamicModelChoiceField(
-        queryset=PowerPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Power port',
-        required=False,
-    )
-    rearport = DynamicModelChoiceField(
-        queryset=RearPort.objects.all(),
-        query_params={'device_id': '$device'},
-        label='Rear port',
-        required=False,
-    )
-
-    fieldsets = (
-        InventoryItemForm.fieldsets[0],
-        ('Component', ('interface', 'consoleport', 'consoleserverport', 'frontport', 'rearport', 'poweroutlet', 'powerport')),
-    ) + InventoryItemForm.fieldsets[1:]
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -151,17 +104,16 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.fields['serial'].disabled = True
             self.fields['asset_tag'].disabled = True
             self.fields['part_id'].disabled = True
+            self.fields['manufacturer'].disabled = True
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial['part_id'] = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
+            self.initial['manufacturer'] = asset.inventoryitem_type.manufacturer_id
 
             if get_plugin_setting('prefill_asset_name_create_inventoryitem'):
                 self.initial['name'] = asset.name if asset.name else None
             if get_plugin_setting('prefill_asset_tag_create_inventoryitem'):
                 self.initial['tags'] = asset.tags.all() if asset.tags else None
-
-            self.fields['manufacturer'].widget = StaticSelect(attrs={'readonly':True, 'disabled':True})
-            self.fields['manufacturer'].choices = [(asset.inventoryitem_type.manufacturer.pk, asset.inventoryitem_type.manufacturer)]
 
     def clean(self):
         super().clean()

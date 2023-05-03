@@ -4,9 +4,10 @@ from django.utils.text import slugify
 
 from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
-from utilities.forms import (
-    add_blank_choice, ChoiceField, CommentField, CSVChoiceField,
-    CSVModelChoiceField, DynamicModelChoiceField
+from utilities.forms import add_blank_choice
+from utilities.forms.fields import (
+    ChoiceField, CommentField, CSVChoiceField, CSVModelChoiceField,
+    DynamicModelChoiceField
 )
 from tenancy.models import Contact, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices

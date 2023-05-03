@@ -2,14 +2,17 @@
 
 <div class="card">
   <h5 class="card-header">Assets</h5>
-  <div class="card-body">
-    <table class="table table-hover attr-table">
+  <ul class="list-group list-group-flush">
     {% for asset_stat in asset_stats %}
-      <tr>
-        <td>{{ asset_stat.label }}</td>
-        <td><a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{ asset_stat.filter_field }}={{ object.pk }}{{ asset_stat.extra_filter }}">{{ asset_stat.count }}</a></td>
+      <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{ asset_stat.filter_field }}={{ object.pk }}{{ asset_stat.extra_filter }}" class="list-group-item list-group-item-action d-flex justify-content-between">
+        {{ asset_stat.label|bettertitle }}
+        {% if asset_stat.count %}
+          <span class="badge bg-primary rounded-pill">{{ asset_stat.count }}</span>
+        {% else %}
+          <span class="badge bg-light rounded-pill">&mdash;</span>
+        {% endif %}
       </tr>
+      </a>
     {% endfor %}
-    </table>
-  </div>
+  </ul>
 </div>
