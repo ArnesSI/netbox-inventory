@@ -49,6 +49,35 @@ class InventoryItemGroupView(generic.ObjectView):
 
         # get counts for each inventoryitem type and status combination
         type_status_counts = asset_counts_type_status(instance, assets)
+
+        # change structure of stored objects
+        type_status_objects = []
+        prev_type = 0
+        asset_obj = {}
+        for tsc in type_status_counts:
+            if prev_type != tsc['inventoryitem_type']:
+                prev_type = tsc['inventoryitem_type']
+                # make sure skip first insert
+                if len(asset_obj.keys()) != 0:
+                    type_status_objects.append(asset_obj)
+                asset_obj = {}
+
+            # collection of statuses for same types
+            status_list = { 
+                'status': tsc['status'],
+                'count': str(tsc['count']), # needs to be a string to render
+                'color': tsc['color']
+            }
+            if len(asset_obj.keys()) != 0:
+                asset_obj.get('status_list').append(status_list)
+            else:
+                # initial list of assets
+                asset_obj = {
+                    'inventoryitem_type__manufacturer__name': tsc['inventoryitem_type__manufacturer__name'],
+                    'inventoryitem_type__model': tsc['inventoryitem_type__model'],
+                    'inventoryitem_type': tsc['inventoryitem_type'],
+                    'status_list': [status_list]
+                }
         
         # counts by status, ignoring different inventoryitem_types
         status_counts = asset_counts_status(type_status_counts)
@@ -58,6 +87,7 @@ class InventoryItemGroupView(generic.ObjectView):
             'asset_table': asset_table,
             'type_status_counts': type_status_counts,
             'status_counts': status_counts,
+            'type_status_objects': type_status_objects
         }
 
 

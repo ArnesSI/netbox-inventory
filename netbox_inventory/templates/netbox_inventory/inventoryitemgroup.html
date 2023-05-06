@@ -79,33 +79,27 @@
           <thead>
             <tr>
               <th>Inventory Item Type</th>
-              <th>Status</th>
-              <th>Count</th>
+              <th>Status - Count</th>
             </tr>
           </thead>
           <tbody>
-            {% for tsc in type_status_counts %}
+            {% for tsc in type_status_objects %}
             <tr>
-            {% ifchanged tsc.inventoryitem_type %}
               <td>
                 <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' tsc.inventoryitem_type %}">
                   {{ tsc.inventoryitem_type__manufacturer__name }} {{ tsc.inventoryitem_type__model }}
                 </a>
               </td>
-            {% else %}
-              <td>&nbsp;</td>
-            {% endifchanged %}
-              <td>
-                {% badge value=tsc.label bg_color=tsc.color %}
-              </td>
-              <td>
-                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_type_id={{ tsc.inventoryitem_type }}&status={{ tsc.status }}">
-                  {{ tsc.count }}
-                </a>
+              <td class="d-flex">
+                {% for status in tsc.status_list %}
+                  <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_type_id={{ tsc.inventoryitem_type }}&status={{ status.status }}" class="w-100 me-2">
+                    {% badge value=status.status|capfirst|add:' - '|add:status.count bg_color=status.color|add:' w-100' %}
+                  </a>
+                {% endfor %}
               </td>
             </tr>
             {% empty %}
-            <tr><td class="text-center text-muted" colspan="3">— No assets found —</td></tr>
+            <tr><td class="text-center text-muted" colspan="2">— No assets found —</td></tr>
             {% endfor %}
           </tbody>
           </table>
