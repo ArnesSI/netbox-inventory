@@ -54,7 +54,8 @@ class InventoryItemGroupView(generic.ObjectView):
         type_status_objects = []
         prev_type = 0
         asset_obj = {}
-        for tsc in type_status_counts:
+        total_items = len(type_status_counts)-1 # get last index
+        for idx, tsc in enumerate(type_status_counts):
             if prev_type != tsc['inventoryitem_type']:
                 prev_type = tsc['inventoryitem_type']
                 # make sure skip first insert
@@ -78,6 +79,10 @@ class InventoryItemGroupView(generic.ObjectView):
                     'inventoryitem_type': tsc['inventoryitem_type'],
                     'status_list': [status_list]
                 }
+            
+            # make sure we dont forget last item
+            if(total_items == idx):
+                type_status_objects.append(asset_obj)
         
         # counts by status, ignoring different inventoryitem_types
         status_counts = asset_counts_status(type_status_counts)
