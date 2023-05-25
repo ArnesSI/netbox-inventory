@@ -67,7 +67,8 @@ class InventoryItemGroupView(generic.ObjectView):
             status_list = { 
                 'status': tsc['status'],
                 'count': str(tsc['count']), # needs to be a string to render
-                'color': tsc['color']
+                'color': tsc['color'],
+                'label': tsc['label']
             }
             if len(asset_obj.keys()) != 0:
                 asset_obj.get('status_list').append(status_list)
