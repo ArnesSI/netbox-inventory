@@ -1,5 +1,7 @@
 from netbox.views import generic
+from tenancy.views import ObjectContactsView
 from utilities.utils import count_related
+from utilities.views import register_model_view
 from .. import filtersets, forms, models, tables
 
 __all__ = (
@@ -10,6 +12,7 @@ __all__ = (
     'SupplierBulkImportView',
     'SupplierBulkEditView',
     'SupplierBulkDeleteView',
+    'SupplierContactsView',
 )
 
 class SupplierView(generic.ObjectView):
@@ -63,3 +66,8 @@ class SupplierBulkEditView(generic.BulkEditView):
 class SupplierBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Supplier.objects.all()
     table = tables.SupplierTable
+
+
+@register_model_view(models.Supplier, 'contacts')
+class SupplierContactsView(ObjectContactsView):
+    queryset = models.Supplier.objects.all()
