@@ -1,6 +1,7 @@
-from django.urls import path
+from django.urls import include, path
 
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
+from utilities.urls import get_model_urls
 from . import models, views
 
 
@@ -33,10 +34,7 @@ urlpatterns = (
     path('suppliers/edit/', views.SupplierBulkEditView.as_view(), name='supplier_bulk_edit'),
     path('suppliers/delete/', views.SupplierBulkDeleteView.as_view(), name='supplier_bulk_delete'),
     path('suppliers/<int:pk>', views.SupplierView.as_view(), name='supplier'),
-    path('suppliers/<int:pk>/edit/', views.SupplierEditView.as_view(), name='supplier_edit'),
-    path('suppliers/<int:pk>/delete/', views.SupplierDeleteView.as_view(), name='supplier_delete'),
-    path('suppliers/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='supplier_changelog', kwargs={'model': models.Supplier}),
-    path('suppliers/<int:pk>/journal/', ObjectJournalView.as_view(), name='supplier_journal', kwargs={'model': models.Supplier}),
+    path('suppliers/<int:pk>/', include(get_model_urls('netbox_inventory', 'supplier'))),
 
     # Purchases
     path('purchases/', views.PurchaseListView.as_view(), name='purchase_list'),

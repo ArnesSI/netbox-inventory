@@ -1,5 +1,7 @@
 from netbox.views import generic
+from tenancy.views import ObjectContactsView
 from utilities.utils import count_related
+from utilities.views import register_model_view
 from .. import filtersets, forms, models, tables
 
 __all__ = (
@@ -10,7 +12,9 @@ __all__ = (
     'SupplierBulkImportView',
     'SupplierBulkEditView',
     'SupplierBulkDeleteView',
+    'SupplierContactsView',
 )
+
 
 class SupplierView(generic.ObjectView):
     queryset = models.Supplier.objects.all()
@@ -29,6 +33,7 @@ class SupplierView(generic.ObjectView):
             'purchase_count': models.Purchase.objects.filter(supplier=instance).count(),
         }
 
+
 class SupplierListView(generic.ObjectListView):
     queryset = models.Supplier.objects.annotate(
         purchase_count=count_related(models.Purchase, 'supplier'),
@@ -39,11 +44,13 @@ class SupplierListView(generic.ObjectListView):
     filterset_form = forms.SupplierFilterForm
 
 
+@register_model_view(models.Supplier, 'edit')
 class SupplierEditView(generic.ObjectEditView):
     queryset = models.Supplier.objects.all()
     form = forms.SupplierForm
 
 
+@register_model_view(models.Supplier, 'delete')
 class SupplierDeleteView(generic.ObjectDeleteView):
     queryset = models.Supplier.objects.all()
 
@@ -63,3 +70,8 @@ class SupplierBulkEditView(generic.BulkEditView):
 class SupplierBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Supplier.objects.all()
     table = tables.SupplierTable
+
+
+@register_model_view(models.Supplier, 'contacts')
+class SupplierContactsView(ObjectContactsView):
+    queryset = models.Supplier.objects.all()
