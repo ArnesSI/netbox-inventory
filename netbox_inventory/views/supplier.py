@@ -15,6 +15,7 @@ __all__ = (
     'SupplierContactsView',
 )
 
+
 class SupplierView(generic.ObjectView):
     queryset = models.Supplier.objects.all()
 
@@ -32,6 +33,7 @@ class SupplierView(generic.ObjectView):
             'purchase_count': models.Purchase.objects.filter(supplier=instance).count(),
         }
 
+
 class SupplierListView(generic.ObjectListView):
     queryset = models.Supplier.objects.annotate(
         purchase_count=count_related(models.Purchase, 'supplier'),
@@ -42,11 +44,13 @@ class SupplierListView(generic.ObjectListView):
     filterset_form = forms.SupplierFilterForm
 
 
+@register_model_view(models.Supplier, 'edit')
 class SupplierEditView(generic.ObjectEditView):
     queryset = models.Supplier.objects.all()
     form = forms.SupplierForm
 
 
+@register_model_view(models.Supplier, 'delete')
 class SupplierDeleteView(generic.ObjectDeleteView):
     queryset = models.Supplier.objects.all()
 
