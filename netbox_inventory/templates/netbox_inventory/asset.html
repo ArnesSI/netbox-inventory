@@ -1,6 +1,7 @@
 {% extends 'generic/object.html' %}
 {% load helpers %}
 {% load humanize %}
+{% load plugins %}
 
 {% block title %}{{ object.hardware_type.manufacturer }} {{ object }}{% endblock %}
 
@@ -141,6 +142,7 @@
         </div>
       </div>
       {% include 'inc/panels/custom_fields.html' %}
+      {% plugin_left_page object %}
     </div>
     <div class="col col-md-6">
       <div class="card">
@@ -179,6 +181,12 @@
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
       {% include 'inc/panels/image_attachments.html' %}
+      {% plugin_right_page object %}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col col-md-12">
+      {% plugin_full_width_page object %}
     </div>
   </div>
 {% endblock content %}
