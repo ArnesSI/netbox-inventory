@@ -1,4 +1,5 @@
 {% extends 'generic/object.html' %}
+{% load plugins %}
 {% load render_table from django_tables2 %}
 
 {% block breadcrumbs %}
@@ -44,10 +45,12 @@
         </div>
       </div>
       {% include 'inc/panels/tags.html' %}
+      {% plugin_left_page object %}
     </div>
     <div class="col col-md-6">
       {% include 'inc/panels/custom_fields.html' %}
       {% include 'inc/panels/comments.html' %}
+      {% plugin_right_page object %}
     </div>
   </div>
   <div class="row mb-3">
@@ -59,5 +62,6 @@
           {% include 'inc/paginator.html' with paginator=asset_table.paginator page=asset_table.page %}
         </div>
       </div>
+      {% plugin_full_width_page object %}
     </div>
 {% endblock content %}
