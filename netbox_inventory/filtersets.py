@@ -9,7 +9,7 @@ from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
 from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
-from .utils import query_located
+from .utils import query_located, get_asset_custom_fields_search_filters
 
 
 class AssetFilterSet(NetBoxModelFilterSet):
@@ -156,14 +156,18 @@ class AssetFilterSet(NetBoxModelFilterSet):
         fields = ('id', 'name', 'serial', 'asset_tag')
 
     def search(self, queryset, name, value):
-        query = Q(
-            Q(serial__icontains=value)|
-            Q(name__icontains=value)|
-            Q(asset_tag__icontains=value)|
-            Q(device_type__model__icontains=value)|
-            Q(module_type__model__icontains=value)|
-            Q(inventoryitem_type__model__icontains=value)
+        query = (
+            Q(serial__icontains=value)
+            | Q(name__icontains=value)
+            | Q(asset_tag__icontains=value)
+            | Q(device_type__model__icontains=value)
+            | Q(module_type__model__icontains=value)
+            | Q(inventoryitem_type__model__icontains=value)
         )
+        custom_field_filters = get_asset_custom_fields_search_filters()
+        for custom_field_filter in custom_field_filters:
+            query |= Q(**{custom_field_filter: value})
+
         return queryset.filter(query)
 
     def filter_kind(self, queryset, name, value):

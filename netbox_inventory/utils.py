@@ -178,3 +178,23 @@ def query_located(queryset, field_name, values, assets_shown='all'):
     else:
         raise Exception('unsupported')
     return queryset.filter(q)
+
+
+def get_asset_custom_fields_search_filters():
+    """Returns a list of custom field filter strings that can be used in Q() filter.
+
+    Custom fields and filters are used is defined in the plugin configuration,
+    under the key ``asset_custom_fields_search_filters``.
+
+    Returns:
+        list: list of custom field filter strings
+    """
+    custom_fields = settings.PLUGINS_CONFIG['netbox_inventory'][
+        'asset_custom_fields_search_filters'
+    ]
+
+    fields = []
+    for field_name, filters in custom_fields.items():
+        for filter in filters:
+            fields.append(f"custom_field_data__{field_name}__{filter}")
+    return fields
