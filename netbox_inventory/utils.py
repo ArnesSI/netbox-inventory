@@ -189,12 +189,10 @@ def get_asset_custom_fields_search_filters():
     Returns:
         list: list of custom field filter strings
     """
-    custom_fields = settings.PLUGINS_CONFIG['netbox_inventory'][
-        'asset_custom_fields_search_filters'
-    ]
+    custom_fields_filters = get_plugin_setting('asset_custom_fields_search_filters')
 
     fields = []
-    for field_name, filters in custom_fields.items():
+    for field_name, filters in custom_fields_filters.items():
         for filter in filters:
             fields.append(f"custom_field_data__{field_name}__{filter}")
     return fields
