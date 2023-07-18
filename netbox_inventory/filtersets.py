@@ -24,6 +24,10 @@ class AssetFilterSet(NetBoxModelFilterSet):
         method='filter_manufacturer',
         label='Manufacturer (ID)',
     )
+    manufacturer_name = filters.MultiValueCharFilter(
+        method='filter_manufacturer',
+        label='Manufacturer (name)',
+    )
     device_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='device_type',
         queryset=DeviceType.objects.all(),
@@ -185,11 +189,20 @@ class AssetFilterSet(NetBoxModelFilterSet):
             return queryset
 
     def filter_manufacturer(self, queryset, name, value):
-        return queryset.filter(
-            Q(device_type__manufacturer__in=value)|
-            Q(module_type__manufacturer__in=value)|
-            Q(inventoryitem_type__manufacturer__in=value)
-        )
+        if name == 'manufacturer_id':
+            return queryset.filter(
+                Q(device_type__manufacturer__in=value)|
+                Q(module_type__manufacturer__in=value)|
+                Q(inventoryitem_type__manufacturer__in=value)
+            )
+        elif name == 'manufacturer_name':
+            # OR for every passed value and for all hardware types
+            q = Q()
+            for v in value:
+                q |= Q(device_type__manufacturer__name__icontains=v)
+                q |= Q(module_type__manufacturer__name__icontains=v)
+                q |= Q(inventoryitem_type__manufacturer__name__icontains=v)
+            return queryset.filter(q)
 
     def filter_is_assigned(self, queryset, name, value):
         if value:
