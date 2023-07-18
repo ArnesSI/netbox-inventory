@@ -24,38 +24,60 @@ class AssetFilterSet(NetBoxModelFilterSet):
         method='filter_manufacturer',
         label='Manufacturer (ID)',
     )
+    manufacturer_name = filters.MultiValueCharFilter(
+        method='filter_manufacturer',
+        label='Manufacturer (name)',
+    )
     device_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='device_type',
         queryset=DeviceType.objects.all(),
         label='Device type (ID)',
     )
-    device_type = django_filters.ModelMultipleChoiceFilter(
+    device_type = filters.MultiValueCharFilter(
         field_name='device_type__slug',
-        queryset=DeviceType.objects.all(),
-        to_field_name='slug',
+        lookup_expr='iexact',
         label='Device type (slug)',
+    )
+    device_type_model = filters.MultiValueCharFilter(
+        field_name='device_type__model',
+        lookup_expr='icontains',
+        label='Device type (model)',
     )
     module_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='module_type',
         queryset=ModuleType.objects.all(),
         label='Module type (ID)',
     )
+    module_type_model = filters.MultiValueCharFilter(
+        field_name='module_type__model',
+        lookup_expr='icontains',
+        label='Module_type (model)',
+    )
     inventoryitem_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='inventoryitem_type',
         queryset=InventoryItemType.objects.all(),
         label='Inventory item type (ID)',
     )
-    inventoryitem_type = django_filters.ModelMultipleChoiceFilter(
+    inventoryitem_type = filters.MultiValueCharFilter(
         field_name='inventoryitem_type__slug',
-        queryset=InventoryItemType.objects.all(),
-        to_field_name='slug',
+        lookup_expr='iexact',
         label='Inventory item type (slug)',
+    )
+    inventoryitem_type_model = filters.MultiValueCharFilter(
+        field_name='inventoryitem_type__model',
+        lookup_expr='icontains',
+        label='Inventory item type (model)',
     )
     inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
         field_name='inventoryitem_type__inventoryitem_group',
         queryset=InventoryItemGroup.objects.all(),
         lookup_expr='in',
         label='Inventory item group (ID)',
+    )
+    inventoryitem_group_name = filters.MultiValueCharFilter(
+        field_name='inventoryitem_type__inventoryitem_group__name',
+        lookup_expr='icontains',
+        label='Inventory item group (name)',
     )
     is_assigned = django_filters.BooleanFilter(
         method='filter_is_assigned',
@@ -66,6 +88,17 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='tenant',
         label='Tenant (ID)',
     )
+    tenant = django_filters.ModelMultipleChoiceFilter(
+        queryset=Tenant.objects.all(),
+        field_name='tenant__slug',
+        to_field_name='slug',
+        label='Tenant (slug)',
+    )
+    tenant_name = filters.MultiValueCharFilter(
+        field_name='tenant__name',
+        lookup_expr='icontains',
+        label='Tenant (name)',
+    )
     contact_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Contact.objects.all(),
         field_name='contact',
@@ -75,6 +108,17 @@ class AssetFilterSet(NetBoxModelFilterSet):
         queryset=Tenant.objects.all(),
         field_name='owner',
         label='Owner (ID)',
+    )
+    owner = django_filters.ModelMultipleChoiceFilter(
+        queryset=Tenant.objects.all(),
+        field_name='owner__slug',
+        to_field_name='slug',
+        label='Owner (slug)',
+    )
+    owner_name = filters.MultiValueCharFilter(
+        field_name='owner__name',
+        lookup_expr='icontains',
+        label='Owner (name)',
     )
     purchase_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Purchase.objects.all(),
@@ -185,11 +229,20 @@ class AssetFilterSet(NetBoxModelFilterSet):
             return queryset
 
     def filter_manufacturer(self, queryset, name, value):
-        return queryset.filter(
-            Q(device_type__manufacturer__in=value)|
-            Q(module_type__manufacturer__in=value)|
-            Q(inventoryitem_type__manufacturer__in=value)
-        )
+        if name == 'manufacturer_id':
+            return queryset.filter(
+                Q(device_type__manufacturer__in=value)|
+                Q(module_type__manufacturer__in=value)|
+                Q(inventoryitem_type__manufacturer__in=value)
+            )
+        elif name == 'manufacturer_name':
+            # OR for every passed value and for all hardware types
+            q = Q()
+            for v in value:
+                q |= Q(device_type__manufacturer__name__icontains=v)
+                q |= Q(module_type__manufacturer__name__icontains=v)
+                q |= Q(inventoryitem_type__manufacturer__name__icontains=v)
+            return queryset.filter(q)
 
     def filter_is_assigned(self, queryset, name, value):
         if value:
