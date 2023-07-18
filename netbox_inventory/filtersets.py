@@ -33,33 +33,51 @@ class AssetFilterSet(NetBoxModelFilterSet):
         queryset=DeviceType.objects.all(),
         label='Device type (ID)',
     )
-    device_type = django_filters.ModelMultipleChoiceFilter(
+    device_type = filters.MultiValueCharFilter(
         field_name='device_type__slug',
-        queryset=DeviceType.objects.all(),
-        to_field_name='slug',
+        lookup_expr='iexact',
         label='Device type (slug)',
+    )
+    device_type_model = filters.MultiValueCharFilter(
+        field_name='device_type__model',
+        lookup_expr='icontains',
+        label='Device type (model)',
     )
     module_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='module_type',
         queryset=ModuleType.objects.all(),
         label='Module type (ID)',
     )
+    module_type_model = filters.MultiValueCharFilter(
+        field_name='module_type__model',
+        lookup_expr='icontains',
+        label='Module_type (model)',
+    )
     inventoryitem_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='inventoryitem_type',
         queryset=InventoryItemType.objects.all(),
         label='Inventory item type (ID)',
     )
-    inventoryitem_type = django_filters.ModelMultipleChoiceFilter(
+    inventoryitem_type = filters.MultiValueCharFilter(
         field_name='inventoryitem_type__slug',
-        queryset=InventoryItemType.objects.all(),
-        to_field_name='slug',
+        lookup_expr='iexact',
         label='Inventory item type (slug)',
+    )
+    inventoryitem_type_model = filters.MultiValueCharFilter(
+        field_name='inventoryitem_type__model',
+        lookup_expr='icontains',
+        label='Inventory item type (model)',
     )
     inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
         field_name='inventoryitem_type__inventoryitem_group',
         queryset=InventoryItemGroup.objects.all(),
         lookup_expr='in',
         label='Inventory item group (ID)',
+    )
+    inventoryitem_group_name = filters.MultiValueCharFilter(
+        field_name='inventoryitem_type__inventoryitem_group__name',
+        lookup_expr='icontains',
+        label='Inventory item group (name)',
     )
     is_assigned = django_filters.BooleanFilter(
         method='filter_is_assigned',
