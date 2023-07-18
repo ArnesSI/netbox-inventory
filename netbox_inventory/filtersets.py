@@ -88,6 +88,17 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='tenant',
         label='Tenant (ID)',
     )
+    tenant = django_filters.ModelMultipleChoiceFilter(
+        queryset=Tenant.objects.all(),
+        field_name='tenant__slug',
+        to_field_name='slug',
+        label='Tenant (slug)',
+    )
+    tenant_name = filters.MultiValueCharFilter(
+        field_name='tenant__name',
+        lookup_expr='icontains',
+        label='Tenant (name)',
+    )
     contact_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Contact.objects.all(),
         field_name='contact',
@@ -97,6 +108,17 @@ class AssetFilterSet(NetBoxModelFilterSet):
         queryset=Tenant.objects.all(),
         field_name='owner',
         label='Owner (ID)',
+    )
+    owner = django_filters.ModelMultipleChoiceFilter(
+        queryset=Tenant.objects.all(),
+        field_name='owner__slug',
+        to_field_name='slug',
+        label='Owner (slug)',
+    )
+    owner_name = filters.MultiValueCharFilter(
+        field_name='owner__name',
+        lookup_expr='icontains',
+        label='Owner (name)',
     )
     purchase_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Purchase.objects.all(),
