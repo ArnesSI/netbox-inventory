@@ -4,7 +4,7 @@ from dcim.api.serializers import (
     NestedDeviceTypeSerializer, NestedDeviceSerializer,
     NestedManufacturerSerializer,
     NestedModuleTypeSerializer, NestedModuleSerializer,
-    NestedInventoryItemSerializer
+    NestedInventoryItemSerializer, NestedLocationSerializer
 )
 from tenancy.api.serializers import NestedContactSerializer, NestedTenantSerializer
 from netbox.api.serializers import NetBoxModelSerializer
@@ -22,7 +22,7 @@ class AssetSerializer(NetBoxModelSerializer):
     module = NestedModuleSerializer(required=False, allow_null=True, default=None)
     inventoryitem_type = NestedInventoryItemTypeSerializer(required=False, allow_null=True, default=None) 
     inventoryitem = NestedInventoryItemSerializer(required=False, allow_null=True, default=None)
-    storage_location = NestedModuleSerializer(required=False, allow_null=True, default=None)
+    storage_location = NestedLocationSerializer(required=False, allow_null=True, default=None)
     purchase = NestedPurchaseSerializer(required=False, allow_null=True, default=None)
     tenant = NestedTenantSerializer(required=False, allow_null=True, default=None)
     contact = NestedContactSerializer(required=False, allow_null=True, default=None)
