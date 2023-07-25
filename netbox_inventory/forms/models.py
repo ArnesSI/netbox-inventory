@@ -4,13 +4,14 @@ from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
 from utilities.forms.widgets import DatePicker
 from tenancy.models import Contact, Tenant
-from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
     'AssetForm',
     'SupplierForm',
     'PurchaseForm',
+    'DeliveryForm',
     'InventoryItemTypeForm',
     'InventoryItemGroupForm',
 )
@@ -59,6 +60,12 @@ class AssetForm(NetBoxModelForm):
         help_text=Asset._meta.get_field('purchase').help_text,
         required=not Asset._meta.get_field('purchase').blank,
     )
+    delivery = DynamicModelChoiceField(
+        queryset=Delivery.objects.all(),
+        help_text=Asset._meta.get_field('delivery').help_text,
+        required=not Asset._meta.get_field('delivery').blank,
+        query_params={'purchase_id': '$purchase'}
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         help_text=Asset._meta.get_field('tenant').help_text,
@@ -103,6 +110,7 @@ class AssetForm(NetBoxModelForm):
             (
                 'owner',
                 'purchase',
+                'delivery',
                 'warranty_start',
                 'warranty_end',
             ),
@@ -137,6 +145,7 @@ class AssetForm(NetBoxModelForm):
             'storage_location',
             'owner',
             'purchase',
+            'delivery',
             'warranty_start',
             'warranty_end',
             'tenant',
@@ -191,6 +200,14 @@ class AssetForm(NetBoxModelForm):
                 if field in self.fields:
                     self.fields[field].disabled = True
 
+    def clean(self):
+        super().clean()
+        # if only delivery set, infer pruchase from it
+        delivery = self.cleaned_data['delivery']
+        purchase = self.cleaned_data['purchase']
+        if delivery and not purchase:
+            self.cleaned_data['purchase'] = delivery.purchase
+
 
 class SupplierForm(NetBoxModelForm):
     slug = SlugField(slug_source='name')
@@ -220,6 +237,34 @@ class PurchaseForm(NetBoxModelForm):
             'supplier',
             'name',
             'date',
+            'description',
+            'comments',
+            'tags',
+        )
+        widgets = {
+            'date': DatePicker(),
+        }
+
+
+class DeliveryForm(NetBoxModelForm):
+    comments = CommentField()
+
+    fieldsets = (('Delivery', (
+        'purchase',
+        'name',
+        'date',
+        'receiving_contact',
+        'description',
+        'tags'
+    )),)
+
+    class Meta:
+        model = Delivery
+        fields = (
+            'purchase',
+            'name',
+            'date',
+            'receiving_contact',
             'description',
             'comments',
             'tags',

@@ -150,6 +150,14 @@ class Asset(NetBoxModel):
         blank=True,
         null=True,
     )
+    delivery = models.ForeignKey(
+        help_text='Delivery this asset was part of',
+        to='netbox_inventory.Delivery',
+        on_delete=models.PROTECT,
+        related_name='assets',
+        blank=True,
+        null=True,
+    )
     purchase = models.ForeignKey(
         help_text='Purchase through which this asset was purchased',
         to='netbox_inventory.Purchase',
@@ -181,7 +189,8 @@ class Asset(NetBoxModel):
 
     clone_fields = [
         'status', 'device_type', 'module_type', 'inventoryitem_type', 'tenant', 'contact',
-        'storage_location', 'owner', 'purchase', 'warranty_start', 'warranty_end', 'comments'
+        'storage_location', 'owner', 'delivery', 'purchase', 'warranty_start', 'warranty_end',
+        'comments'
     ]
 
     @property
@@ -264,6 +273,7 @@ class Asset(NetBoxModel):
         return None
 
     def clean(self):
+        self.clean_delivery()
         self.validate_hardware_types()
         self.validate_hardware()
         self.update_status()
@@ -337,6 +347,10 @@ class Asset(NetBoxModel):
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:
                 asset_set_new_hw(asset=self, hw=new_hw)
+
+    def clean_delivery(self):
+        if self.delivery and self.delivery.purchase != self.purchase:
+            raise ValidationError(f'Assigned delivery must belong to selected purchase ({self.purchase}).')
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:asset', args=[self.pk])
@@ -442,6 +456,62 @@ class Purchase(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:purchase', args=[self.pk])
+
+
+class Delivery(NetBoxModel):
+    """
+    Delivery is a stage in Purchase. Purchase can have multiple deliveries.
+    In each Delivery one or more Assets were delivered.
+    """
+    name = models.CharField(
+        max_length=100
+    )
+    purchase = models.ForeignKey(
+        help_text='Purchase that this delivery is part of',
+        to='netbox_inventory.Purchase',
+        on_delete=models.PROTECT,
+        related_name='orders',
+        blank=False,
+        null=False,
+    )
+    date = models.DateField(
+        help_text='Date when this delivery was made',
+        blank=True,
+        null=True,
+    )
+    receiving_contact = models.ForeignKey(
+        help_text='Contact that accepted this delivery',
+        to='tenancy.Contact',
+        on_delete=models.PROTECT,
+        related_name='deliveries',
+        blank=True,
+        null=True,
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    comments = models.TextField(
+        blank=True
+    )
+
+    clone_fields = [
+        'purchase', 'date', 'receiving_contact', 'description', 'comments'
+    ]
+
+    class Meta:
+        ordering = ['purchase', 'name']
+        unique_together = (
+            ('purchase', 'name'),
+        )
+        verbose_name = 'delivery'
+        verbose_name_plural = 'deliveries'
+
+    def __str__(self):
+        return f'{self.purchase} {self.name}'
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:delivery', args=[self.pk])
 
 
 class InventoryItemType(NetBoxModel):

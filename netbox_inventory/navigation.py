@@ -58,6 +58,21 @@ purchase_buttons = [
     )
 ]
 
+delivery_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:delivery_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        color=ButtonColorChoices.GREEN
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:delivery_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
+]
+
 inventoryitemtype_buttons = [
     PluginMenuButton(
         link='plugins:netbox_inventory:inventoryitemtype_add',
@@ -106,6 +121,12 @@ menu_buttons = (
         link_text='Purchases',
         permissions=["netbox_inventory.view_purchase"],
         buttons=purchase_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:delivery_list',
+        link_text='Deliveries',
+        permissions=["netbox_inventory.view_delivery"],
+        buttons=delivery_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:inventoryitemtype_list',

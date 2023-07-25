@@ -155,11 +155,11 @@
             </tr>
             <tr>
               <th scope="row">Purchase</th>
-              <td>{{ object.purchase|linkify|placeholder }}</td>
+              <td>{{ object.purchase|linkify|placeholder }}{% if object.purchase.date %} on {{ object.purchase.date|annotated_date }}{% endif %}</td>
             </tr>
             <tr>
-              <th scope="row">Purchase date</th>
-              <td>{{ object.purchase.date|annotated_date|placeholder }}</td>
+              <th scope="row">Delivery</th>
+              <td>{{ object.delivery|linkify:'name'|placeholder }}{% if object.delivery.date %} on {{ object.delivery.date|annotated_date }}{% endif %}</td>
             </tr>
             <tr>
               <th scope="row">Warranty start</th>

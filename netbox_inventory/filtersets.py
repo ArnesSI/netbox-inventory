@@ -8,7 +8,7 @@ from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from .utils import query_located, get_asset_custom_fields_search_filters
 
 
@@ -120,6 +120,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='icontains',
         label='Owner (name)',
     )
+    delivery_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Delivery.objects.all(),
+        field_name='delivery',
+        label='Delivery (ID)',
+    )
+    delivery = django_filters.CharFilter(
+        field_name='delivery__name',
+        lookup_expr='iexact',
+        label='Delivery (name)',
+    )
     purchase_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Purchase.objects.all(),
         field_name='purchase',
@@ -142,6 +152,9 @@ class AssetFilterSet(NetBoxModelFilterSet):
     )
     warranty_start = django_filters.DateFromToRangeFilter()
     warranty_end = django_filters.DateFromToRangeFilter()
+    delivery_date = django_filters.DateFromToRangeFilter(
+        field_name='delivery__date',
+    )
     purchase_date = django_filters.DateFromToRangeFilter(
         field_name='purchase__date',
     )
@@ -207,6 +220,9 @@ class AssetFilterSet(NetBoxModelFilterSet):
             | Q(device_type__model__icontains=value)
             | Q(module_type__model__icontains=value)
             | Q(inventoryitem_type__model__icontains=value)
+            | Q(delivery__name__icontains=value)
+            | Q(purchase__name__icontains=value)
+            | Q(purchase__supplier__name__icontains=value)
         )
         custom_field_filters = get_asset_custom_fields_search_filters()
         for custom_field_filter in custom_field_filters:
@@ -308,6 +324,41 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value) |
             Q(description__icontains=value) |
             Q(supplier__name__icontains=value)
+        )
+        return queryset.filter(query)
+
+
+class DeliveryFilterSet(NetBoxModelFilterSet):
+    purchase_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='purchase',
+        queryset=Purchase.objects.all(),
+        label='Purchase (ID)',
+    )
+    supplier_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='purchase__supplier',
+        queryset=Supplier.objects.all(),
+        label='Supplier (ID)',
+    )
+    receiving_contact_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='receiving_contact',
+        queryset=Contact.objects.all(),
+        label='Contact (ID)',
+    )
+    date = django_filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = Delivery
+        fields = (
+            'id', 'name', 'date', 'description', 'receiving_contact', 'purchase',
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(name__icontains=value) |
+            Q(description__icontains=value) |
+            Q(purchase__name__icontains=value) |
+            Q(purchase__supplier__name__icontains=value) |
+            Q(receiving_contact__name__icontains=value)
         )
         return queryset.filter(query)
 

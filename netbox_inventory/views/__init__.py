@@ -3,6 +3,7 @@ from .inventoryitem_type import *
 from .inventoryitem_group import *
 from .supplier import *
 from .purchase import *
+from .delivery import *
 from .asset_create import *
 from .asset_assign import *
 from .asset_reassign import *

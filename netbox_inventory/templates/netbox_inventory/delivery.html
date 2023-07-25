@@ -6,19 +6,17 @@
 {% block breadcrumbs %}
   {{ block.super }}
   <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_inventory:purchase_list' %}?supplier_id={{ object.supplier.pk }}">{{ object.supplier }}</a>
+    <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?supplier_id={{ object.purchase.supplier.pk }}">{{ object.purchase.supplier }}</a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.purchase.pk }}">{{ object.purchase }}</a>
   </li>
 {% endblock %}
 
 {% block extra_controls %}
   {% if perms.netbox_inventory.add_asset %}
-    <a href="{% url 'plugins:netbox_inventory:asset_add' %}?purchase={{ object.pk }}" class="btn btn-sm btn-primary">
+    <a href="{% url 'plugins:netbox_inventory:asset_add' %}?delivery={{ object.pk }}" class="btn btn-sm btn-primary">
       <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add asset
-    </a>
-  {% endif %}
-  {% if perms.netbox_inventory.add_delivery %}
-    <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchase={{ object.pk }}" class="btn btn-sm btn-primary">
-      <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add delivery
     </a>
   {% endif %}
 {% endblock extra_controls %}
@@ -27,7 +25,7 @@
   <div class="row mb-3">
     <div class="col col-md-6">
       <div class="card">
-        <h5 class="card-header">Purchase</h5>
+        <h5 class="card-header">Delivery</h5>
         <div class="card-body">
           <table class="table table-hover attr-table">
             <tr>
@@ -35,8 +33,12 @@
               <td>{{ object.name }}</td>
             </tr>
             <tr>
-              <th scope="row">Supplier</th>
-              <td>{{ object.supplier|linkify }}</td>
+              <th scope="row">Purchase</th>
+              <td>{{ object.purchase|linkify }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Receiving Contact</th>
+              <td>{{ object.receiving_contact|linkify|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">Date</th>
@@ -47,15 +49,9 @@
               <td>{{ object.description|placeholder }}</td>
             </tr>
             <tr>
-              <th scope="row">Deliveries</th>
-              <td>
-                <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.pk }}">{{ delivery_count }}</a>
-              </td>
-            </tr>
-            <tr>
               <th scope="row">Assets</th>
               <td>
-                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?purchase_id={{ object.pk }}">{{ asset_count }}</a>
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?delivery_id={{ object.pk }}">{{ asset_count }}</a>
               </td>
             </tr>
           </table>
@@ -73,7 +69,7 @@
   <div class="row mb-3">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Purchased Assets</h5>
+        <h5 class="card-header">Delivered Assets</h5>
         <div class="card-body table-responsive">
           {% render_table asset_table 'inc/table.html' %}
           {% include 'inc/paginator.html' with paginator=asset_table.paginator page=asset_table.page %}

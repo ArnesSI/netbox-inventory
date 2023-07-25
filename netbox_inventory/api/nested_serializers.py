@@ -2,12 +2,13 @@ from rest_framework import serializers
 
 from dcim.api.serializers import NestedManufacturerSerializer
 from netbox.api.serializers import WritableNestedSerializer
-from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 __all__ = (
     'NestedAssetSerializer',
     'NestedSupplierSerializer',
     'NestedPurchaseSerializer',
+    'NestedDeliverySerializer',
     'NestedInventoryItemTypeSerializer',
     'NestedInventoryItemGroupSerializer',
 )
@@ -42,6 +43,16 @@ class NestedPurchaseSerializer(WritableNestedSerializer):
     class Meta:
         model = Purchase
         fields = ('id', 'url', 'display', 'supplier', 'name', 'date')
+
+
+class NestedDeliverySerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:delivery-detail'
+    )
+
+    class Meta:
+        model = Delivery
+        fields = ('id', 'url', 'display', 'name', 'date')
 
 
 class NestedInventoryItemTypeSerializer(WritableNestedSerializer):

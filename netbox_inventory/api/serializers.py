@@ -9,7 +9,7 @@ from dcim.api.serializers import (
 from tenancy.api.serializers import NestedContactSerializer, NestedTenantSerializer
 from netbox.api.serializers import NetBoxModelSerializer
 from .nested_serializers import *
-from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 class AssetSerializer(NetBoxModelSerializer):
@@ -23,6 +23,7 @@ class AssetSerializer(NetBoxModelSerializer):
     inventoryitem_type = NestedInventoryItemTypeSerializer(required=False, allow_null=True, default=None) 
     inventoryitem = NestedInventoryItemSerializer(required=False, allow_null=True, default=None)
     storage_location = NestedLocationSerializer(required=False, allow_null=True, default=None)
+    delivery = NestedDeliverySerializer(required=False, allow_null=True, default=None)
     purchase = NestedPurchaseSerializer(required=False, allow_null=True, default=None)
     tenant = NestedTenantSerializer(required=False, allow_null=True, default=None)
     contact = NestedContactSerializer(required=False, allow_null=True, default=None)
@@ -34,7 +35,7 @@ class AssetSerializer(NetBoxModelSerializer):
         fields = (
             'id', 'url', 'display', 'name', 'asset_tag', 'serial', 'status',
             'kind', 'device_type', 'device', 'module_type', 'module', 'inventoryitem_type','inventoryitem', 
-            'tenant', 'contact', 'storage_location', 'owner', 'purchase',
+            'tenant', 'contact', 'storage_location', 'owner', 'delivery', 'purchase',
             'warranty_start', 'warranty_end',
             'comments', 'tags', 'custom_fields', 'created', 'last_updated'
         )
@@ -52,13 +53,14 @@ class SupplierSerializer(NetBoxModelSerializer):
     )
     asset_count = serializers.IntegerField(read_only=True)
     purchase_count = serializers.IntegerField(read_only=True)
+    delivery_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Supplier
         fields = (
             'id', 'url', 'display', 'name', 'slug', 'description', 'comments',
             'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
-            'purchase_count',
+            'purchase_count', 'delivery_count',
         )
 
 
@@ -68,12 +70,30 @@ class PurchaseSerializer(NetBoxModelSerializer):
     )
     supplier = NestedSupplierSerializer()
     asset_count = serializers.IntegerField(read_only=True)
+    delivery_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Purchase
         fields = (
-            'id', 'url', 'display', 'supplier', 'name', 'date', 'description', 'comments',
-            'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
+            'id', 'url', 'display', 'supplier', 'name', 'date', 'description',
+            'comments', 'tags', 'custom_fields', 'created', 'last_updated',
+            'asset_count', 'delivery_count',
+        )
+
+
+class DeliverySerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:delivery-detail'
+    )
+    purchase = NestedPurchaseSerializer()
+    receiving_contact = NestedContactSerializer(required=False, allow_null=True, default=None)
+    asset_count = serializers.IntegerField(read_only=True)
+    
+    class Meta:
+        model = Delivery
+        fields = (
+            'id', 'url', 'display', 'purchase', 'name', 'date', 'description', 'comments',
+            'receiving_contact', 'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
         )
 
 

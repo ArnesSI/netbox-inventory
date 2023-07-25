@@ -45,6 +45,7 @@ class AssetListView(generic.ObjectListView):
         'inventoryitem',
         'owner',
         'purchase__supplier',
+        'delivery',
         'storage_location',
     )
     table = tables.AssetTable
