@@ -29,6 +29,12 @@ class AssetSerializer(NetBoxModelSerializer):
     contact = NestedContactSerializer(required=False, allow_null=True, default=None)
     owner = NestedTenantSerializer(required=False, allow_null=True, default=None)
 
+    def to_internal_value(self, data):
+        ret = super().to_internal_value(data)
+        # if only delivery set, infer pruchase from it
+        if 'delivery' in ret and ret['delivery'] and not ret.get('purchase'):
+            ret['purchase'] = ret['delivery'].purchase
+        return ret
 
     class Meta:
         model = Asset
