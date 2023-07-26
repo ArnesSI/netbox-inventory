@@ -159,9 +159,7 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Tenant that owns this asset. It must exist before import.',
         required=False,
     )
-    delivery = CSVModelChoiceField(
-        queryset=Delivery.objects.all(),
-        to_field_name='name',
+    delivery = forms.CharField(
         help_text='Delivery that delivered this asset. See "Import settings" for more info.',
         required=False,
     )
@@ -175,9 +173,7 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Contact that accepted this delivery. It must exist before import.',
         required=False,
     )
-    purchase = CSVModelChoiceField(
-        queryset=Purchase.objects.all(),
-        to_field_name='name',
+    purchase = forms.CharField(
         help_text='Purchase through which this asset was purchased. See "Import settings" for more info.',
         required=False,
     )
@@ -188,7 +184,7 @@ class AssetImportForm(NetBoxModelImportForm):
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
-        help_text='Legal entity this purchase was made from. Required if a new purchase was given.',
+        help_text='Legal entity this purchase was made from. Required if a new purchase is given.',
         required=False,
     )
     tenant = CSVModelChoiceField(
@@ -210,8 +206,8 @@ class AssetImportForm(NetBoxModelImportForm):
             'name', 'asset_tag', 'serial', 'status',
             'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'model_comments', 'storage_site', 'storage_location',
-            'owner', 'delivery', 'delivery_date', 'receiving_contact',
-            'purchase', 'purchase_date', 'supplier', 'warranty_start',
+            'owner', 'supplier', 'purchase', 'purchase_date', 'delivery',
+            'delivery_date', 'receiving_contact', 'warranty_start',
             'warranty_end', 'comments', 'tenant', 'contact', 'tags',
         )
 
@@ -234,6 +230,28 @@ class AssetImportForm(NetBoxModelImportForm):
             raise forms.ValidationError(f'Hardware type not found: "{hardware_kind}", "{manufacturer}", "{model}"')
         setattr(self.instance, f'{hardware_kind}_type', hardware_type)
         return hardware_type
+
+    def clean_purchase(self):
+        supplier = self.cleaned_data.get('supplier')
+        purchase_name = self.cleaned_data.get('purchase')
+        if not purchase_name:
+            return None
+        try:
+            purchase = Purchase.objects.get(supplier=supplier, name=purchase_name)
+        except ObjectDoesNotExist:
+            raise forms.ValidationError(f'Unable to find purchase {supplier} {purchase_name}')
+        return purchase
+
+    def clean_delivery(self):
+        purchase = self.cleaned_data.get('purchase')
+        delivery_name = self.cleaned_data.get('delivery')
+        if not delivery_name:
+            return None
+        try:
+            delivery = Delivery.objects.get(purchase=purchase, name=delivery_name)
+        except ObjectDoesNotExist:
+            raise forms.ValidationError(f'Unable to find delivery {purchase} {delivery_name}')
+        return delivery
 
     def __init__(self, data=None, *args, **kwargs):
         super().__init__(data, *args, **kwargs)

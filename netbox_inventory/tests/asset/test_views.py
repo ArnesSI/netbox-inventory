@@ -19,6 +19,26 @@ class AssetTestCase(
 
     @classmethod
     def setUpTestData(cls):
+        supplier1 = Supplier.objects.create(
+            name='Supplier1',
+            slug='supplier1',
+        )
+        purchase1 = Purchase.objects.create(
+            name='Purchase1',
+            supplier=supplier1,
+        )
+        purchase2 = Purchase.objects.create(
+            name='Purchase2',
+            supplier=supplier1,
+        )
+        delivery1 = Delivery.objects.create(
+            name='the_delivery',
+            purchase=purchase1,
+        )
+        delivery2 = Delivery.objects.create(
+            name='the_delivery',
+            purchase=purchase2,
+        )
         site1 = Site.objects.create(
             name='site1',
             slug='site1',
@@ -61,10 +81,10 @@ class AssetTestCase(
             'device_type': device_type1.pk,
         }
         cls.csv_data = (
-            'serial,status,hardware_kind,manufacturer,model_name',
-            'csv1,stored,device,manufacturer1,device_type1',
-            'csv2,stored,device,manufacturer1,device_type1',
-            'csv3,stored,device,manufacturer_csv,device_type_csv',
+            'serial,status,hardware_kind,manufacturer,model_name,supplier,purchase,delivery',
+            'csv1,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_delivery',
+            'csv2,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_delivery',
+            'csv3,stored,device,manufacturer_csv,device_type_csv,,,',
         )
         cls.csv_update_data = (
             'id,serial,status',
@@ -141,14 +161,15 @@ class AssetTestCase(
         obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
 
         supplier1 = Supplier.objects.create(
-            name='Supplier1',
+            name='Supplier1-autoset',
+            slug='supplier1-autoset',
         )
         purchase1 = Purchase.objects.create(
-            name='Purchase1',
+            name='Purchase1-autoset',
             supplier=supplier1,
         )
         delivery1 = Delivery.objects.create(
-            name='Delivery1',
+            name='Delivery1-autoset',
             purchase=purchase1,
         )
 
