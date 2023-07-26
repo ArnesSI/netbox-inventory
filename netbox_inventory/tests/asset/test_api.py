@@ -1,3 +1,4 @@
+from copy import copy
 from django.contrib.contenttypes.models import ContentType
 from dcim.models import Device, DeviceRole, DeviceType, InventoryItem, Manufacturer, ModuleType, Site
 from users.models import ObjectPermission
@@ -111,6 +112,27 @@ class AssetTest(
         response = self.client.post(self._get_list_url(), create_data, format='json', **self.header)
         instance = self._get_queryset().get(pk=response.data['id'])
         self.assertEqual(instance.purchase, self.purchase1)
+
+    def test_serial_asset_tag_empty(self):
+        """
+        check that assigning empty string for serial or asset_tag, normalizes to None
+        """
+        # Add object-level permission
+        obj_perm = ObjectPermission(
+            name='Test permission',
+            actions=['add', 'change']
+        )
+        obj_perm.save()
+        obj_perm.users.add(self.user)
+        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+
+        create_data = copy(self.create_data[0])
+        create_data['serial'] = ''
+        create_data['asset_tag'] = ''
+        response = self.client.post(self._get_list_url(), create_data, format='json', **self.header)
+        instance = self._get_queryset().get(pk=response.data['id'])
+        self.assertEqual(instance.serial, None)
+        self.assertEqual(instance.asset_tag, None)
 
     @classmethod
     def setUpTestData(cls):
