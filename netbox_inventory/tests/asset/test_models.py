@@ -1,13 +1,29 @@
+from django.forms import ValidationError
 from django.test import override_settings, TestCase
-
 from dcim.models import Device, DeviceType, DeviceRole, Manufacturer, Site
 from utilities.exceptions import AbortRequest
-from netbox_inventory.models import Asset
+
+from netbox_inventory.models import Asset, Supplier, Purchase, Delivery
 from ..settings import CONFIG_SYNC_OFF, CONFIG_SYNC_ON
 
 
 class TestAssetModel(TestCase):
     def setUp(self):
+        self.supplier1 = Supplier.objects.create(
+            name='Supplier1',
+        )
+        self.purchase1 = Purchase.objects.create(
+            name='Purchase1',
+            supplier=self.supplier1,
+        )
+        self.purchase2 = Purchase.objects.create(
+            name='Purchase2',
+            supplier=self.supplier1,
+        )
+        self.delivery1 = Delivery.objects.create(
+            name='Delivery1',
+            purchase=self.purchase1,
+        )
         self.site1 = Site.objects.create(
             name='site1',
             slug='site1',
@@ -169,3 +185,32 @@ class TestAssetModel(TestCase):
         self.device1.delete()
         self.asset1.refresh_from_db()
         self.assertEqual(self.asset1.status, 'stored')
+
+    def test_purchase_delivery_missmatch(self):
+        self.asset1.snapshot()
+        self.asset1.purchase = self.purchase2
+        self.asset1.delivery = self.delivery1
+        with self.assertRaises(ValidationError):
+            self.asset1.full_clean()
+
+    def test_purchase_delivery_empty(self):
+        self.asset1.snapshot()
+        self.asset1.purchase = None
+        self.asset1.delivery = self.delivery1
+        with self.assertRaises(ValidationError):
+            self.asset1.full_clean()
+
+    def test_change_delivery_purchse(self):
+        """
+        Test that when delivery.purchase changes, asset.purchase is updated via signals
+        """
+        self.asset1.snapshot()
+        self.asset1.purchase = self.purchase1
+        self.asset1.delivery = self.delivery1
+        self.asset1.full_clean()
+        self.asset1.save()
+        self.delivery1.purchase = self.purchase2
+        self.delivery1.full_clean()
+        self.delivery1.save()
+        self.asset1.refresh_from_db()
+        self.assertEqual(self.asset1.purchase, self.purchase2)

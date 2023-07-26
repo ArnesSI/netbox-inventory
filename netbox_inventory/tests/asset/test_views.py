@@ -6,7 +6,7 @@ from users.models import ObjectPermission
 from utilities.testing import post_data, ViewTestCases
 
 from netbox_inventory.tests.custom import ModelViewTestCase
-from netbox_inventory.models import Asset
+from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
 from ..settings import CONFIG_ALLOW_CREATE_DEVICE_TYPE
 
 
@@ -125,6 +125,49 @@ class AssetTestCase(
     @override_settings(PLUGINS_CONFIG=CONFIG_ALLOW_CREATE_DEVICE_TYPE)
     def test_bulk_import_objects_with_constrained_permission(self):
         return super().test_bulk_import_objects_with_constrained_permission()
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
+    def test_purchase_delivery_autoset(self):
+        """
+        check that assigning delivery without purchase auto-sets purchase
+        """
+        # Assign unconstrained permission
+        obj_perm = ObjectPermission(
+            name='test-asset permission',
+            actions=['add', 'change']
+        )
+        obj_perm.save()
+        obj_perm.users.add(self.user)
+        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+
+        supplier1 = Supplier.objects.create(
+            name='Supplier1',
+        )
+        purchase1 = Purchase.objects.create(
+            name='Purchase1',
+            supplier=supplier1,
+        )
+        delivery1 = Delivery.objects.create(
+            name='Delivery1',
+            purchase=purchase1,
+        )
+
+        form_data = {
+            'status': 'stored',
+            'serial': '123delivery',
+            'device_type': DeviceType.objects.first(),
+            'delivery': delivery1.pk,
+        }
+
+        request = {
+            'path': self._get_url('add'),
+            'data': post_data(form_data),
+        }
+        self.assertHttpStatus(self.client.post(**request), 302)
+
+        assets = Asset.objects.filter(serial='123delivery')
+        self.assertEqual(len(assets), 1)
+        self.assertEqual(assets.first().purchase, purchase1)
 
 
 class AssetBulkAddTestCase(
