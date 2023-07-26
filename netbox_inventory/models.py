@@ -188,8 +188,9 @@ class Asset(NetBoxModel):
     )
 
     clone_fields = [
-        'status', 'device_type', 'module_type', 'inventoryitem_type', 'tenant', 'contact',
-        'storage_location', 'owner', 'delivery', 'purchase', 'warranty_start', 'warranty_end',
+        'name', 'asset_tag', 'status', 'device_type', 'module_type',
+        'inventoryitem_type', 'owner', 'purchase', 'delivery',
+        'warranty_start', 'warranty_end', 'tenant', 'contact', 'storage_location',
         'comments'
     ]
 
