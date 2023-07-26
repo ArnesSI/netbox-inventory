@@ -11,7 +11,7 @@ class DeliveryTest(
         APIViewTestCases.UpdateObjectViewTestCase,
         APIViewTestCases.DeleteObjectViewTestCase):
     model = Delivery
-    brief_fields = ['id', 'url', 'display', 'name', 'date']
+    brief_fields = ['date', 'display', 'id', 'name', 'url']
 
     bulk_update_data = {
         'description': 'new description',

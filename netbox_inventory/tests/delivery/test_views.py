@@ -55,10 +55,10 @@ class DeliveryTestCase(
             f'Delivery 6,{purchase1.pk},2023-03-26',
         )
         cls.csv_update_data = (
-            'id,description,supplier',
-            f'{delivery1.pk},description 1,{purchase2.pk}',
-            f'{delivery2.pk},description 2,{purchase2.pk}',
-            f'{delivery3.pk},description 3,{purchase2.pk}',
+            'id,description,purchase',
+            f'{delivery1.pk},description 1,{delivery1.purchase.pk}',
+            f'{delivery2.pk},description 2,{delivery2.purchase.pk}',
+            f'{delivery3.pk},description 3,{delivery3.purchase.pk}',
         )
         cls.bulk_edit_data = {
             'description': 'bulk description',
