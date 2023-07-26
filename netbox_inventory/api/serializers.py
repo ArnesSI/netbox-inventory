@@ -34,6 +34,10 @@ class AssetSerializer(NetBoxModelSerializer):
         # if only delivery set, infer pruchase from it
         if 'delivery' in ret and ret['delivery'] and not ret.get('purchase'):
             ret['purchase'] = ret['delivery'].purchase
+        if 'asset_tag' in ret and ret['asset_tag'] == '':
+            ret['asset_tag'] = None
+        if 'serial' in ret and ret['serial'] == '':
+            ret['serial'] = None
         return ret
 
     class Meta:
