@@ -3,11 +3,13 @@ import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
 from tenancy.tables import ContactsColumnMixin
-from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 __all__ = (
     'AssetTable',
     'SupplierTable',
+    'PurchaseTable',
+    'DeliveryTable',
     'InventoryItemTypeTable',
     'InventoryItemGroupTable',
 )
@@ -77,9 +79,16 @@ class AssetTable(NetBoxTable):
     purchase = tables.Column(
         linkify=True,
     )
+    delivery = tables.Column(
+        linkify=True,
+    )
     purchase_date = columns.DateColumn(
         accessor='purchase__date',
         verbose_name='Purchase Date',
+    )
+    delivery_date = columns.DateColumn(
+        accessor='delivery__date',
+        verbose_name='Delivery Date',
     )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
@@ -216,7 +225,9 @@ class AssetTable(NetBoxTable):
             'owner',
             'supplier',
             'purchase',
+            'delivery',
             'purchase_date',
+            'delivery_date',
             'warranty_start',
             'warranty_end',
             'comments',
@@ -248,6 +259,11 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
         url_params={'supplier_id': 'pk'},
         verbose_name='Purchases',
     )
+    delivery_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:delivery_list',
+        url_params={'supplier_id': 'pk'},
+        verbose_name='Deliveries',
+    )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
         url_params={'supplier_id': 'pk'},
@@ -267,6 +283,7 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
             'comments',
             'contacts',
             'purchase_count',
+            'delivery_count',
             'asset_count',
             'tags',
             'created',
@@ -286,6 +303,11 @@ class PurchaseTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
+    delivery_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:delivery_list',
+        url_params={'purchase_id': 'pk'},
+        verbose_name='Deliveries',
+    )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
         url_params={'purchase_id': 'pk'},
@@ -304,6 +326,7 @@ class PurchaseTable(NetBoxTable):
             'date',
             'description',
             'comments',
+            'delivery_count',
             'asset_count',
             'tags',
             'created',
@@ -313,6 +336,62 @@ class PurchaseTable(NetBoxTable):
         default_columns = (
             'name',
             'supplier',
+            'date',
+            'asset_count',
+        )
+
+
+class DeliveryTable(NetBoxTable):
+    supplier = tables.Column(
+        accessor=columns.Accessor('purchase__supplier'),
+        linkify=True,
+    )
+    purchase = tables.Column(
+        linkify=True,
+    )
+    date = columns.DateColumn(
+        verbose_name='Delivery Date',
+    )
+    purchase_date = columns.DateColumn(
+        accessor=columns.Accessor('purchase__date'),
+        verbose_name='Purchase Date',
+    )
+    receiving_contact = tables.Column(
+        linkify=True,
+    )
+    name = tables.Column(
+        linkify=True,
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'delivery_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Delivery
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'purchase',
+            'supplier',
+            'date',
+            'purchase_date',
+            'receiving_contact',
+            'description',
+            'comments',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'purchase',
             'date',
             'asset_count',
         )

@@ -11,7 +11,7 @@ from utilities.forms.fields import (
 )
 from tenancy.models import Contact, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices
-from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_plugin_setting
 
 __all__ = (
@@ -21,6 +21,8 @@ __all__ = (
     'SupplierBulkEditForm',
     'PurchaseImportForm',
     'PurchaseBulkEditForm',
+    'DeliveryImportForm',
+    'DeliveryBulkEditForm',
     'InventoryItemTypeImportForm',
     'InventoryItemTypeBulkEditForm',
     'InventoryItemGroupImportForm',
@@ -67,12 +69,10 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('purchase').help_text,
         required=not Asset._meta.get_field('purchase').blank,
     )
-    order_number = forms.CharField(
-        required=False,
-    )
-    # FIXME figure out how to use DateFicker field for these
-    purchase_date = forms.CharField(
-        required=False,
+    delivery = DynamicModelChoiceField(
+        queryset=Delivery.objects.all(),
+        help_text=Asset._meta.get_field('delivery').help_text,
+        required=not Asset._meta.get_field('delivery').blank,
     )
     warranty_start = forms.CharField(
         required=False,
@@ -103,12 +103,12 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         ('General', ('name', 'status')),
         ('Hardware', ('device_type', 'device', 'module_type', 'module')),
-        ('Purchase', ('owner', 'purchase', 'warranty_start', 'warranty_end')), 
+        ('Purchase', ('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end')), 
         ('Assigned to', ('tenant', 'contact')), 
         ('Location', ('storage_location',)),
     )
     nullable_fields = (
-        'name', 'device', 'module', 'owner', 'purchase', 'tenant', 'contact',
+        'name', 'device', 'module', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
         'warranty_start', 'warranty_end',
     )
 
@@ -159,6 +159,22 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Tenant that owns this asset. It must exist before import.',
         required=False,
     )
+    delivery = CSVModelChoiceField(
+        queryset=Delivery.objects.all(),
+        to_field_name='name',
+        help_text='Delivery that delivered this asset. See "Import settings" for more info.',
+        required=False,
+    )
+    delivery_date = forms.DateField(
+        help_text='Date when this delivery was made.',
+        required=False,
+    )
+    receiving_contact = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        to_field_name='name',
+        help_text='Contact that accepted this delivery. It must exist before import.',
+        required=False,
+    )
     purchase = CSVModelChoiceField(
         queryset=Purchase.objects.all(),
         to_field_name='name',
@@ -194,8 +210,9 @@ class AssetImportForm(NetBoxModelImportForm):
             'name', 'asset_tag', 'serial', 'status',
             'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'model_comments', 'storage_site', 'storage_location',
-            'owner', 'purchase', 'purchase_date', 'supplier',
-            'warranty_start', 'warranty_end', 'comments', 'tenant', 'contact', 'tags',
+            'owner', 'delivery', 'delivery_date', 'receiving_contact',
+            'purchase', 'purchase_date', 'supplier', 'warranty_start',
+            'warranty_end', 'comments', 'tenant', 'contact', 'tags',
         )
 
     def clean_model_name(self):
@@ -260,11 +277,20 @@ class AssetImportForm(NetBoxModelImportForm):
             # handle creating related resources if they don't exist and enabled in settings
             if (get_plugin_setting('asset_import_create_purchase')
                 and self.data.get('purchase') and self.data.get('supplier')):
-                Purchase.objects.get_or_create(
+                purchase, _ = Purchase.objects.get_or_create(
                     name=self.data.get('purchase'),
                     supplier=self._get_or_create_related('supplier'),
                     defaults={'date': self._get_clean_value('purchase_date')}
                 )
+                if self.data.get('delivery'):
+                    Delivery.objects.get_or_create(
+                        name=self.data.get('delivery'),
+                        purchase=purchase,
+                        defaults={
+                            'date': self._get_clean_value('delivery_date'),
+                            'receiving_contact': self._get_clean_value('receiving_contact'),
+                        }
+                    )
             if (get_plugin_setting('asset_import_create_device_type')
                 and self.data.get('hardware_kind') == 'device'):
                 DeviceType.objects.get_or_create(
@@ -379,7 +405,7 @@ class PurchaseImportForm(NetBoxModelImportForm):
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
-        help_text=' Legal entity this purchase was made at. It must exist when importing.',
+        help_text='Legal entity this purchase was made at. It must exist when importing.',
         required=True,
     )
     
@@ -411,6 +437,55 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
         ('General', ('date', 'supplier', 'description',)),
     )
     nullable_fields = ('date', 'description',)
+
+
+class DeliveryImportForm(NetBoxModelImportForm):
+    purchase = CSVModelChoiceField(
+        queryset=Purchase.objects.all(),
+        to_field_name='name',
+        help_text='Purchase that this delivery is part of. It must exist when importing.',
+        required=True,
+    )
+    receiving_contact = CSVModelChoiceField(
+        queryset=Contact.objects.all(),
+        to_field_name='name',
+        help_text='Contact that accepted this delivery. It must exist when importing.',
+        required=False,
+    )
+    
+    class Meta:
+        model = Delivery
+        fields = (
+            'name', 'date', 'purchase', 'receiving_contact', 'description', 'comments', 'tags'
+        )
+
+
+class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
+    date = forms.CharField(
+        required=False,
+    )
+    purchase = DynamicModelChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
+    )
+    receiving_contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label='Receiving Contact',
+    )
+    description = forms.CharField(
+        required=False,
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = Delivery
+    fieldsets = (
+        ('General', ('date', 'purchase', 'receiving_contact', 'description',)),
+    )
+    nullable_fields = ('date', 'description', 'receiving_contact',)
 
 
 class InventoryItemTypeImportForm(NetBoxModelImportForm):

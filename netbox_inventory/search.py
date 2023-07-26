@@ -1,5 +1,5 @@
 from netbox.search import SearchIndex
-from .models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 class AssetIndex(SearchIndex):
@@ -30,6 +30,15 @@ class PurchaseIndex(SearchIndex):
     )
 
 
+class DeliveryIndex(SearchIndex):
+    model = Delivery
+    fields = (
+        ("name", 100),
+        ("description", 500),
+        ("comments", 5000),
+    )
+
+
 class InventoryItemTypeIndex(SearchIndex):
     model = InventoryItemType
     fields = (
@@ -51,6 +60,7 @@ indexes = [
     AssetIndex,
     SupplierIndex,
     PurchaseIndex,
+    DeliveryIndex,
     InventoryItemTypeIndex,
     InventoryItemGroupIndex,
 ]

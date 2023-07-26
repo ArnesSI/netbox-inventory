@@ -8,13 +8,14 @@ from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..models import Asset, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
 __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
     'PurchaseFilterForm',
+    'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
 )
@@ -30,7 +31,8 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         )),
         ('Usage', ('tenant_id', 'contact_id')),
         ('Purchase', (
-            'owner_id', 'purchase_id', 'supplier_id', 'purchase_date_after',
+            'owner_id', 'delivery_id', 'purchase_id', 'supplier_id',
+            'delivery_date_after', 'delivery_date_before', 'purchase_date_after',
             'purchase_date_before', 'warranty_start_after', 'warranty_start_before',
             'warranty_end_after', 'warranty_end_before'
         )),
@@ -109,6 +111,12 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         null_option='None',
         label='Owner',
     )
+    delivery_id = DynamicModelMultipleChoiceField(
+        queryset=Delivery.objects.all(),
+        required=False,
+        null_option='None',
+        label='Delivery',
+    )
     purchase_id = DynamicModelMultipleChoiceField(
         queryset=Purchase.objects.all(),
         required=False,
@@ -119,6 +127,16 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Supplier.objects.all(),
         required=False,
         label='Supplier',
+    )
+    delivery_date_after = forms.DateField(
+        required=False,
+        label='Delivered on or after',
+        widget=DatePicker,
+    )
+    delivery_date_before = forms.DateField(
+        required=False,
+        label='Delivered on or before',
+        widget=DatePicker,
     )
     purchase_date_after = forms.DateField(
         required=False,
@@ -253,6 +271,47 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
     date_before = forms.DateField(
         required=False,
         label='Purchased on or before',
+        widget=DatePicker,
+    )
+    tag = TagFilterField(model)
+
+
+class DeliveryFilterForm(NetBoxModelFilterSetForm):
+    model = Delivery
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Delivery', (
+            'purchase_id',
+            'supplier_id',
+            'receiving_contact_id',
+            'date_after',
+            'date_before'
+        )),
+    )
+
+    purchase_id = DynamicModelMultipleChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
+    )
+    supplier_id = DynamicModelMultipleChoiceField(
+        queryset=Supplier.objects.all(),
+        required=False,
+        label='Supplier',
+    )
+    receiving_contact_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        label='Contact',
+    )
+    date_after = forms.DateField(
+        required=False,
+        label='Delivered on or after',
+        widget=DatePicker,
+    )
+    date_before = forms.DateField(
+        required=False,
+        label='Delivered on or before',
         widget=DatePicker,
     )
     tag = TagFilterField(model)

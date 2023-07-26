@@ -1,11 +1,11 @@
 import logging
 
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, pre_delete
+from django.db.models.signals import pre_save, pre_delete, post_save
 
 from dcim.models import Device, Module, InventoryItem
 from utilities.exceptions import AbortRequest
-from .models import Asset
+from .models import Asset, Delivery
 from .utils import get_plugin_setting, get_status_for, is_equal_none
 
 
@@ -66,3 +66,12 @@ def free_assigned_asset(instance, **kwargs):
     asset.full_clean()
     asset.save(clear_old_hw=False)
     logger.info(f'Asset marked as stored {asset}')
+
+
+@receiver(post_save, sender=Delivery)
+def handle_delivery_purchase_change(instance, created, **kwargs):
+    """
+    Update child Assets if Delivery Purchase has changed.
+    """
+    if not created:
+        Asset.objects.filter(delivery=instance).update(purchase=instance.purchase)

@@ -5,7 +5,7 @@ from utilities.testing import APIViewTestCases, disable_warnings
 from rest_framework import status
 
 from ..custom import APITestCase
-from ...models import Asset, InventoryItemType
+from ...models import Asset, Delivery, InventoryItemType, Purchase, Supplier
 
 
 class AssetTest(
@@ -94,6 +94,24 @@ class AssetTest(
         with disable_warnings('django.request'):
             self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
 
+    def test_purchase_delivery_autoset(self):
+        """
+        check that assigning delivery without purchase auto-sets purchase
+        """
+        # Add object-level permission
+        obj_perm = ObjectPermission(
+            name='Test permission',
+            actions=['add', 'change']
+        )
+        obj_perm.save()
+        obj_perm.users.add(self.user)
+        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+
+        create_data = self.create_data[2]
+        response = self.client.post(self._get_list_url(), create_data, format='json', **self.header)
+        instance = self._get_queryset().get(pk=response.data['id'])
+        self.assertEqual(instance.purchase, self.purchase1)
+
     @classmethod
     def setUpTestData(cls):
         manufacturer = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer1')
@@ -106,6 +124,9 @@ class AssetTest(
         cls.device1 = Device.objects.create(name='Device 1', device_role=device_role1, device_type=device_type1, site=site1, status='active')
         cls.device2 = Device.objects.create(name='Device 2', device_role=device_role1, device_type=device_type2, site=site1, status='active')
         cls.inventoryitem1 = InventoryItem.objects.create(device=cls.device1, name='II 1')
+        supplier1 = Supplier.objects.create(name='Supplier1')
+        cls.purchase1 = Purchase.objects.create(name='Purchase1', supplier=supplier1)
+        cls.delivery1 = Delivery.objects.create(name='Delivery1', purchase=cls.purchase1)
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)
         Asset.objects.create(name='Asset 2', serial='asset2', device_type=device_type1)
@@ -134,5 +155,6 @@ class AssetTest(
                 'status': 'stored',
                 'inventoryitem_type': inventoryitem_type1.pk,
                 'inventoryitem': cls.inventoryitem1.pk,
+                'delivery': cls.delivery1.pk,
             },
         ]

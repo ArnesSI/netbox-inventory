@@ -28,11 +28,13 @@ class PurchaseView(generic.ObjectView):
         return {
             'asset_table': asset_table,
             'asset_count': models.Asset.objects.filter(purchase=instance).count(),
+            'delivery_count': models.Delivery.objects.filter(purchase=instance).count(),
         }
 
 class PurchaseListView(generic.ObjectListView):
     queryset = models.Purchase.objects.annotate(
         asset_count=count_related(models.Asset, 'purchase'),
+        delivery_count=count_related(models.Delivery, 'purchase'),
     )
     table = tables.PurchaseTable
     filterset = filtersets.PurchaseFilterSet
