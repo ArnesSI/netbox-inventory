@@ -21,6 +21,7 @@ class AssetTestCase(
     def setUpTestData(cls):
         supplier1 = Supplier.objects.create(
             name='Supplier1',
+            slug='supplier1',
         )
         purchase1 = Purchase.objects.create(
             name='Purchase1',
@@ -161,6 +162,7 @@ class AssetTestCase(
 
         supplier1 = Supplier.objects.create(
             name='Supplier1-autoset',
+            slug='supplier1-autoset',
         )
         purchase1 = Purchase.objects.create(
             name='Purchase1-autoset',

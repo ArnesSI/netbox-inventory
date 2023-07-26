@@ -11,6 +11,7 @@ class TestAssetModel(TestCase):
     def setUp(self):
         self.supplier1 = Supplier.objects.create(
             name='Supplier1',
+            slug='supplier1',
         )
         self.purchase1 = Purchase.objects.create(
             name='Purchase1',
