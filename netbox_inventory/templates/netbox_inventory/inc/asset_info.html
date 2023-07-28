@@ -24,7 +24,7 @@
       <tr>
         <th>Warranty remaining</th>
         <td>
-          {% include "netbox_inventory/inc/asset_warranty.html" with asset=asset %}
+          {% include warranty_progressbar with record=asset %}
         </td>
       </tr>
     </table>

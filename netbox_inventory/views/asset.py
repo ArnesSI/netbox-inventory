@@ -3,12 +3,13 @@ import logging
 from django.contrib import messages
 from django.db import IntegrityError
 from django.shortcuts import redirect
+from django.template import Template
 from netbox.views import generic
 from utilities.forms import ConfirmationForm, restrict_form_fields
 
 from .. import filtersets, forms, models, tables
+from ..template_content import WARRANTY_PROGRESSBAR
 from ..utils import (
-    get_asset_warranty_context,
     get_tags_and_edit_protected_asset_fields,
     get_tags_that_protect_asset_from_deletion,
 )
@@ -30,7 +31,7 @@ class AssetView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         context = super().get_extra_context(request, instance)
-        context.update(get_asset_warranty_context(instance))
+        context['warranty_progressbar'] = Template(WARRANTY_PROGRESSBAR)
         return context
 
 

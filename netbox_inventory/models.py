@@ -246,14 +246,11 @@ class Asset(NetBoxModel):
     def warranty_remaining(self):
         """
             How many days are left in warranty period.
-            Returns negative duration if period has not started yet
+            Returns negative duration if warranty expired
             Return None if warranty_end not defined
         """
         if self.warranty_end:
-            if self.warranty_start and self.warranty_start > date.today():
-                return date.today() - self.warranty_start
-            else:
-                return self.warranty_end - date.today()
+            return self.warranty_end - date.today()
         return None
 
     @property
@@ -272,6 +269,17 @@ class Asset(NetBoxModel):
         if self.warranty_end and self.warranty_start:
             return self.warranty_end - self.warranty_start
         return None
+
+    @property
+    def warranty_progress(self):
+        """
+        Percentage of warranty elapsed
+        Returns > 100 if warranty has expired, < 0 if not started yet and None
+        if warranty_start or warranty_end not set.
+        """
+        if not self.warranty_start or not self.warranty_end:
+            return None
+        return int(100 * (self.warranty_elapsed / self.warranty_total))
 
     def clean(self):
         self.clean_delivery()

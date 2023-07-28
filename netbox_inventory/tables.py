@@ -4,6 +4,7 @@ import django_tables2 as tables
 from netbox.tables import columns, NetBoxTable
 from tenancy.tables import ContactsColumnMixin
 from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
@@ -89,6 +90,13 @@ class AssetTable(NetBoxTable):
     delivery_date = columns.DateColumn(
         accessor='delivery__date',
         verbose_name='Delivery Date',
+
+    )
+    warranty_progress = columns.TemplateColumn(
+        template_code=WARRANTY_PROGRESSBAR,
+        order_by='warranty_end',
+        #orderable=False,
+        verbose_name='Warranty remaining',
     )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
@@ -230,6 +238,7 @@ class AssetTable(NetBoxTable):
             'delivery_date',
             'warranty_start',
             'warranty_end',
+            'warranty_progress',
             'comments',
             'tags',
             'created',
