@@ -24,6 +24,7 @@ class NetBoxInventoryConfig(PluginConfig):
         'asset_disable_editing_fields_for_tags': {},
         'asset_disable_deletion_for_tags': [],
         'asset_custom_fields_search_filters': {},
+        'asset_warranty_expire_warning_days': 90,
         'prefill_asset_name_create_inventoryitem': False,
         'prefill_asset_tag_create_inventoryitem': False,
     }

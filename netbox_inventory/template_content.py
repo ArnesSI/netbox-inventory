@@ -1,16 +1,58 @@
+from django.template import Template
 from extras.plugins import PluginTemplateExtension
 
 from .models import Asset
-from .utils import get_asset_warranty_context
 
+
+WARRANTY_PROGRESSBAR = '''
+{% with record.warranty_progress as wp %}
+{% with record.warranty_remaining as wr %}
+{% with settings.PLUGINS_CONFIG.netbox_inventory.asset_warranty_expire_warning_days as wthresh %}
+
+{% if wp is None and wr.days <= 0 %}
+    <div class="progress"><div role="progressbar" class="progress-bar progress-bar-striped bg-danger" style="width:100%;">Expired {{ record.warranty_end|timesince|split:','|first }} ago</div></div>
+{% elif wp is None and wr.days > 0 %}
+    <div class="progress"><div role="progressbar" class="progress-bar progress-bar-striped {% if wthresh and wr.days < wthresh %}bg-warning{% else %}bg-success{% endif %}" style="width:100%;">{{ record.warranty_end|timeuntil|split:','|first }}</div></div>
+{% elif wp is None %}
+    <span class="text-muted">No data</span>
+{% else %}
+
+<div class="progress">
+  <div
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="{% if wp < 0 %}0{% else %}{{ wp }}{% endif %}"
+    class="progress-bar {% if wp >= 100 %}bg-danger{% elif wthresh and wr.days < wthresh %}bg-warning{% else %}bg-success{% endif %}"
+    style="width: {% if wp < 0 %}0%{% else %}{{ wp }}%{% endif %};"
+  >
+  {% if record.warranty_progress >= 100 %}
+    Expired {{ record.warranty_end|timesince|split:','|first }} ago
+  </div>
+  {% elif record.warranty_progress >= 35 %}
+    {{ record.warranty_end|timeuntil|split:','|first }}
+  </div>
+  {% elif record.warranty_progress >= 0 %}
+  </div>
+    <span class="ps-1">{{ record.warranty_end|timeuntil|split:','|first }}</span>
+  {% else %}
+  </div>
+    <span class="text-center" style="width: 100%">Starts in {{ record.warranty_start|timeuntil|split:','|first }}</span>
+  {% endif %}
+</div>
+
+{% endif %}
+{% endwith wthresh %}
+{% endwith wr %}
+{% endwith wp %}
+'''
 
 class AssetInfoExtension(PluginTemplateExtension):
     def left_page(self):
         object = self.context.get('object')
         asset = Asset.objects.filter(**{self.kind:object}).first()
         context = {'asset': asset}
-        if asset:
-            context.update(get_asset_warranty_context(asset))
+        context['warranty_progressbar'] = Template(WARRANTY_PROGRESSBAR)
         return self.render('netbox_inventory/inc/asset_info.html', extra_context=context)
 
 
