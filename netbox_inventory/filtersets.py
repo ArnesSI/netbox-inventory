@@ -1,3 +1,4 @@
+from functools import reduce
 from django.db.models import Q
 import django_filters
 
@@ -207,6 +208,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='location',
         label='Located location (ID)',
     )
+    tenant_any = filters.MultiValueCharFilter(
+        method='filter_tenant_any',
+        field_name='tenant_any',
+        label='Any tanant (slug)',
+    )
 
     class Meta:
         model = Asset
@@ -287,6 +293,12 @@ class AssetFilterSet(NetBoxModelFilterSet):
 
     def filter_located(self, queryset, name, value):
         return query_located(queryset, name, value)
+
+    def filter_tenant_any(self, queryset, name, value):
+        # filter OR for owner and tenant slug
+        q_list = map(lambda n: Q(tenant__slug__iexact=n)|Q(owner__slug__iexact=n), value)
+        q_list = reduce(lambda a,b: a|b, q_list)
+        return queryset.filter(q_list)
 
 
 class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
