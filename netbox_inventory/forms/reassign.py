@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from dcim.models import Device, InventoryItem, Module, Site, Location, Manufacturer
 from netbox.forms import NetBoxModelForm
-from utilities.forms.fields import DynamicModelChoiceField, ChoiceField
+from utilities.forms.fields import DynamicModelChoiceField
 from ..choices import AssetStatusChoices
 from ..models import Asset, InventoryItemType, InventoryItemGroup
 from ..utils import get_status_for
@@ -28,7 +28,7 @@ class AssetReassignMixin(forms.Form):
         query_params={'site_id': '$storage_site',},
         help_text='Limit New Asset choices only to assets stored at this location',
     )
-    asset_status = ChoiceField(
+    asset_status = forms.ChoiceField(
         choices=AssetStatusChoices,
         initial=get_status_for('stored'),
         label='Old Asset Status',

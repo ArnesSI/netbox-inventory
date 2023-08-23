@@ -3,7 +3,7 @@ from django import forms
 from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Location, Rack
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
-from utilities.forms.fields import DynamicModelMultipleChoiceField, MultipleChoiceField, TagFilterField
+from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
 from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
@@ -43,11 +43,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         )),
     )
 
-    status = MultipleChoiceField(
+    status = forms.MultipleChoiceField(
         choices=AssetStatusChoices,
         required=False,
     )
-    kind = MultipleChoiceField(
+    kind = forms.MultipleChoiceField(
         choices=HardwareKindChoices,
         required=False,
         help_text='Type of hardware',
