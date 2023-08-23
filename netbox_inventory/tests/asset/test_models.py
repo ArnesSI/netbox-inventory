@@ -39,9 +39,9 @@ class TestAssetModel(TestCase):
             model='device_type1',
             slug='device_type1'
         )
-        self.device_role1 = DeviceRole.objects.create(
-            name='device_role1',
-            slug='device_role1'
+        self.role1 = DeviceRole.objects.create(
+            name='role1',
+            slug='role1'
         )
         self.asset1 = Asset.objects.create(
             asset_tag='asset1',
@@ -53,14 +53,14 @@ class TestAssetModel(TestCase):
             site=self.site1,
             status='active',
             device_type=self.device_type1,
-            device_role=self.device_role1,
+            role=self.role1,
             name='device1',
         )
         self.device2 = Device.objects.create(
             site=self.site1,
             status='active',
             device_type=self.device_type1,
-            device_role=self.device_role1,
+            role=self.role1,
             name='device2',
         )
 
