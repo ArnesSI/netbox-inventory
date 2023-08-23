@@ -34,7 +34,6 @@ class AssetReassignMixin(forms.Form):
         label='Old Asset Status',
         help_text='Status to set to existing asset that is being unassigned',
     )
-    tags = None
 
     class Meta:
         fields = ('storage_site', 'storage_location', 'assigned_asset', 'asset_status')
@@ -100,6 +99,10 @@ class AssetReassignMixin(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # remove tags field from form
+        self.fields.pop('tags')
+
         try:
             self.instance.assigned_asset
         except Asset.DoesNotExist:
