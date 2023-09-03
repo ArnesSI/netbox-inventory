@@ -32,7 +32,6 @@ class AssetAssignMixin(forms.Form):
         required=False,
         help_text=Asset._meta.get_field('contact').help_text,
     )
-    tags = None
 
     def _clean_hardware_type(self, kind):
         hardware_type = self.cleaned_data[f'{kind}_type']
@@ -60,6 +59,12 @@ class AssetAssignMixin(forms.Form):
 
         setattr(self.instance, kind, hardware)
         return hardware
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # remove tags field from form
+        self.fields.pop('tags')
 
 
 class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):

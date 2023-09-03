@@ -6,7 +6,7 @@ from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms import add_blank_choice
 from utilities.forms.fields import (
-    ChoiceField, CommentField, CSVChoiceField, CSVModelChoiceField,
+    CommentField, CSVChoiceField, CSVModelChoiceField,
     DynamicModelChoiceField
 )
 from tenancy.models import Contact, Tenant
@@ -34,7 +34,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(
         required=False,
     )
-    status = ChoiceField(
+    status = forms.ChoiceField(
         choices=add_blank_choice(AssetStatusChoices),
         required=False,
         initial='',

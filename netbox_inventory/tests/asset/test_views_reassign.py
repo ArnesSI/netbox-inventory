@@ -44,9 +44,9 @@ class AssetReassignBase():
             manufacturer=self.manufacturer1,
             model='module_type1',
         )
-        self.device_role1 = DeviceRole.objects.create(
-            name='device_role1',
-            slug='device_role1'
+        self.role1 = DeviceRole.objects.create(
+            name='role1',
+            slug='role1'
         )
         self.inventoryitem_type1 = InventoryItemType.objects.create(
             manufacturer=self.manufacturer1,
@@ -62,7 +62,7 @@ class AssetReassignBase():
             site=self.site1,
             status='active',
             device_type=self.device_type1,
-            device_role=self.device_role1,
+            role=self.role1,
             name='device1',
         )
         self.module_bay1 = ModuleBay.objects.create(

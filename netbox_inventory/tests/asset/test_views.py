@@ -54,9 +54,9 @@ class AssetTestCase(
             manufacturer=manufacturer1,
             u_height=1,
         )
-        device_role1 = DeviceRole.objects.create(
-            name='device_role1',
-            slug='device_role1',
+        role1 = DeviceRole.objects.create(
+            name='role1',
+            slug='role1',
             color='9e9e9e',
         )
         asset1 = Asset.objects.create(
@@ -116,7 +116,7 @@ class AssetTestCase(
         )
         device = Device.objects.create(
             name='test-device-assign',
-            device_role = DeviceRole.objects.first(),
+            role = DeviceRole.objects.first(),
             device_type=asset.device_type,
             site = Site.objects.first(),
             status = 'active',
