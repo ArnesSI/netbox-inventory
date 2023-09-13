@@ -74,10 +74,10 @@
     <div class="col col-md-12">
       <div class="card">
         <h5 class="card-header">Deliveries</h5>
-        <div class="card-body table-responsive">
-          {% render_table delivery_table 'inc/table.html' %}
-          {% include 'inc/paginator.html' with paginator=delivery_table.paginator page=delivery_table.page %}
-        </div>
+        <div class="card-body htmx-container table-responsive"
+          hx-get="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.pk }}"
+          hx-trigger="load"
+        ></div>
       </div>
       <div class="card">
         <h5 class="card-header">Purchased Assets</h5>
