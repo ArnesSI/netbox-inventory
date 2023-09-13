@@ -16,11 +16,6 @@
       <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add asset
     </a>
   {% endif %}
-  {% if perms.netbox_inventory.add_delivery %}
-    <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchase={{ object.pk }}" class="btn btn-sm btn-primary">
-      <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add delivery
-    </a>
-  {% endif %}
 {% endblock extra_controls %}
 
 {% block content %}
@@ -78,6 +73,13 @@
           hx-get="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.pk }}"
           hx-trigger="load"
         ></div>
+        {% if perms.netbox_inventory.add_delivery %}
+          <div class="card-footer text-end noprint">
+            <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
+              <i class="mdi mdi-plus-thick" aria-hidden="true"></i>Add a Delivery
+            </a>
+          </div>
+        {% endif %}
       </div>
       <div class="card">
         <h5 class="card-header">Purchased Assets</h5>
