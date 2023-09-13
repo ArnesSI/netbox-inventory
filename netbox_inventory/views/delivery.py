@@ -16,19 +16,7 @@ class DeliveryView(generic.ObjectView):
     queryset = models.Delivery.objects.all()
 
     def get_extra_context(self, request, instance):
-        delivery_assets = models.Asset.objects.restrict(request.user, 'view').filter(
-            delivery=instance
-        )
-        asset_table = tables.AssetTable(delivery_assets, user=request.user)
-        asset_table.columns.hide('delivery')
-        asset_table.columns.hide('delivery_date')
-        asset_table.columns.hide('purchase')
-        asset_table.columns.hide('purchase_date')
-        asset_table.columns.hide('supplier')
-        asset_table.configure(request)
-
         return {
-            'asset_table': asset_table,
             'asset_count': models.Asset.objects.filter(delivery=instance).count(),
         }
 

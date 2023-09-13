@@ -20,15 +20,7 @@ class SupplierView(generic.ObjectView):
     queryset = models.Supplier.objects.all()
 
     def get_extra_context(self, request, instance):
-        supplier_assets = models.Asset.objects.restrict(request.user, 'view').filter(
-            purchase__supplier=instance
-        )
-        asset_table = tables.AssetTable(supplier_assets, user=request.user)
-        asset_table.columns.hide('supplier')
-        asset_table.configure(request)
-
         return {
-            'asset_table': asset_table,
             'asset_count': models.Asset.objects.filter(purchase__supplier=instance).count(),
             'purchase_count': models.Purchase.objects.filter(supplier=instance).count(),
             'delivery_count': models.Delivery.objects.filter(purchase__supplier=instance).count(),
