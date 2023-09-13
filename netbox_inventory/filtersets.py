@@ -208,10 +208,15 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='location',
         label='Located location (ID)',
     )
+    tenant_any_id = filters.MultiValueCharFilter(
+        method='filter_tenant_any',
+        field_name='id',
+        label='Any tenant (slug)',
+    )
     tenant_any = filters.MultiValueCharFilter(
         method='filter_tenant_any',
-        field_name='tenant_any',
-        label='Any tanant (slug)',
+        field_name='slug',
+        label='Any tenant (slug)',
     )
 
     class Meta:
@@ -295,8 +300,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         return query_located(queryset, name, value)
 
     def filter_tenant_any(self, queryset, name, value):
-        # filter OR for owner and tenant slug
-        q_list = map(lambda n: Q(tenant__slug__iexact=n)|Q(owner__slug__iexact=n), value)
+        # filter OR for owner and tenant fields
+        if name=='slug':
+            q_list = map(lambda n: Q(tenant__slug__iexact=n)|Q(owner__slug__iexact=n), value)
+        elif name=='id':
+            q_list = map(lambda n: Q(tenant__pk=n)|Q(owner__pk=n), value)
         q_list = reduce(lambda a,b: a|b, q_list)
         return queryset.filter(q_list)
 
