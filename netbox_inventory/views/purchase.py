@@ -16,17 +16,7 @@ class PurchaseView(generic.ObjectView):
     queryset = models.Purchase.objects.all()
 
     def get_extra_context(self, request, instance):
-        purchase_assets = models.Asset.objects.restrict(request.user, 'view').filter(
-            purchase=instance
-        )
-        asset_table = tables.AssetTable(purchase_assets, user=request.user)
-        asset_table.columns.hide('purchase')
-        asset_table.columns.hide('purchase_date')
-        asset_table.columns.hide('supplier')
-        asset_table.configure(request)
-
         return {
-            'asset_table': asset_table,
             'asset_count': models.Asset.objects.filter(purchase=instance).count(),
             'delivery_count': models.Delivery.objects.filter(purchase=instance).count(),
         }
