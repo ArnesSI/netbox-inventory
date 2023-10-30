@@ -623,7 +623,7 @@ class ConsumableType(NetBoxModel):
     manufacturer = models.ForeignKey(
         to='dcim.Manufacturer',
         on_delete=models.PROTECT,
-        related_name='inventoryitem_types',
+        related_name='consumable_type',
         blank=True,
     )
 
