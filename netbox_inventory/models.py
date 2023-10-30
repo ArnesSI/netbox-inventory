@@ -608,3 +608,70 @@ class InventoryItemGroup(NestedGroupModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])
+
+
+class ConsumableType(NetBoxModel):
+    name = models.CharField(
+        max_length=100,
+    )
+
+    slug = models.SlugField(
+        max_length=100,
+        unique=True,
+    )
+
+    manufacturer = models.ForeignKey(
+        to='dcim.Manufacturer',
+        on_delete=models.PROTECT,
+        related_name='inventoryitem_types',
+        blank=True,
+    )
+
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+
+    part_number = models.CharField(
+        max_length=50,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Consumable(NetBoxModel):
+    consumable_type = models.ForeignKey(
+        to='netbox_inventory.ConsumableType',
+        on_delete=models.PROTECT,
+        related_name='consumables'
+    )
+
+    storage_location = models.ForeignKey(
+        help_text='Where is this consumable stored',
+        to='dcim.Location',
+        on_delete=models.PROTECT,
+        related_name='location',
+    )
+
+    quantity = models.PositiveIntegerField(
+        default=1
+    )
+
+    alert_at_quantity = models.PositiveIntegerField(
+        default=0
+    )
+
+    comments = models.TextField(
+        blank=True
+    )
+
+    class Meta:
+        ordering = ('consumable_type',)
+
+    def __str__(self):
+        return f'{self.storage_location}: {self.consumable_type.name}'
