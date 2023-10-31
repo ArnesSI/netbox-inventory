@@ -642,15 +642,17 @@ class ConsumableType(NetBoxModel):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:consumabletype', args=[self.pk])
+
 
 
 class Consumable(NetBoxModel):
-    index = models.PositiveIntegerField()
-
     consumable_type = models.ForeignKey(
         to='netbox_inventory.ConsumableType',
         on_delete=models.PROTECT,
-        related_name='consumables'
+        related_name='consumable_type',
     )
 
     storage_location = models.ForeignKey(
@@ -673,8 +675,11 @@ class Consumable(NetBoxModel):
     )
 
     class Meta:
-        ordering = ('consumable_type', 'index')
-        unique_together = ('consumable_type', 'index')
+        ordering = ('consumable_type', )
+        unique_together = ('consumable_type', )
 
     def __str__(self):
         return f'{self.storage_location}: {self.consumable_type.name}'
+    
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:consumable', args=[self.pk])

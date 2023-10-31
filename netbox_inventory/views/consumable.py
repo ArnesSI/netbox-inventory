@@ -19,8 +19,8 @@ class ConsumableView(generic.ObjectView):
 class ConsumableListView(generic.ObjectListView):
     queryset = models.Consumable.objects.all()
     table = tables.ConsumableTable
-    filterset = filtersets.ConsumableFilterSet
-    filterset_form = forms.ConsumableFilterForm
+    #filterset = filtersets.ConsumableFilterSet
+    #filterset_form = forms.ConsumableFilterForm
 
 
 class ConsumableEditView(generic.ObjectEditView):
@@ -39,7 +39,7 @@ class ConsumableBulkImportView(generic.BulkImportView):
 
 class ConsumableBulkEditView(generic.BulkEditView):
     queryset = models.Consumable.objects.all()
-    filterset = filtersets.ConsumableFilterSet
+    #filterset = filtersets.ConsumableFilterSet
     table = tables.ConsumableTable
     form = forms.ConsumableBulkEditForm
 

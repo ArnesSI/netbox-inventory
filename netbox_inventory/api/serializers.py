@@ -138,6 +138,7 @@ class InventoryItemGroupSerializer(NetBoxModelSerializer):
             'created', 'last_updated', 'asset_count',
         )
 
+
 class ConsumableTypeSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:consumabletype-detail'
@@ -151,6 +152,7 @@ class ConsumableTypeSerializer(NetBoxModelSerializer):
             'id', 'url', 'display', 'name', 'slug', 'manufacturer', 'description', 'part_number',
         )
 
+
 class ConsumableSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:consumable-detail'
@@ -161,6 +163,6 @@ class ConsumableSerializer(NetBoxModelSerializer):
     class Meta:
         model = Consumable
         fields = (
-            'id', 'url', 'display', 'name', 'consumable_type', 'quantity', 'alert_at_quantity',
+            'id', 'url', 'display', 'consumable_type', 'quantity', 'alert_at_quantity',
             'created', 'last_updated',
         )

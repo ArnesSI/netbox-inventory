@@ -13,6 +13,8 @@ __all__ = (
     'DeliveryTable',
     'InventoryItemTypeTable',
     'InventoryItemGroupTable',
+    'ConsumableTypeTable',
+    'ConsumableTable',
 )
 
 
@@ -487,13 +489,50 @@ class InventoryItemGroupTable(NetBoxTable):
 
 
 class ConsumableTypeTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+
+    manufacturer = tables.Column(
+        linkify=True,
+    )
+
     class Meta(NetBoxTable.Meta):
         model = ConsumableType
-        fields = ('pk', 'id', 'name', 'slug', 'manufacturer', 'description', 'part_number')
-        default_columns = ('name')
+        fields = (
+            'pk', 
+            'id', 
+            'name', 
+            'slug', 
+            'manufacturer', 
+            'description', 
+            'part_number',
+        )
+        default_columns = (
+            'name',
+            'manufacturer',
+            'description',
+            'part_number',
+        )
 
 
 class ConsumableTable(NetBoxTable):
+    consumable_type = tables.Column(
+        linkify=True,
+    )
     class Meta(NetBoxTable.Meta):
         model = Consumable
-        fields = ('pk', 'id', 'consumable_type', 'storage_location', 'quantity', 'alert_at_quantity')
+        fields = (
+            'pk', 
+            'id', 
+            'consumable_type', 
+            'storage_location', 
+            'quantity', 
+            'alert_at_quantity',
+        )
+
+        default_columns = (
+            'consumable_type',
+            'storage_location',
+            'quantity',
+        )

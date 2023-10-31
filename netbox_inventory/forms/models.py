@@ -321,6 +321,11 @@ class InventoryItemGroupForm(NetBoxModelForm):
 
 
 class ConsumableTypeForm(NetBoxModelForm):
+    manufacturer = DynamicModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=True,
+    )
+    slug = SlugField(slug_source='model')
     comments = CommentField()
 
     fieldsets = (

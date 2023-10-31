@@ -4,7 +4,7 @@ from utilities.utils import count_related
 from .. import filtersets, models
 from .serializers import (
     AssetSerializer, InventoryItemTypeSerializer, InventoryItemGroupSerializer,
-    DeliverySerializer, PurchaseSerializer, SupplierSerializer
+    DeliverySerializer, PurchaseSerializer, SupplierSerializer, ConsumableTypeSerializer, ConsumableSerializer
 )
 
 
@@ -77,3 +77,19 @@ class ModuleAssetViewSet(ModuleViewSet):
 class InventoryItemAssetViewSet(InventoryItemViewSet):
     """Adds option to filter on asset assignemnet"""
     filterset_class = filtersets.InventoryItemAssetFilterSet
+
+
+class ConsumableTypeViewSet(NetBoxModelViewSet):
+    queryset = models.ConsumableType.objects.prefetch_related(
+        'manufacturer', 'storage_location', 'tags'
+    )
+    serializer_class = ConsumableTypeSerializer
+    filterset_class = filtersets.ConsumableTypeFilterSet
+
+
+class ConsumableViewSet(NetBoxModelViewSet):
+    queryset = models.Consumable.objects.prefetch_related(
+        'consumable_type', 'tags'
+    )
+    serializer_class = ConsumableSerializer
+    filterset_class = filtersets.ConsumableFilterSet
