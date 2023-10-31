@@ -1,0 +1,52 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load humanize %}
+{% load plugins %}
+
+{% block title %}{{ object }}{% endblock %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li class="breadcrumb-item">
+    <a
+        href="{% url 'plugins:netbox_inventory:consumabletype_list' %}?{{ object.kind }}_type_id={{ object.hardware_type.pk }}">
+        {{ object.manufacturer }} {{ object.name }}</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Consumable Type</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">Name</th>
+                        <td>{{ object.name|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td class="font-monospace">{{ object.description|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Part Number</th>
+                        <td class="font-monospace">{{ object.part_number|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Manufacturer</th>
+                        <td><a href="{{object.manufacturer.get_absolute_url}}">{{ object.manufacturer }}</a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        {% include 'inc/panels/custom_fields.html' %}
+        {% plugin_left_page object %}
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col col-md-12">
+        {% plugin_full_width_page object %}
+    </div>
+</div>
+{% endblock content %}

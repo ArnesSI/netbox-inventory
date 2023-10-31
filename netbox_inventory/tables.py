@@ -520,6 +520,9 @@ class ConsumableTable(NetBoxTable):
     consumable_type = tables.Column(
         linkify=True,
     )
+    storage_location = tables.Column(
+        linkify=True,
+    )
     class Meta(NetBoxTable.Meta):
         model = Consumable
         fields = (
