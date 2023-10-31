@@ -103,6 +103,36 @@ inventoryitemgroup_buttons = [
     )
 ]
 
+consumabletype_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:consumabletype_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        color=ButtonColorChoices.GREEN,
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:consumabletype_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
+]
+
+consumable_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:consumable_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        color=ButtonColorChoices.GREEN,
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:consumable_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        color=ButtonColorChoices.CYAN,
+    )
+]
+
 menu_buttons = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
@@ -139,6 +169,18 @@ menu_buttons = (
         link_text='Inventory Item Groups',
         permissions=["netbox_inventory.view_inventoryitemgroup"],
         buttons=inventoryitemgroup_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:consumabletype_list',
+        link_text='Consumable Type',
+        permissions=["netbox_inventory.view_consumabletype"],
+        buttons=consumabletype_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:consumable_list',
+        link_text='Consumable',
+        permissions=["netbox_inventory.view_consumable"],
+        buttons=consumable_buttons,
     ),
 )
 

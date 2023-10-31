@@ -454,3 +454,9 @@ class ModuleAssetFilterSet(HasAssetFilterMixin, ModuleFilterSet):
 
 class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
     pass
+
+class ConsumableFilterSet(NetBoxModelFilterSet):
+    pass
+
+class ConsumableTypeFilterSet(NetBoxModelFilterSet):
+    pass

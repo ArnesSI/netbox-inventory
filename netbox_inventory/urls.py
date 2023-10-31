@@ -82,4 +82,26 @@ urlpatterns = (
     path('inventory-item-groups/<int:pk>/delete/', views.InventoryItemGroupDeleteView.as_view(), name='inventoryitemgroup_delete'),
     path('inventory-item-groups/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='inventoryitemgroup_changelog', kwargs={'model': models.InventoryItemGroup}),
 
+    # ConsumableType
+    path('consumable-type/', views.ConsumableTypeListView.as_view(), name='consumabletype_list'),
+    path('consumable-type/add/', views.ConsumableTypeEditView.as_view(), name='consumabletype_add'),
+    path('consumable-type/import/', views.ConsumableTypeBulkImportView.as_view(), name='consumabletype_import'),
+    path('consumable-type/edit/', views.ConsumableTypeBulkEditView.as_view(), name='consumabletype_bulk_edit'),
+    path('consumable-type/delete/', views.ConsumableTypeBulkDeleteView.as_view(), name='consumabletype_bulk_delete'),
+    path('consumable-type/<int:pk>', views.ConsumableTypeView.as_view(), name='consumabletype'),
+    path('consumable-type/<int:pk>/edit/', views.ConsumableTypeEditView.as_view(), name='consumabletype_edit'),
+    path('consumable-type/<int:pk>/delete/', views.ConsumableTypeDeleteView.as_view(), name='consumabletype_delete'),
+    path('consumable-type/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='consumabletype_changelog', kwargs={'model': models.ConsumableType}),
+
+    # Consumable
+    path('consumable/', views.ConsumableListView.as_view(), name='consumable_list'),
+    path('consumable/add/', views.ConsumableEditView.as_view(), name='consumable_add'),
+    path('consumable/import/', views.ConsumableBulkImportView.as_view(), name='consumable_import'),
+    path('consumable/edit/', views.ConsumableBulkEditView.as_view(), name='consumable_bulk_edit'),
+    path('consumable/delete/', views.ConsumableBulkDeleteView.as_view(), name='consumable_bulk_delete'),
+    path('consumable/<int:pk>', views.ConsumableView.as_view(), name='consumable'),
+    path('consumable/<int:pk>/edit/', views.ConsumableEditView.as_view(), name='consumable_edit'),
+    path('consumable/<int:pk>/delete/', views.ConsumableDeleteView.as_view(), name='consumable_delete'),
+    path('consumable/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='consumable_changelog', kwargs={'model': models.Consumable}),
+
 )

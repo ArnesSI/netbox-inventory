@@ -9,7 +9,7 @@ from dcim.api.serializers import (
 from tenancy.api.serializers import NestedContactSerializer, NestedTenantSerializer
 from netbox.api.serializers import NetBoxModelSerializer
 from .nested_serializers import *
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, ConsumableType, Consumable
 
 
 class AssetSerializer(NetBoxModelSerializer):
@@ -136,4 +136,31 @@ class InventoryItemGroupSerializer(NetBoxModelSerializer):
         fields = (
             'id', 'url', 'display', 'name', 'parent', 'comments', 'tags', 'custom_fields',
             'created', 'last_updated', 'asset_count',
+        )
+
+class ConsumableTypeSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:consumabletype-detail'
+    )
+
+    manufacturer = NestedManufacturerSerializer()
+
+    class Meta:
+        model = ConsumableType
+        fields = (
+            'id', 'url', 'display', 'name', 'slug', 'manufacturer', 'description', 'part_number',
+        )
+
+class ConsumableSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:consumable-detail'
+    )
+
+    consumable_type = NestedConsumableTypeSerializer()
+
+    class Meta:
+        model = Consumable
+        fields = (
+            'id', 'url', 'display', 'name', 'consumable_type', 'quantity', 'alert_at_quantity',
+            'created', 'last_updated',
         )

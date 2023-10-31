@@ -4,7 +4,7 @@ from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
 from utilities.forms.widgets import DatePicker
 from tenancy.models import Contact, Tenant
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, Consumable, ConsumableType
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
@@ -14,6 +14,8 @@ __all__ = (
     'DeliveryForm',
     'InventoryItemTypeForm',
     'InventoryItemGroupForm',
+    'ConsumableForm',
+    'ConsumableTypeForm',
 )
 
 
@@ -315,4 +317,48 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'parent',
             'tags',
             'comments',
+        )
+
+
+class ConsumableTypeForm(NetBoxModelForm):
+    comments = CommentField()
+
+    fieldsets = (
+        (
+            'Consumable Type',
+            ('name', 'slug', 'manufacturer', 'description', 'part_number')
+        ), 
+    )
+
+    class Meta:
+        model = ConsumableType
+        fields = (
+            'name',
+            'slug',
+            'manufacturer',
+            'description',
+            'part_number',
+            'tags',
+        )
+
+
+class ConsumableForm(NetBoxModelForm):
+    comments = CommentField()
+
+    fieldsets = (
+        (
+            'Consumable',
+            ('consumable_type', 'storage_location', 'quantity', 'alert_at_quantity')
+        ),
+    )
+
+    class Meta:
+        model = Consumable
+        fields = (
+            'consumable_type',
+            'storage_location',
+            'quantity',
+            'alert_at_quantity',
+            'comments',
+            'tags',
         )

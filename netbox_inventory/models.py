@@ -645,6 +645,8 @@ class ConsumableType(NetBoxModel):
 
 
 class Consumable(NetBoxModel):
+    index = models.PositiveIntegerField()
+
     consumable_type = models.ForeignKey(
         to='netbox_inventory.ConsumableType',
         on_delete=models.PROTECT,
@@ -652,7 +654,7 @@ class Consumable(NetBoxModel):
     )
 
     storage_location = models.ForeignKey(
-        help_text='Where is this consumable stored',
+        help_text='Where this consumable is stored',
         to='dcim.Location',
         on_delete=models.PROTECT,
         related_name='location',
@@ -671,7 +673,8 @@ class Consumable(NetBoxModel):
     )
 
     class Meta:
-        ordering = ('consumable_type',)
+        ordering = ('consumable_type', 'index')
+        unique_together = ('consumable_type', 'index')
 
     def __str__(self):
         return f'{self.storage_location}: {self.consumable_type.name}'

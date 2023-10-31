@@ -3,7 +3,7 @@ import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
 from tenancy.tables import ContactsColumnMixin
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, Consumable, ConsumableType
 from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
@@ -484,3 +484,16 @@ class InventoryItemGroupTable(NetBoxTable):
             'asset_count',
             'inventoryitem_type_count',
         )
+
+
+class ConsumableTypeTable(NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = ConsumableType
+        fields = ('pk', 'id', 'name', 'slug', 'manufacturer', 'description', 'part_number')
+        default_columns = ('name')
+
+
+class ConsumableTable(NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = Consumable
+        fields = ('pk', 'id', 'consumable_type', 'storage_location', 'quantity', 'alert_at_quantity')

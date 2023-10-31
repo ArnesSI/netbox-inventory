@@ -8,7 +8,7 @@ from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, ConsumableType, Consumable
 
 
 __all__ = (
@@ -18,6 +18,8 @@ __all__ = (
     'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
+    'ConsumableTypeFilterForm',
+    'ConsumableFilterForm',
 )
 
 
@@ -345,5 +347,23 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
         queryset=InventoryItemGroup.objects.all(),
         required=False,
         label='Parent group'
+    )
+    tag = TagFilterField(model)
+
+
+class ConsumableTypeFilterForm(NetBoxModelFilterSetForm):
+    model = ConsumableType
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Consumable Type', ('manufacturer'))
+    )
+    tag = TagFilterField(model)
+
+
+class ConsumableFilterForm(NetBoxModelFilterSetForm):
+    model = Consumable
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Consumable', ('consumable_type'))
     )
     tag = TagFilterField(model)
