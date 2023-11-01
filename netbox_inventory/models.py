@@ -647,7 +647,6 @@ class ConsumableType(NetBoxModel):
         return reverse('plugins:netbox_inventory:consumabletype', args=[self.pk])
 
 
-
 class Consumable(NetBoxModel):
     consumable_type = models.ForeignKey(
         to='netbox_inventory.ConsumableType',

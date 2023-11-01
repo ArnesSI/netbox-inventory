@@ -9,7 +9,7 @@ from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, Consumable, ConsumableType
 from .utils import query_located, get_asset_custom_fields_search_filters
 
 
@@ -456,7 +456,36 @@ class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
     pass
 
 class ConsumableTypeFilterSet(NetBoxModelFilterSet):
-    pass
+    manufacturer_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='manufacturer',
+        queryset=Manufacturer.objects.all(),
+        label='Manufacturer',
+    )
+
+    class Meta:
+        fields = (
+            'id', 'manufacturer_id', 'part_number',
+        )
+        model = ConsumableType
 
 class ConsumableFilterSet(NetBoxModelFilterSet):
-    pass
+    consumable_type_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='consumable_type',
+        queryset=ConsumableType.objects.all(),
+        label='Consumable Type',
+    )
+    storage_location_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='storage_location',
+        queryset=Location.objects.all(),
+        label='Storage Location',
+    )
+    manufacturer_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='consumable_type__manufacturer',
+        queryset=Manufacturer.objects.all(),
+        label='Manufacturer',
+    )
+    class Meta:
+        fields = (
+            'storage_location_id', 'consumable_type_id', 'manufacturer_id'
+        )
+        model = Consumable

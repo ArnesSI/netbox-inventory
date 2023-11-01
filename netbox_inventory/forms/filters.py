@@ -353,17 +353,38 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
 
 class ConsumableTypeFilterForm(NetBoxModelFilterSetForm):
     model = ConsumableType
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
     fieldsets = (
         (None, ('q', 'filter_id', 'tag')),
-        ('Consumable Type', ('manufacturer'))
+        ('Consumable Type', ('manufacturer_id', ))
     )
     tag = TagFilterField(model)
 
 
 class ConsumableFilterForm(NetBoxModelFilterSetForm):
     model = Consumable
+    consumable_type_id = DynamicModelMultipleChoiceField(
+        queryset=ConsumableType.objects.all(),
+        required=False,
+        label='Consumable Type',
+    )
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    storage_location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        label='Location',
+    )
     fieldsets = (
         (None, ('q', 'filter_id', 'tag')),
-        ('Consumable', ('consumable_type'))
+        ('Consumable Type', ('consumable_type_id', 'manufacturer_id')),
+        ('Location', ('storage_location_id', )),
     )
     tag = TagFilterField(model)
