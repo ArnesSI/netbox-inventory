@@ -637,6 +637,10 @@ class ConsumableType(NetBoxModel):
         blank=True,
     )
 
+    comments = models.TextField(
+        blank=True
+    )
+
     class Meta:
         ordering = ('name',)
 

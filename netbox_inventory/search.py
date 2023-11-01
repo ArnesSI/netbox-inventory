@@ -59,13 +59,15 @@ class ConsumableTypeIndex(SearchIndex):
     model = ConsumableType
     fields = (
         ("name", 100),
+        ("part_number", 100),
         ("comments", 5000),
     )
 
 class ConsumableIndex(SearchIndex):
     model = Consumable
     fields = (
-        ("name", 100),
+        ("consumable_type", 100),
+        ("storage_location", 1000),
         ("comments", 5000),
     )
 

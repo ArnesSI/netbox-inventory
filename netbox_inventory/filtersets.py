@@ -467,6 +467,7 @@ class ConsumableTypeFilterSet(NetBoxModelFilterSet):
             'id', 'manufacturer_id', 'part_number',
         )
         model = ConsumableType
+        
 
 class ConsumableFilterSet(NetBoxModelFilterSet):
     consumable_type_id = django_filters.ModelMultipleChoiceFilter(
