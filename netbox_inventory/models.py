@@ -676,7 +676,7 @@ class Consumable(NetBoxModel):
 
     class Meta:
         ordering = ('consumable_type', )
-        unique_together = ('consumable_type', )
+        unique_together = ('consumable_type', 'storage_location')
 
     def __str__(self):
         return f'{self.storage_location}: {self.consumable_type.name}'
