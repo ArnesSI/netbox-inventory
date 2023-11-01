@@ -172,13 +172,13 @@ menu_buttons = (
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:consumabletype_list',
-        link_text='Consumable Type',
+        link_text='Consumable Types',
         permissions=["netbox_inventory.view_consumabletype"],
         buttons=consumabletype_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:consumable_list',
-        link_text='Consumable',
+        link_text='Consumables',
         permissions=["netbox_inventory.view_consumable"],
         buttons=consumable_buttons,
     ),
