@@ -14,8 +14,8 @@ __all__ = (
     'DeliveryForm',
     'InventoryItemTypeForm',
     'InventoryItemGroupForm',
-    'ConsumableForm',
     'ConsumableTypeForm',
+    'ConsumableForm',
 )
 
 

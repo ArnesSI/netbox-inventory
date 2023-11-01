@@ -86,4 +86,4 @@ class NestedConsumableTypeSerializer(WritableNestedSerializer):
 
     class Meta:
         model = ConsumableType
-        fields = ('id', 'url', 'slug', 'manufacturer', 'description', 'part_number')
+        fields = ('id', 'url', 'display', 'slug', 'name', 'manufacturer', 'description', 'part_number')

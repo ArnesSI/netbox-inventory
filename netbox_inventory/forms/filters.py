@@ -384,7 +384,7 @@ class ConsumableFilterForm(NetBoxModelFilterSetForm):
     )
     fieldsets = (
         (None, ('q', 'filter_id', 'tag')),
-        ('Consumable Type', ('consumable_type_id', 'manufacturer_id')),
+        ('Consumable Type', ('manufacturer_id', 'consumable_type_id')),
         ('Location', ('storage_location_id', )),
     )
     tag = TagFilterField(model)

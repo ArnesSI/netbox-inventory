@@ -642,7 +642,7 @@ class ConsumableType(NetBoxModel):
 
     def __str__(self):
         return self.name
-    
+
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:consumabletype', args=[self.pk])
 
@@ -651,14 +651,14 @@ class Consumable(NetBoxModel):
     consumable_type = models.ForeignKey(
         to='netbox_inventory.ConsumableType',
         on_delete=models.PROTECT,
-        related_name='consumable_type',
+        related_name='consumable',
     )
 
     storage_location = models.ForeignKey(
         help_text='Where this consumable is stored',
         to='dcim.Location',
         on_delete=models.PROTECT,
-        related_name='location',
+        related_name='consumable',
     )
 
     quantity = models.PositiveIntegerField(
@@ -674,7 +674,7 @@ class Consumable(NetBoxModel):
     )
 
     class Meta:
-        ordering = ('consumable_type', )
+        ordering = ('consumable_type', 'storage_location')
         unique_together = ('consumable_type', 'storage_location')
 
     def __str__(self):
