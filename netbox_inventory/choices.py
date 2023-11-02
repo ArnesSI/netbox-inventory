@@ -16,3 +16,11 @@ class HardwareKindChoices(ChoiceSet):
         ('module', 'Module'),
         ('inventoryitem', 'Inventory Item'),
     ]
+
+class ConsumableQuantityStatusChoices(ChoiceSet):
+    key = 'Consumable.quantity_status'
+
+    CHOICES = [
+        ('In-Stock', 'In-Stock', 'green'),
+        ('Low-Stock', 'Low-Stock', 'red')
+    ]

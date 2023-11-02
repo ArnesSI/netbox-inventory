@@ -10,7 +10,7 @@
 <li class="breadcrumb-item">
     <a
         href="{% url 'plugins:netbox_inventory:consumabletype_list' %}?{{ object.kind }}_type_id={{ object.hardware_type.pk }}">
-        {{ object.manufacturer }} {{ object.name }}</a>
+        {{ object.storage_location }} {{ object.consumable_type.name }}</a>
 </li>
 {% endblock %}
 
@@ -18,24 +18,29 @@
 <div class="row mb-3">
     <div class="col col-md-6">
         <div class="card">
-            <h5 class="card-header">Consumable Type</h5>
+            <h5 class="card-header">Consumable</h5>
             <div class="card-body">
                 <table class="table table-hover attr-table">
                     <tr>
-                        <th scope="row">Name</th>
-                        <td>{{ object.name|placeholder }}</td>
+                        <th scope="row">Consumable Type</th>
+                        <td><a href="{{object.consumable_type.get_absolute_url}}">
+                                {{ object.consumable_type.name|placeholder }}</a></td>
                     </tr>
                     <tr>
-                        <th scope="row">Description</th>
-                        <td>{{ object.description|placeholder }}</td>
+                        <th scope="row">Storage Location</th>
+                        <td>{{ object.storage_location|placeholder }}</td>
                     </tr>
                     <tr>
-                        <th scope="row">Part Number</th>
-                        <td class="font-monospace">{{ object.part_number|placeholder }}</td>
+                        <th scope="row">Quantity</th>
+                        <td class="font-monospace">{{ object.quantity|placeholder }}</td>
                     </tr>
                     <tr>
-                        <th scope="row">Manufacturer</th>
-                        <td><a href="{{object.manufacturer.get_absolute_url}}">{{ object.manufacturer }}</a></td>
+                        <th scope="row">Alert At Quantity</th>
+                        <td class="font-monospace">{{ object.alert_at_quantity|placeholder }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Stock Status</th>
+                        <td>{{ object.quantity_status|placeholder }}</td>
                     </tr>
                 </table>
             </div>

@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel, NestedGroupModel
-from .choices import HardwareKindChoices, AssetStatusChoices
+from .choices import HardwareKindChoices, AssetStatusChoices, ConsumableQuantityStatusChoices
 from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
 
 
@@ -611,6 +611,10 @@ class InventoryItemGroup(NestedGroupModel):
 
 
 class ConsumableType(NetBoxModel):
+    """
+    A type of consumable that can be stored at a location. F.ex, power cables, ethernet
+    cables, etc.
+    """
     name = models.CharField(
         max_length=100,
     )
@@ -652,6 +656,10 @@ class ConsumableType(NetBoxModel):
 
 
 class Consumable(NetBoxModel):
+    """
+    An instance of a ConsumableType, this model is used to store the current
+    stock of a given ConsumableType at a given location.
+    """
     consumable_type = models.ForeignKey(
         to='netbox_inventory.ConsumableType',
         on_delete=models.PROTECT,
@@ -683,6 +691,16 @@ class Consumable(NetBoxModel):
 
     def __str__(self):
         return f'{self.storage_location}: {self.consumable_type.name}'
+
+    @property
+    def quantity_status(self):
+        if self.quantity < self.alert_at_quantity:
+            return 'Low-Stock'
+        else:
+            return 'In-Stock'
+        
+    def get_quantity_status_color(self):
+        return ConsumableQuantityStatusChoices.colors.get(self.quantity_status)
     
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:consumable', args=[self.pk])

@@ -492,10 +492,10 @@ class ConsumableTypeTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
-
     manufacturer = tables.Column(
         linkify=True,
     )
+    comments = columns.MarkdownColumn()
 
     class Meta(NetBoxTable.Meta):
         model = ConsumableType
@@ -507,6 +507,7 @@ class ConsumableTypeTable(NetBoxTable):
             'manufacturer', 
             'description', 
             'part_number',
+            'comments',
         )
         default_columns = (
             'name',
@@ -523,6 +524,20 @@ class ConsumableTable(NetBoxTable):
     storage_location = tables.Column(
         linkify=True,
     )
+    comments = columns.MarkdownColumn()
+    quantity_status = columns.ChoiceFieldColumn()
+
+    actions = columns.ActionsColumn(
+        extra_buttons="""
+            <a href="{% url 'plugins:netbox_inventory:asset_assign' record.pk %}" class="btn btn-sm btn-blue" title="Edit hardware assignment">
+                <i class="mdi mdi-plus"></i>
+            </a>
+            <a href="{% url 'plugins:netbox_inventory:asset_assign' record.pk %}" class="btn btn-sm btn-orange" title="Edit hardware assignment">
+                <i class="mdi mdi-minus"></i>
+            </a>
+        """
+    )
+
     class Meta(NetBoxTable.Meta):
         model = Consumable
         fields = (
@@ -532,10 +547,14 @@ class ConsumableTable(NetBoxTable):
             'storage_location', 
             'quantity', 
             'alert_at_quantity',
+            'comments',
+            'quantity_status',
         )
 
         default_columns = (
             'consumable_type',
             'storage_location',
             'quantity',
+            'alert_at_quantity',
+            'quantity_status',
         )
