@@ -10,3 +10,4 @@ from .asset_reassign import *
 from .tabs import *
 from .consumable_type import *
 from .consumable import *
+from .consumable_quantity_edit import *

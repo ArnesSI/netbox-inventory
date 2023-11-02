@@ -529,10 +529,10 @@ class ConsumableTable(NetBoxTable):
 
     actions = columns.ActionsColumn(
         extra_buttons="""
-            <a href="{% url 'plugins:netbox_inventory:asset_assign' record.pk %}" class="btn btn-sm btn-blue" title="Edit hardware assignment">
+            <a href="{% url 'plugins:netbox_inventory:consumable_increment' record.pk %}" class="btn btn-sm btn-blue" title="Increment quantity by a specified amount">
                 <i class="mdi mdi-plus"></i>
             </a>
-            <a href="{% url 'plugins:netbox_inventory:asset_assign' record.pk %}" class="btn btn-sm btn-orange" title="Edit hardware assignment">
+            <a href="{% url 'plugins:netbox_inventory:consumable_decrement' record.pk %}" class="btn btn-sm btn-orange" title="Decrement quantity by a specified amount">
                 <i class="mdi mdi-minus"></i>
             </a>
         """

@@ -102,6 +102,7 @@ urlpatterns = (
     path('consumable/<int:pk>', views.ConsumableView.as_view(), name='consumable'),
     path('consumable/<int:pk>/edit/', views.ConsumableEditView.as_view(), name='consumable_edit'),
     path('consumable/<int:pk>/delete/', views.ConsumableDeleteView.as_view(), name='consumable_delete'),
+    path('consumable/<int:pk>/increment/', views.ConsumableIncrementView.as_view(), name='consumable_increment'),
+    path('consumable/<int:pk>/decrement/', views.ConsumableDecrementView.as_view(), name='consumable_decrement'),
     path('consumable/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='consumable_changelog', kwargs={'model': models.Consumable}),
-
 )
