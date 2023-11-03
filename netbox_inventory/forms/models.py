@@ -325,7 +325,7 @@ class ConsumableTypeForm(NetBoxModelForm):
         queryset=Manufacturer.objects.all(),
         required=True,
     )
-    slug = SlugField(slug_source='model')
+    slug = SlugField(slug_source='name')
     comments = CommentField()
 
     fieldsets = (

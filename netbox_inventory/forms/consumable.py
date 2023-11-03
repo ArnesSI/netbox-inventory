@@ -15,9 +15,6 @@ __all__ = (
 )
 
 
-
-logger = logging.getLogger('netbox.netbox_inventory.forms.consumable')
-
 class ConsumableIncrementForm(NetBoxModelForm):
     increment_qty = IntegerField(required=True)
 
