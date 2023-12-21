@@ -66,6 +66,11 @@ class AssetAssignMixin(forms.Form):
         # remove tags field from form
         self.fields.pop('tags')
 
+        # Remove Custom Fields from form
+        for cf_name in self.custom_fields.keys():
+           self.fields.pop(cf_name, None)
+        self.custom_fields = {}
+        self.custom_fields_groups = {}
 
 class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
     site = DynamicModelChoiceField(
