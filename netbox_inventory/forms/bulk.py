@@ -11,7 +11,7 @@ from utilities.forms.fields import (
 )
 from tenancy.models import Contact, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, ConsumableType, Consumable
 from ..utils import get_plugin_setting
 
 __all__ = (
@@ -27,6 +27,10 @@ __all__ = (
     'InventoryItemTypeBulkEditForm',
     'InventoryItemGroupImportForm',
     'InventoryItemGroupBulkEditForm',
+    'ConsumableTypeImportForm',
+    'ConsumableTypeBulkEditForm',
+    'ConsumableImportForm',
+    'ConsumableBulkEditForm',
 )
 
 
@@ -579,3 +583,57 @@ class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
         (None, ('parent',)),
     )
     nullable_fields = ('parent',)
+
+
+class ConsumableTypeImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = ConsumableType
+        fields = (
+            'name', 'slug', 'manufacturer', 'description', 'part_number'
+        )
+
+
+class ConsumableTypeBulkEditForm(NetBoxModelBulkEditForm):
+    manufacturer = DynamicModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = ConsumableType
+    fieldsets = (
+        ('Consumable Type', ('manufacturer', 'part_number')),
+    )
+    nullable_fields = (
+        'description',
+    )
+
+
+class ConsumableImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = Consumable
+        fields = (
+            'consumable_type', 'storage_location', 'quantity', 'alert_at_quantity', 'comments'
+        )
+
+
+class ConsumableBulkEditForm(NetBoxModelBulkEditForm):
+    manufacturer = DynamicModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = Consumable
+    fieldsets = (
+        ('Consumable', ('consumable_type', 'quantity')),
+    )
+    nullable_fields = (
+        'description',
+    )

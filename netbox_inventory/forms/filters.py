@@ -8,7 +8,7 @@ from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, ConsumableType, Consumable
 
 
 __all__ = (
@@ -18,6 +18,8 @@ __all__ = (
     'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
+    'ConsumableTypeFilterForm',
+    'ConsumableFilterForm',
 )
 
 
@@ -345,5 +347,44 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
         queryset=InventoryItemGroup.objects.all(),
         required=False,
         label='Parent group'
+    )
+    tag = TagFilterField(model)
+
+
+class ConsumableTypeFilterForm(NetBoxModelFilterSetForm):
+    model = ConsumableType
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Consumable Type', ('manufacturer_id', ))
+    )
+    tag = TagFilterField(model)
+
+
+class ConsumableFilterForm(NetBoxModelFilterSetForm):
+    model = Consumable
+    consumable_type_id = DynamicModelMultipleChoiceField(
+        queryset=ConsumableType.objects.all(),
+        required=False,
+        label='Consumable Type',
+    )
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    storage_location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        label='Location',
+    )
+    fieldsets = (
+        (None, ('q', 'filter_id', 'tag')),
+        ('Consumable Type', ('manufacturer_id', 'consumable_type_id')),
+        ('Location', ('storage_location_id', )),
     )
     tag = TagFilterField(model)

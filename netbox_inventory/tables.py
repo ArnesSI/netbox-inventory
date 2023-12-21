@@ -3,7 +3,7 @@ import django_tables2 as tables
 
 from netbox.tables import columns, NetBoxTable
 from tenancy.tables import ContactsColumnMixin
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier, Consumable, ConsumableType
 from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
@@ -13,6 +13,8 @@ __all__ = (
     'DeliveryTable',
     'InventoryItemTypeTable',
     'InventoryItemGroupTable',
+    'ConsumableTypeTable',
+    'ConsumableTable',
 )
 
 
@@ -483,4 +485,76 @@ class InventoryItemGroupTable(NetBoxTable):
             'name',
             'asset_count',
             'inventoryitem_type_count',
+        )
+
+
+class ConsumableTypeTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    manufacturer = tables.Column(
+        linkify=True,
+    )
+    comments = columns.MarkdownColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = ConsumableType
+        fields = (
+            'pk', 
+            'id', 
+            'name', 
+            'slug', 
+            'manufacturer', 
+            'description', 
+            'part_number',
+            'comments',
+        )
+        default_columns = (
+            'name',
+            'manufacturer',
+            'description',
+            'part_number',
+        )
+
+
+class ConsumableTable(NetBoxTable):
+    consumable_type = tables.Column(
+        linkify=True,
+    )
+    storage_location = tables.Column(
+        linkify=True,
+    )
+    comments = columns.MarkdownColumn()
+    quantity_status = columns.ChoiceFieldColumn()
+
+    actions = columns.ActionsColumn(
+        extra_buttons="""
+            <a href="{% url 'plugins:netbox_inventory:consumable_increment' record.pk %}" class="btn btn-sm btn-blue" title="Increment quantity by a specified amount">
+                <i class="mdi mdi-plus"></i>
+            </a>
+            <a href="{% url 'plugins:netbox_inventory:consumable_decrement' record.pk %}" class="btn btn-sm btn-orange" title="Decrement quantity by a specified amount">
+                <i class="mdi mdi-minus"></i>
+            </a>
+        """
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = Consumable
+        fields = (
+            'pk', 
+            'id', 
+            'consumable_type', 
+            'storage_location', 
+            'quantity', 
+            'alert_at_quantity',
+            'comments',
+            'quantity_status',
+        )
+
+        default_columns = (
+            'consumable_type',
+            'storage_location',
+            'quantity',
+            'alert_at_quantity',
+            'quantity_status',
         )

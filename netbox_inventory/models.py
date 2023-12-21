@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel, NestedGroupModel
-from .choices import HardwareKindChoices, AssetStatusChoices
+from .choices import HardwareKindChoices, AssetStatusChoices, ConsumableQuantityStatusChoices
 from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
 
 
@@ -608,3 +608,99 @@ class InventoryItemGroup(NestedGroupModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])
+
+
+class ConsumableType(NetBoxModel):
+    """
+    A type of consumable that can be stored at a location. F.ex, power cables, ethernet
+    cables, etc.
+    """
+    name = models.CharField(
+        max_length=100,
+    )
+
+    slug = models.SlugField(
+        max_length=100,
+        unique=True,
+    )
+
+    manufacturer = models.ForeignKey(
+        to='dcim.Manufacturer',
+        on_delete=models.PROTECT,
+        related_name='consumable_type',
+        blank=True,
+    )
+
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+
+    part_number = models.CharField(
+        max_length=50,
+        blank=True,
+    )
+
+    comments = models.TextField(
+        blank=True
+    )
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:consumabletype', args=[self.pk])
+
+
+class Consumable(NetBoxModel):
+    """
+    An instance of a ConsumableType, this model is used to store the current
+    stock of a given ConsumableType at a given location.
+    """
+    consumable_type = models.ForeignKey(
+        to='netbox_inventory.ConsumableType',
+        on_delete=models.PROTECT,
+        related_name='consumable',
+    )
+
+    storage_location = models.ForeignKey(
+        help_text='Where this consumable is stored',
+        to='dcim.Location',
+        on_delete=models.PROTECT,
+        related_name='consumable',
+    )
+
+    quantity = models.PositiveIntegerField(
+        default=1
+    )
+
+    alert_at_quantity = models.PositiveIntegerField(
+        default=0
+    )
+
+    comments = models.TextField(
+        blank=True
+    )
+
+    class Meta:
+        ordering = ('consumable_type', 'storage_location')
+        unique_together = ('consumable_type', 'storage_location')
+
+    def __str__(self):
+        return f'{self.storage_location}: {self.consumable_type.name}'
+
+    @property
+    def quantity_status(self):
+        if self.quantity < self.alert_at_quantity:
+            return 'Low-Stock'
+        else:
+            return 'In-Stock'
+        
+    def get_quantity_status_color(self):
+        return ConsumableQuantityStatusChoices.colors.get(self.quantity_status)
+    
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:consumable', args=[self.pk])

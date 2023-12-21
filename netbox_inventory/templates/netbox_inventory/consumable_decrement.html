@@ -1,0 +1,14 @@
+{% extends 'generic/object_edit.html' %}
+
+{% block title %}Decrement {{ object.storage_location }} {{ object.consumable_type.name }}{% endblock %}
+
+{% block tabs %}
+<ul class="nav nav-tabs px-3">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="edit-form-tab" data-bs-toggle="tab" data-bs-target="#edit-form"
+            type="button" role="tab" aria-controls="edit-form" aria-selected="true">
+            Decrement Consumable Quantity
+        </button>
+    </li>
+</ul>
+{% endblock %}

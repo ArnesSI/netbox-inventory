@@ -14,5 +14,7 @@ router.register('deliveries', views.DeliveryViewSet)
 router.register('dcim/devices', views.DeviceAssetViewSet)
 router.register('dcim/modules', views.ModuleAssetViewSet)
 router.register('dcim/inventory-items', views.InventoryItemAssetViewSet)
+router.register('consumable-type', views.ConsumableTypeViewSet)
+router.register('consumable', views.ConsumableViewSet)
 
 urlpatterns = router.urls
