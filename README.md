@@ -84,13 +84,13 @@ For adding to a NetBox Docker setup see
 You can install a development version directly from GitHub:
 
 ```bash
-pip install git+https://github.com/ArnesSI/netbox-inventory.git@master
+pip install https://github.com/ArnesSI/netbox-inventory/archive/master.tar.gz
 ```
 
 or by adding to your `local_requirements.txt` or `plugin_requirements.txt` (netbox-docker):
 
 ```bash
-git+https://github.com/ArnesSI/netbox-inventory.git@master
+https://github.com/ArnesSI/netbox-inventory/archive/master.tar.gz
 ```
 
 After installation, enable the plugin in `/opt/netbox/netbox/netbox/configuration.py`,
