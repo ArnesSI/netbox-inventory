@@ -283,6 +283,7 @@ class Asset(NetBoxModel):
 
     def clean(self):
         self.clean_delivery()
+        self.clean_warranty_dates()
         self.validate_hardware_types()
         self.validate_hardware()
         self.update_status()
@@ -360,6 +361,10 @@ class Asset(NetBoxModel):
     def clean_delivery(self):
         if self.delivery and self.delivery.purchase != self.purchase:
             raise ValidationError(f'Assigned delivery must belong to selected purchase ({self.purchase}).')
+
+    def clean_warranty_dates(self):
+        if self.warranty_start and self.warranty_end and self.warranty_end <= self.warranty_start:
+            raise ValidationError({'warranty_end': f'Warranty end date must be after warranty start date.'})
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:asset', args=[self.pk])
