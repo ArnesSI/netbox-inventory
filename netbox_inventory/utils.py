@@ -108,7 +108,7 @@ def asset_set_new_hw(asset, hw):
         if hw.manufacturer != asset.inventoryitem_type.manufacturer:
             hw.manufacturer = asset.inventoryitem_type.manufacturer
             hw_save = True
-        part_id = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
+        part_id = asset.inventoryitem_type.part_number
         if hw.part_id != part_id:
             hw.part_id = part_id
             hw_save = True
