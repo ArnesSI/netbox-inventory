@@ -51,11 +51,13 @@ class AssetReassignBase():
         self.inventoryitem_type1 = InventoryItemType.objects.create(
             manufacturer=self.manufacturer1,
             model='inventoryitem_type1',
+            part_number='partnumber1',
             slug='inventoryitem_type1'
         )
         self.inventoryitem_type2 = InventoryItemType.objects.create(
             manufacturer=self.manufacturer1,
             model='inventoryitem_type2',
+            part_number='partnumber2',
             slug='inventoryitem_type2'
         )
         self.device1 = Device.objects.create(
@@ -246,7 +248,7 @@ class InventoryItemReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         self.tested_hardware.refresh_from_db()
         self.asset_new.refresh_from_db()
         self.assertEqual(self.tested_hardware.manufacturer, self.asset_new.inventoryitem_type.manufacturer)
-        self.assertEqual(self.tested_hardware.part_id, self.asset_new.inventoryitem_type.model)
+        self.assertEqual(self.tested_hardware.part_id, self.asset_new.inventoryitem_type.part_number)
 
 
 class DeviceUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
@@ -305,4 +307,4 @@ class InventoryItemUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         # also check if inventory item manufacturer and part_id was kept
         self.tested_hardware.refresh_from_db()
         self.assertEqual(self.tested_hardware.manufacturer, self.asset_old.inventoryitem_type.manufacturer)
-        self.assertEqual(self.tested_hardware.part_id, self.asset_old.inventoryitem_type.model)
+        self.assertEqual(self.tested_hardware.part_id, self.asset_old.inventoryitem_type.part_number)

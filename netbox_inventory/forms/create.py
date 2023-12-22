@@ -107,7 +107,7 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
             self.fields['manufacturer'].disabled = True
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
-            self.initial['part_id'] = asset.inventoryitem_type.part_number or asset.inventoryitem_type.model
+            self.initial['part_id'] = asset.inventoryitem_type.part_number
             self.initial['manufacturer'] = asset.inventoryitem_type.manufacturer_id
 
             if get_plugin_setting('prefill_asset_name_create_inventoryitem'):
