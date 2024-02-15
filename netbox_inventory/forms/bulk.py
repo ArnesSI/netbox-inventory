@@ -11,7 +11,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import DatePicker
 from tenancy.models import Contact, Tenant
-from ..choices import AssetStatusChoices, HardwareKindChoices
+from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_plugin_setting
 
@@ -186,6 +186,11 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Date when this purchase was made.',
         required=False,
     )
+    purchase_status = CSVChoiceField(
+        choices=PurchaseStatusChoices,
+        help_text='Status of purchase',
+        required=False
+    )
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
@@ -211,8 +216,8 @@ class AssetImportForm(NetBoxModelImportForm):
             'name', 'asset_tag', 'serial', 'status',
             'hardware_kind', 'manufacturer', 'model_name', 'part_number',
             'model_comments', 'storage_site', 'storage_location',
-            'owner', 'supplier', 'purchase', 'purchase_date', 'delivery',
-            'delivery_date', 'receiving_contact', 'warranty_start',
+            'owner', 'supplier', 'purchase', 'purchase_date', 'purchase_status',
+            'delivery', 'delivery_date', 'receiving_contact', 'warranty_start',
             'warranty_end', 'comments', 'tenant', 'contact', 'tags',
         )
 
@@ -303,7 +308,10 @@ class AssetImportForm(NetBoxModelImportForm):
                 purchase, _ = Purchase.objects.get_or_create(
                     name=self.data.get('purchase'),
                     supplier=self._get_or_create_related('supplier'),
-                    defaults={'date': self._get_clean_value('purchase_date')}
+                    defaults={
+                        'date': self._get_clean_value('purchase_date'),
+                        'status': self._get_clean_value('purchase_status'),
+                    }
                 )
                 if self.data.get('delivery'):
                     Delivery.objects.get_or_create(
@@ -431,15 +439,24 @@ class PurchaseImportForm(NetBoxModelImportForm):
         help_text='Legal entity this purchase was made at. It must exist when importing.',
         required=True,
     )
-    
+    status = CSVChoiceField(
+        choices=PurchaseStatusChoices,
+        help_text='Status of purchase',
+    )
+
     class Meta:
         model = Purchase
         fields = (
-            'name', 'date', 'supplier', 'description', 'comments', 'tags'
+            'name', 'date', 'status', 'supplier', 'description', 'comments', 'tags'
         )
 
 
 class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
+    status = forms.ChoiceField(
+        choices=add_blank_choice(PurchaseStatusChoices),
+        required=False,
+        initial='',
+    )
     date = forms.DateField(
         label='Date',
         required=False,
@@ -459,7 +476,7 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Purchase
     fieldsets = (
-        ('General', ('date', 'supplier', 'description',)),
+        ('General', ('date', 'status', 'supplier', 'description',)),
     )
     nullable_fields = ('date', 'description',)
 

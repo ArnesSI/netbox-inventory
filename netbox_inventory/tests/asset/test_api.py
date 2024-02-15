@@ -147,7 +147,7 @@ class AssetTest(
         cls.device2 = Device.objects.create(name='Device 2', role=role1, device_type=device_type2, site=site1, status='active')
         cls.inventoryitem1 = InventoryItem.objects.create(device=cls.device1, name='II 1')
         supplier1 = Supplier.objects.create(name='Supplier1', slug='supplier1')
-        cls.purchase1 = Purchase.objects.create(name='Purchase1', supplier=supplier1)
+        cls.purchase1 = Purchase.objects.create(name='Purchase1', supplier=supplier1, status='closed')
         cls.delivery1 = Delivery.objects.create(name='Delivery1', purchase=cls.purchase1)
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)

@@ -85,7 +85,7 @@ class PurchaseSerializer(NetBoxModelSerializer):
     class Meta:
         model = Purchase
         fields = (
-            'id', 'url', 'display', 'supplier', 'name', 'date', 'description',
+            'id', 'url', 'display', 'supplier', 'name', 'status', 'date', 'description',
             'comments', 'tags', 'custom_fields', 'created', 'last_updated',
             'asset_count', 'delivery_count',
         )

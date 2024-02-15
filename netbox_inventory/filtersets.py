@@ -8,7 +8,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, Tenant
-from .choices import HardwareKindChoices, AssetStatusChoices
+from .choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from .utils import query_located, get_asset_custom_fields_search_filters
 
@@ -330,6 +330,9 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
         field_name='supplier',
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
+    )
+    status = django_filters.MultipleChoiceFilter(
+        choices=PurchaseStatusChoices,
     )
     date = django_filters.DateFromToRangeFilter()
 

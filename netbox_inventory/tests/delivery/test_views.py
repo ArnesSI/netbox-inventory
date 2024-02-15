@@ -25,10 +25,12 @@ class DeliveryTestCase(
         purchase1 = Purchase.objects.create(
             name='Purchase 1',
             supplier=supplier1,
+            status='closed',
         )
         purchase2 = Purchase.objects.create(
             name='Purchase 1',
             supplier=supplier2,
+            status='closed',
         )
         delivery1 = Delivery.objects.create(
             name='Delivery 1',

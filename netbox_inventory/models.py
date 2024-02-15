@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel, NestedGroupModel
-from .choices import HardwareKindChoices, AssetStatusChoices
+from .choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
 
 
@@ -442,6 +442,11 @@ class Purchase(NetBoxModel):
         blank=False,
         null=False,
     )
+    status = models.CharField(
+        max_length=30,
+        choices=PurchaseStatusChoices,
+        help_text='Status of purchase',
+    )
     date = models.DateField(
         help_text='Date when this purchase was made',
         blank=True,
@@ -456,7 +461,7 @@ class Purchase(NetBoxModel):
     )
 
     clone_fields = [
-        'supplier', 'date', 'description', 'comments'
+        'supplier', 'date', 'status', 'description', 'comments'
     ]
 
     class Meta:
@@ -464,6 +469,9 @@ class Purchase(NetBoxModel):
         unique_together = (
             ('supplier', 'name'),
         )
+
+    def get_status_color(self):
+        return PurchaseStatusChoices.colors.get(self.status)
 
     def __str__(self):
         return f'{self.supplier} {self.name}'

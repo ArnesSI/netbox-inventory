@@ -7,7 +7,7 @@ from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterFie
 from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, Tenant
-from ..choices import HardwareKindChoices, AssetStatusChoices
+from ..choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
 
@@ -255,13 +255,17 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
     model = Purchase
     fieldsets = (
         (None, ('q', 'filter_id', 'tag')),
-        ('Purchase', ('supplier_id', 'date_after', 'date_before')),
+        ('Purchase', ('supplier_id', 'status', 'date_after', 'date_before')),
     )
 
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
         label='Supplier',
+    )
+    status = forms.MultipleChoiceField(
+        choices=PurchaseStatusChoices,
+        required=False,
     )
     date_after = forms.DateField(
         required=False,

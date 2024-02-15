@@ -26,10 +26,12 @@ class AssetTestCase(
         purchase1 = Purchase.objects.create(
             name='Purchase1',
             supplier=supplier1,
+            status='closed',
         )
         purchase2 = Purchase.objects.create(
             name='Purchase2',
             supplier=supplier1,
+            status='closed',
         )
         delivery1 = Delivery.objects.create(
             name='the_delivery',
@@ -167,6 +169,7 @@ class AssetTestCase(
         purchase1 = Purchase.objects.create(
             name='Purchase1-autoset',
             supplier=supplier1,
+            status='closed',
         )
         delivery1 = Delivery.objects.create(
             name='Delivery1-autoset',

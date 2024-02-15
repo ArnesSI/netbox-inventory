@@ -229,13 +229,14 @@ class SupplierForm(NetBoxModelForm):
 class PurchaseForm(NetBoxModelForm):
     comments = CommentField()
 
-    fieldsets = (('Purchase', ('supplier', 'name', 'date', 'description', 'tags')),)
+    fieldsets = (('Purchase', ('supplier', 'name', 'status', 'date', 'description', 'tags')),)
 
     class Meta:
         model = Purchase
         fields = (
             'supplier',
             'name',
+            'status',
             'date',
             'description',
             'comments',

@@ -312,6 +312,7 @@ class PurchaseTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
+    status = columns.ChoiceFieldColumn()
     delivery_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:delivery_list',
         url_params={'purchase_id': 'pk'},
@@ -332,6 +333,7 @@ class PurchaseTable(NetBoxTable):
             'id',
             'name',
             'supplier',
+            'status',
             'date',
             'description',
             'comments',
