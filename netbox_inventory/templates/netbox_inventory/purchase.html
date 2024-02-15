@@ -26,6 +26,10 @@
               <td>{{ object.supplier|linkify }}</td>
             </tr>
             <tr>
+              <th scope="row">Status</th>
+              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+            </tr>
+            <tr>
               <th scope="row">Date</th>
               <td>{{ object.date|annotated_date|placeholder }}</td>
             </tr>

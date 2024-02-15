@@ -42,7 +42,7 @@ class NestedPurchaseSerializer(WritableNestedSerializer):
 
     class Meta:
         model = Purchase
-        fields = ('id', 'url', 'display', 'supplier', 'name', 'date')
+        fields = ('id', 'url', 'display', 'supplier', 'name', 'status', 'date')
 
 
 class NestedDeliverySerializer(WritableNestedSerializer):

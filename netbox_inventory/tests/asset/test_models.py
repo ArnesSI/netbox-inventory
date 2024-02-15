@@ -16,10 +16,12 @@ class TestAssetModel(TestCase):
         self.purchase1 = Purchase.objects.create(
             name='Purchase1',
             supplier=self.supplier1,
+            status='closed',
         )
         self.purchase2 = Purchase.objects.create(
             name='Purchase2',
             supplier=self.supplier1,
+            status='closed',
         )
         self.delivery1 = Delivery.objects.create(
             name='Delivery1',

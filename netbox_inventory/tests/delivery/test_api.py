@@ -20,7 +20,7 @@ class DeliveryTest(
     @classmethod
     def setUpTestData(cls) -> None:
         supplier1 = Supplier.objects.create(name='Supplier1', slug='supplier1')
-        purchase1 = Purchase.objects.create(name='Purchase1', supplier=supplier1)
+        purchase1 = Purchase.objects.create(name='Purchase1', supplier=supplier1, status='closed')
         Delivery.objects.create(name='Delivery 1', purchase=purchase1)
         Delivery.objects.create(name='Delivery 2', purchase=purchase1)
         Delivery.objects.create(name='Delivery 3', purchase=purchase1)
