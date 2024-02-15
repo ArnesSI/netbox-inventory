@@ -27,17 +27,17 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: netbox-inventory
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Checkout netbox ${{ matrix.netbox-version }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: "netbox-community/netbox"
           ref: ${{ matrix.netbox-version }}
