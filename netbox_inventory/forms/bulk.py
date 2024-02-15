@@ -9,6 +9,7 @@ from utilities.forms.fields import (
     CommentField, CSVChoiceField, CSVModelChoiceField,
     DynamicModelChoiceField
 )
+from utilities.forms.widgets import DatePicker
 from tenancy.models import Contact, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices
 from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
@@ -74,11 +75,15 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('delivery').help_text,
         required=not Asset._meta.get_field('delivery').blank,
     )
-    warranty_start = forms.CharField(
+    warranty_start = forms.DateField(
+        label='Warranty start',
         required=False,
+        widget=DatePicker()
     )
-    warranty_end = forms.CharField(
+    warranty_end = forms.DateField(
+        label='Warranty end',
         required=False,
+        widget=DatePicker()
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -435,8 +440,10 @@ class PurchaseImportForm(NetBoxModelImportForm):
 
 
 class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
-    date = forms.CharField(
+    date = forms.DateField(
+        label='Date',
         required=False,
+        widget=DatePicker()
     )
     supplier = DynamicModelChoiceField(
         queryset=Supplier.objects.all(),
@@ -479,8 +486,10 @@ class DeliveryImportForm(NetBoxModelImportForm):
 
 
 class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
-    date = forms.CharField(
+    date = forms.DateField(
+        label='Date',
         required=False,
+        widget=DatePicker()
     )
     purchase = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
