@@ -6,11 +6,12 @@ from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel, NestedGroupModel
+from netbox.models.features import ImageAttachmentsMixin
 from .choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
 
 
-class Asset(NetBoxModel):
+class Asset(NetBoxModel, ImageAttachmentsMixin):
     """
     An Asset represents a piece of hardware we want to keep track of. It has a
     make (model, part number) that is one of: Device Type, Module Type or
@@ -181,10 +182,6 @@ class Asset(NetBoxModel):
 
     comments = models.TextField(
         blank=True
-    )
-
-    images = GenericRelation(
-        to='extras.ImageAttachment'
     )
 
     clone_fields = [
