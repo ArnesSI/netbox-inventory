@@ -9,6 +9,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
+    environment: release
+    permissions:
+      id-token: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
