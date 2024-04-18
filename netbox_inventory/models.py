@@ -1,12 +1,11 @@
 from datetime import date
 
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel, NestedGroupModel
-from netbox.models.features import ImageAttachmentsMixin
+from netbox.models.features import ContactsMixin, ImageAttachmentsMixin
 from .choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
 
@@ -385,7 +384,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         )
 
 
-class Supplier(NetBoxModel):
+class Supplier(NetBoxModel, ContactsMixin):
     """
     Supplier is a legal entity that sold some assets that we keep track of.
     This can be the same entity as Manufacturer or a separate one. However
@@ -402,9 +401,6 @@ class Supplier(NetBoxModel):
     description = models.CharField(
         max_length=200,
         blank=True
-    )
-    contacts = GenericRelation(
-        to='tenancy.ContactAssignment'
     )
     comments = models.TextField(
         blank=True
@@ -533,7 +529,7 @@ class Delivery(NetBoxModel):
         return reverse('plugins:netbox_inventory:delivery', args=[self.pk])
 
 
-class InventoryItemType(NetBoxModel):
+class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
     """
     Inventory Item Type is a model (make, part number) of an Inventory Item. In
     that it is simmilar to Device Type or Module Type.
@@ -565,9 +561,6 @@ class InventoryItemType(NetBoxModel):
     )
     comments = models.TextField(
         blank=True
-    )
-    images = GenericRelation(
-        to='extras.ImageAttachment'
     )
 
     clone_fields = [
