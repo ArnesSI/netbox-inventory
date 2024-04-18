@@ -5,13 +5,13 @@ from netbox_inventory import __version__
 from netbox_inventory.tests.custom import APITestCase
 
 
-class NetboxDnsVersionTestCase(SimpleTestCase):
+class NetboxInventoryVersionTestCase(SimpleTestCase):
     """
     Test for netbox_inventory package
     """
 
     def test_version(self):
-        assert __version__ == "1.5.2"
+        assert __version__ == "1.6.0"
 
 
 class AppTest(APITestCase):
