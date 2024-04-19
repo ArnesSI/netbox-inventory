@@ -156,4 +156,4 @@ if (HAVE_MENU and settings.PLUGINS_CONFIG['netbox_inventory']['top_level_menu'])
     )
 else:
     # display under plugins
-    menu_items = menu_buttons
+    menu_items = assets_buttons + deliveries_buttons
