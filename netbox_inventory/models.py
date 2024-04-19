@@ -239,6 +239,19 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return None
 
     @property
+    def current_site(self):
+        location = self.current_location
+        if location:
+            return location.site
+
+    @property
+    def current_location(self):
+        installed = self.installed_location
+        if installed:
+            return installed
+        return self.storage_location
+
+    @property
     def warranty_remaining(self):
         """
             How many days are left in warranty period.
