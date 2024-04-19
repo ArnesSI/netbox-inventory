@@ -103,13 +103,28 @@ inventoryitemgroup_buttons = [
     )
 ]
 
-menu_buttons = (
+assets_buttons = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
         link_text='Assets',
         permissions=["netbox_inventory.view_asset"],
         buttons=asset_buttons,
     ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:inventoryitemtype_list',
+        link_text='Inventory Item Types',
+        permissions=["netbox_inventory.view_inventoryitemtype"],
+        buttons=inventoryitemtype_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:inventoryitemgroup_list',
+        link_text='Inventory Item Groups',
+        permissions=["netbox_inventory.view_inventoryitemgroup"],
+        buttons=inventoryitemgroup_buttons,
+    ),
+)
+
+deliveries_buttons = (
     PluginMenuItem(
         link='plugins:netbox_inventory:supplier_list',
         link_text='Suppliers',
@@ -128,18 +143,6 @@ menu_buttons = (
         permissions=["netbox_inventory.view_delivery"],
         buttons=delivery_buttons,
     ),
-    PluginMenuItem(
-        link='plugins:netbox_inventory:inventoryitemtype_list',
-        link_text='Inventory Item Types',
-        permissions=["netbox_inventory.view_inventoryitemtype"],
-        buttons=inventoryitemtype_buttons,
-    ),
-    PluginMenuItem(
-        link='plugins:netbox_inventory:inventoryitemgroup_list',
-        link_text='Inventory Item Groups',
-        permissions=["netbox_inventory.view_inventoryitemgroup"],
-        buttons=inventoryitemgroup_buttons,
-    ),
 )
 
 # can't use utils.get_plugin_setting() here, get value manually
@@ -148,7 +151,8 @@ if (HAVE_MENU and settings.PLUGINS_CONFIG['netbox_inventory']['top_level_menu'])
     menu = PluginMenu(
         label=f'Inventory',
         groups=(
-            ('Asset Management', menu_buttons),
+            ('Asset Management', assets_buttons),
+            ('Deliveries', deliveries_buttons),
         ),
         icon_class='mdi mdi-clipboard-text-multiple-outline'
     )
