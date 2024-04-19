@@ -1,5 +1,3 @@
-from packaging import version
-
 from django.conf import settings
 from extras.plugins import PluginMenuItem, PluginMenuButton
 from utilities.choices import ButtonColorChoices
