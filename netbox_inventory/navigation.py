@@ -16,13 +16,15 @@ asset_buttons = [
         link='plugins:netbox_inventory:asset_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=["netbox_inventory.add_asset"],
     ),
     PluginMenuButton(
         link='plugins:netbox_inventory:asset_import',
         title='Import',
         icon_class='mdi mdi-upload',
         color=ButtonColorChoices.CYAN,
+        permissions=["netbox_inventory.add_asset"],
     )
 ]
 
@@ -31,13 +33,15 @@ supplier_buttons = [
         link='plugins:netbox_inventory:supplier_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=["netbox_inventory.add_supplier"],
     ),
     PluginMenuButton(
         link='plugins:netbox_inventory:supplier_import',
         title='Import',
         icon_class='mdi mdi-upload',
         color=ButtonColorChoices.CYAN,
+        permissions=["netbox_inventory.add_supplier"],
     )
 ]
 
@@ -46,13 +50,15 @@ purchase_buttons = [
         link='plugins:netbox_inventory:purchase_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=["netbox_inventory.add_purchase"],
     ),
     PluginMenuButton(
         link='plugins:netbox_inventory:purchase_import',
         title='Import',
         icon_class='mdi mdi-upload',
         color=ButtonColorChoices.CYAN,
+        permissions=["netbox_inventory.add_purchase"],
     )
 ]
 
@@ -61,13 +67,15 @@ delivery_buttons = [
         link='plugins:netbox_inventory:delivery_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=["netbox_inventory.add_delivery"],
     ),
     PluginMenuButton(
         link='plugins:netbox_inventory:delivery_import',
         title='Import',
         icon_class='mdi mdi-upload',
         color=ButtonColorChoices.CYAN,
+        permissions=["netbox_inventory.add_delivery"],
     )
 ]
 
@@ -76,13 +84,15 @@ inventoryitemtype_buttons = [
         link='plugins:netbox_inventory:inventoryitemtype_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=["netbox_inventory.add_inventoryitemtype"],
     ),
     PluginMenuButton(
         link='plugins:netbox_inventory:inventoryitemtype_import',
         title='Import',
         icon_class='mdi mdi-upload',
         color=ButtonColorChoices.CYAN,
+        permissions=["netbox_inventory.add_inventoryitemtype"],
     )
 ]
 
@@ -91,13 +101,15 @@ inventoryitemgroup_buttons = [
         link='plugins:netbox_inventory:inventoryitemgroup_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=["netbox_inventory.add_inventoryitemgroup"],
     ),
     PluginMenuButton(
         link='plugins:netbox_inventory:inventoryitemgroup_import',
         title='Import',
         icon_class='mdi mdi-upload',
         color=ButtonColorChoices.CYAN,
+        permissions=["netbox_inventory.add_inventoryitemgroup"],
     )
 ]
 
