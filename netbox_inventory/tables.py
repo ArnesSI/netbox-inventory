@@ -1,10 +1,14 @@
 from django.db.models.functions import Coalesce
 import django_tables2 as tables
+from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import columns, NetBoxTable
 from tenancy.tables import ContactsColumnMixin
 from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from .template_content import WARRANTY_PROGRESSBAR
+
+from dcim.tables import DeviceTypeTable, ModuleTypeTable
+from utilities.tables import register_table_column
 
 __all__ = (
     'AssetTable',
@@ -486,3 +490,27 @@ class InventoryItemGroupTable(NetBoxTable):
             'asset_count',
             'inventoryitem_type_count',
         )
+
+
+# ========================
+# DCIM model table columns
+# ========================
+
+asset_count = columns.LinkedCountColumn(
+    viewname='plugins:netbox_inventory:asset_list',
+    url_params={'device_type_id': 'pk'},
+    verbose_name=_('Assets'),
+    accessor="assets__count",
+)
+
+register_table_column(asset_count, 'assets', DeviceTypeTable)
+
+
+asset_count = columns.LinkedCountColumn(
+    viewname='plugins:netbox_inventory:asset_list',
+    url_params={'module_type_id': 'pk'},
+    verbose_name=_('Assets'),
+    accessor="assets__count",
+)
+
+register_table_column(asset_count, 'assets', ModuleTypeTable)
