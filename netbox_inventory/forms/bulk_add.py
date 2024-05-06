@@ -1,6 +1,5 @@
 from django import forms
 
-from utilities.forms import BootstrapMixin
 from .models import AssetForm
 
 
@@ -10,7 +9,7 @@ __all__ = (
 )
 
 
-class AssetBulkAddForm(BootstrapMixin, forms.Form):
+class AssetBulkAddForm(forms.Form):
     """ Form for creating multiple Assets by count """
     count = forms.IntegerField(
         min_value=1,
