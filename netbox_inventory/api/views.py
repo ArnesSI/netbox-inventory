@@ -1,6 +1,6 @@
 from dcim.api.views import DeviceViewSet, InventoryItemViewSet, ModuleViewSet
 from netbox.api.viewsets import NetBoxModelViewSet
-from utilities.utils import count_related
+from utilities.query import count_related
 from .. import filtersets, models
 from .serializers import (
     AssetSerializer, InventoryItemTypeSerializer, InventoryItemGroupSerializer,
