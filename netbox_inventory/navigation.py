@@ -1,10 +1,10 @@
 from django.conf import settings
-from extras.plugins import PluginMenuItem, PluginMenuButton
+from netbox.plugins import PluginMenuItem, PluginMenuButton
 from utilities.choices import ButtonColorChoices
 
 # compatibility with netbox v3.3 that does not have PluginMenu
 try:
-    from extras.plugins import PluginMenu
+    from netbox.plugins import PluginMenu
     HAVE_MENU = True
 except ImportError:
     HAVE_MENU = False
