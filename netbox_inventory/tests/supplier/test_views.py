@@ -114,7 +114,7 @@ class ContactAssignmentTestCase(
         tags = create_tags('Alpha', 'Bravo', 'Charlie')
 
         cls.form_data = {
-            'content_type': ContentType.objects.get_for_model(Supplier).pk,
+            'object_type': ContentType.objects.get_for_model(Supplier).pk,
             'object_id': suppliers[3].pk,
             'contact': contacts[3].pk,
             'role': contact_roles[3].pk,
@@ -133,6 +133,6 @@ class ContactAssignmentTestCase(
             url = reverse('tenancy:contactassignment_add')
             content_type = ContentType.objects.get_for_model(Supplier).pk
             object_id = Supplier.objects.first().pk
-            return f"{url}?content_type={content_type}&object_id={object_id}"
+            return f"{url}?object_type={content_type}&object_id={object_id}"
 
         return super()._get_url(action, instance=instance)
