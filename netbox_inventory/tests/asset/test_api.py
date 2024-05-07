@@ -18,7 +18,7 @@ class AssetTest(
         APIViewTestCases.UpdateObjectViewTestCase,
         APIViewTestCases.DeleteObjectViewTestCase):
     model = Asset
-    brief_fields = ['display', 'id', 'serial', 'url']
+    brief_fields = ['display', 'id', 'name', 'serial', 'url']
 
     bulk_update_data = {
         'status': 'used',
