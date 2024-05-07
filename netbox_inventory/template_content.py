@@ -10,34 +10,40 @@ WARRANTY_PROGRESSBAR = '''
 {% with settings.PLUGINS_CONFIG.netbox_inventory.asset_warranty_expire_warning_days as wthresh %}
 
 {% if wp is None and wr.days <= 0 %}
-    <div class="progress"><div role="progressbar" class="progress-bar progress-bar-striped bg-danger" style="width:100%;">Expired {{ record.warranty_end|timesince|split:','|first }} ago</div></div>
+  <div class="progress" role="progressbar">
+    <div class="progress-bar progress-bar-striped text-bg-danger" style="width:100%;">
+      Expired {{ record.warranty_end|timesince|split:','|first }} ago
+    </div>
+  </div>
 {% elif wp is None and wr.days > 0 %}
-    <div class="progress"><div role="progressbar" class="progress-bar progress-bar-striped {% if wthresh and wr.days < wthresh %}bg-warning{% else %}bg-success{% endif %}" style="width:100%;">{{ record.warranty_end|timeuntil|split:','|first }}</div></div>
+  <div class="progress" role="progressbar">
+    <div class="progress-bar progress-bar-striped text-bg-{% if wthresh and wr.days < wthresh %}warning{% else %}success{% endif %}" style="width:100%;">
+      {{ record.warranty_end|timeuntil|split:','|first }}
+    </div>
+  </div>
 {% elif wp is None %}
-    <span class="text-muted">No data</span>
+    {{ ""|placeholder }}
 {% else %}
 
-<div class="progress">
+<div
+  class="progress"
+  role="progressbar"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="{% if wp < 0 %}0{% else %}{{ wp }}{% endif %}"
+>
   <div
-    role="progressbar"
-    aria-valuemin="0"
-    aria-valuemax="100"
-    aria-valuenow="{% if wp < 0 %}0{% else %}{{ wp }}{% endif %}"
-    class="progress-bar {% if wp >= 100 %}bg-danger{% elif wthresh and wr.days < wthresh %}bg-warning{% else %}bg-success{% endif %}"
+    class="progress-bar text-bg-{% if wp >= 100 %}danger{% elif wthresh and wr.days < wthresh %}warning{% else %}success{% endif %}"
     style="width: {% if wp < 0 %}0%{% else %}{{ wp }}%{% endif %};"
-  >
+  ></div>
   {% if record.warranty_progress >= 100 %}
-    Expired {{ record.warranty_end|timesince|split:','|first }} ago
-  </div>
+    <span class="justify-content-center d-flex align-items-center position-absolute text-light w-100 h-100">Expired {{ record.warranty_end|timesince|split:','|first }} ago</span>
   {% elif record.warranty_progress >= 35 %}
-    {{ record.warranty_end|timeuntil|split:','|first }}
-  </div>
+    <span class="justify-content-center d-flex align-items-center position-absolute text-body-emphasis w-100 h-100">{{ record.warranty_end|timeuntil|split:','|first }}</span>
   {% elif record.warranty_progress >= 0 %}
-  </div>
-    <span class="ps-1">{{ record.warranty_end|timeuntil|split:','|first }}</span>
+    <span class="justify-content-center d-flex align-items-center position-absolute text-body-emphasis w-100 h-100">{{ record.warranty_end|timeuntil|split:','|first }}</span>
   {% else %}
-  </div>
-    <span class="text-center" style="width: 100%">Starts in {{ record.warranty_start|timeuntil|split:','|first }}</span>
+    <span class="justify-content-center d-flex align-items-center position-absolute text-body-emphasis w-100 h-100">Starts in {{ record.warranty_start|timeuntil|split:','|first }}</span>
   {% endif %}
 </div>
 
