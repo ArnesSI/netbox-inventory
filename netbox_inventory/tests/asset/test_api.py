@@ -1,5 +1,6 @@
 from copy import copy
-from django.contrib.contenttypes.models import ContentType
+
+from core.models import ObjectType
 from dcim.models import Device, DeviceRole, DeviceType, InventoryItem, Manufacturer, ModuleType, Site
 from users.models import ObjectPermission
 from utilities.testing import APIViewTestCases, disable_warnings
@@ -34,7 +35,7 @@ class AssetTest(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         update_data = {'device':self.device1.pk}
 
@@ -62,7 +63,7 @@ class AssetTest(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         update_data = {'device':self.device2.pk}
 
@@ -84,7 +85,7 @@ class AssetTest(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         update_data = {'inventoryitem':self.inventoryitem1.pk}
 
@@ -106,7 +107,7 @@ class AssetTest(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         create_data = self.create_data[2]
         response = self.client.post(self._get_list_url(), create_data, format='json', **self.header)
@@ -124,7 +125,7 @@ class AssetTest(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         create_data = copy(self.create_data[0])
         create_data['serial'] = ''
