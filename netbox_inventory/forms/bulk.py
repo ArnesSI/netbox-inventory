@@ -9,6 +9,7 @@ from utilities.forms.fields import (
     CommentField, CSVChoiceField, CSVModelChoiceField,
     DynamicModelChoiceField
 )
+from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 from tenancy.models import Contact, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
@@ -106,11 +107,11 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Asset
     fieldsets = (
-        ('General', ('name', 'status')),
-        ('Hardware', ('device_type', 'device', 'module_type', 'module')),
-        ('Purchase', ('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end')), 
-        ('Assigned to', ('tenant', 'contact')), 
-        ('Location', ('storage_location',)),
+        FieldSet('name', 'status', name='General'),
+        FieldSet('device_type', 'device', 'module_type', 'module', name='Hardware'),
+        FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'), 
+        FieldSet('tenant', 'contact', name='Assigned to'), 
+        FieldSet('storage_location', name='Location'),
     )
     nullable_fields = (
         'name', 'device', 'module', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
@@ -427,7 +428,7 @@ class SupplierBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Supplier
     fieldsets = (
-        ('General', ('description',)),
+        FieldSet('description', name='General'),
     )
     nullable_fields = ('description',)
 
@@ -476,7 +477,7 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Purchase
     fieldsets = (
-        ('General', ('date', 'status', 'supplier', 'description',)),
+        FieldSet('date', 'status', 'supplier', 'description', name='General'),
     )
     nullable_fields = ('date', 'description',)
 
@@ -527,7 +528,7 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Delivery
     fieldsets = (
-        ('General', ('date', 'purchase', 'receiving_contact', 'description',)),
+        FieldSet('date', 'purchase', 'receiving_contact', 'description', name='General'),
     )
     nullable_fields = ('date', 'description', 'receiving_contact',)
 
@@ -570,7 +571,7 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
 
     model = InventoryItemType
     fieldsets = (
-        ('Inventory Item Type', ('manufacturer', 'inventoryitem_group')),
+        FieldSet('manufacturer', 'inventoryitem_group', name='Inventory Item Type'),
     )
     nullable_fields = (
         'inventoryitem_group',
@@ -602,6 +603,6 @@ class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
 
     model = InventoryItemGroup
     fieldsets = (
-        (None, ('parent',)),
+        FieldSet('parent'),
     )
     nullable_fields = ('parent',)

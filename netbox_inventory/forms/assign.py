@@ -4,6 +4,7 @@ from dcim.models import Device, InventoryItem, Module, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, Tenant
 from utilities.forms.fields import DynamicModelChoiceField
+from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import APISelect
 from ..models import Asset
 
@@ -93,9 +94,9 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
 
     fieldsets = (
-        ('Asset', ('device_type', 'name')),
-        ('Device', ('site', 'device')),
-        ('Assigned to', ('tenant', 'contact')),
+        FieldSet('device_type', 'name', name='Asset'),
+        FieldSet('site', 'device', name='Device'),
+        FieldSet('tenant', 'contact', name='Assigned to'),
     )
 
     class Meta:
@@ -131,9 +132,9 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
 
     fieldsets = (
-        ('Asset', ('module_type', 'name')),
-        ('Module', ('device', 'module',)),
-        ('Tenancy', ('tenant', 'contact')),
+        FieldSet('module_type', 'name', name='Asset'),
+        FieldSet('device', 'module', name='Module'),
+        FieldSet('tenant', 'contact', name='Tenancy'),
     )
 
     class Meta:
@@ -175,9 +176,9 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
 
     fieldsets = (
-        ('Asset', ('inventoryitem_type', 'name')),
-        ('Inventory Item', ('device', 'inventoryitem')),
-        ('Tenancy', ('tenant', 'contact')),
+        FieldSet('inventoryitem_type', 'name', name='Asset'),
+        FieldSet('device', 'inventoryitem', name='Inventory Item'),
+        FieldSet('tenant', 'contact', name='Tenancy'),
     )
 
     class Meta:
