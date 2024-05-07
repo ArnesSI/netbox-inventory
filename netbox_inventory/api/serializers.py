@@ -26,7 +26,7 @@ class SupplierSerializer(NetBoxModelSerializer):
             'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
             'purchase_count', 'delivery_count',
         )
-        brief_fields = ('id', 'url', 'display', 'name', 'slug')
+        brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
 
 
 class PurchaseSerializer(NetBoxModelSerializer):
@@ -44,7 +44,7 @@ class PurchaseSerializer(NetBoxModelSerializer):
             'comments', 'tags', 'custom_fields', 'created', 'last_updated',
             'asset_count', 'delivery_count',
         )
-        brief_fields = ('id', 'url', 'display', 'supplier', 'name', 'status', 'date')
+        brief_fields = ('id', 'url', 'display', 'supplier', 'name', 'status', 'date', 'description')
 
 
 class DeliverySerializer(NetBoxModelSerializer):
@@ -61,7 +61,7 @@ class DeliverySerializer(NetBoxModelSerializer):
             'id', 'url', 'display', 'purchase', 'name', 'date', 'description', 'comments',
             'receiving_contact', 'tags', 'custom_fields', 'created', 'last_updated', 'asset_count',
         )
-        brief_fields = ('id', 'url', 'display', 'name', 'date')
+        brief_fields = ('id', 'url', 'display', 'name', 'date', 'description')
 
 
 class InventoryItemGroupSerializer(NestedGroupModelSerializer):
@@ -135,7 +135,7 @@ class AssetSerializer(NetBoxModelSerializer):
             'warranty_start', 'warranty_end',
             'comments', 'tags', 'custom_fields', 'created', 'last_updated'
         )
-        brief_fields = ('id', 'url', 'display', 'serial')
+        brief_fields = ('id', 'url', 'display', 'serial', 'name')
         # DRF autiomatically creates validator from model's unique_together contraints
         # that doesn't work if we allow some filelds in a unique_together to be null
         # so we remove DRF's auto generated validators and rely on model's validation
