@@ -1,8 +1,8 @@
 import logging
 
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
+from core.models import ObjectType
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
 from dcim.models import Device
 from utilities.forms.fields import DynamicModelChoiceField
@@ -124,7 +124,7 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
                 raise ValidationError('Only a single component can be selected')
             if field_value:
                 component_set = field_name
-                self.cleaned_data['component_type'] = ContentType.objects.get(app_label='dcim', model=field_name)
+                self.cleaned_data['component_type'] = ObjectType.objects.get(app_label='dcim', model=field_name)
                 self.cleaned_data['component_id'] = field_value.pk
                 self.cleaned_data.pop(field_name)
 
