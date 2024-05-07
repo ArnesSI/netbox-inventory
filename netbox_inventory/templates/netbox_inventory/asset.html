@@ -155,19 +155,19 @@
             </tr>
             <tr>
               <th scope="row">Purchase</th>
-              <td>{{ object.purchase|linkify|placeholder }}{% if object.purchase.date %} on {{ object.purchase.date|annotated_date }}{% endif %}</td>
+              <td>{{ object.purchase|linkify|placeholder }}{% if object.purchase.date %} on {{ object.purchase.date|isodate }}{% endif %}</td>
             </tr>
             <tr>
               <th scope="row">Delivery</th>
-              <td>{{ object.delivery|linkify:'name'|placeholder }}{% if object.delivery.date %} on {{ object.delivery.date|annotated_date }}{% endif %}</td>
+              <td>{{ object.delivery|linkify:'name'|placeholder }}{% if object.delivery.date %} on {{ object.delivery.date|isodate }}{% endif %}</td>
             </tr>
             <tr>
               <th scope="row">Warranty start</th>
-              <td>{{ object.warranty_start|annotated_date|placeholder }}</td>
+              <td>{{ object.warranty_start|isodate|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">Warranty end</th>
-              <td>{{ object.warranty_end|annotated_date|placeholder }}</td>
+              <td>{{ object.warranty_end|isodate|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">Warranty remaining</th>
