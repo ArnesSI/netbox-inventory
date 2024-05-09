@@ -1,5 +1,5 @@
 from netbox.views import generic
-from utilities.utils import count_related
+from utilities.query import count_related
 from .. import filtersets, forms, models, tables
 
 __all__ = (

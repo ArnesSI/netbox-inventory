@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 
+from core.models import ObjectType
 from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Site
 from extras.choices import ObjectChangeActionChoices
 from extras.models import ObjectChange
@@ -137,7 +138,7 @@ class AssetReassignBase():
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         # Try GET with model-level permission
         self.assertHttpStatus(self.client.get(self._get_url('edit', instance)), 200)

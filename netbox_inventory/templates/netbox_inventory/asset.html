@@ -17,129 +17,125 @@
     <div class="col col-md-6">
       <div class="card">
         <h5 class="card-header">Asset</h5>
-        <div class="card-body">
-          <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">Name</th>
-              <td>{{ object.name|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Asset Tag</th>
-              <td class="font-monospace">{{ object.asset_tag|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Serial Number</th>
-              <td class="font-monospace">{{ object.serial|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Status</th>
-              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
-            </tr>
-            <tr>
-              <th scope="row">{{ object.get_kind_display }} Type</th>
-              <td><a href="{{object.hardware_type.get_absolute_url}}">{{ object.hardware_type.manufacturer }} {{ object.hardware_type }}</a></td>
-            </tr>
-            {% if object.kind == 'inventoryitem' %}
-            <tr>
-              <th scope="row">Inventory Item Group</th>
-              <td>
-                {% if object.inventoryitem_type.inventoryitem_group %}
-                  {% for group in object.inventoryitem_type.inventoryitem_group.get_ancestors %}
-                    {{ group|linkify }} /
-                  {% endfor %}
-                  {{ object.inventoryitem_type.inventoryitem_group|linkify }}
-                {% else %}
-                  {{ ''|placeholder }}
-                {% endif %}
-              </td>
-            </tr>
-            {% endif %}
-            <tr>
-              <th scope="row" title="Where is this asset stored when not in use">Storage Location</th>
-              <td>
-                {% if object.storage_location %}
-                  {{ object.storage_location.site }} /
-                {% endif %}
-                {{ object.storage_location|linkify|placeholder }}</td>
-            </tr>
-          </table>
-        </div>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Name</th>
+            <td>{{ object.name|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Asset Tag</th>
+            <td class="font-monospace">{{ object.asset_tag|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Serial Number</th>
+            <td class="font-monospace">{{ object.serial|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Status</th>
+            <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+          </tr>
+          <tr>
+            <th scope="row">{{ object.get_kind_display }} Type</th>
+            <td><a href="{{object.hardware_type.get_absolute_url}}">{{ object.hardware_type.manufacturer }} {{ object.hardware_type }}</a></td>
+          </tr>
+          {% if object.kind == 'inventoryitem' %}
+          <tr>
+            <th scope="row">Inventory Item Group</th>
+            <td>
+              {% if object.inventoryitem_type.inventoryitem_group %}
+                {% for group in object.inventoryitem_type.inventoryitem_group.get_ancestors %}
+                  {{ group|linkify }} /
+                {% endfor %}
+                {{ object.inventoryitem_type.inventoryitem_group|linkify }}
+              {% else %}
+                {{ ''|placeholder }}
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th scope="row" title="Where is this asset stored when not in use">Storage Location</th>
+            <td>
+              {% if object.storage_location %}
+                {{ object.storage_location.site }} /
+              {% endif %}
+              {{ object.storage_location|linkify|placeholder }}</td>
+          </tr>
+        </table>
       </div>
       <div class="card">
-        <h5 class="card-header">Assigned To</h5>
-        <div class="card-body">
-          <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">Tenant</th>
-              <td>
-                {% if object.tenant.group %}
-                  {{ object.tenant.group|linkify }} /
-                {% endif %}
-                {{ object.tenant|linkify|placeholder }}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Contact</th>
-              <td>{{ object.contact|linkify|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">{{ object.get_kind_display }}</th>
-              <td>{{ object.hardware|linkify|placeholder }}</td>
-            </tr>
-          </table>
-        </div>
-        <div class="card-footer text-end noprint">
-          {# only show create button if use has add permissions for the kind of hardware being created #}
-          {% if object.kind == 'device' and perms.dcim.add_device or object.kind == 'module' and perms.dcim.add_module or object.kind == 'inventoryitem' and perms.dcim.add_inventoryitem %}
-            {% if object.hardware %}
-            <a href="#" class="btn btn-sm btn-outline-dark disabled">
-              <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
-            </a>
-            {% else %}
-            <a href="{% url 'plugins:netbox_inventory:asset_'|add:object.kind|add:'_create' %}?asset_id={{ object.pk }}" class="btn btn-sm btn-green" title="Create a new {{ object.get_kind_display }} from this asset">
-              <span class="mdi mdi-vector-difference-ba" aria-hidden="true"></span> Create {{ object.get_kind_display }}
-            </a>
+        <h5 class="card-header">
+          Assigned To
+          <div class="card-actions">
+            {# only show create button if use has add permissions for the kind of hardware being created #}
+            {% if object.kind == 'device' and perms.dcim.add_device or object.kind == 'module' and perms.dcim.add_module or object.kind == 'inventoryitem' and perms.dcim.add_inventoryitem %}
+              {% if object.hardware %}
+                <a href="#" class="btn btn-sm btn-ghost-dark disabled">
+                  <i class="mdi mdi-vector-difference-ba" aria-hidden="true"></i> Create {{ object.get_kind_display }}
+                </a>
+              {% else %}
+                <a href="{% url 'plugins:netbox_inventory:asset_'|add:object.kind|add:'_create' %}?asset_id={{ object.pk }}" class="btn btn-sm btn-ghost-green" title="Create a new {{ object.get_kind_display }} from this asset">
+                  <i class="mdi mdi-vector-difference-ba" aria-hidden="true"></i> Create {{ object.get_kind_display }}
+                </a>
+              {% endif %}
             {% endif %}
-          {% endif %}
-          {# only show edit button if user has change permission on asset #}
-          {% if perms.netbox_inventory.change_asset %}
-            <a href="{% url 'plugins:netbox_inventory:asset_assign' object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-orange">
-              <span class="mdi mdi-vector-link" aria-hidden="true"></span> Edit Assignment
-            </a>
-          {% endif %}
-        </div>
+            {# only show edit button if user has change permission on asset #}
+            {% if perms.netbox_inventory.change_asset %}
+              <a href="{% url 'plugins:netbox_inventory:asset_assign' object.pk %}?return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-ghost-orange">
+                <i class="mdi mdi-vector-link" aria-hidden="true"></i> Edit Assignment
+              </a>
+            {% endif %}
+          </div>
+        </h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Tenant</th>
+            <td>
+              {% if object.tenant.group %}
+                {{ object.tenant.group|linkify }} /
+              {% endif %}
+              {{ object.tenant|linkify|placeholder }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Contact</th>
+            <td>{{ object.contact|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">{{ object.get_kind_display }}</th>
+            <td>{{ object.hardware|linkify|placeholder }}</td>
+          </tr>
+        </table>
       </div>
       <div class="card">
         <h5 class="card-header">Installed Location</h5>
-        <div class="card-body">
-          <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">Site</th>
-              <td>{{ object.installed_site|linkify|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Location</th>
-              <td>
-                {% if object.installed_location %}
-                  {% for location in object.installed_location.get_ancestors %}
-                    {{ location|linkify }} /
-                  {% endfor %}
-                  {{ object.installed_location|linkify }}
-                {% else %}
-                  {{ ''|placeholder }}
-                {% endif %}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Rack</th>
-              <td>{{ object.installed_rack|linkify|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Device</th>
-              <td>{{ object.installed_device|linkify|placeholder }}</td>
-            </tr>
-          </table>
-        </div>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Site</th>
+            <td>{{ object.installed_site|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Location</th>
+            <td>
+              {% if object.installed_location %}
+                {% for location in object.installed_location.get_ancestors %}
+                  {{ location|linkify }} /
+                {% endfor %}
+                {{ object.installed_location|linkify }}
+              {% else %}
+                {{ ''|placeholder }}
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Rack</th>
+            <td>{{ object.installed_rack|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Device</th>
+            <td>{{ object.installed_device|linkify|placeholder }}</td>
+          </tr>
+        </table>
       </div>
       {% include 'inc/panels/custom_fields.html' %}
       {% plugin_left_page object %}
@@ -147,36 +143,34 @@
     <div class="col col-md-6">
       <div class="card">
         <h5 class="card-header">Purchase</h5>
-        <div class="card-body">
-          <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">Owner</th>
-              <td>{{ object.owner|linkify|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Purchase</th>
-              <td>{{ object.purchase|linkify|placeholder }}{% if object.purchase.date %} on {{ object.purchase.date|annotated_date }}{% endif %}</td>
-            </tr>
-            <tr>
-              <th scope="row">Delivery</th>
-              <td>{{ object.delivery|linkify:'name'|placeholder }}{% if object.delivery.date %} on {{ object.delivery.date|annotated_date }}{% endif %}</td>
-            </tr>
-            <tr>
-              <th scope="row">Warranty start</th>
-              <td>{{ object.warranty_start|annotated_date|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Warranty end</th>
-              <td>{{ object.warranty_end|annotated_date|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Warranty remaining</th>
-              <td>
-                {% include warranty_progressbar with record=object %}
-              </td>
-            </tr>
-          </table>
-        </div>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Owner</th>
+            <td>{{ object.owner|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Purchase</th>
+            <td>{{ object.purchase|linkify|placeholder }}{% if object.purchase.date %} on {{ object.purchase.date|isodate }}{% endif %}</td>
+          </tr>
+          <tr>
+            <th scope="row">Delivery</th>
+            <td>{{ object.delivery|linkify:'name'|placeholder }}{% if object.delivery.date %} on {{ object.delivery.date|isodate }}{% endif %}</td>
+          </tr>
+          <tr>
+            <th scope="row">Warranty start</th>
+            <td>{{ object.warranty_start|isodate|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Warranty end</th>
+            <td>{{ object.warranty_end|isodate|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Warranty remaining</th>
+            <td>
+              {% include warranty_progressbar with record=object %}
+            </td>
+          </tr>
+        </table>
       </div>
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}

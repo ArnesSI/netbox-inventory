@@ -1,6 +1,6 @@
-from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 
+from core.models import ObjectType
 from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, Site
 from users.models import ObjectPermission
 from utilities.testing import post_data, ViewTestCases
@@ -108,8 +108,8 @@ class AssetTestCase(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
-        obj_perm.object_types.add(ContentType.objects.get_for_model(Device))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(Device))
 
         asset = Asset.objects.create(
             status='stored',
@@ -160,7 +160,7 @@ class AssetTestCase(
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
-        obj_perm.object_types.add(ContentType.objects.get_for_model(self.model))
+        obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         supplier1 = Supplier.objects.create(
             name='Supplier1-autoset',

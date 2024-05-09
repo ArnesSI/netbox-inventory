@@ -1,51 +1,51 @@
 {% load helpers %}
 
 <div class="card">
-  <h5 class="card-header">Asset</h5>
-  <div class="card-body">
-  {% if asset %}
-    <table class="table table-hover attr-table">
-      <tr>
-        <th scope="row"><span title="Asset name">Name</span></th>
-        <td><a href="{% url "plugins:netbox_inventory:asset" asset.pk %}">{{ asset.hardware_type.manufacturer }} {{ asset }}{% if asset.name %} ({{ asset.name }}){% endif %}</a></td>
-      </tr>
-      <tr>
-        <th scope="row"><span title="Asset status">Status</span></a></th>
-        <td>{% badge asset.get_status_display bg_color=asset.get_status_color %}</a></td>
-      </tr>
-      <tr>
-        <th scope="row">Owner</th>
-        <td>{{ asset.owner|linkify|placeholder }}</td>
-      </tr>
-      <tr>
-        <th scope="row">Purchase</th>
-        <td>{{ asset.purchase|linkify|placeholder }}</td>
-      </tr>
-      <tr>
-        <th>Warranty remaining</th>
-        <td>
-          {% include warranty_progressbar with record=asset %}
-        </td>
-      </tr>
-    </table>
-  {% else %}
-    <div class="text-muted">None assigned</div>
-  {% endif %}
-  </div>
-  <div class="card-footer text-end noprint">
+  <h5 class="card-header">
+    Asset
     {# only show reassign button if user has change permissions on asset #}
     {% if perms.netbox_inventory.change_asset %}
-      {% with object|meta:"model_name" as object_type %}
-      {% if object_type == "device" %}
-      <a href="{% url 'plugins:netbox_inventory:asset_device_reassign' object.pk %}" class="btn btn-sm btn-orange">
-      {% elif object_type == "module" %}
-      <a href="{% url 'plugins:netbox_inventory:asset_module_reassign' object.pk %}" class="btn btn-sm btn-orange">
-      {% elif object_type == "inventoryitem" %}
-      <a href="{% url 'plugins:netbox_inventory:asset_inventoryitem_reassign' object.pk %}" class="btn btn-sm btn-orange">
-      {% endif %}
-      {% endwith %}
-        <span class="mdi mdi-vector-link" aria-hidden="true"></span> Edit Assignment
-      </a>
+      <div class="card-actions">
+        {% with object|meta:"model_name" as object_type %}
+        {% if object_type == "device" %}
+        <a href="{% url 'plugins:netbox_inventory:asset_device_reassign' object.pk %}" class="btn btn-sm btn-ghost-orange">
+        {% elif object_type == "module" %}
+        <a href="{% url 'plugins:netbox_inventory:asset_module_reassign' object.pk %}" class="btn btn-sm btn-ghost-orange">
+        {% elif object_type == "inventoryitem" %}
+        <a href="{% url 'plugins:netbox_inventory:asset_inventoryitem_reassign' object.pk %}" class="btn btn-sm btn-ghost-orange">
+        {% endif %}
+        {% endwith %}
+          <i class="mdi mdi-vector-link" aria-hidden="true"></i> Edit Assignment
+        </a>
+      </div>
     {% endif %}
-  </div>
+  </h5>
+  {% if asset %}
+  <table class="table table-hover attr-table">
+    <tr>
+      <th scope="row"><span title="Asset name">Name</span></th>
+      <td><a href="{% url "plugins:netbox_inventory:asset" asset.pk %}">{{ asset.hardware_type.manufacturer }} {{ asset }}{% if asset.name %} ({{ asset.name }}){% endif %}</a></td>
+    </tr>
+    <tr>
+      <th scope="row"><span title="Asset status">Status</span></a></th>
+      <td>{% badge asset.get_status_display bg_color=asset.get_status_color %}</a></td>
+    </tr>
+    <tr>
+      <th scope="row">Owner</th>
+      <td>{{ asset.owner|linkify|placeholder }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Purchase</th>
+      <td>{{ asset.purchase|linkify|placeholder }}</td>
+    </tr>
+    <tr>
+      <th>Warranty remaining</th>
+      <td>
+        {% include warranty_progressbar with record=asset %}
+      </td>
+    </tr>
+  </table>
+  {% else %}
+  <div class="text-muted">None assigned</div>
+  {% endif %}
 </div>

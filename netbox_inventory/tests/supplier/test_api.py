@@ -11,7 +11,7 @@ class SupplierTest(
         APIViewTestCases.UpdateObjectViewTestCase,
         APIViewTestCases.DeleteObjectViewTestCase):
     model = Supplier
-    brief_fields = ['display', 'id', 'name', 'slug', 'url']
+    brief_fields = ['description', 'display', 'id', 'name', 'slug', 'url']
     create_data = [
         {
             'name': 'Supplier 4',
