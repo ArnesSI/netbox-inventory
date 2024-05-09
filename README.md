@@ -61,10 +61,6 @@ support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
-|       3.3      |      1.1.x     |
-|       3.4      |      1.2.x     |
-|       3.5      | 1.3.x & 1.4.x  |
-|       3.6      |      1.5.x     |
 |       3.7      |      1.6.x     |
 |       4.0      |      2.0.x     |
 
