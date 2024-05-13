@@ -94,7 +94,7 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
 
     fieldsets = (
-        FieldSet('device_type', 'name', name='Asset'),
+        FieldSet('name', name='Asset'),
         FieldSet('site', 'device', name='Device'),
         FieldSet('tenant', 'contact', name='Assigned to'),
     )
@@ -132,7 +132,7 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
 
     fieldsets = (
-        FieldSet('module_type', 'name', name='Asset'),
+        FieldSet('name', name='Asset'),
         FieldSet('device', 'module', name='Module'),
         FieldSet('tenant', 'contact', name='Tenancy'),
     )
@@ -176,7 +176,7 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
 
     fieldsets = (
-        FieldSet('inventoryitem_type', 'name', name='Asset'),
+        FieldSet('name', name='Asset'),
         FieldSet('device', 'inventoryitem', name='Inventory Item'),
         FieldSet('tenant', 'contact', name='Tenancy'),
     )
