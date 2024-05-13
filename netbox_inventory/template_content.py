@@ -2,6 +2,7 @@ from django.template import Template
 from netbox.plugins import PluginTemplateExtension
 
 from .models import Asset
+from .utils import query_located
 
 
 WARRANTY_PROGRESSBAR = '''
@@ -78,6 +79,35 @@ class AssetTypeStats(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
 
 
+class AssetLocationStats(PluginTemplateExtension):
+    def right_page(self):
+        object = self.context.get('object')
+        user = self.context['request'].user
+        assets_qs = Asset.objects.restrict(user, 'view')
+        count_installed = query_located(assets_qs, self.location_type, [object.pk], assets_shown='installed').count()
+        count_stored = query_located(assets_qs, self.location_type, [object.pk], assets_shown='stored').count()
+        context = {
+            'asset_stats': [
+                {
+                    'label': 'Installed',
+                    'filter_field': f'installed_{self.location_type}_id',
+                    'count': count_installed,
+                },
+                {
+                    'label': 'Stored',
+                    'filter_field': f'storage_{self.location_type}_id',
+                    'count': count_stored,
+                },
+                {
+                    'label': 'Total',
+                    'filter_field': f'located_{self.location_type}_id',
+                    'count': count_installed + count_stored,
+                },
+            ],
+        }
+        return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
+
+
 class DeviceAssetInfo(AssetInfoExtension):
     model = 'dcim.device'
     kind = 'device'
@@ -141,6 +171,36 @@ class ManufacturerAssetInfo(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
 
 
+class SiteAssetInfo(AssetLocationStats):
+    model = 'dcim.site'
+    location_type='site'
+
+
+class LocationAssetInfo(AssetLocationStats):
+    model = 'dcim.location'
+    location_type='location'
+
+
+class RackAssetInfo(PluginTemplateExtension):
+    # rack cannot have stored assets so we can't use AssetLocationStats
+    model = 'dcim.rack'
+    def right_page(self):
+        object = self.context.get('object')
+        user = self.context['request'].user
+        assets_qs = Asset.objects.restrict(user, 'view')
+        assets_qs = query_located(assets_qs, 'rack', [object.pk])
+        context = {
+            'asset_stats': [
+                {
+                    'label': 'Installed',
+                    'filter_field': 'installed_rack_id',
+                    'count': assets_qs.count(),
+                },
+            ],
+        }
+        return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
+
+
 class TenantAssetInfo(PluginTemplateExtension):
     model = 'tenancy.tenant'
     def right_page(self):
@@ -187,6 +247,9 @@ template_extensions = (
     DeviceTypeAssetInfo,
     ModuleTypeAssetInfo,
     ManufacturerAssetInfo,
+    SiteAssetInfo,
+    LocationAssetInfo,
+    RackAssetInfo,
     TenantAssetInfo,
     ContactAssetInfo,
 )
