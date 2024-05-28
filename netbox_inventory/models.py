@@ -212,6 +212,11 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         return self.device or self.module or self.inventoryitem or None
 
     @property
+    def storage_site(self):
+        if self.storage_location:
+            return self.storage_location.site
+
+    @property
     def installed_site(self):
         device = self.installed_device
         if device:
@@ -240,9 +245,10 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
 
     @property
     def current_site(self):
-        location = self.current_location
-        if location:
-            return location.site
+        installed = self.installed_site
+        if installed:
+            return installed
+        return self.storage_site
 
     @property
     def current_location(self):
