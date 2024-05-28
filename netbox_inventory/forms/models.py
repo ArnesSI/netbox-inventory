@@ -2,6 +2,7 @@ from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
 from netbox.forms import NetBoxModelForm
 from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 from tenancy.models import Contact, Tenant
 from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
@@ -94,41 +95,11 @@ class AssetForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        ('General', ('name', 'asset_tag', 'tags', 'status')),
-        (
-            'Hardware',
-            (
-                'serial',
-                'manufacturer',
-                'device_type',
-                'module_type',
-                'inventoryitem_type',
-            ),
-        ),
-        (
-            'Purchase',
-            (
-                'owner',
-                'purchase',
-                'delivery',
-                'warranty_start',
-                'warranty_end',
-            ),
-        ),
-        (
-            'Assigned to',
-            (
-                'tenant',
-                'contact',
-            ),
-        ),
-        (
-            'Location',
-            (
-                'storage_site',
-                'storage_location',
-            ),
-        ),
+        FieldSet('name', 'asset_tag', 'tags', 'status', name='General'),
+        FieldSet('serial', 'manufacturer', 'device_type', 'module_type', 'inventoryitem_type', name='Hardware'),
+        FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'),
+        FieldSet('tenant', 'contact', name='Assigned to'),
+        FieldSet('storage_site', 'storage_location', name='Location'),
     )
 
     class Meta:
@@ -213,7 +184,9 @@ class SupplierForm(NetBoxModelForm):
     slug = SlugField(slug_source='name')
     comments = CommentField()
 
-    fieldsets = (('Supplier', ('name', 'slug', 'description', 'tags')),)
+    fieldsets = (
+        FieldSet('name', 'slug', 'description', 'tags', name='Supplier'),
+    )
 
     class Meta:
         model = Supplier
@@ -229,7 +202,9 @@ class SupplierForm(NetBoxModelForm):
 class PurchaseForm(NetBoxModelForm):
     comments = CommentField()
 
-    fieldsets = (('Purchase', ('supplier', 'name', 'status', 'date', 'description', 'tags')),)
+    fieldsets = (
+        FieldSet('supplier', 'name', 'status', 'date', 'description', 'tags', name='Purchase'),
+    )
 
     class Meta:
         model = Purchase
@@ -250,14 +225,9 @@ class PurchaseForm(NetBoxModelForm):
 class DeliveryForm(NetBoxModelForm):
     comments = CommentField()
 
-    fieldsets = (('Delivery', (
-        'purchase',
-        'name',
-        'date',
-        'receiving_contact',
-        'description',
-        'tags'
-    )),)
+    fieldsets = (
+        FieldSet('purchase', 'name', 'date', 'receiving_contact', 'description', 'tags', name='Delivery'),
+    )
 
     class Meta:
         model = Delivery
@@ -280,10 +250,7 @@ class InventoryItemTypeForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        (
-            'Inventory Item Type',
-            ('manufacturer', 'model', 'slug', 'part_number', 'inventoryitem_group', 'tags'),
-        ),
+        FieldSet('manufacturer', 'model', 'slug', 'part_number', 'inventoryitem_group', 'tags', name='Inventory Item Type'),
     )
 
     class Meta:
@@ -303,10 +270,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        (
-            'Inventory Item Group',
-            ('name', 'parent', 'tags'),
-        ),
+        FieldSet('name', 'parent', 'tags', name='Inventory Item Group'),
     )
 
     class Meta:

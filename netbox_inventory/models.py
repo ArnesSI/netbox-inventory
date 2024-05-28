@@ -389,11 +389,29 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
 
     class Meta:
         ordering = ('device_type', 'module_type', 'inventoryitem_type', 'serial',)
-        unique_together = (
-            ('device_type', 'serial'),
-            ('module_type', 'serial'),
-            ('inventoryitem_type', 'serial'),
-            ('owner', 'asset_tag'),
+        constraints = (
+            models.UniqueConstraint(
+                fields=('device_type', 'serial'),
+                name='unique_device_type_serial',
+            ),
+            models.UniqueConstraint(
+                fields=('module_type', 'serial'),
+                name='unique_module_type_serial',
+            ),
+            models.UniqueConstraint(
+                fields=('inventoryitem_type', 'serial'),
+                name='unique_inventoryitem_type_serial',
+            ),
+            models.UniqueConstraint(
+                fields=('owner', 'asset_tag'),
+                name='unique_owner_asset_tag',
+            ),
+            models.UniqueConstraint(
+                'asset_tag',
+                condition=models.Q(owner__isnull=True),
+                name='unique_asset_tag',
+                violation_error_message='Asset with this Asset Tag and no Owner already exists.',
+            ),
         )
 
 

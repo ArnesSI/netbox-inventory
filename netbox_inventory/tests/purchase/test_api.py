@@ -11,7 +11,7 @@ class PurchaseTest(
         APIViewTestCases.UpdateObjectViewTestCase,
         APIViewTestCases.DeleteObjectViewTestCase):
     model = Purchase
-    brief_fields = ['date', 'display', 'id', 'name', 'status', 'supplier', 'url']
+    brief_fields = ['date', 'description', 'display', 'id', 'name', 'status', 'supplier', 'url']
 
     bulk_update_data = {
         'description': 'new description',

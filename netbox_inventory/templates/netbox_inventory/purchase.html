@@ -1,7 +1,6 @@
 {% extends 'generic/object.html' %}
 {% load helpers %}
 {% load plugins %}
-{% load render_table from django_tables2 %}
 
 {% block breadcrumbs %}
   {{ block.super }}
@@ -15,42 +14,40 @@
     <div class="col col-md-6">
       <div class="card">
         <h5 class="card-header">Purchase</h5>
-        <div class="card-body">
-          <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">Name</th>
-              <td>{{ object.name }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Supplier</th>
-              <td>{{ object.supplier|linkify }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Status</th>
-              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
-            </tr>
-            <tr>
-              <th scope="row">Date</th>
-              <td>{{ object.date|annotated_date|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Description</th>
-              <td>{{ object.description|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Deliveries</th>
-              <td>
-                <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.pk }}">{{ delivery_count }}</a>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Assets</th>
-              <td>
-                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?purchase_id={{ object.pk }}">{{ asset_count }}</a>
-              </td>
-            </tr>
-          </table>
-        </div>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Name</th>
+            <td>{{ object.name }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Supplier</th>
+            <td>{{ object.supplier|linkify }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Status</th>
+            <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+          </tr>
+          <tr>
+            <th scope="row">Date</th>
+            <td>{{ object.date|isodate|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Description</th>
+            <td>{{ object.description|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Deliveries</th>
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.pk }}">{{ delivery_count }}</a>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Assets</th>
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?purchase_id={{ object.pk }}">{{ asset_count }}</a>
+            </td>
+          </tr>
+        </table>
       </div>
       {% include 'inc/panels/tags.html' %}
       {% plugin_left_page object %}
@@ -64,32 +61,30 @@
   <div class="row mb-3">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Deliveries</h5>
-        <div class="card-body htmx-container table-responsive"
-          hx-get="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.pk }}"
-          hx-trigger="load"
-        ></div>
-        {% if perms.netbox_inventory.add_delivery %}
-          <div class="card-footer text-end noprint">
-            <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
-              <i class="mdi mdi-plus-thick" aria-hidden="true"></i>Add a Delivery
-            </a>
-          </div>
-        {% endif %}
+        <h5 class="card-header">
+          Deliveries
+          {% if perms.netbox_inventory.add_delivery %}
+            <div class="card-actions">
+              <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Delivery
+              </a>
+            </div>
+          {% endif %}
+        </h5>
+        {% htmx_table 'plugins:netbox_inventory:delivery_list' purchase_id=object.pk %}
       </div>
       <div class="card">
-        <h5 class="card-header">Purchased Assets</h5>
-        <div class="card-body htmx-container table-responsive"
-          hx-get="{% url 'plugins:netbox_inventory:asset_list' %}?purchase_id={{ object.pk }}"
-          hx-trigger="load"
-        ></div>
-        {% if perms.netbox_inventory.add_asset %}
-          <div class="card-footer text-end noprint">
-            <a href="{% url 'plugins:netbox_inventory:asset_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
-              <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add an Asset
-            </a>
-          </div>
-        {% endif %}
+        <h5 class="card-header">
+          Purchased Assets
+          {% if perms.netbox_inventory.add_asset %}
+            <div class="card-actions">
+              <a href="{% url 'plugins:netbox_inventory:asset_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add an Asset
+              </a>
+            </div>
+          {% endif %}
+        </h5>
+        {% htmx_table 'plugins:netbox_inventory:asset_list' purchase_id=object.pk %}
       </div>
       {% plugin_full_width_page object %}
     </div>

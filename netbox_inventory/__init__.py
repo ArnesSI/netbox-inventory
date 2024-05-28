@@ -1,4 +1,4 @@
-from extras.plugins import PluginConfig
+from netbox.plugins import PluginConfig
 from .version import __version__
 
 
@@ -10,7 +10,7 @@ class NetBoxInventoryConfig(PluginConfig):
     author = 'Matej Vadnjal'
     author_email = 'matej.vadnjal@arnes.si'
     base_url = 'inventory'
-    min_version = '3.7.0'
+    min_version = '4.0.0'
     default_settings = {
         'top_level_menu': True,
         'used_status_name': 'used',

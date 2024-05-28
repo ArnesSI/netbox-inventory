@@ -424,6 +424,12 @@ class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
         queryset=InventoryItemGroup.objects.all(),
         label='Parent group (ID)',
     )
+    ancestor_id = filters.TreeNodeMultipleChoiceFilter(
+        queryset=InventoryItemGroup.objects.all(),
+        field_name='parent',
+        lookup_expr='in',
+        label='Inventory item group (ID)',
+    )
 
     class Meta:
         model = InventoryItemGroup
