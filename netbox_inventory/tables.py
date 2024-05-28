@@ -94,11 +94,11 @@ class AssetTable(NetBoxTable):
     )
     current_site = tables.Column(
         linkify=True,
-        verbose_name='Current Location',
+        verbose_name='Current Site',
     )
     current_location = tables.Column(
         linkify=True,
-        verbose_name='Current Site',
+        verbose_name='Current Location',
     )
     warranty_progress = columns.TemplateColumn(
         template_code=WARRANTY_PROGRESSBAR,
