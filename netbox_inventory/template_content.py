@@ -152,7 +152,7 @@ class ManufacturerAssetInfo(PluginTemplateExtension):
                 {
                     'label': 'Module',
                     'filter_field': 'manufacturer_id',
-                    'extra_filter': '&kind= module',
+                    'extra_filter': '&kind=module',
                     'count': count_module,
                 },
                 {
