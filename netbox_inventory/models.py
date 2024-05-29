@@ -65,7 +65,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
     device_type = models.ForeignKey(
         to='dcim.DeviceType',
         on_delete=models.PROTECT,
-        related_name='+',
+        related_name='assets',
         blank=True,
         null=True,
         verbose_name='Device Type',
@@ -73,7 +73,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
     module_type = models.ForeignKey(
         to='dcim.ModuleType',
         on_delete=models.PROTECT,
-        related_name='+',
+        related_name='assets',
         blank=True,
         null=True,
         verbose_name='Module Type',
