@@ -225,7 +225,8 @@ class AssetFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         query = (
-            Q(serial__icontains=value)
+            Q(id__contains=value)
+            | Q(serial__icontains=value)
             | Q(name__icontains=value)
             | Q(asset_tag__icontains=value)
             | Q(device_type__model__icontains=value)
