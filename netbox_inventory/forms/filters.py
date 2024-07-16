@@ -345,7 +345,7 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         query_params={
             'group_id': '$contact_group',
         },
-        label='Contact',
+        label='Receiving contact',
     )
     date_after = forms.DateField(
         required=False,

@@ -28,7 +28,12 @@
           </tr>
           <tr>
             <th scope="row">Receiving Contact</th>
-            <td>{{ object.receiving_contact|linkify|placeholder }}</td>
+            <td>
+              {% if object.receiving_contact.group %}
+                {{ object.receiving_contact.group|linkify }} /
+              {% endif %}
+              {{ object.receiving_contact|linkify|placeholder }}
+            </td>
           </tr>
           <tr>
             <th scope="row">Date</th>
