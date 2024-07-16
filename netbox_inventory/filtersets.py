@@ -260,6 +260,8 @@ class AssetFilterSet(NetBoxModelFilterSet):
             | Q(delivery__name__icontains=value)
             | Q(purchase__name__icontains=value)
             | Q(purchase__supplier__name__icontains=value)
+            | Q(tenant__name__icontains=value)
+            | Q(owner__name__icontains=value)
         )
         custom_field_filters = get_asset_custom_fields_search_filters()
         for custom_field_filter in custom_field_filters:
