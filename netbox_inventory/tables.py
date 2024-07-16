@@ -92,6 +92,14 @@ class AssetTable(NetBoxTable):
         verbose_name='Delivery Date',
 
     )
+    current_site = tables.Column(
+        linkify=True,
+        verbose_name='Current Site',
+    )
+    current_location = tables.Column(
+        linkify=True,
+        verbose_name='Current Location',
+    )
     warranty_progress = columns.TemplateColumn(
         template_code=WARRANTY_PROGRESSBAR,
         order_by='warranty_end',
@@ -229,7 +237,10 @@ class AssetTable(NetBoxTable):
             'installed_device',
             'tenant',
             'contact',
+            'storage_site',
             'storage_location',
+            'current_site',
+            'current_location',
             'owner',
             'supplier',
             'purchase',
