@@ -3,7 +3,7 @@ from django.db.models import Q
 import django_filters
 
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
-from dcim.models import Manufacturer, DeviceType, ModuleType, Site, Location
+from dcim.models import Manufacturer, Device, DeviceType, Module, ModuleType, InventoryItem, Site, Location
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
@@ -29,6 +29,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         method='filter_manufacturer',
         label='Manufacturer (name)',
     )
+    device = filters.MultiValueCharFilter(
+        field_name='device__name',
+        lookup_expr='iexact',
+        label='Device (name)',
+    )
+    device_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='device',
+        queryset=Device.objects.all(),
+        label='Device (ID)',
+    )
     device_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='device_type',
         queryset=DeviceType.objects.all(),
@@ -44,6 +54,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='icontains',
         label='Device type (model)',
     )
+    module_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='module',
+        queryset=Module.objects.all(),
+        label='Module (ID)',
+    )
     module_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='module_type',
         queryset=ModuleType.objects.all(),
@@ -52,7 +67,17 @@ class AssetFilterSet(NetBoxModelFilterSet):
     module_type_model = filters.MultiValueCharFilter(
         field_name='module_type__model',
         lookup_expr='icontains',
-        label='Module_type (model)',
+        label='Module type (model)',
+    )
+    inventoryitem = filters.MultiValueCharFilter(
+        field_name='inventoryitem__name',
+        lookup_expr='iexact',
+        label='Inventory item (name)',
+    )
+    inventoryitem_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='inventoryitem',
+        queryset=InventoryItem.objects.all(),
+        label='Inventory item (ID)',
     )
     inventoryitem_type_id = django_filters.ModelMultipleChoiceFilter(
         field_name='inventoryitem_type',
