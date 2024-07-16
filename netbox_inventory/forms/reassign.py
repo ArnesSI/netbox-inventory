@@ -1,9 +1,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from dcim.models import Device, InventoryItem, Module, Site, Location, Manufacturer
 from netbox.forms import NetBoxModelForm
 from utilities.forms.fields import DynamicModelChoiceField
+from utilities.forms.rendering import FieldSet
 from ..choices import AssetStatusChoices
 from ..models import Asset, InventoryItemType, InventoryItemGroup
 from ..utils import get_status_for
@@ -31,8 +33,14 @@ class AssetReassignMixin(forms.Form):
     asset_status = forms.ChoiceField(
         choices=AssetStatusChoices,
         initial=get_status_for('stored'),
-        label='Old Asset Status',
+        label='Status',
         help_text='Status to set to existing asset that is being unassigned',
+    )
+
+    fieldsets = (
+        FieldSet('storage_site', 'storage_location', 'assigned_asset',
+                 name=_('New Asset')),
+        FieldSet('asset_status', name=_('Old Asset')),
     )
 
     class Meta:
@@ -113,7 +121,8 @@ class AssetReassignMixin(forms.Form):
             self.instance.assigned_asset
         except Asset.DoesNotExist:
             # no asset currently assigned, hide status field for old asset
-            self.fields['asset_status'].widget = forms.HiddenInput()
+            self.fields.pop('asset_status')
+            self.fieldsets = (self.fieldsets[0],)
 
 
 class AssetDeviceReassignForm(AssetReassignMixin, NetBoxModelForm):
@@ -213,6 +222,13 @@ class AssetInventoryItemReassignForm(AssetReassignMixin, NetBoxModelForm):
         },
         label='New Asset',
         help_text='New asset to assign to inventory item. Set to blank to remove assignment.',
+    )
+
+    fieldsets = (
+        FieldSet('manufacturer', 'inventoryitem_group', 'inventoryitem_type',
+                 'storage_site', 'storage_location', 'assigned_asset',
+                 name=_('New Asset')),
+        FieldSet('asset_status', name=_('Old Asset')),
     )
 
     class Meta:

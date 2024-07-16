@@ -63,22 +63,6 @@ class AssetInfoExtension(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_info.html', extra_context=context)
 
 
-class AssetTypeStats(PluginTemplateExtension):
-    def right_page(self):
-        object = self.context.get('object')
-        user = self.context['request'].user
-        context = {
-            'asset_stats': [
-                {
-                    'label': 'Total',
-                    'filter_field': f'{self.kind}_id',
-                    'count': Asset.objects.restrict(user, 'view').filter(**{self.kind:object}).count(),
-                },
-            ],
-        }
-        return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
-
-
 class AssetLocationStats(PluginTemplateExtension):
     def right_page(self):
         object = self.context.get('object')
@@ -123,16 +107,6 @@ class InventoryItemAssetInfo(AssetInfoExtension):
     kind = 'inventoryitem'
 
 
-class DeviceTypeAssetInfo(AssetTypeStats):
-    model = 'dcim.devicetype'
-    kind = 'device_type'
-
-
-class ModuleTypeAssetInfo(AssetTypeStats):
-    model = 'dcim.moduletype'
-    kind = 'module_type'
-
-
 class ManufacturerAssetInfo(PluginTemplateExtension):
     model = 'dcim.manufacturer'
     def right_page(self):
@@ -152,7 +126,7 @@ class ManufacturerAssetInfo(PluginTemplateExtension):
                 {
                     'label': 'Module',
                     'filter_field': 'manufacturer_id',
-                    'extra_filter': '&kind= module',
+                    'extra_filter': '&kind=module',
                     'count': count_module,
                 },
                 {
@@ -244,8 +218,6 @@ template_extensions = (
     DeviceAssetInfo,
     ModuleAssetInfo,
     InventoryItemAssetInfo,
-    DeviceTypeAssetInfo,
-    ModuleTypeAssetInfo,
     ManufacturerAssetInfo,
     SiteAssetInfo,
     LocationAssetInfo,
