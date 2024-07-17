@@ -31,7 +31,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned',
             name='Hardware'
         ),
-        FieldSet('tenant_id', 'contact_group', 'contact', name='Usage'),
+        FieldSet('tenant_id', 'contact_group_id', 'contact', name='Usage'),
         FieldSet(
             'owner_id', 'delivery_id', 'purchase_id', 'supplier_id',
             'delivery_date_after', 'delivery_date_before', 'purchase_date_after',
@@ -103,7 +103,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         null_option='None',
         label='Tenant',
     )
-    contact_group = DynamicModelMultipleChoiceField(
+    contact_group_id = DynamicModelMultipleChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
         null_option='None',
@@ -114,7 +114,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         required=False,
         null_option='None',
         query_params={
-            'group_id': '$contact_group',
+            'group_id': '$contact_group_id',
         },
         label='Contact',
     )
@@ -316,7 +316,7 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         FieldSet(
             'purchase_id',
             'supplier_id',
-            'contact_group',
+            'contact_group_id',
             'receiving_contact_id',
             'date_after',
             'date_before',
@@ -333,7 +333,7 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label='Supplier',
     )
-    contact_group = DynamicModelMultipleChoiceField(
+    contact_group_id = DynamicModelMultipleChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
         null_option='None',
@@ -343,7 +343,7 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         queryset=Contact.objects.all(),
         required=False,
         query_params={
-            'group_id': '$contact_group',
+            'group_id': '$contact_group_id',
         },
         label='Receiving contact',
     )

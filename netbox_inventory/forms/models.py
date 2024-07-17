@@ -249,6 +249,7 @@ class DeliveryForm(NetBoxModelForm):
     )
     receiving_contact = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
+        required=False,
         help_text=Delivery._meta.get_field('receiving_contact').help_text,
         query_params={
             'group_id': '$contact_group',
