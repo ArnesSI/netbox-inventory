@@ -31,7 +31,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned',
             name='Hardware'
         ),
-        FieldSet('tenant_id', 'contact_group_id', 'contact', name='Usage'),
+        FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
         FieldSet(
             'owner_id', 'delivery_id', 'purchase_id', 'supplier_id',
             'delivery_date_after', 'delivery_date_before', 'purchase_date_after',
@@ -109,7 +109,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         null_option='None',
         label='Contact Group',
     )
-    contact = DynamicModelMultipleChoiceField(
+    contact_id = DynamicModelMultipleChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         null_option='None',
