@@ -11,7 +11,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
-from tenancy.models import Contact, Tenant
+from tenancy.models import Contact, ContactGroup, Tenant
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from ..utils import get_plugin_setting
@@ -91,10 +91,20 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('tenant').help_text,
         required=not Asset._meta.get_field('tenant').blank,
     )
+    contact_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+        help_text='Filter contacts by group',
+    )
     contact = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         help_text=Asset._meta.get_field('contact').help_text,
         required=not Asset._meta.get_field('contact').blank,
+        query_params={
+            'group_id': '$contact_group',
+        },
     )
     storage_location = DynamicModelChoiceField(
         queryset=Location.objects.all(),
@@ -110,7 +120,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         FieldSet('name', 'status', name='General'),
         FieldSet('device_type', 'device', 'module_type', 'module', name='Hardware'),
         FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'), 
-        FieldSet('tenant', 'contact', name='Assigned to'), 
+        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'), 
         FieldSet('storage_location', name='Location'),
     )
     nullable_fields = (
@@ -514,10 +524,20 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label='Purchase',
     )
+    contact_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+        help_text='Filter receiving contacts by group',
+    )
     receiving_contact = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label='Receiving Contact',
+        query_params={
+            'group_id': '$contact_group',
+        },
     )
     description = forms.CharField(
         required=False,
@@ -528,7 +548,7 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Delivery
     fieldsets = (
-        FieldSet('date', 'purchase', 'receiving_contact', 'description', name='General'),
+        FieldSet('date', 'purchase', 'contact_group', 'receiving_contact', 'description', name='General'),
     )
     nullable_fields = ('date', 'description', 'receiving_contact',)
 

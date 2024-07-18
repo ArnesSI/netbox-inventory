@@ -7,7 +7,7 @@ from dcim.models import Manufacturer, Device, DeviceType, Module, ModuleType, In
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
-from tenancy.models import Contact, Tenant
+from tenancy.models import Contact, ContactGroup, Tenant
 from .choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from .utils import query_located, get_asset_custom_fields_search_filters
@@ -124,6 +124,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='tenant__name',
         lookup_expr='icontains',
         label='Tenant (name)',
+    )
+    contact_group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ContactGroup.objects.all(),
+        field_name='contact__group',
+        label='Contact Group (ID)',
     )
     contact_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Contact.objects.all(),
@@ -389,6 +394,11 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
         field_name='purchase__supplier',
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
+    )
+    contact_group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ContactGroup.objects.all(),
+        field_name='receiving_contact__group',
+        label='Contact Group (ID)',
     )
     receiving_contact_id = django_filters.ModelMultipleChoiceFilter(
         field_name='receiving_contact',

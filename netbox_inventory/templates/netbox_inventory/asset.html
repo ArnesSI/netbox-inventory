@@ -99,7 +99,12 @@
           </tr>
           <tr>
             <th scope="row">Contact</th>
-            <td>{{ object.contact|linkify|placeholder }}</td>
+            <td>
+              {% if object.contact.group %}
+                {{ object.contact.group|linkify }} /
+              {% endif %}
+              {{ object.contact|linkify|placeholder }}
+            </td>
           </tr>
           <tr>
             <th scope="row">{{ object.get_kind_display }}</th>

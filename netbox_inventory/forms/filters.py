@@ -7,7 +7,7 @@ from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterFie
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 from tenancy.forms import ContactModelFilterForm
-from tenancy.models import Contact, Tenant
+from tenancy.models import Contact, ContactGroup, Tenant
 from ..choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
 from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
@@ -31,7 +31,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned',
             name='Hardware'
         ),
-        FieldSet('tenant_id', 'contact_id', name='Usage'),
+        FieldSet('tenant_id', 'contact_group_id', 'contact', name='Usage'),
         FieldSet(
             'owner_id', 'delivery_id', 'purchase_id', 'supplier_id',
             'delivery_date_after', 'delivery_date_before', 'purchase_date_after',
@@ -103,10 +103,19 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         null_option='None',
         label='Tenant',
     )
-    contact_id = DynamicModelMultipleChoiceField(
+    contact_group_id = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+    )
+    contact = DynamicModelMultipleChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         null_option='None',
+        query_params={
+            'group_id': '$contact_group_id',
+        },
         label='Contact',
     )
     owner_id = DynamicModelMultipleChoiceField(
@@ -249,7 +258,23 @@ class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
     model = Supplier
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('contact', 'contact_role', 'contact_group', name='Contacts'),
+        FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
+    )
+    
+    contact_group = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+    )
+    contact = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$contact_group',
+        },
+        label='Contact',
     )
 
     tag = TagFilterField(model)
@@ -291,6 +316,7 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         FieldSet(
             'purchase_id',
             'supplier_id',
+            'contact_group_id',
             'receiving_contact_id',
             'date_after',
             'date_before',
@@ -307,10 +333,19 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label='Supplier',
     )
+    contact_group_id = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+    )
     receiving_contact_id = DynamicModelMultipleChoiceField(
         queryset=Contact.objects.all(),
         required=False,
-        label='Contact',
+        query_params={
+            'group_id': '$contact_group_id',
+        },
+        label='Receiving contact',
     )
     date_after = forms.DateField(
         required=False,
