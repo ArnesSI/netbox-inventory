@@ -1,6 +1,7 @@
 import strawberry
 import strawberry_django
-from typing import Annotated
+from typing import Optional
+from strawberry import LazyType
 
 from .models import (
     Asset,
@@ -20,7 +21,7 @@ from .filtersets import (
 )
 from netbox.graphql.filter_mixins import autotype_decorator, BaseFilterMixin
 
-# Filter definitions using existing FilterSets
+# Filter definitions
 @strawberry_django.filter(Asset)
 @autotype_decorator(AssetFilterSet)
 class AssetFilter(BaseFilterMixin):
@@ -74,7 +75,11 @@ class InventoryItemTypeType:
 
 @strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
 class InventoryItemGroupType:
-    pass
+    parent: Optional['InventoryItemGroupType'] = strawberry.field(default=None)
+    children: list['InventoryItemGroupType'] = strawberry.field(default_factory=list)
+
+InventoryItemGroupType.parent = strawberry.field(LazyType["InventoryItemGroupType", __name__])
+InventoryItemGroupType.children = strawberry.field(lambda: list[InventoryItemGroupType])
 
 # Query definition
 @strawberry.type
