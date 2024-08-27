@@ -8,7 +8,7 @@ from .types import (
     PurchaseType,
     DeliveryType,
     InventoryItemTypeType,
-    # InventoryItemGroupType
+    InventoryItemGroupType
     )
 
 @strawberry.type
@@ -46,9 +46,9 @@ class InventoryItemTypeQuery:
         return models.InventoryItemType.get(pk=id)
     inventory_item_type_list: list[InventoryItemTypeType] = strawberry_django.field()
 
-# @strawberry.type
-# class InventoryItemGroupQuery:
-#     @strawberry.field
-#     def inventory_item_group(self, id: int) -> InventoryItemGroupType:
-#         return models.InventoryItemGroup.get(pk=id)
-#     inventory_item_group_list: list[InventoryItemGroupType] = strawberry_django.field()
+@strawberry.type
+class InventoryItemGroupQuery:
+    @strawberry.field
+    def inventory_item_group(self, id: int) -> InventoryItemGroupType:
+        return models.InventoryItemGroup.get(pk=id)
+    inventory_item_group_list: list[InventoryItemGroupType] = strawberry_django.field()

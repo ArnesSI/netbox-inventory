@@ -8,7 +8,7 @@ from netbox_inventory.models import (
     Purchase,
     Delivery,
     InventoryItemType,
-    # InventoryItemGroup
+    InventoryItemGroup
 )
 
 from netbox_inventory.filtersets import (
@@ -17,7 +17,7 @@ from netbox_inventory.filtersets import (
     PurchaseFilterSet,
     DeliveryFilterSet,
     InventoryItemTypeFilterSet,
-    # InventoryItemGroupFilterSet
+    InventoryItemGroupFilterSet
 )
 
 __all__ = (
@@ -53,9 +53,9 @@ class DeliveryFilter(BaseFilterMixin):
 @autotype_decorator(InventoryItemTypeFilterSet)
 class InventoryItemTypeFilter(BaseFilterMixin):
     pass
-#
-# @strawberry_django.filter(InventoryItemGroup, lookups=True)
-# @autotype_decorator(InventoryItemGroupFilterSet)
-# class InventoryItemGroupFilter(BaseFilterMixin):
-#     pass
-#
+
+@strawberry_django.filter(InventoryItemGroup, lookups=True)
+@autotype_decorator(InventoryItemGroupFilterSet)
+class InventoryItemGroupFilter(BaseFilterMixin):
+    pass
+

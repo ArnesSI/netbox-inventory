@@ -4,7 +4,7 @@ from .schema import (
     PurchaseQuery,
     DeliveryQuery,
     InventoryItemTypeQuery,
-    # InventoryItemGroupQuery
+    InventoryItemGroupQuery
 )
 
 schema = [
@@ -13,5 +13,5 @@ schema = [
     PurchaseQuery,
     DeliveryQuery,
     InventoryItemTypeQuery,
-    # InventoryItemGroupQuery # Commented out to due to circular dependency
+    InventoryItemGroupQuery # Commented out to due to circular dependency
 ]
