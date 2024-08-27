@@ -4,8 +4,14 @@ from typing import Annotated
 
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
 
-from .filters import AssetFilter, SupplierFilter, PurchaseFilter, DeliveryFilter, InventoryItemTypeFilter, \
-    InventoryItemGroupFilter
+from .filters import (
+    AssetFilter,
+    SupplierFilter,
+    PurchaseFilter,
+    DeliveryFilter,
+    InventoryItemTypeFilter,
+    # InventoryItemGroupFilter
+)
 
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
@@ -33,7 +39,7 @@ class InventoryItemTypeType:
     # TODO: Fill in fields
     pass
 
-@strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
-class InventoryItemGroupType:
-    # TODO: Fill in fields
-    pass
+# @strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
+# class InventoryItemGroupType:
+#     # TODO: Fill in fields
+#     pass

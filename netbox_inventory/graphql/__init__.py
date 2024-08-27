@@ -4,7 +4,7 @@ from .schema import (
     PurchaseQuery,
     DeliveryQuery,
     InventoryItemTypeQuery,
-    InventoryItemGroupQuery
+    # InventoryItemGroupQuery
 )
 
 schema = [
