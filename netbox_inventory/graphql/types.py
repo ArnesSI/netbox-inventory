@@ -13,61 +13,64 @@ from .filters import (
     InventoryItemGroupFilter
 )
 
+
+
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
 class AssetType:
+    device_type: Annotated["DeviceTypeType", strawberry.lazy('netbox.dcim.graphql.types')] | None
     # name: str
     # asset_tag: Optional[str]
     # serial: Optional[str]
     # status: AssetStatusChoices
 
-    @strawberry_django.field
-    def device_type(self) -> Optional[Annotated["DeviceTypeType", strawberry.lazy("netbox.dcim.graphql.types")]]:
-        return self.device_type
-
-    @strawberry_django.field
-    def module_type(self) -> Optional[Annotated["ModuleTypeType", strawberry.lazy("netbox.dcim.graphql.types")]]:
-        return self.module_type
+    # @strawberry_django.field
+    # def device_type(self) -> Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
+    #     return self.device_type
+    #
+    # @strawberry_django.field
+    # def module_type(self) -> Optional[Annotated["ModuleTypeType", strawberry.lazy("netbox.dcim.graphql.types")]]:
+    #     return self.module_type
 
     # @strawberry_django.field
     # def inventoryitem_type(self) -> Optional[
     #     Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]:
     #     return self.inventoryitem_type
 
-    @strawberry_django.field
-    def device(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.dcim.graphql.types")]]:
-        return self.device
-
-    @strawberry_django.field
-    def module(self) -> Optional[Annotated["ModuleType", strawberry.lazy("netbox.dcim.graphql.types")]]:
-        return self.module
-
-    @strawberry_django.field
-    def inventoryitem(self) -> Optional[Annotated["InventoryItemType", strawberry.lazy("netbox.dcim.graphql.types")]]:
-        return self.inventoryitem
-
-    @strawberry_django.field
-    def tenant(self) -> Optional[Annotated["Tenant", strawberry.lazy("netbox.dcim.graphql.types")]]:
-        return self.tenant
-
-    @strawberry_django.field
-    def contact(self) -> Optional[Annotated["Contact", strawberry.lazy("netbox.graphql.types")]]:
-        return self.contact
-
-    @strawberry_django.field
-    def storage_location(self) -> Optional[Annotated["Location", strawberry.lazy("netbox.graphql.types")]]:
-        return self.storage_location
-
-    @strawberry_django.field
-    def owner(self) -> Optional[Annotated["Tenant", strawberry.lazy("netbox.graphql.types")]]:
-        return self.owner
-
-    @strawberry_django.field
-    def delivery(self) -> Optional[Annotated["DeliveryType", strawberry.lazy("netbox_inventory.graphql.types")]]:
-        return self.delivery
-
-    @strawberry_django.field
-    def purchase(self) -> Optional[Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]]:
-        return self.purchase
+    # @strawberry_django.field
+    # def device(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.dcim.graphql.types")]]:
+    #     return self.device
+    #
+    # @strawberry_django.field
+    # def module(self) -> Optional[Annotated["ModuleType", strawberry.lazy("netbox.dcim.graphql.types")]]:
+    #     return self.module
+    #
+    # @strawberry_django.field
+    # def inventoryitem(self) -> Optional[Annotated["InventoryItemType", strawberry.lazy("netbox.dcim.graphql.types")]]:
+    #     return self.inventoryitem
+    #
+    # @strawberry_django.field
+    # def tenant(self) -> Optional[Annotated["Tenant", strawberry.lazy("netbox.dcim.graphql.types")]]:
+    #     return self.tenant
+    #
+    # @strawberry_django.field
+    # def contact(self) -> Optional[Annotated["Contact", strawberry.lazy("netbox.graphql.types")]]:
+    #     return self.contact
+    #
+    # @strawberry_django.field
+    # def storage_location(self) -> Optional[Annotated["Location", strawberry.lazy("netbox.graphql.types")]]:
+    #     return self.storage_location
+    #
+    # @strawberry_django.field
+    # def owner(self) -> Optional[Annotated["Tenant", strawberry.lazy("netbox.graphql.types")]]:
+    #     return self.owner
+    #
+    # @strawberry_django.field
+    # def delivery(self) -> Optional[Annotated["DeliveryType", strawberry.lazy("netbox_inventory.graphql.types")]]:
+    #     return self.delivery
+    #
+    # @strawberry_django.field
+    # def purchase(self) -> Optional[Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]]:
+    #     return self.purchase
 
 @strawberry_django.type(Supplier, fields="__all__", filters=SupplierFilter)
 class SupplierType:
