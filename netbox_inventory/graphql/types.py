@@ -3,7 +3,7 @@ import strawberry_django
 from typing import Annotated, Optional
 
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
-
+from netbox_inventory.choices import AssetStatusChoices
 from .filters import (
     AssetFilter,
     SupplierFilter,
@@ -13,8 +13,18 @@ from .filters import (
     InventoryItemGroupFilter
 )
 
+
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
 class AssetType:
+    name: str
+    asset_tag: Optional[str]
+    serial: Optional[str]
+    status: AssetStatusChoices
+
+    @strawberry_django.field
+    def tags(self) -> list[Annotated["TagType", strawberry.lazy("netbox.graphql.types")]]:
+        return self.tags.all()
+
     @strawberry_django.field
     def device_type(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.graphql.types")]]:
         return self.device_type
@@ -24,7 +34,8 @@ class AssetType:
         return self.module_type
 
     @strawberry_django.field
-    def inventoryitem_type(self) -> Optional[Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]:
+    def inventoryitem_type(self) -> Optional[
+        Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.inventoryitem_type
 
     @strawberry_django.field
@@ -63,11 +74,13 @@ class AssetType:
     def purchase(self) -> Optional[Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.purchase
 
+
 @strawberry_django.type(Supplier, fields="__all__", filters=SupplierFilter)
 class SupplierType:
     @strawberry_django.field
     def purchases(self) -> list[Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.purchases.all()
+
 
 @strawberry_django.type(Purchase, fields="__all__", filters=PurchaseFilter)
 class PurchaseType:
@@ -83,6 +96,7 @@ class PurchaseType:
     def assets(self) -> list[Annotated["AssetType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.assets.all()
 
+
 @strawberry_django.type(Delivery, fields="__all__", filters=DeliveryFilter)
 class DeliveryType:
     @strawberry_django.field
@@ -97,6 +111,7 @@ class DeliveryType:
     def assets(self) -> list[Annotated["AssetType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.assets.all()
 
+
 @strawberry_django.type(InventoryItemType, fields="__all__", filters=InventoryItemTypeFilter)
 class InventoryItemTypeType:
     @strawberry_django.field
@@ -104,13 +119,16 @@ class InventoryItemTypeType:
         return self.manufacturer
 
     @strawberry_django.field
-    def inventoryitem_group(self) -> Optional[Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")]]:
+    def inventoryitem_group(self) -> Optional[
+        Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.inventoryitem_group
+
 
 @strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
 class InventoryItemGroupType:
     @strawberry_django.field
-    def parent(self) -> Optional[Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")]]:
+    def parent(self) -> Optional[
+        Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.parent
 
     @strawberry_django.field
@@ -118,5 +136,6 @@ class InventoryItemGroupType:
         return self.children.all()
 
     @strawberry_django.field
-    def inventoryitem_types(self) -> list[Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]:
+    def inventoryitem_types(self) -> list[
+        Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]:
         return self.inventoryitem_types.all()

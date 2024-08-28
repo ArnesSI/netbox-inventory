@@ -26,7 +26,7 @@ __all__ = (
     'PurchaseFilter',
     'DeliveryFilter',
     'InventoryItemTypeFilter',
-    # 'InventoryItemGroupFilter',
+    'InventoryItemGroupFilter',
 )
 
 @strawberry_django.filter(Asset, lookups=True)
