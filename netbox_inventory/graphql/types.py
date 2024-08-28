@@ -1,8 +1,6 @@
 import strawberry
 import strawberry_django
 from typing import Annotated, Optional
-from netbox.extras.graphql.mixins import ContactsMixin, CustomFieldsMixin, TagsMixin
-from netbox.netbox.graphql.types import BaseObjectType, NetBoxObjectType
 
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
 from .filters import (
