@@ -21,9 +21,9 @@ class AssetType:
     serial: Optional[str]
     # status: AssetStatusChoices
 
-    @strawberry_django.field
-    def tags(self) -> list[Annotated["TagType", strawberry.lazy("netbox.graphql.types")]]:
-        return self.tags.all()
+    # @strawberry_django.field
+    # def tags(self) -> list[Annotated["TagType", strawberry.lazy("netbox.graphql.types")]]:
+    #     return self.tags.all()
 
     @strawberry_django.field
     def device_type(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.graphql.types")]]:
