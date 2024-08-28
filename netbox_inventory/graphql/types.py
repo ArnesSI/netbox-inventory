@@ -16,7 +16,7 @@ from .filters import (
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
 class AssetType:
-    device_type: Annotated["DeviceTypeType", strawberry.lazy('netbox.graphql.types')] | None
+    device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
     # name: str
     # asset_tag: Optional[str]
     # serial: Optional[str]
