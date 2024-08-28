@@ -20,7 +20,7 @@ from .filters import (
 class AssetType:
     device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
     module_type: Optional[Annotated["ModuleTypeType", strawberry.lazy("dcim.graphql.types")]] | None
-    inventoryitem_type: Optional[Annotated["InventoryItemTypeType", strawberry.lazy("dcim.graphql.types")]] | None
+    # inventoryitem_type: Optional[Annotated["InventoryItemTypeType", strawberry.lazy("netbox.dcim.graphql.types")]] | None
     tenant: Annotated["TenantType", strawberry.lazy('tenancy.graphql.types')] | None
     # @strawberry_django.field
     # def device(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.dcim.graphql.types")]]:
