@@ -1,6 +1,8 @@
 import strawberry
 import strawberry_django
 from typing import Annotated, Optional
+from netbox.extras.graphql.mixins import ContactsMixin, CustomFieldsMixin, TagsMixin
+from netbox.graphql.types import NetBoxObjectType
 
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
 from .filters import (
@@ -15,11 +17,11 @@ from .filters import (
 
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
-class AssetType:
+class AssetType(ContactsMixin, NetBoxObjectType):
     device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
     module_type: Optional[Annotated["ModuleTypeType", strawberry.lazy("dcim.graphql.types")]] | None
-    # inventoryitem_type: Optional[Annotated["InventoryItemTypeType", strawberry.lazy("dcim.graphql.types")]] | None
-    # tenant: Annotated["TenantType", strawberry.lazy('tenancy.graphql.types')] | None
+    inventoryitem_type: Optional[Annotated["InventoryItemTypeType", strawberry.lazy("dcim.graphql.types")]] | None
+    tenant: Annotated["TenantType", strawberry.lazy('tenancy.graphql.types')] | None
     # @strawberry_django.field
     # def device(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.dcim.graphql.types")]]:
     #     return self.device
