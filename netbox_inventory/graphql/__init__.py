@@ -13,5 +13,5 @@ schema = [
     PurchaseQuery,
     DeliveryQuery,
     InventoryItemTypeQuery,
-    InventoryItemGroupQuery # Commented out to due to circular dependency
+    # InventoryItemGroupQuery # Commented out to due to circular dependency
 ]
