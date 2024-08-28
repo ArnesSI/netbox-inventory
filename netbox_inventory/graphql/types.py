@@ -3,7 +3,6 @@ import strawberry_django
 from typing import Annotated, Optional
 
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
-from netbox_inventory.choices import AssetStatusChoices
 from .filters import (
     AssetFilter,
     SupplierFilter,
@@ -17,7 +16,7 @@ from .filters import (
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
 class AssetType:
-    device_type: Annotated["DeviceTypeType", strawberry.lazy('netbox.dcim.graphql.types')] | None
+    device_type: Annotated["DeviceTypeType", strawberry.lazy('netbox.graphql.types')] | None
     # name: str
     # asset_tag: Optional[str]
     # serial: Optional[str]
