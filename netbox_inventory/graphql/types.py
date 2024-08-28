@@ -19,7 +19,7 @@ class AssetType:
     name: str
     asset_tag: Optional[str]
     serial: Optional[str]
-    status: AssetStatusChoices
+    # status: AssetStatusChoices
 
     @strawberry_django.field
     def tags(self) -> list[Annotated["TagType", strawberry.lazy("netbox.graphql.types")]]:
