@@ -17,7 +17,7 @@ from .filters import (
 
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
-class AssetType(ContactsMixin, NetBoxObjectType):
+class AssetType(ContactsMixin, BaseObjectType):
     device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
     module_type: Optional[Annotated["ModuleTypeType", strawberry.lazy("dcim.graphql.types")]] | None
     inventoryitem_type: Optional[Annotated["InventoryItemTypeType", strawberry.lazy("dcim.graphql.types")]] | None
