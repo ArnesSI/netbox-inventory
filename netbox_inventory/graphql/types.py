@@ -3,7 +3,6 @@ import strawberry_django
 from typing import Annotated
 from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
 from netbox.graphql.types import (
-    BaseObjectType,
     NetBoxObjectType,
     OrganizationalObjectType,
 )
@@ -96,7 +95,7 @@ class DeliveryType(NetBoxObjectType):
 @strawberry_django.type(
     InventoryItemType, fields="__all__", filters=InventoryItemTypeFilter
 )
-class InventoryItemTypeType(ImageAttachmentsMixin, BaseObjectType):
+class InventoryItemTypeType(ImageAttachmentsMixin, NetBoxObjectType):
     manufacturer: Annotated["ManufacturerType", strawberry.lazy("dcim.graphql.types")]
     inventoryitem_group: (
         Annotated[
