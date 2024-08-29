@@ -2,7 +2,6 @@ import strawberry
 import strawberry_django
 from typing import Annotated
 from netbox.graphql.types import NetBoxObjectType
-from extras.graphql.mixins import ContactsMixin
 from netbox_inventory.models import (
     Asset,
     Supplier,
@@ -22,7 +21,7 @@ from .filters import (
 
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
-class AssetType(ContactsMixin, NetBoxObjectType):
+class AssetType(NetBoxObjectType):
     device_type: (
         Annotated["DeviceTypeType", strawberry.lazy("dcim.graphql.types")] | None
     )
@@ -77,7 +76,7 @@ class PurchaseType(NetBoxObjectType):
 
 
 @strawberry_django.type(Delivery, fields="__all__", filters=DeliveryFilter)
-class DeliveryType(ContactsMixin, NetBoxObjectType):
+class DeliveryType(NetBoxObjectType):
     purchase: Annotated[
         "PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")
     ]
