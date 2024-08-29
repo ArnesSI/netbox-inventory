@@ -1,8 +1,6 @@
 import strawberry
 import strawberry_django
 from typing import Annotated, Optional
-# from netbox.extras.graphql.mixins import ContactsMixin, CustomFieldsMixin, TagsMixin
-# from netbox.graphql.types import NetBoxObjectType
 
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
 from .filters import (
@@ -14,6 +12,11 @@ from .filters import (
     InventoryItemGroupFilter
 )
 
+# TODO: Add tags (tried with mixin)
+# TODO: Change status to status choices
+# TODO: InventoryItemType, i don't see an InventoryItemTypeType in the models
+# TODO: DeliveryType
+# TODO: PurchaseType
 
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
@@ -22,6 +25,12 @@ class AssetType:
     module_type: Optional[Annotated["ModuleTypeType", strawberry.lazy("dcim.graphql.types")]] | None
     # inventoryitem_type: Optional[Annotated["InventoryItemTypeType", strawberry.lazy("netbox.dcim.graphql.types")]] | None
     tenant: Annotated["TenantType", strawberry.lazy('tenancy.graphql.types')] | None
+    device: Annotated["DeviceType", strawberry.lazy('dcim.graphql.types')] | None
+    module: Annotated["ModuleType", strawberry.lazy('dcim.graphql.types')] | None
+    contact: Annotated["ContactType", strawberry.lazy('tenancy.graphql.types')] | None
+    inventoryitem: Annotated["InventoryItemType", strawberry.lazy('dcim.graphql.types')] | None
+    storage_location: Annotated["LocationType", strawberry.lazy('dcim.graphql.types')] | None
+    owner: Annotated["TenantType", strawberry.lazy('tenancy.graphql.types')] | None
     # @strawberry_django.field
     # def device(self) -> Optional[Annotated["DeviceType", strawberry.lazy("netbox.dcim.graphql.types")]]:
     #     return self.device
@@ -30,17 +39,8 @@ class AssetType:
     # def module(self) -> Optional[Annotated["ModuleType", strawberry.lazy("netbox.dcim.graphql.types")]]:
     #     return self.module
     #
-    # @strawberry_django.field
-    # def inventoryitem(self) -> Optional[Annotated["InventoryItemType", strawberry.lazy("netbox.dcim.graphql.types")]]:
-    #     return self.inventoryitem
     #
-    # @strawberry_django.field
-    # def tenant(self) -> Optional[Annotated["Tenant", strawberry.lazy("netbox.dcim.graphql.types")]]:
-    #     return self.tenant
-    #
-    # @strawberry_django.field
-    # def contact(self) -> Optional[Annotated["Contact", strawberry.lazy("netbox.graphql.types")]]:
-    #     return self.contact
+
     #
     # @strawberry_django.field
     # def storage_location(self) -> Optional[Annotated["Location", strawberry.lazy("netbox.graphql.types")]]:
