@@ -9,9 +9,9 @@ from .schema import (
 
 schema = [
     AssetQuery,
-    # SupplierQuery,
-    # PurchaseQuery,
-    # DeliveryQuery,
-    # InventoryItemTypeQuery,
-    # InventoryItemGroupQuery # Commented out to due to circular dependency
+    SupplierQuery,
+    PurchaseQuery,
+    DeliveryQuery,
+    InventoryItemTypeQuery,
+    InventoryItemGroupQuery
 ]
