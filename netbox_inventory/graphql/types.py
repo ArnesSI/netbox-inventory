@@ -50,4 +50,4 @@ class InventoryItemTypeType:
 
 @strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
 class InventoryItemGroupType:
-    pass
+    parent: Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")] | None
