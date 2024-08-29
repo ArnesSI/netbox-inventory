@@ -2,7 +2,11 @@ import strawberry
 import strawberry_django
 from typing import Annotated
 from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
-from netbox.graphql.types import BaseObjectType, NetBoxObjectType, OrganizationalObjectType
+from netbox.graphql.types import (
+    BaseObjectType,
+    NetBoxObjectType,
+    OrganizationalObjectType,
+)
 from netbox_inventory.models import (
     Asset,
     Supplier,
