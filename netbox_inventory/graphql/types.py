@@ -12,9 +12,6 @@ from .filters import (
     InventoryItemGroupFilter
 )
 
-# TODO: Add tags (tried with mixin)
-# TODO: Change status to status choices
-
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
 class AssetType:
     device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
