@@ -42,6 +42,7 @@ class PurchaseType:
 class DeliveryType:
     purchase: Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]
     receiving_contact: Annotated["ContactType", strawberry.lazy("tenancy.graphql.types")] | None
+    assets: list[Annotated["AssetType", strawberry.lazy("netbox_inventory.graphql.types")]]
 
 @strawberry_django.type(InventoryItemType, fields="__all__", filters=InventoryItemTypeFilter)
 class InventoryItemTypeType:
