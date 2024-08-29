@@ -14,16 +14,12 @@ from .filters import (
 
 # TODO: Add tags (tried with mixin)
 # TODO: Change status to status choices
-# TODO: InventoryItemType, i don't see an InventoryItemTypeType in the models
-# TODO: DeliveryType
-# TODO: PurchaseType
-
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
 class AssetType:
     device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
     module_type: Annotated["ModuleTypeType", strawberry.lazy("dcim.graphql.types")] | None
-    inventoryitem_type: Annotated["InventoryItemTypeType", strawberry.lazy("netbox.dcim.graphql.types")] | None
+    inventoryitem_type: Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")] | None
     tenant: Annotated["TenantType", strawberry.lazy('tenancy.graphql.types')] | None
     device: Annotated["DeviceType", strawberry.lazy('dcim.graphql.types')] | None
     module: Annotated["ModuleType", strawberry.lazy('dcim.graphql.types')] | None
