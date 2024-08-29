@@ -1,7 +1,8 @@
 import strawberry
 import strawberry_django
-from typing import Annotated, Optional
-
+from typing import Annotated
+from netbox.graphql.types import NetBoxObjectType
+from extras.graphql.mixins import ContactsMixin
 from netbox_inventory.models import Asset, Supplier, Purchase, Delivery, InventoryItemType, InventoryItemGroup
 from .filters import (
     AssetFilter,
@@ -13,7 +14,7 @@ from .filters import (
 )
 
 @strawberry_django.type(Asset, fields="__all__", filters=AssetFilter)
-class AssetType:
+class AssetType(ContactsMixin, NetBoxObjectType):
     device_type: Annotated["DeviceTypeType", strawberry.lazy('dcim.graphql.types')] | None
     module_type: Annotated["ModuleTypeType", strawberry.lazy("dcim.graphql.types")] | None
     inventoryitem_type: Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")] | None
@@ -28,28 +29,28 @@ class AssetType:
     purchase: Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")] | None
 
 @strawberry_django.type(Supplier, fields="__all__", filters=SupplierFilter)
-class SupplierType:
+class SupplierType(NetBoxObjectType):
     purchases: list[Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]]
 
 @strawberry_django.type(Purchase, fields="__all__", filters=PurchaseFilter)
-class PurchaseType:
+class PurchaseType(NetBoxObjectType):
     supplier: Annotated["SupplierType", strawberry.lazy("netbox_inventory.graphql.types")]
     assets: list[Annotated["AssetType", strawberry.lazy("netbox_inventory.graphql.types")]]
     orders: list[Annotated["DeliveryType", strawberry.lazy("netbox_inventory.graphql.types")]]
 
 @strawberry_django.type(Delivery, fields="__all__", filters=DeliveryFilter)
-class DeliveryType:
+class DeliveryType(ContactsMixin, NetBoxObjectType):
     purchase: Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]
     receiving_contact: Annotated["ContactType", strawberry.lazy("tenancy.graphql.types")] | None
     assets: list[Annotated["AssetType", strawberry.lazy("netbox_inventory.graphql.types")]]
 
 @strawberry_django.type(InventoryItemType, fields="__all__", filters=InventoryItemTypeFilter)
-class InventoryItemTypeType:
+class InventoryItemTypeType(NetBoxObjectType):
     manufacturer: Annotated["ManufacturerType", strawberry.lazy("dcim.graphql.types")]
     inventoryitem_group: Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")] | None
 
 @strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
-class InventoryItemGroupType:
+class InventoryItemGroupType(NetBoxObjectType):
     parent: Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")] | None
     inventoryitem_types: list[Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]
     children: list[Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")]]
