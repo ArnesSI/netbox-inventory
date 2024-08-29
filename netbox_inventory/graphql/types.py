@@ -32,11 +32,13 @@ class AssetType:
 
 @strawberry_django.type(Supplier, fields="__all__", filters=SupplierFilter)
 class SupplierType:
-    pass
+    purchases: list[Annotated["PurchaseType", strawberry.lazy("netbox_inventory.graphql.types")]]
 
 @strawberry_django.type(Purchase, fields="__all__", filters=PurchaseFilter)
 class PurchaseType:
     supplier: Annotated["SupplierType", strawberry.lazy("netbox_inventory.graphql.types")]
+    assets: list[Annotated["AssetType", strawberry.lazy("netbox_inventory.graphql.types")]]
+    orders: list[Annotated["DeliveryType", strawberry.lazy("netbox_inventory.graphql.types")]]
 
 @strawberry_django.type(Delivery, fields="__all__", filters=DeliveryFilter)
 class DeliveryType:
@@ -52,3 +54,5 @@ class InventoryItemTypeType:
 @strawberry_django.type(InventoryItemGroup, fields="__all__", filters=InventoryItemGroupFilter)
 class InventoryItemGroupType:
     parent: Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")] | None
+    inventoryitem_types: list[Annotated["InventoryItemTypeType", strawberry.lazy("netbox_inventory.graphql.types")]]
+    children: list[Annotated["InventoryItemGroupType", strawberry.lazy("netbox_inventory.graphql.types")]]
