@@ -3,8 +3,8 @@ from django.test import override_settings
 
 from core.models import ObjectType
 from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Site
-from extras.choices import ObjectChangeActionChoices
-from extras.models import ObjectChange
+from core.choices import ObjectChangeActionChoices
+from core.models import ObjectChange
 from users.models import ObjectPermission
 from utilities.testing import ViewTestCases
 from utilities.testing.utils import post_data
