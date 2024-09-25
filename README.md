@@ -63,6 +63,7 @@ support older netbox version as per table below:
 |----------------|----------------|
 |       3.7      |      1.6.x     |
 |       4.0      |      2.0.x     |
+|       4.1      |      2.1.x     |
 
 ## Installing
 
