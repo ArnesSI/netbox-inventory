@@ -131,13 +131,15 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         * queryset - queryset of Asset model
         * field_name - 'site' or 'location' or 'rack'
         * values - list of PKs of location types to filter on
-        * assets_shown - 'all' or 'installd' or 'stored'
+        * assets_shown - 'all' or 'installed' or 'stored'
     """
     q_installed = (
         Q(**{f'device__{field_name}__in':values})|
         Q(**{f'module__device__{field_name}__in':values})|
         Q(**{f'inventoryitem__device__{field_name}__in':values})
     )
+
+    # Q expressions for stored
     if field_name == 'rack':
         # storage in rack is not supported
         # generate Q() that matches none
@@ -147,11 +149,12 @@ def query_located(queryset, field_name, values, assets_shown='all'):
             Q(**{f'storage_location__in':values})&
             Q(status=get_status_for('stored'))
         )
-    else:
+    elif field_name == 'site':
         q_stored = (
-            Q(**{f'storage_location__{field_name}__in':values})&
+            Q(**{f'storage_location__site__in':values})&
             Q(status=get_status_for('stored'))
         )
+
     if assets_shown == 'all':
         q = q_installed | q_stored
     elif assets_shown == 'installed':
