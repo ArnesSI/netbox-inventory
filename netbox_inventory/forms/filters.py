@@ -1,6 +1,6 @@
 from django import forms
 
-from dcim.models import Device, DeviceType, Manufacturer, ModuleType, Site, Location, Rack
+from dcim.models import Device, DeviceType, DeviceRole, Manufacturer, ModuleType, Site, Location, Rack
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
@@ -27,8 +27,9 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'status'),
         FieldSet(
-            'kind', 'manufacturer_id', 'device_type_id', 'module_type_id',
-            'inventoryitem_type_id', 'inventoryitem_group_id', 'is_assigned',
+            'kind', 'manufacturer_id', 'device_type_id', 'device_role_id',
+            'module_type_id', 'inventoryitem_type_id', 'inventoryitem_group_id',
+             'is_assigned',
             name='Hardware'
         ),
         FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
@@ -68,6 +69,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'manufacturer_id': '$manufacturer_id',
         },
         label='Device type',
+    )
+    device_role_id = DynamicModelMultipleChoiceField(
+        queryset=DeviceRole.objects.all(),
+        required=False,
+        label='Device role',
     )
     module_type_id = DynamicModelMultipleChoiceField(
         queryset=ModuleType.objects.all(),
