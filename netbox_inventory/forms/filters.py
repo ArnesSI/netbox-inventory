@@ -217,7 +217,6 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     installed_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
         required=False,
-        null_option='None',
         query_params={
             'site_id': '$installed_site_id',
         },
@@ -227,7 +226,6 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     installed_rack_id = DynamicModelMultipleChoiceField(
         queryset=Rack.objects.all(),
         required=False,
-        null_option='None',
         query_params={
             'site_id': '$installed_site_id',
             'location_id': '$installed_location_id',
@@ -238,7 +236,6 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     installed_device_id = DynamicModelMultipleChoiceField(
         queryset=Device.objects.all(),
         required=False,
-        null_option='None',
         query_params={
             'site_id': '$installed_site_id',
             'location_id': '$installed_location_id',
@@ -255,7 +252,6 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     located_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
         required=False,
-        null_option='None',
         query_params={
             'site_id': '$located_site_id',
         },
