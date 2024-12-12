@@ -7,7 +7,7 @@ from tenancy.tables import ContactsColumnMixin
 from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 from .template_content import WARRANTY_PROGRESSBAR
 
-from dcim.tables import DeviceTypeTable, ModuleTypeTable
+from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from utilities.tables import register_table_column
 
 __all__ = (
@@ -526,3 +526,13 @@ asset_count = columns.LinkedCountColumn(
 )
 
 register_table_column(asset_count, 'assets', ModuleTypeTable)
+
+
+asset_count = columns.LinkedCountColumn(
+    viewname='plugins:netbox_inventory:asset_list',
+    url_params={'rack_type_id': 'pk'},
+    verbose_name=_('Assets'),
+    accessor="assets__count",
+)
+
+register_table_column(asset_count, 'assets', RackTypeTable)
