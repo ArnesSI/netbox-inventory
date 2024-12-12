@@ -63,7 +63,7 @@ class AssetInfoExtension(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_info.html', extra_context=context)
 
 
-class AssetLocationStats(PluginTemplateExtension):
+class AssetLocationCounts(PluginTemplateExtension):
     def right_page(self):
         object = self.context.get('object')
         user = self.context['request'].user
@@ -107,7 +107,7 @@ class InventoryItemAssetInfo(AssetInfoExtension):
     kind = 'inventoryitem'
 
 
-class ManufacturerAssetInfo(PluginTemplateExtension):
+class ManufacturerAssetCounts(PluginTemplateExtension):
     model = 'dcim.manufacturer'
     def right_page(self):
         object = self.context.get('object')
@@ -145,17 +145,17 @@ class ManufacturerAssetInfo(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
 
 
-class SiteAssetInfo(AssetLocationStats):
+class SiteAssetCounts(AssetLocationCounts):
     model = 'dcim.site'
     location_type='site'
 
 
-class LocationAssetInfo(AssetLocationStats):
+class LocationAssetCounts(AssetLocationCounts):
     model = 'dcim.location'
     location_type='location'
 
 
-class RackAssetInfo(PluginTemplateExtension):
+class RackAssetCounts(PluginTemplateExtension):
     # rack cannot have stored assets so we can't use AssetLocationStats
     model = 'dcim.rack'
     def right_page(self):
@@ -175,7 +175,7 @@ class RackAssetInfo(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
 
 
-class TenantAssetInfo(PluginTemplateExtension):
+class TenantAssetCounts(PluginTemplateExtension):
     model = 'tenancy.tenant'
     def right_page(self):
         object = self.context.get('object')
@@ -197,7 +197,7 @@ class TenantAssetInfo(PluginTemplateExtension):
         return self.render('netbox_inventory/inc/asset_stats_counts.html', extra_context=context)
 
 
-class ContactAssetInfo(PluginTemplateExtension):
+class ContactAssetCounts(PluginTemplateExtension):
     model = 'tenancy.contact'
     def right_page(self):
         object = self.context.get('object')
@@ -218,10 +218,10 @@ template_extensions = (
     DeviceAssetInfo,
     ModuleAssetInfo,
     InventoryItemAssetInfo,
-    ManufacturerAssetInfo,
-    SiteAssetInfo,
-    LocationAssetInfo,
-    RackAssetInfo,
-    TenantAssetInfo,
-    ContactAssetInfo,
+    ManufacturerAssetCounts,
+    SiteAssetCounts,
+    LocationAssetCounts,
+    RackAssetCounts,
+    TenantAssetCounts,
+    ContactAssetCounts,
 )
