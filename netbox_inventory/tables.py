@@ -135,6 +135,7 @@ class AssetTable(NetBoxTable):
                 'device_type__manufacturer',
                 'module_type__manufacturer',
                 'inventoryitem_type__manufacturer',
+                'rack_type__manufacturer',
             )
         ).order_by(
             ('-' if is_descending else '') + 'manufacturer',
@@ -146,7 +147,7 @@ class AssetTable(NetBoxTable):
         queryset, _ = self.order_manufacturer(queryset, is_descending)
         queryset = queryset.annotate(
             model=Coalesce(
-                'device_type__model', 'module_type__model', 'inventoryitem_type__model'
+                'device_type__model', 'module_type__model', 'inventoryitem_type__model', 'rack_type__model'
             )
         ).order_by(
             ('-' if is_descending else '') + 'manufacturer',
@@ -158,7 +159,7 @@ class AssetTable(NetBoxTable):
     def order_hardware(self, queryset, is_descending):
         queryset = queryset.annotate(
             hw=Coalesce(
-                'device__name', 'module__device__name', 'inventoryitem__device__name'
+                'device__name', 'module__device__name', 'inventoryitem__device__name', 'rack__name'
             )
         ).order_by(
             ('-' if is_descending else '') + 'hw',
@@ -170,13 +171,13 @@ class AssetTable(NetBoxTable):
     def _order_annotate_installed(self, queryset):
         return queryset.annotate(
             site_name=Coalesce(
-                'device__site__name', 'module__device__site__name', 'inventoryitem__device__site__name'
+                'device__site__name', 'module__device__site__name', 'inventoryitem__device__site__name', 'rack__site__name'
             ),
             location_name=Coalesce(
-                'device__location__name', 'module__device__location__name', 'inventoryitem__device__location__name'
+                'device__location__name', 'module__device__location__name', 'inventoryitem__device__location__name', 'rack__location__name'
             ),
             rack_name=Coalesce(
-                'device__rack__name', 'module__device__rack__name', 'inventoryitem__device__rack__name'
+                'device__rack__name', 'module__device__rack__name', 'inventoryitem__device__rack__name', 'rack__name'
             ),
             device_name=Coalesce(
                 'device__name', 'module__device__name', 'inventoryitem__device__name'
