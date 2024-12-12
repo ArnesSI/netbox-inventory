@@ -103,6 +103,13 @@ def asset_set_new_hw(asset, hw):
     if hw.asset_tag != new_asset_tag:
         hw.asset_tag = new_asset_tag
         hw_save = True
+    # handle changing of model (<kind>_type)
+    if asset.kind in ['device', 'module']:
+        asset_type = getattr(asset, asset.kind+'_type')
+        hw_type = getattr(hw, asset.kind+'_type')
+        if asset_type != hw_type:
+            setattr(hw, asset.kind+'_type', asset_type)
+            hw_save = True
     # for inventory items also set manufacturer and part_number
     if asset.inventoryitem_type:
         if hw.manufacturer != asset.inventoryitem_type.manufacturer:

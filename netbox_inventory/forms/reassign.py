@@ -99,6 +99,8 @@ class AssetReassignMixin(forms.Form):
         try:
             # update hardware assignment and validate data
             setattr(asset, asset.kind, instance)
+            # signal to assset.clean() methods to not validate _type match beetween asset and hw
+            asset._in_reassign = True
             asset.full_clean(exclude=(asset.kind,))
         except ValidationError as e:
             # ValidationError raised for device or module field
@@ -133,7 +135,6 @@ class AssetDeviceReassignForm(AssetReassignMixin, NetBoxModelForm):
         query_params={
             'kind': 'device',
             'is_assigned': False,
-            'device_type_id': '$device_type',
             'storage_site_id': '$storage_site',
             'storage_location_id': '$storage_location',
         },
@@ -143,16 +144,7 @@ class AssetDeviceReassignForm(AssetReassignMixin, NetBoxModelForm):
 
     class Meta:
         model = Device
-        # device_type is here only to allow setting assigned_asset query_params on device_type
-        fields = AssetReassignMixin.Meta.fields + ('device_type',)
-        widgets = {'device_type': forms.HiddenInput,}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # limit asset selection based on current device.device_type
-        self.initial['device_type'] = self.instance.device_type_id
-        assigned_asset_field = self.fields['assigned_asset']
-        assigned_asset_field.queryset = Asset.objects.filter(device_type=self.instance.device_type, device__isnull=True)
+        fields = AssetReassignMixin.Meta.fields
 
 
 class AssetModuleReassignForm(AssetReassignMixin, NetBoxModelForm):
@@ -163,7 +155,6 @@ class AssetModuleReassignForm(AssetReassignMixin, NetBoxModelForm):
         query_params={
             'kind': 'module',
             'is_assigned': False,
-            'module_type_id': '$module_type',
             'storage_site_id': '$storage_site',
             'storage_location_id': '$storage_location',
         },
@@ -173,16 +164,7 @@ class AssetModuleReassignForm(AssetReassignMixin, NetBoxModelForm):
 
     class Meta:
         model = Module
-        # module_type is here only to allow setting assigned_asset query_params on module_type
-        fields = AssetReassignMixin.Meta.fields + ('module_type',)
-        widgets = {'module_type': forms.HiddenInput,}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # limit asset selection based on current module.module_type
-        self.initial['module_type'] = self.instance.module_type_id
-        assigned_asset_field = self.fields['assigned_asset']
-        assigned_asset_field.queryset = Asset.objects.filter(module_type=self.instance.module_type, module__isnull=True)
+        fields = AssetReassignMixin.Meta.fields
 
 
 class AssetInventoryItemReassignForm(AssetReassignMixin, NetBoxModelForm):
