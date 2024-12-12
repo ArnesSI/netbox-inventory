@@ -360,6 +360,10 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return None
         old_hw = get_prechange_field(self, self.kind)
         new_hw = getattr(self, self.kind)
+        if old_hw:
+            old_hw.snapshot()
+        if new_hw:
+            new_hw.snapshot()
         old_serial = get_prechange_field(self, 'serial')
         old_asset_tag = get_prechange_field(self, 'asset_tag')
         if not new_hw and old_hw and clear_old_hw:
