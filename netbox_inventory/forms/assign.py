@@ -1,6 +1,6 @@
 from django import forms
 
-from dcim.models import Device, InventoryItem, Module, Site
+from dcim.models import Device, InventoryItem, Location, Module, Rack, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, Tenant
 from utilities.forms.fields import DynamicModelChoiceField
@@ -12,6 +12,7 @@ __all__ = (
     'AssetDeviceAssignForm',
     'AssetModuleAssignForm',
     'AssetInventoryItemAssignForm',
+    'AssetRackAssignForm',
 )
 
 
@@ -43,7 +44,7 @@ class AssetAssignMixin(forms.Form):
     def _clean_hardware(self, kind):
         """
         Args: 
-            kind (str): one of device, module or inventoryitem
+            kind (str): one of device, module, inventoryitem, rack
         """
         hardware = self.cleaned_data[kind]
         if hardware:
@@ -72,6 +73,7 @@ class AssetAssignMixin(forms.Form):
            self.fields.pop(cf_name, None)
         self.custom_fields = {}
         self.custom_fields_groups = {}
+
 
 class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
     site = DynamicModelChoiceField(
@@ -205,3 +207,45 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
 
         self.instance.inventoryitem = inventoryitem
         return inventoryitem
+
+
+class AssetRackAssignForm(AssetAssignMixin, NetBoxModelForm):
+    site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        initial_params={'racks': '$rack'},
+    )
+    location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        query_params={'site_id': '$site'},
+        initial_params={'racks': '$rack'},
+    )
+    rack = DynamicModelChoiceField(
+        queryset=Rack.objects.all(),
+        query_params={'rack_type_id': '$rack_type', 'site_id': '$site', 'location_id': '$location'},
+        label='Rack',
+        required=False,
+        help_text='Set to empty to unassign asset from rack',
+    )
+
+    fieldsets = (
+        FieldSet('name', name='Asset'),
+        FieldSet('site', 'location', 'rack', name='Rack'),
+        FieldSet('tenant', 'contact', name='Tenancy'),
+    )
+
+    class Meta:
+        model = Asset
+        fields = ('rack_type', 'name', 'site', 'location', 'rack', 'tenant', 'contact')
+        widgets = {'rack_type': forms.HiddenInput()}
+
+    def clean_rack(self):
+        # prevents trying to set asset.rack
+        return None
+
+    def clean_rack_type(self):
+        return self._clean_hardware_type('rack')
+
+    def clean_rack(self):
+        return self._clean_hardware('rack')

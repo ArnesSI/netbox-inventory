@@ -19,5 +19,6 @@ class AssetAssignView(generic.ObjectEditView):
             'device': AssetDeviceAssignForm,
             'module': AssetModuleAssignForm,
             'inventoryitem': AssetInventoryItemAssignForm,
+            'rack': AssetRackAssignForm,
         }[obj.kind]
         return super().dispatch(request, *args, **kwargs)

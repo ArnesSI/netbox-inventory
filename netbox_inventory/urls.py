@@ -23,9 +23,11 @@ urlpatterns = (
     path('assets/device/create/', views.AssetDeviceCreateView.as_view(), name='asset_device_create'),
     path('assets/module/create/', views.AssetModuleCreateView.as_view(), name='asset_module_create'),
     path('assets/inventory-item/create/', views.AssetInventoryItemCreateView.as_view(), name='asset_inventoryitem_create'),
+    path('assets/rack/create/', views.AssetRackCreateView.as_view(), name='asset_rack_create'),
     path('assets/device/<int:pk>/reassign/', views.AssetDeviceReassignView.as_view(), name='asset_device_reassign'),
     path('assets/module/<int:pk>/reassign/', views.AssetModuleReassignView.as_view(), name='asset_module_reassign'),
     path('assets/inventoryitem/<int:pk>/reassign/', views.AssetInventoryItemReassignView.as_view(), name='asset_inventoryitem_reassign'),
+    path('assets/rack/<int:pk>/reassign/', views.AssetRackReassignView.as_view(), name='asset_rack_reassign'),
 
     # Suppliers
     path('suppliers/', views.SupplierListView.as_view(), name='supplier_list'),
