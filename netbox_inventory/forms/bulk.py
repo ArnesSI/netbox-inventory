@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 
-from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
+from dcim.models import DeviceType, Manufacturer, ModuleType, Location, RackType, Site
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms import add_blank_choice
 from utilities.forms.fields import (
@@ -58,6 +58,16 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     )
     # FIXME figure out how to only show set null checkbox
     module = forms.CharField(
+        disabled=True,
+        required=False,
+    )
+    rack_type = DynamicModelChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack type',
+    )
+    # FIXME figure out how to only show set null checkbox
+    rack = forms.CharField(
         disabled=True,
         required=False,
     )
@@ -118,13 +128,13 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     model = Asset
     fieldsets = (
         FieldSet('name', 'status', name='General'),
-        FieldSet('device_type', 'device', 'module_type', 'module', name='Hardware'),
+        FieldSet('device_type', 'device', 'module_type', 'module', 'rack_type', 'rack', name='Hardware'),
         FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'), 
         FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'), 
         FieldSet('storage_location', name='Location'),
     )
     nullable_fields = (
-        'name', 'device', 'module', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
+        'name', 'device', 'module', 'rack', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
         'warranty_start', 'warranty_end',
     )
 
