@@ -20,6 +20,7 @@ class NetBoxInventoryConfig(PluginConfig):
         'asset_import_create_device_type': False,
         'asset_import_create_module_type': False,
         'asset_import_create_inventoryitem_type': False,
+        'asset_import_create_rack_type': False,
         'asset_import_create_tenant': False,
         'asset_disable_editing_fields_for_tags': {},
         'asset_disable_deletion_for_tags': [],
