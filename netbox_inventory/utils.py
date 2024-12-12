@@ -142,7 +142,12 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         * values - list of PKs of location types to filter on
         * assets_shown - 'all' or 'installed' or 'stored'
     """
+    if field_name == 'rack':
+        q_installed = Q(**{f'rack__in':values})
+    else:
+        q_installed = Q(**{f'rack__{field_name}__in':values})
     q_installed = (
+        q_installed|
         Q(**{f'device__{field_name}__in':values})|
         Q(**{f'module__device__{field_name}__in':values})|
         Q(**{f'inventoryitem__device__{field_name}__in':values})

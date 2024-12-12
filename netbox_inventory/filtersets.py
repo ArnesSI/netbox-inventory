@@ -3,7 +3,7 @@ from django.db.models import Q
 import django_filters
 
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
-from dcim.models import Manufacturer, Device, DeviceType, DeviceRole, Module, ModuleType, InventoryItem, InventoryItemRole, Site, Location
+from dcim.models import Manufacturer, Device, DeviceType, DeviceRole, Module, ModuleType, InventoryItem, InventoryItemRole, Rack, RackRole, RackType, Site, Location
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
@@ -124,6 +124,41 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='inventoryitem__role__slug',
         lookup_expr='iexact',
         label='Inventory item role (slug)',
+    )
+    rack = filters.MultiValueCharFilter(
+        field_name='rack__name',
+        lookup_expr='iexact',
+        label='Rack (name)',
+    )
+    rack_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='rack',
+        queryset=Rack.objects.all(),
+        label='Rack (ID)',
+    )
+    rack_type_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='rack_type',
+        queryset=RackType.objects.all(),
+        label='Rack type (ID)',
+    )
+    rack_type = filters.MultiValueCharFilter(
+        field_name='rack_type__slug',
+        lookup_expr='iexact',
+        label='Rack type (slug)',
+    )
+    rack_type_model = filters.MultiValueCharFilter(
+        field_name='rack_type__model',
+        lookup_expr='icontains',
+        label='Rack type (model)',
+    )
+    rack_role_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='rack__role',
+        queryset=RackRole.objects.all(),
+        label='Rack role (ID)',
+    )
+    rack_role = filters.MultiValueCharFilter(
+        field_name='rack__role__slug',
+        lookup_expr='iexact',
+        label='Rack role (slug)',
     )
     is_assigned = django_filters.BooleanFilter(
         method='filter_is_assigned',
@@ -282,6 +317,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
             | Q(device_type__model__icontains=value)
             | Q(module_type__model__icontains=value)
             | Q(inventoryitem_type__model__icontains=value)
+            | Q(rack_type__model__icontains=value)
             | Q(delivery__name__icontains=value)
             | Q(purchase__name__icontains=value)
             | Q(purchase__supplier__name__icontains=value)
