@@ -5,12 +5,11 @@ A [Netbox](https://github.com/netbox-community/netbox) plugin for hardware inven
 ## Features
 
 Keep track of your hardware, whether it is installed or in storage. You can
-define assets that represent hardware that can be used as a device, module or
-inventory item in NetBox.
+define assets that represent hardware that can be used as a device, module, inventory item or rack in NetBox.
 
 Each asset can have a storage location defined, when not in use. You can assign
 an asset to a device, module or inventory item. The plugin can keep serial number
-and asset tag between asset and device, module or inventory item in sync if
+and asset tag between asset and device, module, inventory item or rack in sync if
 enabled in settings.
 
 On Site and Location detail views there is a new tab Assets that can show assets
@@ -149,8 +148,9 @@ PLUGINS_CONFIG = {
 | `sync_hardware_serial_asset_tag` | `False` | When an asset is assigned or unassigned to a device, module or inventory item, update its serial number and asset tag to be in sync with the asset? For device and module device type or module type is also updated to match asset. For inventory items, manufacturer and part ID are updated to match asset. |
 | `asset_import_create_purchase` | `False` | When importing assets, automatically create any given purchase, delivery or supplier if it doesn't exist already |
 | `asset_import_create_device_type` | `False` | When importing a device type asset, automatically create manufacturer and/or device type if it doesn't exist |
-| `asset_import_create_module_type` | `False` | When importing a module type asset, automatically create manufacturer and/or device type if it doesn't exist |
-| `asset_import_create_inventoryitem_type` | `False` | When importing an inventory type asset, automatically create manufacturer and/or device type if it doesn't exist |
+| `asset_import_create_module_type` | `False` | When importing a module type asset, automatically create manufacturer and/or module type if it doesn't exist |
+| `asset_import_create_inventoryitem_type` | `False` | When importing an inventory type asset, automatically create manufacturer and/or inventory item type if it doesn't exist |
+| `asset_import_create_rack_type` | `False` | When importing a rack type asset, automatically create manufacturer and/or rack type if it doesn't exist |
 | `asset_import_create_tenant` | `False` | When importing an asset, with owner or tenant, automatically create tenant if it doesn't exist |
 | `asset_disable_editing_fields_for_tags` | `{}` | A dictionary of tags and fields that should be disabled for editing. This is useful if you want to prevent editing of certain fields for certain assets. The dictionary is in the form of `{tag: [field1, field2]}`. Example: `{'no-edit': ['serial_number', 'asset_tag']}`. This only affects the UI, the API can still be used to edit the fields. |
 | `asset_disable_deletion_for_tags` | `[]` | List of tags that will disable deletion of assets. This only affects the UI, not the API. |
