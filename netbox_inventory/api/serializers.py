@@ -3,7 +3,7 @@ from rest_framework import serializers
 from dcim.api.serializers import (
     DeviceTypeSerializer, DeviceSerializer, ManufacturerSerializer,
     ModuleTypeSerializer, ModuleSerializer, InventoryItemSerializer,
-    LocationSerializer
+    LocationSerializer, RackTypeSerializer, RackSerializer,
 )
 from tenancy.api.serializers import ContactSerializer, TenantSerializer
 from netbox.api.serializers import NestedGroupModelSerializer, NetBoxModelSerializer
@@ -108,6 +108,8 @@ class AssetSerializer(NetBoxModelSerializer):
     module = ModuleSerializer(nested=True, required=False, allow_null=True, default=None)
     inventoryitem_type = InventoryItemTypeSerializer(nested=True, required=False, allow_null=True, default=None) 
     inventoryitem = InventoryItemSerializer(nested=True, required=False, allow_null=True, default=None)
+    rack_type = RackTypeSerializer(nested=True, required=False, allow_null=True, default=None)
+    rack = RackSerializer(nested=True, required=False, allow_null=True, default=None)
     storage_location = LocationSerializer(nested=True, required=False, allow_null=True, default=None)
     delivery = DeliverySerializer(nested=True, required=False, allow_null=True, default=None)
     purchase = PurchaseSerializer(nested=True, required=False, allow_null=True, default=None)
@@ -130,7 +132,8 @@ class AssetSerializer(NetBoxModelSerializer):
         model = Asset
         fields = (
             'id', 'url', 'display', 'name', 'asset_tag', 'serial', 'status',
-            'kind', 'device_type', 'device', 'module_type', 'module', 'inventoryitem_type','inventoryitem', 
+            'kind', 'device_type', 'device', 'module_type', 'module',
+            'inventoryitem_type','inventoryitem', 'rack_type', 'rack', 
             'tenant', 'contact', 'storage_location', 'owner', 'delivery', 'purchase',
             'warranty_start', 'warranty_end',
             'comments', 'tags', 'custom_fields', 'created', 'last_updated'

@@ -10,8 +10,8 @@ from .serializers import (
 
 class AssetViewSet(NetBoxModelViewSet):
     queryset = models.Asset.objects.prefetch_related(
-        'device_type', 'device', 'module_type', 'module', 'storage_location',
-        'delivery', 'purchase__supplier', 'tags'
+        'device_type', 'device', 'module_type', 'module', 'rack_type', 'rack',
+        'storage_location', 'delivery', 'purchase__supplier', 'tags'
     )
     serializer_class = AssetSerializer
     filterset_class = filtersets.AssetFilterSet
