@@ -14,6 +14,8 @@
         <a href="{% url 'plugins:netbox_inventory:asset_module_reassign' object.pk %}" class="btn btn-sm btn-ghost-orange">
         {% elif object_type == "inventoryitem" %}
         <a href="{% url 'plugins:netbox_inventory:asset_inventoryitem_reassign' object.pk %}" class="btn btn-sm btn-ghost-orange">
+        {% elif object_type == "rack" %}
+        <a href="{% url 'plugins:netbox_inventory:asset_rack_reassign' object.pk %}" class="btn btn-sm btn-ghost-orange">
         {% endif %}
         {% endwith %}
           <i class="mdi mdi-vector-link" aria-hidden="true"></i> Edit Assignment

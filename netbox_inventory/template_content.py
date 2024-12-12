@@ -107,6 +107,11 @@ class InventoryItemAssetInfo(AssetInfoExtension):
     kind = 'inventoryitem'
 
 
+class RackAssetInfo(AssetInfoExtension):
+    model = 'dcim.rack'
+    kind = 'rack'
+
+
 class ManufacturerAssetCounts(PluginTemplateExtension):
     model = 'dcim.manufacturer'
     def right_page(self):
@@ -218,6 +223,7 @@ template_extensions = (
     DeviceAssetInfo,
     ModuleAssetInfo,
     InventoryItemAssetInfo,
+    RackAssetInfo,
     ManufacturerAssetCounts,
     SiteAssetCounts,
     LocationAssetCounts,
