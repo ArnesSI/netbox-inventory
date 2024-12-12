@@ -1,4 +1,4 @@
-from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
+from dcim.models import DeviceType, Manufacturer, ModuleType, Location, RackType, Site
 from netbox.forms import NetBoxModelForm
 from netbox_inventory.choices import HardwareKindChoices
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
@@ -27,6 +27,7 @@ class AssetForm(NetBoxModelForm):
             'device_types': '$device_type',
             'module_types': '$module_type',
             'inventoryitem_types': '$inventoryitem_type',
+            'rack_types': '$rack_type',
         },
     )
     device_type = DynamicModelChoiceField(
@@ -50,6 +51,13 @@ class AssetForm(NetBoxModelForm):
             'manufacturer_id': '$manufacturer',
         },
         label='Inventory item type',
+    )
+    rack_type = DynamicModelChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        query_params={
+            'manufacturer_id': '$manufacturer',
+        },
     )
     owner = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -109,7 +117,7 @@ class AssetForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet('name', 'asset_tag', 'tags', 'status', name='General'),
-        FieldSet('serial', 'manufacturer', 'device_type', 'module_type', 'inventoryitem_type', name='Hardware'),
+        FieldSet('serial', 'manufacturer', 'device_type', 'module_type', 'inventoryitem_type', 'rack_type', name='Hardware'),
         FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'),
         FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
         FieldSet('storage_site', 'storage_location', name='Location'),
@@ -126,6 +134,7 @@ class AssetForm(NetBoxModelForm):
             'device_type',
             'module_type',
             'inventoryitem_type',
+            'rack_type',
             'storage_location',
             'owner',
             'purchase',
@@ -153,13 +162,13 @@ class AssetForm(NetBoxModelForm):
         self.no_hardware_type = True
         if self.instance:
             if (self.instance.device_type or self.instance.module_type
-                or self.instance.inventoryitem_type):
+                or self.instance.inventoryitem_type or self.instance.rack_type):
                 self.no_hardware_type = False
 
-        # if assigned to device/module/inventoryitem we can't change device_type/...
+        # if assigned to device/module/... we can't change device_type/...
         if (
             self.instance.device or self.instance.module
-            or self.instance.inventoryitem
+            or self.instance.inventoryitem or self.instance.rack
         ):
             self.fields['manufacturer'].disabled = True
             for kind in HardwareKindChoices.values():

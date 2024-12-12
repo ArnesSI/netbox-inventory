@@ -67,8 +67,9 @@
         <h5 class="card-header">
           Assigned To
           <div class="card-actions">
-            {# only show create button if use has add permissions for the kind of hardware being created #}
-            {% if object.kind == 'device' and perms.dcim.add_device or object.kind == 'module' and perms.dcim.add_module or object.kind == 'inventoryitem' and perms.dcim.add_inventoryitem %}
+            {# only show create button if user has add permissions for the kind of hardware being created #}
+            {# django templates don't support parenthesis in if statements, but and has priority over or #}
+            {% if object.kind == 'device' and perms.dcim.add_device or object.kind == 'module' and perms.dcim.add_module or object.kind == 'inventoryitem' and perms.dcim.add_inventoryitem or object.kind == 'rack' and perms.dcim.add_rack %}
               {% if object.hardware %}
                 <a href="#" class="btn btn-sm btn-ghost-dark disabled">
                   <i class="mdi mdi-vector-difference-ba" aria-hidden="true"></i> Create {{ object.get_kind_display }}
