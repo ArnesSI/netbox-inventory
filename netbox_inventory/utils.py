@@ -35,9 +35,24 @@ def get_status_for(status):
         return None
     if status_name not in dict(AssetStatusChoices):
         raise ImproperlyConfigured(
-            f'Configuration defines status {status_name}, but not defined in AssetStatusChoices'
+            f'netbox_inventory plugin configuration defines status {status_name}, but it is not defined in FIELD_CHOICES["netbox_inventory.Asset.status"]'
         )
     return status_name
+
+
+def get_all_statuses_for(status):
+    status_names = get_plugin_setting(status + '_additional_status_names')
+    status_names = set(status_names)
+    # add primary status
+    if primary_status := get_status_for(status):
+        status_names.add(primary_status)
+    if len(status_names) < 1:
+        return None
+    if extra_statuses := status_names.difference(set(dict(AssetStatusChoices))):
+        raise ImproperlyConfigured(
+            f'netbox_inventory plugin configuration defines statuses {extra_statuses}, but these are not defined in FIELD_CHOICES["netbox_inventory.Asset.status"]'
+        )
+    return list(status_names)
 
 
 def get_tags_that_protect_asset_from_deletion():
@@ -160,12 +175,12 @@ def query_located(queryset, field_name, values, assets_shown='all'):
     elif field_name == 'location':
         q_stored = (
             Q(**{f'storage_location__in':values})&
-            Q(status=get_status_for('stored'))
+            Q(status__in=get_all_statuses_for('stored'))
         )
     elif field_name == 'site':
         q_stored = (
             Q(**{f'storage_location__site__in':values})&
-            Q(status=get_status_for('stored'))
+            Q(status__in=get_all_statuses_for('stored'))
         )
 
     if assets_shown == 'all':

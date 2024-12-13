@@ -144,7 +144,9 @@ PLUGINS_CONFIG = {
 |---------|---------------|-------------|
 | `top_level_menu` | `True`| Add netbox-inventory to the top level of netbox navigation menu under Inventory heading. If set to False the plugin will add a menu item under the Plugins menu item.
 | `used_status_name` | `'used'`| Status that indicates asset is in use. See "Automatic management of asset status" below for more info on this setting.
+| `used_additional_status_names` | `[]` (empty list) | List of statuses that are also considered as in use.
 | `stored_status_name` | `'stored'`| Status that indicates asset is in storage. See "Automatic management of asset status" below for more info on this setting.
+| `stored_additional_status_names` | `['retired',]`| List of statuses that are also considered as not in use by various filters.
 | `sync_hardware_serial_asset_tag` | `False` | When an asset is assigned or unassigned to a device, module or inventory item, update its serial number and asset tag to be in sync with the asset? For device and module device type or module type is also updated to match asset. For inventory items, manufacturer and part ID are updated to match asset. |
 | `asset_import_create_purchase` | `False` | When importing assets, automatically create any given purchase, delivery or supplier if it doesn't exist already |
 | `asset_import_create_device_type` | `False` | When importing a device type asset, automatically create manufacturer and/or device type if it doesn't exist |
@@ -168,6 +170,8 @@ FIELD_CHOICES = {
     ),
 }
 ```
+
+If you add more statuses, you should also adjust `used_additional_status_names` and `stored_additional_status_names` settings.
 
 ## Common questions
 
