@@ -35,7 +35,7 @@ def get_status_for(status):
         return None
     if status_name not in dict(AssetStatusChoices):
         raise ImproperlyConfigured(
-            f'Configuration defines status {status_name}, but not defined in AssetStatusChoices'
+            f'netbox_inventory plugin configuration defines status {status_name}, but it is not defined in FIELD_CHOICES["netbox_inventory.Asset.status"]'
         )
     return status_name
 
