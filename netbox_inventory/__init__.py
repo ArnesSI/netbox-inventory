@@ -14,7 +14,9 @@ class NetBoxInventoryConfig(PluginConfig):
     default_settings = {
         'top_level_menu': True,
         'used_status_name': 'used',
+        'used_additional_status_names': list(),
         'stored_status_name': 'stored',
+        'stored_additional_status_names': ['retired',],
         'sync_hardware_serial_asset_tag': False,
         'asset_import_create_purchase': False,
         'asset_import_create_device_type': False,
