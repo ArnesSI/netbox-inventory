@@ -38,6 +38,9 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
         ]
         | None
     )
+    rack_type: (
+        Annotated["RackTypeType", strawberry.lazy("dcim.graphql.types")] | None
+    )
     tenant: Annotated["TenantType", strawberry.lazy("tenancy.graphql.types")] | None
     device: Annotated["DeviceType", strawberry.lazy("dcim.graphql.types")] | None
     module: Annotated["ModuleType", strawberry.lazy("dcim.graphql.types")] | None
@@ -45,6 +48,7 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
     inventoryitem: (
         Annotated["InventoryItemType", strawberry.lazy("dcim.graphql.types")] | None
     )
+    rack: Annotated["RackType", strawberry.lazy("dcim.graphql.types")] | None
     storage_location: (
         Annotated["LocationType", strawberry.lazy("dcim.graphql.types")] | None
     )

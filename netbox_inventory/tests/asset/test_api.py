@@ -1,7 +1,7 @@
 from copy import copy
 
 from core.models import ObjectType
-from dcim.models import Device, DeviceRole, DeviceType, InventoryItem, Manufacturer, ModuleType, Site
+from dcim.models import Device, DeviceRole, DeviceType, InventoryItem, Manufacturer, ModuleType, Rack, RackType, Site
 from users.models import ObjectPermission
 from utilities.testing import APIViewTestCases, disable_warnings
 from rest_framework import status
@@ -140,6 +140,7 @@ class AssetTest(
         manufacturer = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer1')
         device_type1 = DeviceType.objects.create(model='Device Type 1', slug='devicetype1', manufacturer=manufacturer)
         device_type2 = DeviceType.objects.create(model='Device Type 2', slug='devicetype2', manufacturer=manufacturer)
+        rack_type1 = RackType.objects.create(model='Rack Type 1', slug='racktype1', manufacturer=manufacturer)
         module_type1 = ModuleType.objects.create(model='Module Type 1', manufacturer=manufacturer)
         inventoryitem_type1 = InventoryItemType.objects.create(model='II Type 1', manufacturer=manufacturer)
         site1 = Site.objects.create(name='Site 1', slug='site1')
@@ -153,7 +154,7 @@ class AssetTest(
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)
         Asset.objects.create(name='Asset 2', serial='asset2', device_type=device_type1)
-        Asset.objects.create(name='Asset 3', serial='asset3', device_type=device_type1)
+        Asset.objects.create(name='Asset 3', serial='asset3', rack_type=rack_type1)
 
         cls.create_data = [
             {

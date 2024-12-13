@@ -13,15 +13,16 @@ from .utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, ge
 class Asset(NetBoxModel, ImageAttachmentsMixin):
     """
     An Asset represents a piece of hardware we want to keep track of. It has a
-    make (model, part number) that is one of: Device Type, Module Type or
-    InventoryItem Type.
+    make (model, part number) that is one of: Device Type, Module Type,
+    InventoryItem Type or Rack Type.
 
     Asset must have a serial number, can have an asset tag (inventory number). It
-    must have one of DeviceType, ModuleType or InventoryItemType. It can have a
-    storage location (instance of Location). There are also fields to keep track of
+    must have one of DeviceType, ModuleType, InventoryItemType, RackType. It can have
+    a storage location (instance of Location). There are also fields to keep track of
     purchase and warranty info.
 
-    An asset that is in use, can be assigned to a Device, Module or InventoryItem.
+    An asset that is in use, can be assigned to a Device, Module, InventoryItem or
+    Rack.
     """
     #
     # fields that identify asset
@@ -86,6 +87,14 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         null=True,
         verbose_name='Inventory Item Type',
     )
+    rack_type = models.ForeignKey(
+        to='dcim.RackType',
+        on_delete=models.PROTECT,
+        related_name='assets',
+        blank=True,
+        null=True,
+        verbose_name='Rack Type',
+    )
 
     #
     # used fields
@@ -111,6 +120,13 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=True,
         verbose_name='Inventory Item',
+    )
+    rack = models.OneToOneField(
+        to='dcim.Rack',
+        on_delete=models.SET_NULL,
+        related_name='assigned_asset',
+        blank=True,
+        null=True,
     )
     tenant = models.ForeignKey(
         help_text='Tenant using this asset',
@@ -198,6 +214,8 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return 'module'
         elif self.inventoryitem_type_id:
             return 'inventoryitem'
+        elif self.rack_type_id:
+            return 'rack'
         assert False, f'Invalid hardware kind detected for asset {self.pk}'
 
     def get_kind_display(self):
@@ -205,11 +223,11 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
 
     @property
     def hardware_type(self):
-        return self.device_type or self.module_type or self.inventoryitem_type or None
+        return self.device_type or self.module_type or self.inventoryitem_type or self.rack_type or None
 
     @property
     def hardware(self):
-        return self.device or self.module or self.inventoryitem or None
+        return self.device or self.module or self.inventoryitem or self.rack or None
 
     @property
     def storage_site(self):
@@ -221,22 +239,30 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         device = self.installed_device
         if device:
             return device.site
+        if self.rack:
+            return self.rack.site
 
     @property
     def installed_location(self):
         device = self.installed_device
         if device:
             return device.location
+        if self.rack:
+            return self.rack.location
 
     @property
     def installed_rack(self):
         device = self.installed_device
         if device:
             return device.rack
+        if self.rack:
+            return self.rack
 
     @property
     def installed_device(self):
-        if self.kind == 'device':
+        if self.kind == 'rack':
+            return None
+        elif self.kind == 'device':
             return self.device
         elif self.hardware:
             return self.hardware.device
@@ -309,11 +335,11 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         return super().save(*args, **kwargs)
 
     def validate_hardware_types(self):
-        """Ensure only one device/module_type/inventoryitem_type is set at a time."""
-        if sum(map(bool, [self.device_type, self.module_type, self.inventoryitem_type])) > 1:
-            raise ValidationError('Only one of device type, module type and inventory item type can be set for the same asset.')
-        if not self.device_type and not self.module_type and not self.inventoryitem_type:
-            raise ValidationError('One of device type, module type or inventory item type must be set.')
+        """Ensure only one device/module_type/inventoryitem_type/rack_type is set at a time."""
+        if sum(map(bool, [self.device_type, self.module_type, self.inventoryitem_type, self.rack_type])) > 1:
+            raise ValidationError('Only one of device type, module type inventory item type and rack type can be set for the same asset.')
+        if not self.device_type and not self.module_type and not self.inventoryitem_type and not self.rack_type:
+            raise ValidationError('One of device type, module type, inventory item type or rack type must be set.')
 
     def validate_hardware(self):
         """Ensure only one device/module is set at a time and it matches device/module_type."""
@@ -336,7 +362,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
                 raise ValidationError(f'Cannot set {hw_other} for asset that is a {kind}')
 
     def update_status(self):
-        """ If asset was assigned or unassigned to a particular device, module, inventoryitem
+        """ If asset was assigned or unassigned to a particular device, module, inventoryitem, rack
             update asset.status. Depending on plugin configuration.
         """
         old_hw = get_prechange_field(self, self.kind)
@@ -353,7 +379,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             self.status = stored_status
 
     def update_hardware_used(self, clear_old_hw=True):
-        """ If assigning as device, module or inventoryitem set serial and
+        """ If assigning as device, module, inventoryitem or rack set serial and
             asset_tag on it. Also remove them if unasigning.
         """
         if not get_plugin_setting('sync_hardware_serial_asset_tag'):
@@ -401,7 +427,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return f'{self.hardware_type} (id:{self.id})'
 
     class Meta:
-        ordering = ('device_type', 'module_type', 'inventoryitem_type', 'serial',)
+        ordering = ('device_type', 'module_type', 'inventoryitem_type', 'rack_type', 'serial',)
         constraints = (
             models.UniqueConstraint(
                 fields=('device_type', 'serial'),
@@ -414,6 +440,10 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             models.UniqueConstraint(
                 fields=('inventoryitem_type', 'serial'),
                 name='unique_inventoryitem_type_serial',
+            ),
+            models.UniqueConstraint(
+                fields=('rack_type', 'serial'),
+                name='unique_rack_type_serial',
             ),
             models.UniqueConstraint(
                 fields=('owner', 'asset_tag'),

@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from dcim.models import Device, InventoryItem, Module, Site, Location, Manufacturer
+from dcim.models import Device, InventoryItem, Module, Rack, Site, Location, Manufacturer
 from netbox.forms import NetBoxModelForm
 from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.rendering import FieldSet
@@ -15,6 +15,7 @@ __all__ = (
     'AssetDeviceReassignForm',
     'AssetModuleReassignForm',
     'AssetInventoryItemReassignForm',
+    'AssetRackReassignForm',
 )
 
 
@@ -216,3 +217,23 @@ class AssetInventoryItemReassignForm(AssetReassignMixin, NetBoxModelForm):
     class Meta:
         model = InventoryItem
         fields = ('manufacturer', 'inventoryitem_group', 'inventoryitem_type') + AssetReassignMixin.Meta.fields
+
+
+class AssetRackReassignForm(AssetReassignMixin, NetBoxModelForm):
+    assigned_asset = DynamicModelChoiceField(
+        queryset=Asset.objects.filter(rack_type__isnull=False, rack__isnull=True),
+        required=False,
+        selector=True,
+        query_params={
+            'kind': 'rack',
+            'is_assigned': False,
+            'storage_site_id': '$storage_site',
+            'storage_location_id': '$storage_location',
+        },
+        label='New Asset',
+        help_text='New asset to assign to rack',
+    )
+
+    class Meta:
+        model = Rack
+        fields = AssetReassignMixin.Meta.fields

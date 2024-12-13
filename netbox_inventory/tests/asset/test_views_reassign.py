@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 
 from core.models import ObjectType
-from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Site
+from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Rack, RackType, Site
 from core.choices import ObjectChangeActionChoices
 from core.models import ObjectChange
 from users.models import ObjectPermission
@@ -61,6 +61,11 @@ class AssetReassignBase():
             part_number='partnumber2',
             slug='inventoryitem_type2'
         )
+        self.rack_type1 = RackType.objects.create(
+            manufacturer=self.manufacturer1,
+            model='rack_type1',
+            slug='rack_type1'
+        )
         self.device1 = Device.objects.create(
             site=self.site1,
             status='active',
@@ -80,6 +85,12 @@ class AssetReassignBase():
         self.inventoryitem1 = InventoryItem.objects.create(
             device=self.device1,
             name='inventoryitem1',
+        )
+        self.rack1 = Rack.objects.create(
+            site=self.site1,
+            status='active',
+            rack_type=self.rack_type1,
+            name='rack1',
         )
         self.asset_device_old = Asset.objects.create(
             asset_tag='asset_device',
@@ -102,6 +113,13 @@ class AssetReassignBase():
             inventoryitem_type=self.inventoryitem_type1,
             inventoryitem=self.inventoryitem1,
         )
+        self.asset_rack_old = Asset.objects.create(
+            asset_tag='asset_rack',
+            serial='asset_rack',
+            status='used',
+            rack_type=self.rack_type1,
+            rack=self.rack1,
+        )
         self.asset_device_new = Asset.objects.create(
             asset_tag='asset_device2',
             serial='asset_device2',
@@ -119,6 +137,12 @@ class AssetReassignBase():
             serial='asset_inventoryitem2',
             status='stored',
             inventoryitem_type=self.inventoryitem_type2,
+        )
+        self.asset_rack_new = Asset.objects.create(
+            asset_tag='asset_rack2',
+            serial='asset_rack2',
+            status='stored',
+            rack_type=self.rack_type1,
         )
 
     def _get_url(self, _, instance):
@@ -252,6 +276,24 @@ class InventoryItemReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         self.assertEqual(self.tested_hardware.part_id, self.asset_new.inventoryitem_type.part_number)
 
 
+class RackReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
+    """
+    Test assigning different Asset to Module
+    """
+    model = Rack
+
+    def setUp(self):
+        super().setUp()
+        self.form_data = {
+            'rack_type': self.rack1.rack_type.pk,
+            'assigned_asset': self.asset_rack_new.pk,
+            'asset_status': 'stored',
+        }
+        self.tested_hardware = self.rack1
+        self.asset_new = self.asset_rack_new
+        self.asset_old = self.asset_rack_old
+
+
 class DeviceUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
     """
     Test assigning no Asset to Device
@@ -309,3 +351,20 @@ class InventoryItemUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         self.tested_hardware.refresh_from_db()
         self.assertEqual(self.tested_hardware.manufacturer, self.asset_old.inventoryitem_type.manufacturer)
         self.assertEqual(self.tested_hardware.part_id, self.asset_old.inventoryitem_type.part_number)
+
+
+class RackUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
+    """
+    Test assigning no Asset to Rack
+    """
+    model = Rack
+
+    def setUp(self):
+        super().setUp()
+        self.form_data = {
+            'rack_type': self.rack1.rack_type.pk,
+            'asset_status': 'stored',
+        }
+        self.tested_hardware = self.rack1
+        self.asset_new = None
+        self.asset_old = self.asset_rack_old

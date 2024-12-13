@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.signals import pre_save
 
-from dcim.models import Device, Module, InventoryItem
+from dcim.models import Device, Module, InventoryItem, Rack
 from .choices import AssetStatusChoices
 
 
@@ -78,17 +78,19 @@ def asset_clear_old_hw(old_hw):
     pre_save.disconnect(prevent_update_serial_asset_tag, sender=Device)
     pre_save.disconnect(prevent_update_serial_asset_tag, sender=Module)
     pre_save.disconnect(prevent_update_serial_asset_tag, sender=InventoryItem)
+    pre_save.disconnect(prevent_update_serial_asset_tag, sender=Rack)
     old_hw.serial = ''
     old_hw.asset_tag = None
     old_hw.save()
     pre_save.connect(prevent_update_serial_asset_tag, sender=Device)
     pre_save.connect(prevent_update_serial_asset_tag, sender=Module)
     pre_save.connect(prevent_update_serial_asset_tag, sender=InventoryItem)
+    pre_save.connect(prevent_update_serial_asset_tag, sender=Rack)
 
 
 def asset_set_new_hw(asset, hw):
     """
-    Asset was assigned to hardware (device/module/inventory item) and we want to
+    Asset was assigned to hardware (device/module/inventory item/rack) and we want to
     sync some field values from asset to hardware
     Validation if asset can be assigned to hw should be done before calling this function.
     """
@@ -104,7 +106,7 @@ def asset_set_new_hw(asset, hw):
         hw.asset_tag = new_asset_tag
         hw_save = True
     # handle changing of model (<kind>_type)
-    if asset.kind in ['device', 'module']:
+    if asset.kind in ['device', 'module', 'rack']:
         asset_type = getattr(asset, asset.kind+'_type')
         hw_type = getattr(hw, asset.kind+'_type')
         if asset_type != hw_type:
@@ -140,7 +142,12 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         * values - list of PKs of location types to filter on
         * assets_shown - 'all' or 'installed' or 'stored'
     """
+    if field_name == 'rack':
+        q_installed = Q(**{f'rack__in':values})
+    else:
+        q_installed = Q(**{f'rack__{field_name}__in':values})
     q_installed = (
+        q_installed|
         Q(**{f'device__{field_name}__in':values})|
         Q(**{f'module__device__{field_name}__in':values})|
         Q(**{f'inventoryitem__device__{field_name}__in':values})

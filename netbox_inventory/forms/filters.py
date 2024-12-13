@@ -1,6 +1,6 @@
 from django import forms
 
-from dcim.models import Device, DeviceType, DeviceRole, InventoryItemRole, Manufacturer, ModuleType, Site, Location, Rack
+from dcim.models import Device, DeviceType, DeviceRole, InventoryItemRole, Manufacturer, ModuleType, Site, Location, Rack, RackRole, RackType
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
@@ -29,7 +29,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         FieldSet(
             'kind', 'manufacturer_id', 'device_type_id', 'device_role_id',
             'module_type_id', 'inventoryitem_type_id', 'inventoryitem_group_id',
-            'inventoryitem_role_id', 'is_assigned',
+            'inventoryitem_role_id', 'rack_type_id', 'rack_role_id', 'is_assigned',
             name='Hardware'
         ),
         FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
@@ -100,6 +100,19 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=InventoryItemRole.objects.all(),
         required=False,
         label='Inventory item role',
+    )
+    rack_type_id = DynamicModelMultipleChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        query_params={
+            'manufacturer_id': '$manufacturer_id',
+        },
+        label='Rack type',
+    )
+    rack_role_id = DynamicModelMultipleChoiceField(
+        queryset=RackRole.objects.all(),
+        required=False,
+        label='Rack role',
     )
     is_assigned = forms.NullBooleanField(
         required=False,

@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 
-from dcim.models import DeviceType, Manufacturer, ModuleType, Location, Site
+from dcim.models import DeviceType, Manufacturer, ModuleType, Location, RackType, Site
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
 from utilities.forms import add_blank_choice
 from utilities.forms.fields import (
@@ -58,6 +58,16 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     )
     # FIXME figure out how to only show set null checkbox
     module = forms.CharField(
+        disabled=True,
+        required=False,
+    )
+    rack_type = DynamicModelChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack type',
+    )
+    # FIXME figure out how to only show set null checkbox
+    rack = forms.CharField(
         disabled=True,
         required=False,
     )
@@ -118,13 +128,13 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     model = Asset
     fieldsets = (
         FieldSet('name', 'status', name='General'),
-        FieldSet('device_type', 'device', 'module_type', 'module', name='Hardware'),
+        FieldSet('device_type', 'device', 'module_type', 'module', 'rack_type', 'rack', name='Hardware'),
         FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'), 
         FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'), 
         FieldSet('storage_location', name='Location'),
     )
     nullable_fields = (
-        'name', 'device', 'module', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
+        'name', 'device', 'module', 'rack', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
         'warranty_start', 'warranty_end',
     )
 
@@ -143,7 +153,7 @@ class AssetImportForm(NetBoxModelImportForm):
     )
     model_name = forms.CharField(
         required=True,
-        help_text='Model of this device/module/inventory item type. See "Import settings" for more info.',
+        help_text='Model of this device/module/inventory item/rack type. See "Import settings" for more info.',
     )
     part_number = forms.CharField(
         required=False,
@@ -245,6 +255,8 @@ class AssetImportForm(NetBoxModelImportForm):
             hardware_class = ModuleType
         elif hardware_kind == 'inventoryitem':
             hardware_class = InventoryItemType
+        elif hardware_kind == 'rack':
+            hardware_class = RackType
         try:
             hardware_type = hardware_class.objects.get(manufacturer=manufacturer, model=model)
         except ObjectDoesNotExist:
@@ -296,13 +308,14 @@ class AssetImportForm(NetBoxModelImportForm):
         Form's validate_unique calls this method to determine what atributes to
         exclude from uniqness check. Parent method excludes any fields that are
         not present on form. In our case we have model_name field we assign to
-        device_type, module_type or inventory_item dinamically. So we remove those
-        fields from exclusions.
+        device_type, module_type, inventoryitem_type or rack_type dinamically.
+        So we remove those fields from exclusions.
         """
         exclude = super()._get_validation_exclusions()
         exclude.remove('device_type')
         exclude.remove('module_type')
         exclude.remove('inventoryitem_type')
+        exclude.remove('rack_type')
         return exclude
 
     def _create_related_objects(self):
@@ -365,6 +378,17 @@ class AssetImportForm(NetBoxModelImportForm):
                         'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
+                        'comments': self._get_clean_value('model_comments'),
+                    },
+                )
+            if (get_plugin_setting('asset_import_create_rack_type')
+                and self.data.get('hardware_kind') == 'rack'):
+                RackType.objects.get_or_create(
+                    model__iexact=self.data.get('model_name'),
+                    manufacturer=self._get_or_create_related('manufacturer'),
+                    defaults={
+                        'model': self.data.get('model_name'),
+                        'slug': slugify(self.data.get('model_name')),
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )

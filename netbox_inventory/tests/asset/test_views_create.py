@@ -1,6 +1,6 @@
 from django.test import override_settings
 
-from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Site
+from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Rack, RackType, Site
 from utilities.testing import ViewTestCases
 
 from netbox_inventory.tests.custom import ModelViewTestCase
@@ -43,6 +43,11 @@ class AssetCreateHwBase():
             model='inventoryitem_type1',
             slug='inventoryitem_type1'
         )
+        self.rack_type1 = RackType.objects.create(
+            manufacturer=self.manufacturer1,
+            model='rack_type1',
+            slug='rack_type1',
+        )
         self.device1 = Device.objects.create(
             site=self.site1,
             status='active',
@@ -72,6 +77,12 @@ class AssetCreateHwBase():
             status='stored',
             inventoryitem_type=self.inventoryitem_type1,
         )
+        self.asset_rack_sn = Asset.objects.create(
+            asset_tag='asset_rack',
+            serial='asset_rack',
+            status='stored',
+            rack_type=self.rack_type1,
+        )
         self.asset_device_no = Asset.objects.create(
             status='stored',
             device_type=self.device_type1,
@@ -83,6 +94,10 @@ class AssetCreateHwBase():
         self.asset_inventoryitem_no = Asset.objects.create(
             status='stored',
             inventoryitem_type=self.inventoryitem_type1,
+        )
+        self.asset_rack_no = Asset.objects.create(
+            status='stored',
+            rack_type=self.rack_type1,
         )
 
     def _get_url(self, _):
@@ -170,6 +185,23 @@ class SerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestC
         self.tested_asset = self.asset_inventoryitem_sn
 
 
+class SerialRackAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+    """
+    Test creating new Rack from Asset with serial
+    """
+    model = Rack
+
+    def setUp(self):
+        super().setUp()
+        self.form_data = {
+            'site': self.site1.pk,
+            'rack_type': self.rack_type1.pk,
+            'status': 'active',
+            'name': 'tested_rack',
+        }
+        self.tested_asset = self.asset_rack_sn
+
+
 class NoSerialDeviceAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
     """
     Test creating new Device from Asset with blank serial
@@ -218,3 +250,21 @@ class NoSerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTes
             'name': 'inventoryitem1',
         }
         self.tested_asset = self.asset_inventoryitem_no
+
+
+class NoSerialRackAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+    """
+    Test creating new Rack from Asset with blank serial
+    """
+    model = Rack
+
+    def setUp(self):
+        super().setUp()
+        self.form_data = {
+            'site': self.site1.pk,
+            'rack_type': self.rack_type1.pk,
+            'status': 'active',
+            'name': 'tested_rack',
+        }
+        self.tested_asset = self.asset_rack_no
+

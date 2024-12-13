@@ -15,6 +15,7 @@ class HardwareKindChoices(ChoiceSet):
         ('device', 'Device'),
         ('module', 'Module'),
         ('inventoryitem', 'Inventory Item'),
+        ('rack', 'Rack'),
     ]
 
 

@@ -3,8 +3,8 @@ import logging
 from django.core.exceptions import ValidationError
 
 from core.models import ObjectType
-from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm
-from dcim.models import Device
+from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm, RackForm
+from dcim.models import Device, Rack
 from utilities.forms.fields import DynamicModelChoiceField
 from ..utils import get_plugin_setting
 
@@ -12,6 +12,7 @@ __all__ = (
     'AssetDeviceCreateForm',
     'AssetModuleCreateForm',
     'AssetInventoryItemCreateForm',
+    'AssetRackCreateForm',
 )
 
 
@@ -130,3 +131,23 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
 
     def clean_manufacturer(self):
         return self.instance.assigned_asset.inventoryitem_type.manufacturer
+
+
+class AssetRackCreateForm(AssetCreateMixin, RackForm):
+    """
+        Populates and disables editing of asset and rack_type fields
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.update_hardware_fields('rack_type')
+
+        # Omit RackType-defined fields because rack_type is set
+        for field_name in Rack.RACKTYPE_FIELDS:
+            if field_name in self.fields:
+                del self.fields[field_name]
+        # also remove last fieldset that refers to RACKTYPE_FIELDS
+        self.fieldsets = self.fieldsets[:-1]
+
+    def clean_device_type(self):
+        # no mattter what was POSTed, rack_type cannot be changed/missing...
+        return self.instance.assigned_asset.rack_type

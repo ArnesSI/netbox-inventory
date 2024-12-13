@@ -41,6 +41,11 @@
                   Inventory Item
                 </button>
               </li>
+            <li role="presentation" class="nav-item">
+                <button role="tab" type="button" id="rack_type_tab" data-bs-toggle="tab" aria-controls="rack_type" data-bs-target="#rack_type" class="nav-link {% if form.initial.rack_type %}active{% endif %}">
+                  Rack
+                </button>
+              </li>
           </ul>
         </div>
         <div class="tab-content p-0 border-0">
@@ -52,6 +57,9 @@
           </div>
           <div class="tab-pane {% if form.initial.inventoryitem_type %}active{% endif %}" id="inventoryitem_type" role="tabpanel" aria-labeled-by="inventoryitem_type_tab">
             {% render_field form.inventoryitem_type %}
+          </div>
+          <div class="tab-pane {% if form.initial.rack_type %}active{% endif %}" id="rack_type" role="tabpanel" aria-labeled-by="rack_type_tab">
+            {% render_field form.rack_type %}
           </div>
         </div>
     </div>

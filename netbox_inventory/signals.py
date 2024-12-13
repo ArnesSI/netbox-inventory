@@ -3,7 +3,7 @@ import logging
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, pre_delete, post_save
 
-from dcim.models import Device, Module, InventoryItem
+from dcim.models import Device, Module, InventoryItem, Rack
 from utilities.exceptions import AbortRequest
 from .models import Asset, Delivery
 from .utils import get_plugin_setting, get_status_for, is_equal_none
@@ -15,9 +15,10 @@ logger = logging.getLogger('netbox.netbox_inventory.signals')
 @receiver(pre_save, sender=Device)
 @receiver(pre_save, sender=Module)
 @receiver(pre_save, sender=InventoryItem)
+@receiver(pre_save, sender=Rack)
 def prevent_update_serial_asset_tag(instance, **kwargs):
     """
-    When a hardware (Device, Module or InventoryItem) has an Asset assigned and
+    When a hardware (Device, Module, InventoryItem, Rack) has an Asset assigned and
     user changes serial or asset_tag on hardware, prevent that change
     and inform that change must be made on Asset instance instead.
     
@@ -43,9 +44,10 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
 @receiver(pre_delete, sender=Device)
 @receiver(pre_delete, sender=Module)
 @receiver(pre_delete, sender=InventoryItem)
+@receiver(pre_delete, sender=Rack)
 def free_assigned_asset(instance, **kwargs):
     """
-    If a hardware (Device, Module or InventoryItem) has an Asset assigned and
+    If a hardware (Device, Module, InventoryItem, Rack) has an Asset assigned and
     that hardware is deleted, update Asset.status to stored_status.
 
     Netbox handles deletion in a DB transaction, so if deletion failes for any
