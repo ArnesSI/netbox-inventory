@@ -169,6 +169,41 @@ FIELD_CHOICES = {
 }
 ```
 
+## Common questions
+
+### I'd like to attach documents to asset, purchase, supplier, etc
+
+Netbox inventory supports limited file attachments for its various models. You can add images to assets, inventory item types and that is it.
+
+If you would like to attach various other documents to purchases, deliveries, suppliers... first ask yourself if you really need those documents in netbox or could you use some other tool that is possibly in use in your organization. Netbox itself is not great at managing documents. If you decide to manage documents outside netbox, you can porobably still achieve some sort of integration by using [custom links feature](https://netboxlabs.com/docs/netbox/en/stable/customization/custom-links/) to link from a netbox inventory object directly to a document in your document system.
+
+If you really want to store document in netbox itself, then consider using [netbox_attachments plugin](https://github.com/Kani999/netbox-attachments). Here is a sample netbox configuration that will allow adding documents to suppliers, purchases and deliveries:
+
+```python
+PLUGINS = [
+    'netbox_inventory',
+    'netbox_attachments',
+]
+
+PLUGINS_CONFIG = {
+    'netbox_attachments': {
+        'apps': ['netbox_inventory',],
+        'display_setting': {
+            "netbox_inventory.supplier": "left_page",
+            "netbox_inventory.purchase": "full_width_page",
+            "netbox_inventory.delivery": "righ_page",
+            "netbox_inventory.asset": "hidden",
+            "netbox_inventory.inventoryitemtype": "hidden",
+            "netbox_inventory.inventoryitemgroup": "hidden",
+        },
+    },
+}
+```
+
+Here is what it looks like when viewing a purchase:
+
+![Example using netbox_attachments plugin](docs/img/netbox_attachments_example.png)
+
 ## Models
 
 Current plugin data model:
