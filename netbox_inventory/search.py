@@ -10,7 +10,7 @@ class AssetIndex(SearchIndex):
         ("serial", 60),
         ("comments", 5000),
     )
-
+    display_attrs = ('name', 'asset_tag', 'status')
 
 class SupplierIndex(SearchIndex):
     model = Supplier
