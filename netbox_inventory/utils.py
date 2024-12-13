@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models.signals import pre_save
 
 from dcim.models import Device, Module, InventoryItem, Rack
+from netbox.plugins import get_plugin_config
 from .choices import AssetStatusChoices
 
 
@@ -25,9 +26,7 @@ def get_prechange_field(obj, field_name):
 
 
 def get_plugin_setting(setting_name):
-    plugin_settings = settings.PLUGINS_CONFIG['netbox_inventory']
-    assert setting_name in plugin_settings, f'Setting {setting_name} not supported'
-    return plugin_settings[setting_name]
+    return get_plugin_config('netbox_inventory', setting_name)
 
 
 def get_status_for(status):

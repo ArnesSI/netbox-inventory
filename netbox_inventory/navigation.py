@@ -1,13 +1,4 @@
-from django.conf import settings
-from netbox.plugins import PluginMenuItem, PluginMenuButton
-
-# compatibility with netbox v3.3 that does not have PluginMenu
-try:
-    from netbox.plugins import PluginMenu
-    HAVE_MENU = True
-except ImportError:
-    HAVE_MENU = False
-    PluginMenu = PluginMenuItem
+from netbox.plugins import PluginMenu, PluginMenuItem, PluginMenuButton, get_plugin_config
 
 
 asset_buttons = [
@@ -100,7 +91,7 @@ inventoryitemgroup_buttons = [
     )
 ]
 
-assets_buttons = (
+assets_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:asset_list',
         link_text='Assets',
@@ -121,7 +112,7 @@ assets_buttons = (
     ),
 )
 
-deliveries_buttons = (
+deliveries_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:supplier_list',
         link_text='Suppliers',
@@ -142,17 +133,16 @@ deliveries_buttons = (
     ),
 )
 
-# can't use utils.get_plugin_setting() here, get value manually
-if (HAVE_MENU and settings.PLUGINS_CONFIG['netbox_inventory']['top_level_menu']):
+if get_plugin_config('netbox_inventory', 'top_level_menu'):
     # add a top level entry
     menu = PluginMenu(
         label=f'Inventory',
         groups=(
-            ('Asset Management', assets_buttons),
-            ('Deliveries', deliveries_buttons),
+            ('Asset Management', assets_items),
+            ('Deliveries', deliveries_items),
         ),
         icon_class='mdi mdi-clipboard-text-multiple-outline'
     )
 else:
     # display under plugins
-    menu_items = assets_buttons + deliveries_buttons
+    menu_items = assets_items + deliveries_items
