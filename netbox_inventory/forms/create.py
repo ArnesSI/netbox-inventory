@@ -143,7 +143,8 @@ class AssetRackCreateForm(AssetCreateMixin, RackForm):
 
         # Omit RackType-defined fields because rack_type is set
         for field_name in Rack.RACKTYPE_FIELDS:
-            del self.fields[field_name]
+            if field_name in self.fields:
+                del self.fields[field_name]
         # also remove last fieldset that refers to RACKTYPE_FIELDS
         self.fieldsets = self.fieldsets[:-1]
 
