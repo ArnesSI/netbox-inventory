@@ -7,10 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcim', '0191_module_bay_rebuild'),
-        ('extras', '0121_customfield_related_object_filter'),
         ('netbox_inventory', '0008_alter_asset_device_type_alter_asset_module_type'),
-        ('tenancy', '0015_contactassignment_rename_content_type'),
     ]
 
     operations = [
