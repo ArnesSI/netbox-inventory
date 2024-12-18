@@ -49,6 +49,11 @@ class AssetTable(NetBoxTable):
         linkify=True,
         order_by=('device', 'module'),
     )
+    hardware_role = tables.Column(
+        accessor=columns.Accessor('hardware__role'),
+        linkify=True,
+        verbose_name='Hardware Role',
+    )
     installed_site = tables.Column(
         linkify=True,
         verbose_name='Installed Site',
@@ -167,7 +172,20 @@ class AssetTable(NetBoxTable):
             ('-' if is_descending else '') + 'serial',
         )
         return (queryset, True)
-    
+
+    def order_hardware_role(self, queryset, is_descending):
+        queryset = queryset.annotate(
+            role_name=Coalesce(
+                'device__role__name',
+                'inventoryitem__role__name',
+                'rack__role__name',
+            )
+        ).order_by(
+            ('-' if is_descending else '') + 'role_name',
+            ('-' if is_descending else '') + 'serial',
+        )
+        return (queryset, True)
+
     def _order_annotate_installed(self, queryset):
         return queryset.annotate(
             site_name=Coalesce(
@@ -236,6 +254,7 @@ class AssetTable(NetBoxTable):
             'hardware_type',
             'inventoryitem_group',
             'hardware',
+            'hardware_role',
             'installed_site',
             'installed_location',
             'installed_rack',
