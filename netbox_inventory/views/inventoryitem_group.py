@@ -1,4 +1,5 @@
 from netbox.views import generic
+from utilities.views import register_model_view
 
 from .. import filtersets, forms, models, tables
 from ..choices import AssetStatusChoices
@@ -15,6 +16,7 @@ __all__ = (
 )
 
 
+@register_model_view(models.InventoryItemGroup)
 class InventoryItemGroupView(generic.ObjectView):
     queryset = models.InventoryItemGroup.objects.all()
 
@@ -97,6 +99,7 @@ class InventoryItemGroupView(generic.ObjectView):
         }
 
 
+@register_model_view(models.InventoryItemGroup, 'list', path='', detail=False)
 class InventoryItemGroupListView(generic.ObjectListView):
     queryset = models.InventoryItemGroup.objects.add_related_count(
         models.InventoryItemGroup.objects.all(),
@@ -117,20 +120,25 @@ class InventoryItemGroupListView(generic.ObjectListView):
     filterset_form = forms.InventoryItemGroupFilterForm
 
 
+@register_model_view(models.InventoryItemGroup, 'edit')
+@register_model_view(models.InventoryItemGroup, 'add', detail=False)
 class InventoryItemGroupEditView(generic.ObjectEditView):
     queryset = models.InventoryItemGroup.objects.all()
     form = forms.InventoryItemGroupForm
 
 
+@register_model_view(models.InventoryItemGroup, 'delete')
 class InventoryItemGroupDeleteView(generic.ObjectDeleteView):
     queryset = models.InventoryItemGroup.objects.all()
 
 
+@register_model_view(models.InventoryItemGroup, 'bulk_import', path='import', detail=False)
 class InventoryItemGroupBulkImportView(generic.BulkImportView):
     queryset = models.InventoryItemGroup.objects.all()
     model_form = forms.InventoryItemGroupImportForm
 
 
+@register_model_view(models.InventoryItemGroup, 'bulk_edit', path='edit', detail=False)
 class InventoryItemGroupBulkEditView(generic.BulkEditView):
     queryset = models.InventoryItemGroup.objects.all()
     filterset = filtersets.InventoryItemGroupFilterSet
@@ -138,6 +146,7 @@ class InventoryItemGroupBulkEditView(generic.BulkEditView):
     form = forms.InventoryItemGroupBulkEditForm
 
 
+@register_model_view(models.InventoryItemGroup, 'bulk_delete', path='delete', detail=False)
 class InventoryItemGroupBulkDeleteView(generic.BulkDeleteView):
     queryset = models.InventoryItemGroup.objects.all()
     table = tables.InventoryItemGroupTable

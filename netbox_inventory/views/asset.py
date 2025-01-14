@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.template import Template
 from netbox.views import generic
 from utilities.forms import ConfirmationForm, restrict_form_fields
+from utilities.views import register_model_view
 
 from .. import filtersets, forms, models, tables
 from ..template_content import WARRANTY_PROGRESSBAR
@@ -26,6 +27,7 @@ __all__ = (
 )
 
 
+@register_model_view(models.Asset)
 class AssetView(generic.ObjectView):
     queryset = models.Asset.objects.all()
 
@@ -35,6 +37,7 @@ class AssetView(generic.ObjectView):
         return context
 
 
+@register_model_view(models.Asset, 'list', path='', detail=False)
 class AssetListView(generic.ObjectListView):
     queryset = models.Asset.objects.prefetch_related(
         'device_type__manufacturer',
@@ -56,6 +59,7 @@ class AssetListView(generic.ObjectListView):
     filterset_form = forms.AssetFilterForm
 
 
+@register_model_view(models.Asset, 'bulk_add', path='bulk-add', detail=False)
 class AssetBulkCreateView(generic.BulkCreateView):
     queryset = models.Asset.objects.all()
     form = forms.AssetBulkAddForm
@@ -82,12 +86,15 @@ class AssetBulkCreateView(generic.BulkCreateView):
         return new_objects
 
 
+@register_model_view(models.Asset, 'edit')
+@register_model_view(models.Asset, 'add', detail=False)
 class AssetEditView(generic.ObjectEditView):
     queryset = models.Asset.objects.all()
     form = forms.AssetForm
     template_name = 'netbox_inventory/asset_edit.html'
 
 
+@register_model_view(models.Asset, 'delete')
 class AssetDeleteView(generic.ObjectDeleteView):
     queryset = models.Asset.objects.all()
 
@@ -117,12 +124,14 @@ class AssetDeleteView(generic.ObjectDeleteView):
         return super().post(request, *args, **kwargs)
 
 
+@register_model_view(models.Asset, 'bulk_import', path='import', detail=False)
 class AssetBulkImportView(generic.BulkImportView):
     queryset = models.Asset.objects.all()
     model_form = forms.AssetImportForm
     template_name = 'netbox_inventory/asset_bulk_import.html'
 
 
+@register_model_view(models.Asset, 'bulk_edit', path='edit', detail=False)
 class AssetBulkEditView(generic.BulkEditView):
     queryset = models.Asset.objects.all()
     filterset = filtersets.AssetFilterSet
@@ -198,6 +207,7 @@ class AssetBulkEditView(generic.BulkEditView):
         return super().post(request, **kwargs)
 
 
+@register_model_view(models.Asset, 'bulk_delete', path='delete', detail=False)
 class AssetBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Asset.objects.all()
     table = tables.AssetTable
