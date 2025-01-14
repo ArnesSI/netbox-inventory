@@ -11,7 +11,7 @@ urlpatterns = (
     path('assets/', views.AssetListView.as_view(), name='asset_list'),
     path('assets/add/', views.AssetEditView.as_view(), name='asset_add'),
     path('assets/bulk-add/', views.AssetBulkCreateView.as_view(), name='asset_bulk_add'),
-    path('assets/import/', views.AssetBulkImportView.as_view(), name='asset_import'),
+    path('assets/import/', views.AssetBulkImportView.as_view(), name='asset_bulk_import'),
     path('assets/edit/', views.AssetBulkEditView.as_view(), name='asset_bulk_edit'),
     path('assets/delete/', views.AssetBulkDeleteView.as_view(), name='asset_bulk_delete'),
     path('assets/<int:pk>', views.AssetView.as_view(), name='asset'),
@@ -32,7 +32,7 @@ urlpatterns = (
     # Suppliers
     path('suppliers/', views.SupplierListView.as_view(), name='supplier_list'),
     path('suppliers/add/', views.SupplierEditView.as_view(), name='supplier_add'),
-    path('suppliers/import/', views.SupplierBulkImportView.as_view(), name='supplier_import'),
+    path('suppliers/import/', views.SupplierBulkImportView.as_view(), name='supplier_bulk_import'),
     path('suppliers/edit/', views.SupplierBulkEditView.as_view(), name='supplier_bulk_edit'),
     path('suppliers/delete/', views.SupplierBulkDeleteView.as_view(), name='supplier_bulk_delete'),
     path('suppliers/<int:pk>', views.SupplierView.as_view(), name='supplier'),
@@ -41,7 +41,7 @@ urlpatterns = (
     # Purchases
     path('purchases/', views.PurchaseListView.as_view(), name='purchase_list'),
     path('purchases/add/', views.PurchaseEditView.as_view(), name='purchase_add'),
-    path('purchases/import/', views.PurchaseBulkImportView.as_view(), name='purchase_import'),
+    path('purchases/import/', views.PurchaseBulkImportView.as_view(), name='purchase_bulk_import'),
     path('purchases/edit/', views.PurchaseBulkEditView.as_view(), name='purchase_bulk_edit'),
     path('purchases/delete/', views.PurchaseBulkDeleteView.as_view(), name='purchase_bulk_delete'),
     path('purchases/<int:pk>', views.PurchaseView.as_view(), name='purchase'),
@@ -53,7 +53,7 @@ urlpatterns = (
     # Deliveries
     path('deliveries/', views.DeliveryListView.as_view(), name='delivery_list'),
     path('deliveries/add/', views.DeliveryEditView.as_view(), name='delivery_add'),
-    path('deliveries/import/', views.DeliveryBulkImportView.as_view(), name='delivery_import'),
+    path('deliveries/import/', views.DeliveryBulkImportView.as_view(), name='delivery_bulk_import'),
     path('deliveries/edit/', views.DeliveryBulkEditView.as_view(), name='delivery_bulk_edit'),
     path('deliveries/delete/', views.DeliveryBulkDeleteView.as_view(), name='delivery_bulk_delete'),
     path('deliveries/<int:pk>', views.DeliveryView.as_view(), name='delivery'),
@@ -65,7 +65,7 @@ urlpatterns = (
     # InventoryItemTypes
     path('inventory-item-types/', views.InventoryItemTypeListView.as_view(), name='inventoryitemtype_list'),
     path('inventory-item-types/add/', views.InventoryItemTypeEditView.as_view(), name='inventoryitemtype_add'),
-    path('inventory-item-types/import/', views.InventoryItemTypeBulkImportView.as_view(), name='inventoryitemtype_import'),
+    path('inventory-item-types/import/', views.InventoryItemTypeBulkImportView.as_view(), name='inventoryitemtype_bulk_import'),
     path('inventory-item-types/edit/', views.InventoryItemTypeBulkEditView.as_view(), name='inventoryitemtype_bulk_edit'),
     path('inventory-item-types/delete/', views.InventoryItemTypeBulkDeleteView.as_view(), name='inventoryitemtype_bulk_delete'),
     path('inventory-item-types/<int:pk>', views.InventoryItemTypeView.as_view(), name='inventoryitemtype'),
@@ -76,7 +76,7 @@ urlpatterns = (
     # InventoryItemGroups
     path('inventory-item-groups/', views.InventoryItemGroupListView.as_view(), name='inventoryitemgroup_list'),
     path('inventory-item-groups/add/', views.InventoryItemGroupEditView.as_view(), name='inventoryitemgroup_add'),
-    path('inventory-item-groups/import/', views.InventoryItemGroupBulkImportView.as_view(), name='inventoryitemgroup_import'),
+    path('inventory-item-groups/import/', views.InventoryItemGroupBulkImportView.as_view(), name='inventoryitemgroup_bulk_import'),
     path('inventory-item-groups/edit/', views.InventoryItemGroupBulkEditView.as_view(), name='inventoryitemgroup_bulk_edit'),
     path('inventory-item-groups/delete/', views.InventoryItemGroupBulkDeleteView.as_view(), name='inventoryitemgroup_bulk_delete'),
     path('inventory-item-groups/<int:pk>', views.InventoryItemGroupView.as_view(), name='inventoryitemgroup'),
