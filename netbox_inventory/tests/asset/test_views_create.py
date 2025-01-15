@@ -181,6 +181,7 @@ class SerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestC
         self.form_data = {
             'device': self.device1.pk,
             'name': 'inventoryitem1',
+            'status': 'active',
         }
         self.tested_asset = self.asset_inventoryitem_sn
 
@@ -248,6 +249,7 @@ class NoSerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTes
         self.form_data = {
             'device': self.device1.pk,
             'name': 'inventoryitem1',
+            'status': 'active',
         }
         self.tested_asset = self.asset_inventoryitem_no
 

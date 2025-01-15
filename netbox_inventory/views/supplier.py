@@ -16,6 +16,7 @@ __all__ = (
 )
 
 
+@register_model_view(models.Supplier)
 class SupplierView(generic.ObjectView):
     queryset = models.Supplier.objects.all()
 
@@ -27,6 +28,7 @@ class SupplierView(generic.ObjectView):
         }
 
 
+@register_model_view(models.Supplier, 'list', path='', detail=False)
 class SupplierListView(generic.ObjectListView):
     queryset = models.Supplier.objects.annotate(
         purchase_count=count_related(models.Purchase, 'supplier'),
@@ -39,6 +41,7 @@ class SupplierListView(generic.ObjectListView):
 
 
 @register_model_view(models.Supplier, 'edit')
+@register_model_view(models.Supplier, 'add', detail=False)
 class SupplierEditView(generic.ObjectEditView):
     queryset = models.Supplier.objects.all()
     form = forms.SupplierForm
@@ -49,11 +52,13 @@ class SupplierDeleteView(generic.ObjectDeleteView):
     queryset = models.Supplier.objects.all()
 
 
+@register_model_view(models.Supplier, 'bulk_import', path='import', detail=False)
 class SupplierBulkImportView(generic.BulkImportView):
     queryset = models.Supplier.objects.all()
     model_form = forms.SupplierImportForm
 
 
+@register_model_view(models.Supplier, 'bulk_edit', path='edit', detail=False)
 class SupplierBulkEditView(generic.BulkEditView):
     queryset = models.Supplier.objects.all()
     filterset = filtersets.SupplierFilterSet
@@ -61,6 +66,7 @@ class SupplierBulkEditView(generic.BulkEditView):
     form = forms.SupplierBulkEditForm
 
 
+@register_model_view(models.Supplier, 'bulk_delete', path='delete', detail=False)
 class SupplierBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Supplier.objects.all()
     table = tables.SupplierTable

@@ -1,5 +1,6 @@
 from netbox.views import generic
 from utilities.query import count_related
+from utilities.views import register_model_view
 from .. import filtersets, forms, models, tables
 
 __all__ = (
@@ -12,6 +13,8 @@ __all__ = (
     'DeliveryBulkDeleteView',
 )
 
+
+@register_model_view(models.Delivery)
 class DeliveryView(generic.ObjectView):
     queryset = models.Delivery.objects.all()
 
@@ -21,6 +24,7 @@ class DeliveryView(generic.ObjectView):
         }
 
 
+@register_model_view(models.Delivery, 'list', path='', detail=False)
 class DeliveryListView(generic.ObjectListView):
     queryset = models.Delivery.objects.annotate(
         asset_count=count_related(models.Asset, 'delivery'),
@@ -30,20 +34,25 @@ class DeliveryListView(generic.ObjectListView):
     filterset_form = forms.DeliveryFilterForm
 
 
+@register_model_view(models.Delivery, 'edit')
+@register_model_view(models.Delivery, 'add', detail=False)
 class DeliveryEditView(generic.ObjectEditView):
     queryset = models.Delivery.objects.all()
     form = forms.DeliveryForm
 
 
+@register_model_view(models.Delivery, 'delete')
 class DeliveryDeleteView(generic.ObjectDeleteView):
     queryset = models.Delivery.objects.all()
 
 
+@register_model_view(models.Delivery, 'bulk_import', path='import', detail=False)
 class DeliveryBulkImportView(generic.BulkImportView):
     queryset = models.Delivery.objects.all()
     model_form = forms.DeliveryImportForm
 
 
+@register_model_view(models.Delivery, 'bulk_edit', path='edit', detail=False)
 class DeliveryBulkEditView(generic.BulkEditView):
     queryset = models.Delivery.objects.all()
     filterset = filtersets.DeliveryFilterSet
@@ -51,6 +60,7 @@ class DeliveryBulkEditView(generic.BulkEditView):
     form = forms.DeliveryBulkEditForm
 
 
+@register_model_view(models.Delivery, 'bulk_delete', path='delete', detail=False)
 class DeliveryBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Delivery.objects.all()
     table = tables.DeliveryTable

@@ -93,27 +93,27 @@ class AssetLocationCounts(PluginTemplateExtension):
 
 
 class DeviceAssetInfo(AssetInfoExtension):
-    model = 'dcim.device'
+    models = ['dcim.device']
     kind = 'device'
 
 
 class ModuleAssetInfo(AssetInfoExtension):
-    model = 'dcim.module'
+    models = ['dcim.module']
     kind = 'module'
 
 
 class InventoryItemAssetInfo(AssetInfoExtension):
-    model = 'dcim.inventoryitem'
+    models = ['dcim.inventoryitem']
     kind = 'inventoryitem'
 
 
 class RackAssetInfo(AssetInfoExtension):
-    model = 'dcim.rack'
+    models = ['dcim.rack']
     kind = 'rack'
 
 
 class ManufacturerAssetCounts(PluginTemplateExtension):
-    model = 'dcim.manufacturer'
+    models = ['dcim.manufacturer']
     def right_page(self):
         object = self.context.get('object')
         user = self.context['request'].user
@@ -151,18 +151,18 @@ class ManufacturerAssetCounts(PluginTemplateExtension):
 
 
 class SiteAssetCounts(AssetLocationCounts):
-    model = 'dcim.site'
+    models = ['dcim.site']
     location_type='site'
 
 
 class LocationAssetCounts(AssetLocationCounts):
-    model = 'dcim.location'
+    models = ['dcim.location']
     location_type='location'
 
 
 class RackAssetCounts(PluginTemplateExtension):
     # rack cannot have stored assets so we can't use AssetLocationStats
-    model = 'dcim.rack'
+    models = ['dcim.rack']
     def right_page(self):
         object = self.context.get('object')
         user = self.context['request'].user
@@ -181,7 +181,7 @@ class RackAssetCounts(PluginTemplateExtension):
 
 
 class TenantAssetCounts(PluginTemplateExtension):
-    model = 'tenancy.tenant'
+    models = ['tenancy.tenant']
     def right_page(self):
         object = self.context.get('object')
         user = self.context['request'].user
@@ -203,7 +203,7 @@ class TenantAssetCounts(PluginTemplateExtension):
 
 
 class ContactAssetCounts(PluginTemplateExtension):
-    model = 'tenancy.contact'
+    models = ['tenancy.contact']
     def right_page(self):
         object = self.context.get('object')
         user = self.context['request'].user

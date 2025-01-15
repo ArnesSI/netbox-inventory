@@ -9,7 +9,7 @@ asset_buttons = [
         permissions=["netbox_inventory.add_asset"],
     ),
     PluginMenuButton(
-        link='plugins:netbox_inventory:asset_import',
+        link='plugins:netbox_inventory:asset_bulk_import',
         title='Import',
         icon_class='mdi mdi-upload',
         permissions=["netbox_inventory.add_asset"],
@@ -24,7 +24,7 @@ supplier_buttons = [
         permissions=["netbox_inventory.add_supplier"],
     ),
     PluginMenuButton(
-        link='plugins:netbox_inventory:supplier_import',
+        link='plugins:netbox_inventory:supplier_bulk_import',
         title='Import',
         icon_class='mdi mdi-upload',
         permissions=["netbox_inventory.add_supplier"],
@@ -39,7 +39,7 @@ purchase_buttons = [
         permissions=["netbox_inventory.add_purchase"],
     ),
     PluginMenuButton(
-        link='plugins:netbox_inventory:purchase_import',
+        link='plugins:netbox_inventory:purchase_bulk_import',
         title='Import',
         icon_class='mdi mdi-upload',
         permissions=["netbox_inventory.add_purchase"],
@@ -54,7 +54,7 @@ delivery_buttons = [
         permissions=["netbox_inventory.add_delivery"],
     ),
     PluginMenuButton(
-        link='plugins:netbox_inventory:delivery_import',
+        link='plugins:netbox_inventory:delivery_bulk_import',
         title='Import',
         icon_class='mdi mdi-upload',
         permissions=["netbox_inventory.add_delivery"],
@@ -69,7 +69,7 @@ inventoryitemtype_buttons = [
         permissions=["netbox_inventory.add_inventoryitemtype"],
     ),
     PluginMenuButton(
-        link='plugins:netbox_inventory:inventoryitemtype_import',
+        link='plugins:netbox_inventory:inventoryitemtype_bulk_import',
         title='Import',
         icon_class='mdi mdi-upload',
         permissions=["netbox_inventory.add_inventoryitemtype"],
@@ -84,7 +84,7 @@ inventoryitemgroup_buttons = [
         permissions=["netbox_inventory.add_inventoryitemgroup"],
     ),
     PluginMenuButton(
-        link='plugins:netbox_inventory:inventoryitemgroup_import',
+        link='plugins:netbox_inventory:inventoryitemgroup_bulk_import',
         title='Import',
         icon_class='mdi mdi-upload',
         permissions=["netbox_inventory.add_inventoryitemgroup"],
