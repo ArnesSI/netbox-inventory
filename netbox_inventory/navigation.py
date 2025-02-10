@@ -1,6 +1,40 @@
 from netbox.plugins import PluginMenu, PluginMenuItem, PluginMenuButton, get_plugin_config
 
 
+#
+# Assets
+#
+
+inventoryitemgroup_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemgroup_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        permissions=["netbox_inventory.add_inventoryitemgroup"],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemgroup_bulk_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        permissions=["netbox_inventory.add_inventoryitemgroup"],
+    )
+]
+
+inventoryitemtype_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemtype_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        permissions=["netbox_inventory.add_inventoryitemtype"],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:inventoryitemtype_bulk_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        permissions=["netbox_inventory.add_inventoryitemtype"],
+    )
+]
+
 asset_buttons = [
     PluginMenuButton(
         link='plugins:netbox_inventory:asset_add',
@@ -15,6 +49,32 @@ asset_buttons = [
         permissions=["netbox_inventory.add_asset"],
     )
 ]
+
+assets_items = (
+    PluginMenuItem(
+        link='plugins:netbox_inventory:asset_list',
+        link_text='Assets',
+        permissions=["netbox_inventory.view_asset"],
+        buttons=asset_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:inventoryitemtype_list',
+        link_text='Inventory Item Types',
+        permissions=["netbox_inventory.view_inventoryitemtype"],
+        buttons=inventoryitemtype_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:inventoryitemgroup_list',
+        link_text='Inventory Item Groups',
+        permissions=["netbox_inventory.view_inventoryitemgroup"],
+        buttons=inventoryitemgroup_buttons,
+    ),
+)
+
+
+#
+# Deliveries
+#
 
 supplier_buttons = [
     PluginMenuButton(
@@ -61,57 +121,6 @@ delivery_buttons = [
     )
 ]
 
-inventoryitemtype_buttons = [
-    PluginMenuButton(
-        link='plugins:netbox_inventory:inventoryitemtype_add',
-        title='Add',
-        icon_class='mdi mdi-plus-thick',
-        permissions=["netbox_inventory.add_inventoryitemtype"],
-    ),
-    PluginMenuButton(
-        link='plugins:netbox_inventory:inventoryitemtype_bulk_import',
-        title='Import',
-        icon_class='mdi mdi-upload',
-        permissions=["netbox_inventory.add_inventoryitemtype"],
-    )
-]
-
-inventoryitemgroup_buttons = [
-    PluginMenuButton(
-        link='plugins:netbox_inventory:inventoryitemgroup_add',
-        title='Add',
-        icon_class='mdi mdi-plus-thick',
-        permissions=["netbox_inventory.add_inventoryitemgroup"],
-    ),
-    PluginMenuButton(
-        link='plugins:netbox_inventory:inventoryitemgroup_bulk_import',
-        title='Import',
-        icon_class='mdi mdi-upload',
-        permissions=["netbox_inventory.add_inventoryitemgroup"],
-    )
-]
-
-assets_items = (
-    PluginMenuItem(
-        link='plugins:netbox_inventory:asset_list',
-        link_text='Assets',
-        permissions=["netbox_inventory.view_asset"],
-        buttons=asset_buttons,
-    ),
-    PluginMenuItem(
-        link='plugins:netbox_inventory:inventoryitemtype_list',
-        link_text='Inventory Item Types',
-        permissions=["netbox_inventory.view_inventoryitemtype"],
-        buttons=inventoryitemtype_buttons,
-    ),
-    PluginMenuItem(
-        link='plugins:netbox_inventory:inventoryitemgroup_list',
-        link_text='Inventory Item Groups',
-        permissions=["netbox_inventory.view_inventoryitemgroup"],
-        buttons=inventoryitemgroup_buttons,
-    ),
-)
-
 deliveries_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:supplier_list',
@@ -132,6 +141,11 @@ deliveries_items = (
         buttons=delivery_buttons,
     ),
 )
+
+
+#
+# Menu
+#
 
 if get_plugin_config('netbox_inventory', 'top_level_menu'):
     # add a top level entry

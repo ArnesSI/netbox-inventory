@@ -20,6 +20,90 @@ __all__ = (
 )
 
 
+#
+# Assets
+#
+
+class InventoryItemGroupTable(NetBoxTable):
+    name = columns.MPTTColumn(
+        linkify=True,
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'inventoryitem_group_id': 'pk'},
+        verbose_name='Assets',
+    )
+    inventoryitem_type_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:inventoryitemtype_list',
+        url_params={'inventoryitem_group_id': 'pk'},
+        verbose_name='Inventory Item Types',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = InventoryItemGroup
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+            'asset_count',
+            'inventoryitem_type_count',
+        )
+        default_columns = (
+            'name',
+            'asset_count',
+            'inventoryitem_type_count',
+        )
+
+
+class InventoryItemTypeTable(NetBoxTable):
+    manufacturer = tables.Column(
+        linkify=True,
+    )
+    model = tables.Column(
+        linkify=True,
+    )
+    inventoryitem_group = tables.Column(
+        linkify=True,
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'inventoryitem_type_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = InventoryItemType
+        fields = (
+            'pk',
+            'id',
+            'manufacturer',
+            'model',
+            'slug',
+            'part_number',
+            'inventoryitem_group',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+            'asset_count',
+        )
+        default_columns = (
+            'manufacturer',
+            'model',
+            'asset_count',
+        )
+
+
 class AssetTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
@@ -294,6 +378,10 @@ class AssetTable(NetBoxTable):
         )
 
 
+#
+# Deliveries
+#
+
 class SupplierTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,
@@ -440,86 +528,6 @@ class DeliveryTable(NetBoxTable):
             'purchase',
             'date',
             'asset_count',
-        )
-
-
-class InventoryItemTypeTable(NetBoxTable):
-    manufacturer = tables.Column(
-        linkify=True,
-    )
-    model = tables.Column(
-        linkify=True,
-    )
-    inventoryitem_group = tables.Column(
-        linkify=True,
-    )
-    asset_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:asset_list',
-        url_params={'inventoryitem_type_id': 'pk'},
-        verbose_name='Assets',
-    )
-    comments = columns.MarkdownColumn()
-    tags = columns.TagColumn()
-
-    class Meta(NetBoxTable.Meta):
-        model = InventoryItemType
-        fields = (
-            'pk',
-            'id',
-            'manufacturer',
-            'model',
-            'slug',
-            'part_number',
-            'inventoryitem_group',
-            'comments',
-            'tags',
-            'created',
-            'last_updated',
-            'actions',
-            'asset_count',
-        )
-        default_columns = (
-            'manufacturer',
-            'model',
-            'asset_count',
-        )
-
-
-class InventoryItemGroupTable(NetBoxTable):
-    name = columns.MPTTColumn(
-        linkify=True,
-    )
-    asset_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:asset_list',
-        url_params={'inventoryitem_group_id': 'pk'},
-        verbose_name='Assets',
-    )
-    inventoryitem_type_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:inventoryitemtype_list',
-        url_params={'inventoryitem_group_id': 'pk'},
-        verbose_name='Inventory Item Types',
-    )
-    comments = columns.MarkdownColumn()
-    tags = columns.TagColumn()
-
-    class Meta(NetBoxTable.Meta):
-        model = InventoryItemGroup
-        fields = (
-            'pk',
-            'id',
-            'name',
-            'comments',
-            'tags',
-            'created',
-            'last_updated',
-            'actions',
-            'asset_count',
-            'inventoryitem_type_count',
-        )
-        default_columns = (
-            'name',
-            'asset_count',
-            'inventoryitem_type_count',
         )
 
 

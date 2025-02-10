@@ -13,6 +13,66 @@ from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purc
 from .utils import query_located, get_asset_custom_fields_search_filters
 
 
+#
+# Assets
+#
+
+class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
+    parent_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=InventoryItemGroup.objects.all(),
+        label='Parent group (ID)',
+    )
+    ancestor_id = filters.TreeNodeMultipleChoiceFilter(
+        queryset=InventoryItemGroup.objects.all(),
+        field_name='parent',
+        lookup_expr='in',
+        label='Inventory item group (ID)',
+    )
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'id', 'name'
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(name__icontains=value)
+        return queryset.filter(query)
+
+
+class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
+    manufacturer_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='manufacturer',
+        queryset=Manufacturer.objects.all(),
+        label='Manufacturer (ID)',
+    )
+    manufacturer = django_filters.ModelMultipleChoiceFilter(
+        field_name='manufacturer__slug',
+        queryset=Manufacturer.objects.all(),
+        label='Manufacturer (slug)',
+    )
+    inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
+        field_name='inventoryitem_group',
+        queryset=InventoryItemGroup.objects.all(),
+        lookup_expr='in',
+        label='Inventory item group (ID)',
+    )
+
+    class Meta:
+        model = InventoryItemType
+        fields = (
+            'id', 'manufacturer_id', 'manufacturer', 'model', 'slug', 'part_number',
+            'inventoryitem_group_id',
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(model__icontains=value) |
+            Q(part_number__icontains=value)
+        )
+        return queryset.filter(query)
+
+
 class AssetFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=AssetStatusChoices,
@@ -401,6 +461,35 @@ class AssetFilterSet(NetBoxModelFilterSet):
         return queryset.filter(q_list)
 
 
+class HasAssetFilterMixin(NetBoxModelFilterSet):
+    has_asset_assigned = django_filters.BooleanFilter(
+        method='_has_asset_assigned',
+        label='Has an asset assigned',
+    )
+
+    def _has_asset_assigned(self, queryset, name, value):
+        params = Q(assigned_asset__isnull=False)
+        if value:
+            return queryset.filter(params)
+        return queryset.exclude(params)
+
+
+class DeviceAssetFilterSet(HasAssetFilterMixin, DeviceFilterSet):
+    pass
+
+
+class ModuleAssetFilterSet(HasAssetFilterMixin, ModuleFilterSet):
+    pass
+
+
+class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
+    pass
+
+
+#
+# Deliveries
+#
+
 class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
     class Meta:
         model = Supplier
@@ -481,82 +570,3 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             Q(receiving_contact__name__icontains=value)
         )
         return queryset.filter(query)
-
-
-class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
-    manufacturer_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='manufacturer',
-        queryset=Manufacturer.objects.all(),
-        label='Manufacturer (ID)',
-    )
-    manufacturer = django_filters.ModelMultipleChoiceFilter(
-        field_name='manufacturer__slug',
-        queryset=Manufacturer.objects.all(),
-        label='Manufacturer (slug)',
-    )
-    inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
-        field_name='inventoryitem_group',
-        queryset=InventoryItemGroup.objects.all(),
-        lookup_expr='in',
-        label='Inventory item group (ID)',
-    )
-
-    class Meta:
-        model = InventoryItemType
-        fields = (
-            'id', 'manufacturer_id', 'manufacturer', 'model', 'slug', 'part_number',
-            'inventoryitem_group_id',
-        )
-
-    def search(self, queryset, name, value):
-        query = Q(
-            Q(model__icontains=value) |
-            Q(part_number__icontains=value)
-        )
-        return queryset.filter(query)
-
-
-class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
-    parent_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=InventoryItemGroup.objects.all(),
-        label='Parent group (ID)',
-    )
-    ancestor_id = filters.TreeNodeMultipleChoiceFilter(
-        queryset=InventoryItemGroup.objects.all(),
-        field_name='parent',
-        lookup_expr='in',
-        label='Inventory item group (ID)',
-    )
-
-    class Meta:
-        model = InventoryItemGroup
-        fields = (
-            'id', 'name'
-        )
-
-    def search(self, queryset, name, value):
-        query = Q(name__icontains=value) 
-        return queryset.filter(query)
-
-
-class HasAssetFilterMixin(NetBoxModelFilterSet):
-    has_asset_assigned = django_filters.BooleanFilter(
-        method='_has_asset_assigned',
-        label='Has an asset assigned',
-    )
-
-    def _has_asset_assigned(self, queryset, name, value):
-        params = Q(assigned_asset__isnull=False)
-        if value:
-            return queryset.filter(params)
-        return queryset.exclude(params)
-
-
-class DeviceAssetFilterSet(HasAssetFilterMixin, DeviceFilterSet):
-    pass
-
-class ModuleAssetFilterSet(HasAssetFilterMixin, ModuleFilterSet):
-    pass
-
-class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
-    pass

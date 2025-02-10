@@ -5,6 +5,13 @@ from . import views
 
 
 urlpatterns = (
+    # InventoryItemGroups
+    path('inventory-item-groups/', include(get_model_urls('netbox_inventory', 'inventoryitemgroup', detail=False))),
+    path('inventory-item-groups/<int:pk>/', include(get_model_urls('netbox_inventory', 'inventoryitemgroup'))),
+
+    # InventoryItemTypes
+    path('inventory-item-types/', include(get_model_urls('netbox_inventory', 'inventoryitemtype', detail=False))),
+    path('inventory-item-types/<int:pk>/', include(get_model_urls('netbox_inventory', 'inventoryitemtype'))),
 
     # Assets
     path('assets/', include(get_model_urls('netbox_inventory', 'asset', detail=False))),
@@ -30,13 +37,4 @@ urlpatterns = (
     # Deliveries
     path('deliveries/', include(get_model_urls('netbox_inventory', 'delivery', detail=False))),
     path('deliveries/<int:pk>/', include(get_model_urls('netbox_inventory', 'delivery'))),
-
-    # InventoryItemTypes
-    path('inventory-item-types/', include(get_model_urls('netbox_inventory', 'inventoryitemtype', detail=False))),
-    path('inventory-item-types/<int:pk>/', include(get_model_urls('netbox_inventory', 'inventoryitemtype'))),
-
-    # InventoryItemGroups
-    path('inventory-item-groups/', include(get_model_urls('netbox_inventory', 'inventoryitemgroup', detail=False))),
-    path('inventory-item-groups/<int:pk>/', include(get_model_urls('netbox_inventory', 'inventoryitemgroup'))),
-
 )
