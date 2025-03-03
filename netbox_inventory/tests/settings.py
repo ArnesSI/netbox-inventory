@@ -1,4 +1,5 @@
 from copy import deepcopy
+
 from django.conf import settings
 
 """ Custom settings to use with override_settings in tests """

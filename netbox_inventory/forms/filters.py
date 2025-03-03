@@ -1,16 +1,35 @@
 from django import forms
 
-from dcim.models import Device, DeviceType, DeviceRole, InventoryItemRole, Manufacturer, ModuleType, Site, Location, Rack, RackRole, RackType
+from dcim.models import (
+    Device,
+    DeviceRole,
+    DeviceType,
+    InventoryItemRole,
+    Location,
+    Manufacturer,
+    ModuleType,
+    Rack,
+    RackRole,
+    RackType,
+    Site,
+)
 from netbox.forms import NetBoxModelFilterSetForm
+from tenancy.forms import ContactModelFilterForm
+from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
-from tenancy.forms import ContactModelFilterForm
-from tenancy.models import Contact, ContactGroup, Tenant
-from ..choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
+from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from ..models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
 
 __all__ = (
     'AssetFilterForm',

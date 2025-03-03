@@ -1,8 +1,7 @@
-from dcim.models import Device, Module, InventoryItem, Rack
+from dcim.models import Device, InventoryItem, Module, Rack
 from netbox.views import generic
 
 from ..forms.reassign import *
-
 
 __all__ = (
     'AssetDeviceReassignView',

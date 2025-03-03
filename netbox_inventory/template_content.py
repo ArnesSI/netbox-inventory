@@ -1,9 +1,9 @@
 from django.template import Template
+
 from netbox.plugins import PluginTemplateExtension
 
 from .models import Asset
 from .utils import query_located
-
 
 WARRANTY_PROGRESSBAR = '''
 {% with record.warranty_progress as wp %}

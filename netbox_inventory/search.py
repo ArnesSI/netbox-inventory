@@ -1,6 +1,13 @@
 from netbox.search import SearchIndex
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
+from .models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
 
 #
 # Assets

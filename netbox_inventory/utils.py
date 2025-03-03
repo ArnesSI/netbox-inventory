@@ -1,10 +1,11 @@
 from django.conf import settings
-from django.db.models import Q
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
 from django.db.models.signals import pre_save
 
-from dcim.models import Device, Module, InventoryItem, Rack
+from dcim.models import Device, InventoryItem, Module, Rack
 from netbox.plugins import get_plugin_config
+
 from .choices import AssetStatusChoices
 
 

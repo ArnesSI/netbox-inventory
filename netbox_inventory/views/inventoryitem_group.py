@@ -2,8 +2,8 @@ from netbox.views import generic
 from utilities.views import register_model_view
 
 from .. import filtersets, forms, models, tables
+from ..analyzers import asset_counts_status, asset_counts_type_status
 from ..choices import AssetStatusChoices
-from ..analyzers import asset_counts_type_status, asset_counts_status
 
 __all__ = (
     'InventoryItemGroupView',

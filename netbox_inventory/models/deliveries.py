@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
+
 from ..choices import PurchaseStatusChoices
 
 

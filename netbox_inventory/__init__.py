@@ -1,4 +1,5 @@
 from netbox.plugins import PluginConfig
+
 from .version import __version__
 
 

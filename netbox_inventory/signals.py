@@ -1,13 +1,13 @@
 import logging
 
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, pre_delete, post_save
 
-from dcim.models import Device, Module, InventoryItem, Rack
+from dcim.models import Device, InventoryItem, Module, Rack
 from utilities.exceptions import AbortRequest
+
 from .models import Asset, Delivery
 from .utils import get_plugin_setting, get_status_for, is_equal_none
-
 
 logger = logging.getLogger('netbox.netbox_inventory.signals')
 

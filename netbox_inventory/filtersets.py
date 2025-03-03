@@ -1,17 +1,39 @@
 from functools import reduce
-from django.db.models import Q
+
 import django_filters
+from django.db.models import Q
 
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
-from dcim.models import Manufacturer, Device, DeviceType, DeviceRole, Module, ModuleType, InventoryItem, InventoryItemRole, Rack, RackRole, RackType, Site, Location
+from dcim.models import (
+    Device,
+    DeviceRole,
+    DeviceType,
+    InventoryItem,
+    InventoryItemRole,
+    Location,
+    Manufacturer,
+    Module,
+    ModuleType,
+    Rack,
+    RackRole,
+    RackType,
+    Site,
+)
 from netbox.filtersets import NetBoxModelFilterSet
-from utilities import filters
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
-from .choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
-from .utils import query_located, get_asset_custom_fields_search_filters
+from utilities import filters
 
+from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from .models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
+from .utils import get_asset_custom_fields_search_filters, query_located
 
 #
 # Assets

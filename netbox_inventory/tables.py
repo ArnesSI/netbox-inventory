@@ -1,14 +1,21 @@
-from django.db.models.functions import Coalesce
 import django_tables2 as tables
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import columns, NetBoxTable
-from tenancy.tables import ContactsColumnMixin
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
-from .template_content import WARRANTY_PROGRESSBAR
-
 from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
+from netbox.tables import NetBoxTable, columns
+from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
+
+from .models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
+from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',

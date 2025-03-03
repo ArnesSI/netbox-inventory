@@ -4,10 +4,17 @@ from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
 
-from netbox.models import NetBoxModel, NestedGroupModel
+from netbox.models import NestedGroupModel, NetBoxModel
 from netbox.models.features import ImageAttachmentsMixin
-from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
+
+from ..choices import AssetStatusChoices, HardwareKindChoices
+from ..utils import (
+    asset_clear_old_hw,
+    asset_set_new_hw,
+    get_plugin_setting,
+    get_prechange_field,
+    get_status_for,
+)
 
 
 class InventoryItemGroup(NestedGroupModel):

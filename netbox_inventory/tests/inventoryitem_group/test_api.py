@@ -1,6 +1,7 @@
 from utilities.testing import APIViewTestCases
-from ..custom import APITestCase
+
 from ...models import InventoryItemGroup
+from ..custom import APITestCase
 
 
 class InventoryItemGroupTest(

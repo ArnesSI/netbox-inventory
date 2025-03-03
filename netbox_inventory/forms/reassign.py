@@ -2,14 +2,22 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from dcim.models import Device, InventoryItem, Module, Rack, Site, Location, Manufacturer
+from dcim.models import (
+    Device,
+    InventoryItem,
+    Location,
+    Manufacturer,
+    Module,
+    Rack,
+    Site,
+)
 from netbox.forms import NetBoxModelForm
 from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.rendering import FieldSet
-from ..choices import AssetStatusChoices
-from ..models import Asset, InventoryItemType, InventoryItemGroup
-from ..utils import get_status_for
 
+from ..choices import AssetStatusChoices
+from ..models import Asset, InventoryItemGroup, InventoryItemType
+from ..utils import get_status_for
 
 __all__ = (
     'AssetDeviceReassignForm',

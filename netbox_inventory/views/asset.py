@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.template import Template
+
 from netbox.views import generic
 from utilities.forms import ConfirmationForm, restrict_form_fields
 from utilities.views import register_model_view

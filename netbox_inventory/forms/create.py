@@ -6,6 +6,7 @@ from core.models import ObjectType
 from dcim.forms import DeviceForm, InventoryItemForm, ModuleForm, RackForm
 from dcim.models import Device, Rack
 from utilities.forms.fields import DynamicModelChoiceField
+
 from ..utils import get_plugin_setting
 
 __all__ = (

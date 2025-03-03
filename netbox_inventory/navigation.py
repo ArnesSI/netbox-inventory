@@ -1,5 +1,9 @@
-from netbox.plugins import PluginMenu, PluginMenuItem, PluginMenuButton, get_plugin_config
-
+from netbox.plugins import (
+    PluginMenu,
+    PluginMenuButton,
+    PluginMenuItem,
+    get_plugin_config,
+)
 
 #
 # Assets

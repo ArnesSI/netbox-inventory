@@ -1,13 +1,24 @@
 from copy import copy
 
-from core.models import ObjectType
-from dcim.models import Device, DeviceRole, DeviceType, InventoryItem, Manufacturer, ModuleType, Rack, RackType, Site
-from users.models import ObjectPermission
-from utilities.testing import APIViewTestCases, disable_warnings
 from rest_framework import status
 
-from ..custom import APITestCase
+from core.models import ObjectType
+from dcim.models import (
+    Device,
+    DeviceRole,
+    DeviceType,
+    InventoryItem,
+    Manufacturer,
+    ModuleType,
+    Rack,
+    RackType,
+    Site,
+)
+from users.models import ObjectPermission
+from utilities.testing import APIViewTestCases, disable_warnings
+
 from ...models import Asset, Delivery, InventoryItemType, Purchase, Supplier
+from ..custom import APITestCase
 
 
 class AssetTest(

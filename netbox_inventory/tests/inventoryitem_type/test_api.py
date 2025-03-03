@@ -1,7 +1,8 @@
 from dcim.models import Manufacturer
 from utilities.testing import APIViewTestCases
+
+from ...models import InventoryItemGroup, InventoryItemType
 from ..custom import APITestCase
-from ...models import InventoryItemType, InventoryItemGroup
 
 
 class InventoryItemTypeTest(

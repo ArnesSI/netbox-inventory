@@ -1,15 +1,23 @@
 from rest_framework import serializers
 
 from dcim.api.serializers import (
-    DeviceTypeSerializer, DeviceSerializer, ManufacturerSerializer,
-    ModuleTypeSerializer, ModuleSerializer, InventoryItemSerializer,
-    LocationSerializer, RackTypeSerializer, RackSerializer,
+    DeviceSerializer,
+    DeviceTypeSerializer,
+    InventoryItemSerializer,
+    LocationSerializer,
+    ManufacturerSerializer,
+    ModuleSerializer,
+    ModuleTypeSerializer,
+    RackSerializer,
+    RackTypeSerializer,
 )
-from tenancy.api.serializers import ContactSerializer, TenantSerializer
 from netbox.api.serializers import NestedGroupModelSerializer, NetBoxModelSerializer
-from netbox_inventory.models import Asset, InventoryItemType, InventoryItemGroup
-from .nested import *
+from tenancy.api.serializers import ContactSerializer, TenantSerializer
+
+from netbox_inventory.models import Asset, InventoryItemGroup, InventoryItemType
+
 from .deliveries import *
+from .nested import *
 
 
 class InventoryItemGroupSerializer(NestedGroupModelSerializer):

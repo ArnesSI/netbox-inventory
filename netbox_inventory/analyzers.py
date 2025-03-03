@@ -1,4 +1,5 @@
 from copy import copy
+
 from django.db.models import Count, F
 
 from .choices import AssetStatusChoices

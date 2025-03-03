@@ -1,16 +1,28 @@
 from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 
-from core.models import ObjectType
-from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, InventoryItem, Module, ModuleBay, ModuleType, Rack, RackType, Site
 from core.choices import ObjectChangeActionChoices
-from core.models import ObjectChange
+from core.models import ObjectChange, ObjectType
+from dcim.models import (
+    Device,
+    DeviceRole,
+    DeviceType,
+    InventoryItem,
+    Manufacturer,
+    Module,
+    ModuleBay,
+    ModuleType,
+    Rack,
+    RackType,
+    Site,
+)
 from users.models import ObjectPermission
 from utilities.testing import ViewTestCases
 from utilities.testing.utils import post_data
 
-from netbox_inventory.tests.custom import ModelViewTestCase
 from netbox_inventory.models import Asset, InventoryItemType
+from netbox_inventory.tests.custom import ModelViewTestCase
+
 from ..settings import CONFIG_SYNC_ON
 
 

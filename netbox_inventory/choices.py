@@ -1,6 +1,5 @@
 from utilities.choices import ChoiceSet
 
-
 #
 # Assets
 #

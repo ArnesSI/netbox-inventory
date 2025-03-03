@@ -1,12 +1,13 @@
 from django.test import override_settings
 
 from core.models import ObjectType
-from dcim.models import Manufacturer, DeviceType, DeviceRole, Device, Site
+from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from users.models import ObjectPermission
-from utilities.testing import post_data, ViewTestCases
+from utilities.testing import ViewTestCases, post_data
 
-from netbox_inventory.tests.custom import ModelViewTestCase
 from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
+from netbox_inventory.tests.custom import ModelViewTestCase
+
 from ..settings import CONFIG_ALLOW_CREATE_DEVICE_TYPE
 
 

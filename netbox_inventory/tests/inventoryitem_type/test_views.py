@@ -1,8 +1,8 @@
 from dcim.models import Manufacturer
 from utilities.testing import ViewTestCases
 
+from netbox_inventory.models import InventoryItemGroup, InventoryItemType
 from netbox_inventory.tests.custom import ModelViewTestCase
-from netbox_inventory.models import InventoryItemType, InventoryItemGroup
 
 
 class InventoryItemTypeTestCase(

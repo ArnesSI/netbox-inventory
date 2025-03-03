@@ -1,6 +1,7 @@
 from utilities.testing import APIViewTestCases
-from ..custom import APITestCase
+
 from ...models import Purchase, Supplier
+from ..custom import APITestCase
 
 
 class PurchaseTest(

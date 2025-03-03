@@ -1,11 +1,12 @@
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
-from utilities.testing import ViewTestCases, create_tags
-from tenancy.choices import ContactPriorityChoices
-from tenancy.models import Contact, ContactRole, ContactAssignment
 
-from netbox_inventory.tests.custom import ModelViewTestCase
+from tenancy.choices import ContactPriorityChoices
+from tenancy.models import Contact, ContactAssignment, ContactRole
+from utilities.testing import ViewTestCases, create_tags
+
 from netbox_inventory.models import Supplier
+from netbox_inventory.tests.custom import ModelViewTestCase
 
 
 class SupplierTestCase(

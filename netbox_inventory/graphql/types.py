@@ -1,26 +1,30 @@
+from typing import Annotated
+
 import strawberry
 import strawberry_django
-from typing import Annotated
+
 from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
 from netbox.graphql.types import (
     NetBoxObjectType,
     OrganizationalObjectType,
 )
+
 from netbox_inventory.models import (
     Asset,
-    Supplier,
-    Purchase,
     Delivery,
-    InventoryItemType,
     InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
 )
+
 from .filters import (
     AssetFilter,
-    SupplierFilter,
-    PurchaseFilter,
     DeliveryFilter,
-    InventoryItemTypeFilter,
     InventoryItemGroupFilter,
+    InventoryItemTypeFilter,
+    PurchaseFilter,
+    SupplierFilter,
 )
 
 

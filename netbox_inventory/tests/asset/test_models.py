@@ -1,9 +1,11 @@
 from django.forms import ValidationError
-from django.test import override_settings, TestCase
-from dcim.models import Device, DeviceType, DeviceRole, Manufacturer, Site
+from django.test import TestCase, override_settings
+
+from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from utilities.exceptions import AbortRequest
 
-from netbox_inventory.models import Asset, Supplier, Purchase, Delivery
+from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
+
 from ..settings import CONFIG_SYNC_OFF, CONFIG_SYNC_ON
 
 
