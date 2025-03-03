@@ -30,7 +30,7 @@ include = ["netbox_inventory*"]
 
 [tool.ruff.lint]
 extend-select = ["E4", "E7", "E9", "F", "W", "C"]
-ignore = []
+ignore = ["F403", "F405"]
 
 [tool.ruff.format]
 quote-style = "single"
