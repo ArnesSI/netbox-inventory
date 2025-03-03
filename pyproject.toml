@@ -27,3 +27,10 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 include = ["netbox_inventory*"]
+
+[tool.ruff.lint]
+extend-select = ["E1", "E2", "E3", "E501", "W"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "single"
