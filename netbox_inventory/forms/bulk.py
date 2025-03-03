@@ -379,7 +379,7 @@ class AssetImportForm(NetBoxModelImportForm):
         exclude.remove('rack_type')
         return exclude
 
-    def _create_related_objects(self):
+    def _create_related_objects(self):  # noqa: C901
         """
         Create missing related objects (Purchase, DeviceType...). Based on plugin
         settings.

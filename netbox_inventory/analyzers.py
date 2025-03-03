@@ -6,7 +6,7 @@ from .choices import AssetStatusChoices
 from .models import Asset
 
 
-def asset_counts_type_status(inventoryitem_group, assets=None):
+def asset_counts_type_status(inventoryitem_group, assets=None):  # noqa: C901
     """
     Return counts of assets based on combinations of inventoryitem type
     and status values for assets that belong to an inventoryitem group.
