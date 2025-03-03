@@ -10,7 +10,6 @@ class DeliveryTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = Delivery
 
     @classmethod

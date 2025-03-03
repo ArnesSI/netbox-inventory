@@ -15,7 +15,6 @@ class AssetTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = Asset
 
     @classmethod
@@ -101,11 +100,9 @@ class AssetTestCase(
 
     @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
     def test_assign_device_from_asset(self):
-
         # Assign unconstrained permission
         obj_perm = ObjectPermission(
-            name='test-device-assign permission',
-            actions=['add', 'change']
+            name='test-device-assign permission', actions=['add', 'change']
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
@@ -119,10 +116,10 @@ class AssetTestCase(
         )
         device = Device.objects.create(
             name='test-device-assign',
-            role = DeviceRole.objects.first(),
+            role=DeviceRole.objects.first(),
             device_type=asset.device_type,
-            site = Site.objects.first(),
-            status = 'active',
+            site=Site.objects.first(),
+            status='active',
         )
 
         form_data = {
@@ -156,8 +153,7 @@ class AssetTestCase(
         """
         # Assign unconstrained permission
         obj_perm = ObjectPermission(
-            name='test-asset permission',
-            actions=['add', 'change']
+            name='test-asset permission', actions=['add', 'change']
         )
         obj_perm.save()
         obj_perm.users.add(self.user)
@@ -202,6 +198,7 @@ class AssetBulkAddTestCase(
     """
     test for /plugins/inventory/assets/bulk-add/
     """
+
     model = Asset
 
     @classmethod

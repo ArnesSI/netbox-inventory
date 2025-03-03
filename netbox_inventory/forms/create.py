@@ -33,7 +33,7 @@ logger = logging.getLogger('netbox.netbox_inventory.forms.create')
 class AssetCreateMixin:
     def update_hardware_fields(self, kind_type):
         """
-            Pre-populate and disable hardware related fields from asset data
+        Pre-populate and disable hardware related fields from asset data
         """
         if self.instance.assigned_asset:
             asset = self.instance.assigned_asset
@@ -61,8 +61,9 @@ class AssetCreateMixin:
 
 class AssetDeviceCreateForm(AssetCreateMixin, DeviceForm):
     """
-        Populates and disables editing of asset and devcie_type fields
+    Populates and disables editing of asset and devcie_type fields
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.update_hardware_fields('device_type')
@@ -74,14 +75,13 @@ class AssetDeviceCreateForm(AssetCreateMixin, DeviceForm):
 
 class AssetModuleCreateForm(AssetCreateMixin, ModuleForm):
     """
-        Populates and disables editing of asset and module_type fields
+    Populates and disables editing of asset and module_type fields
     """
+
     device = DynamicModelChoiceField(
         queryset=Device.objects.all(),
         selector=True,
-        initial_params={
-            'modulebays': '$module_bay'
-        }
+        initial_params={'modulebays': '$module_bay'},
     )
 
     def __init__(self, *args, **kwargs):
@@ -94,10 +94,11 @@ class AssetModuleCreateForm(AssetCreateMixin, ModuleForm):
 
 class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
     """
-        Populates and disables editing of hardware related fields
-        Offers selection of device components and maps selected component
-        to component_type and component_id fields
+    Populates and disables editing of hardware related fields
+    Offers selection of device components and maps selected component
+    to component_type and component_id fields
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -126,7 +127,9 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
                 raise ValidationError('Only a single component can be selected')
             if field_value:
                 component_set = field_name
-                self.cleaned_data['component_type'] = ObjectType.objects.get(app_label='dcim', model=field_name)
+                self.cleaned_data['component_type'] = ObjectType.objects.get(
+                    app_label='dcim', model=field_name
+                )
                 self.cleaned_data['component_id'] = field_value.pk
                 self.cleaned_data.pop(field_name)
 
@@ -136,8 +139,9 @@ class AssetInventoryItemCreateForm(AssetCreateMixin, InventoryItemForm):
 
 class AssetRackCreateForm(AssetCreateMixin, RackForm):
     """
-        Populates and disables editing of asset and rack_type fields
+    Populates and disables editing of asset and rack_type fields
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.update_hardware_fields('rack_type')

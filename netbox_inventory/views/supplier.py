@@ -23,9 +23,13 @@ class SupplierView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         return {
-            'asset_count': models.Asset.objects.filter(purchase__supplier=instance).count(),
+            'asset_count': models.Asset.objects.filter(
+                purchase__supplier=instance
+            ).count(),
             'purchase_count': models.Purchase.objects.filter(supplier=instance).count(),
-            'delivery_count': models.Delivery.objects.filter(purchase__supplier=instance).count(),
+            'delivery_count': models.Delivery.objects.filter(
+                purchase__supplier=instance
+            ).count(),
         }
 
 

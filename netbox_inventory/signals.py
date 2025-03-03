@@ -21,7 +21,7 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
     When a hardware (Device, Module, InventoryItem, Rack) has an Asset assigned and
     user changes serial or asset_tag on hardware, prevent that change
     and inform that change must be made on Asset instance instead.
-    
+
     Only enforces if `sync_hardware_serial_asset_tag` setting is true.
     """
     try:

@@ -9,7 +9,6 @@ class InventoryItemTypeTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = InventoryItemType
 
     @classmethod

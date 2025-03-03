@@ -22,12 +22,13 @@ from ..custom import APITestCase
 
 
 class AssetTest(
-        APITestCase, 
-        APIViewTestCases.GetObjectViewTestCase,
-        APIViewTestCases.ListObjectsViewTestCase,
-        APIViewTestCases.CreateObjectViewTestCase,
-        APIViewTestCases.UpdateObjectViewTestCase,
-        APIViewTestCases.DeleteObjectViewTestCase):
+    APITestCase,
+    APIViewTestCases.GetObjectViewTestCase,
+    APIViewTestCases.ListObjectsViewTestCase,
+    APIViewTestCases.CreateObjectViewTestCase,
+    APIViewTestCases.UpdateObjectViewTestCase,
+    APIViewTestCases.DeleteObjectViewTestCase,
+):
     model = Asset
     brief_fields = ['display', 'id', 'name', 'serial', 'url']
 
@@ -40,27 +41,23 @@ class AssetTest(
         check assigning device to asset when asset's & device's device_type matches
         """
         # Add object-level permission
-        obj_perm = ObjectPermission(
-            name='Test permission',
-            actions=['add', 'change']
-        )
+        obj_perm = ObjectPermission(name='Test permission', actions=['add', 'change'])
         obj_perm.save()
         obj_perm.users.add(self.user)
         obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
-        update_data = {'device':self.device1.pk}
+        update_data = {'device': self.device1.pk}
 
-        response = self.client.post(self._get_list_url(), self.create_data[0], format='json', **self.header)
+        response = self.client.post(
+            self._get_list_url(), self.create_data[0], format='json', **self.header
+        )
         instance = self._get_queryset().get(pk=response.data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
         self.assertHttpStatus(response, status.HTTP_200_OK)
         instance.refresh_from_db()
         self.assertInstanceEqual(
-            instance,
-            update_data,
-            exclude=self.validation_excluded_fields,
-            api=True
+            instance, update_data, exclude=self.validation_excluded_fields, api=True
         )
 
     def test_assign_device_missmatch_device_type(self):
@@ -68,17 +65,16 @@ class AssetTest(
         check assigning device to asset when asset's & device's device_type doesn't match
         """
         # Add object-level permission
-        obj_perm = ObjectPermission(
-            name='Test permission',
-            actions=['add', 'change']
-        )
+        obj_perm = ObjectPermission(name='Test permission', actions=['add', 'change'])
         obj_perm.save()
         obj_perm.users.add(self.user)
         obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
-        update_data = {'device':self.device2.pk}
+        update_data = {'device': self.device2.pk}
 
-        response = self.client.post(self._get_list_url(), self.create_data[0], format='json', **self.header)
+        response = self.client.post(
+            self._get_list_url(), self.create_data[0], format='json', **self.header
+        )
         instance = self._get_queryset().get(pk=response.data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
@@ -90,17 +86,16 @@ class AssetTest(
         check assigning inventoryitem to asset when asset.kind is device
         """
         # Add object-level permission
-        obj_perm = ObjectPermission(
-            name='Test permission',
-            actions=['add', 'change']
-        )
+        obj_perm = ObjectPermission(name='Test permission', actions=['add', 'change'])
         obj_perm.save()
         obj_perm.users.add(self.user)
         obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
-        update_data = {'inventoryitem':self.inventoryitem1.pk}
+        update_data = {'inventoryitem': self.inventoryitem1.pk}
 
-        response = self.client.post(self._get_list_url(), self.create_data[0], format='json', **self.header)
+        response = self.client.post(
+            self._get_list_url(), self.create_data[0], format='json', **self.header
+        )
         instance = self._get_queryset().get(pk=response.data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
@@ -112,16 +107,15 @@ class AssetTest(
         check that assigning delivery without purchase auto-sets purchase
         """
         # Add object-level permission
-        obj_perm = ObjectPermission(
-            name='Test permission',
-            actions=['add', 'change']
-        )
+        obj_perm = ObjectPermission(name='Test permission', actions=['add', 'change'])
         obj_perm.save()
         obj_perm.users.add(self.user)
         obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
 
         create_data = self.create_data[2]
-        response = self.client.post(self._get_list_url(), create_data, format='json', **self.header)
+        response = self.client.post(
+            self._get_list_url(), create_data, format='json', **self.header
+        )
         instance = self._get_queryset().get(pk=response.data['id'])
         self.assertEqual(instance.purchase, self.purchase1)
 
@@ -130,10 +124,7 @@ class AssetTest(
         check that assigning empty string for serial or asset_tag, normalizes to None
         """
         # Add object-level permission
-        obj_perm = ObjectPermission(
-            name='Test permission',
-            actions=['add', 'change']
-        )
+        obj_perm = ObjectPermission(name='Test permission', actions=['add', 'change'])
         obj_perm.save()
         obj_perm.users.add(self.user)
         obj_perm.object_types.add(ObjectType.objects.get_for_model(self.model))
@@ -141,27 +132,59 @@ class AssetTest(
         create_data = copy(self.create_data[0])
         create_data['serial'] = ''
         create_data['asset_tag'] = ''
-        response = self.client.post(self._get_list_url(), create_data, format='json', **self.header)
+        response = self.client.post(
+            self._get_list_url(), create_data, format='json', **self.header
+        )
         instance = self._get_queryset().get(pk=response.data['id'])
         self.assertEqual(instance.serial, None)
         self.assertEqual(instance.asset_tag, None)
 
     @classmethod
     def setUpTestData(cls):
-        manufacturer = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer1')
-        device_type1 = DeviceType.objects.create(model='Device Type 1', slug='devicetype1', manufacturer=manufacturer)
-        device_type2 = DeviceType.objects.create(model='Device Type 2', slug='devicetype2', manufacturer=manufacturer)
-        rack_type1 = RackType.objects.create(model='Rack Type 1', slug='racktype1', manufacturer=manufacturer)
-        module_type1 = ModuleType.objects.create(model='Module Type 1', manufacturer=manufacturer)
-        inventoryitem_type1 = InventoryItemType.objects.create(model='II Type 1', manufacturer=manufacturer)
+        manufacturer = Manufacturer.objects.create(
+            name='Manufacturer 1', slug='manufacturer1'
+        )
+        device_type1 = DeviceType.objects.create(
+            model='Device Type 1', slug='devicetype1', manufacturer=manufacturer
+        )
+        device_type2 = DeviceType.objects.create(
+            model='Device Type 2', slug='devicetype2', manufacturer=manufacturer
+        )
+        rack_type1 = RackType.objects.create(
+            model='Rack Type 1', slug='racktype1', manufacturer=manufacturer
+        )
+        module_type1 = ModuleType.objects.create(
+            model='Module Type 1', manufacturer=manufacturer
+        )
+        inventoryitem_type1 = InventoryItemType.objects.create(
+            model='II Type 1', manufacturer=manufacturer
+        )
         site1 = Site.objects.create(name='Site 1', slug='site1')
         role1 = DeviceRole.objects.create(name='Device Role 1', slug='devicerole1')
-        cls.device1 = Device.objects.create(name='Device 1', role=role1, device_type=device_type1, site=site1, status='active')
-        cls.device2 = Device.objects.create(name='Device 2', role=role1, device_type=device_type2, site=site1, status='active')
-        cls.inventoryitem1 = InventoryItem.objects.create(device=cls.device1, name='II 1')
+        cls.device1 = Device.objects.create(
+            name='Device 1',
+            role=role1,
+            device_type=device_type1,
+            site=site1,
+            status='active',
+        )
+        cls.device2 = Device.objects.create(
+            name='Device 2',
+            role=role1,
+            device_type=device_type2,
+            site=site1,
+            status='active',
+        )
+        cls.inventoryitem1 = InventoryItem.objects.create(
+            device=cls.device1, name='II 1'
+        )
         supplier1 = Supplier.objects.create(name='Supplier1', slug='supplier1')
-        cls.purchase1 = Purchase.objects.create(name='Purchase1', supplier=supplier1, status='closed')
-        cls.delivery1 = Delivery.objects.create(name='Delivery1', purchase=cls.purchase1)
+        cls.purchase1 = Purchase.objects.create(
+            name='Purchase1', supplier=supplier1, status='closed'
+        )
+        cls.delivery1 = Delivery.objects.create(
+            name='Delivery1', purchase=cls.purchase1
+        )
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)
         Asset.objects.create(name='Asset 2', serial='asset2', device_type=device_type1)

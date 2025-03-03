@@ -5,12 +5,12 @@ from netbox.graphql.filter_mixins import BaseFilterMixin, autotype_decorator
 from netbox_inventory import filtersets, models
 
 __all__ = (
-    "AssetFilter",
-    "SupplierFilter",
-    "PurchaseFilter",
-    "DeliveryFilter",
-    "InventoryItemTypeFilter",
-    "InventoryItemGroupFilter",
+    'AssetFilter',
+    'SupplierFilter',
+    'PurchaseFilter',
+    'DeliveryFilter',
+    'InventoryItemTypeFilter',
+    'InventoryItemGroupFilter',
 )
 
 

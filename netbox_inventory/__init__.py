@@ -17,7 +17,9 @@ class NetBoxInventoryConfig(PluginConfig):
         'used_status_name': 'used',
         'used_additional_status_names': list(),
         'stored_status_name': 'stored',
-        'stored_additional_status_names': ['retired',],
+        'stored_additional_status_names': [
+            'retired',
+        ],
         'sync_hardware_serial_asset_tag': False,
         'asset_import_create_purchase': False,
         'asset_import_create_device_type': False,
@@ -36,5 +38,6 @@ class NetBoxInventoryConfig(PluginConfig):
     def ready(self):
         super().ready()
         import netbox_inventory.signals
+
 
 config = NetBoxInventoryConfig

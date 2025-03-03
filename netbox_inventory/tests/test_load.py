@@ -11,7 +11,7 @@ class NetboxInventoryVersionTestCase(SimpleTestCase):
     """
 
     def test_version(self):
-        assert __version__ == "2.3.0"
+        assert __version__ == '2.3.0'
 
 
 class AppTest(APITestCase):
@@ -20,7 +20,7 @@ class AppTest(APITestCase):
     """
 
     def test_root(self):
-        url = reverse("plugins-api:netbox_inventory-api:api-root")
-        response = self.client.get(f"{url}?format=api", **self.header)
+        url = reverse('plugins-api:netbox_inventory-api:api-root')
+        response = self.client.get(f'{url}?format=api', **self.header)
 
         self.assertEqual(response.status_code, 200)

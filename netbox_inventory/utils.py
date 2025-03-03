@@ -90,6 +90,7 @@ def get_tags_and_edit_protected_asset_fields():
 def asset_clear_old_hw(old_hw):
     # need to temporarily disconnect signal receiver that prevents update of device serial if asset assigned
     from .signals import prevent_update_serial_asset_tag
+
     pre_save.disconnect(prevent_update_serial_asset_tag, sender=Device)
     pre_save.disconnect(prevent_update_serial_asset_tag, sender=Module)
     pre_save.disconnect(prevent_update_serial_asset_tag, sender=InventoryItem)
@@ -122,10 +123,10 @@ def asset_set_new_hw(asset, hw):
         hw_save = True
     # handle changing of model (<kind>_type)
     if asset.kind in ['device', 'module', 'rack']:
-        asset_type = getattr(asset, asset.kind+'_type')
-        hw_type = getattr(hw, asset.kind+'_type')
+        asset_type = getattr(asset, asset.kind + '_type')
+        hw_type = getattr(hw, asset.kind + '_type')
         if asset_type != hw_type:
-            setattr(hw, asset.kind+'_type', asset_type)
+            setattr(hw, asset.kind + '_type', asset_type)
             hw_save = True
     # for inventory items also set manufacturer and part_number
     if asset.inventoryitem_type:
@@ -141,7 +142,7 @@ def asset_set_new_hw(asset, hw):
 
 
 def is_equal_none(a, b):
-    """ Compare a and b as string. None is considered the same as empty string. """
+    """Compare a and b as string. None is considered the same as empty string."""
     if a is None or b is None:
         return a == b or a == '' or b == ''
     return a == b
@@ -158,14 +159,14 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         * assets_shown - 'all' or 'installed' or 'stored'
     """
     if field_name == 'rack':
-        q_installed = Q(**{f'rack__in':values})
+        q_installed = Q(**{f'rack__in': values})
     else:
-        q_installed = Q(**{f'rack__{field_name}__in':values})
+        q_installed = Q(**{f'rack__{field_name}__in': values})
     q_installed = (
-        q_installed|
-        Q(**{f'device__{field_name}__in':values})|
-        Q(**{f'module__device__{field_name}__in':values})|
-        Q(**{f'inventoryitem__device__{field_name}__in':values})
+        q_installed
+        | Q(**{f'device__{field_name}__in': values})
+        | Q(**{f'module__device__{field_name}__in': values})
+        | Q(**{f'inventoryitem__device__{field_name}__in': values})
     )
 
     # Q expressions for stored
@@ -174,14 +175,12 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         # generate Q() that matches none
         q_stored = Q(pk__in=[])
     elif field_name == 'location':
-        q_stored = (
-            Q(**{f'storage_location__in':values})&
-            Q(status__in=get_all_statuses_for('stored'))
+        q_stored = Q(**{f'storage_location__in': values}) & Q(
+            status__in=get_all_statuses_for('stored')
         )
     elif field_name == 'site':
-        q_stored = (
-            Q(**{f'storage_location__site__in':values})&
-            Q(status__in=get_all_statuses_for('stored'))
+        q_stored = Q(**{f'storage_location__site__in': values}) & Q(
+            status__in=get_all_statuses_for('stored')
         )
 
     if assets_shown == 'all':
@@ -209,5 +208,5 @@ def get_asset_custom_fields_search_filters():
     fields = []
     for field_name, filters in custom_fields_filters.items():
         for filter in filters:
-            fields.append(f"custom_field_data__{field_name}__{filter}")
+            fields.append(f'custom_field_data__{field_name}__{filter}')
     return fields

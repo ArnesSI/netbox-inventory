@@ -4,6 +4,7 @@ from utilities.choices import ChoiceSet
 # Assets
 #
 
+
 class AssetStatusChoices(ChoiceSet):
     key = 'Asset.status'
 
@@ -26,6 +27,7 @@ class HardwareKindChoices(ChoiceSet):
 #
 # Deliveries
 #
+
 
 class PurchaseStatusChoices(ChoiceSet):
     key = 'Purchase.status'

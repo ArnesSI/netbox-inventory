@@ -6,13 +6,13 @@ from django.db import migrations, models
 
 
 def rebuild_tree(apps, schema_editor):
-    from ..models import InventoryItemGroup 
-    if hasattr(InventoryItemGroup,'_tree_manager'):
+    from ..models import InventoryItemGroup
+
+    if hasattr(InventoryItemGroup, '_tree_manager'):
         InventoryItemGroup._tree_manager.rebuild()
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('netbox_inventory', '0003_add_inventoryitemgroup'),
     ]
@@ -38,7 +38,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='inventoryitemgroup',
             name='parent',
-            field=mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='netbox_inventory.inventoryitemgroup'),
+            field=mptt.fields.TreeForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='children',
+                to='netbox_inventory.inventoryitemgroup',
+            ),
         ),
         migrations.AddField(
             model_name='inventoryitemgroup',
@@ -60,10 +66,18 @@ class Migration(migrations.Migration):
         migrations.RunPython(rebuild_tree, migrations.RunPython.noop),
         migrations.AddConstraint(
             model_name='inventoryitemgroup',
-            constraint=models.UniqueConstraint(fields=('parent', 'name'), name='netbox_inventory_inventoryitemgroup_parent_name'),
+            constraint=models.UniqueConstraint(
+                fields=('parent', 'name'),
+                name='netbox_inventory_inventoryitemgroup_parent_name',
+            ),
         ),
         migrations.AddConstraint(
             model_name='inventoryitemgroup',
-            constraint=models.UniqueConstraint(condition=models.Q(('parent__isnull', True)), fields=('name',), name='netbox_inventory_inventoryitemgroup_name', violation_error_message='A top-level group with this name already exists.'),
+            constraint=models.UniqueConstraint(
+                condition=models.Q(('parent__isnull', True)),
+                fields=('name',),
+                name='netbox_inventory_inventoryitemgroup_name',
+                violation_error_message='A top-level group with this name already exists.',
+            ),
         ),
     ]

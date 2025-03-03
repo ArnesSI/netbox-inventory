@@ -21,7 +21,7 @@ from netbox_inventory.tests.custom import ModelViewTestCase
 from ..settings import CONFIG_SYNC_ON
 
 
-class AssetCreateHwBase():
+class AssetCreateHwBase:
     """
     Base class for tests that create hardware and assign Asset to it
     """
@@ -39,22 +39,17 @@ class AssetCreateHwBase():
             slug='manufacturer1',
         )
         self.device_type1 = DeviceType.objects.create(
-            manufacturer=self.manufacturer1,
-            model='device_type1',
-            slug='device_type1'
+            manufacturer=self.manufacturer1, model='device_type1', slug='device_type1'
         )
         self.module_type1 = ModuleType.objects.create(
             manufacturer=self.manufacturer1,
             model='module_type1',
         )
-        self.role1 = DeviceRole.objects.create(
-            name='role1',
-            slug='role1'
-        )
+        self.role1 = DeviceRole.objects.create(name='role1', slug='role1')
         self.inventoryitem_type1 = InventoryItemType.objects.create(
             manufacturer=self.manufacturer1,
             model='inventoryitem_type1',
-            slug='inventoryitem_type1'
+            slug='inventoryitem_type1',
         )
         self.rack_type1 = RackType.objects.create(
             manufacturer=self.manufacturer1,
@@ -126,7 +121,7 @@ class AssetCreateHwBase():
         # in addition to a new inventoryitem instance in db,
         # it must have matching serial and asset2 must have it assigned
         # blank value for Asset.serial is None, but for Device/Module/IItem.serial it's ''
-        checked_serial = self.tested_asset.serial or '' 
+        checked_serial = self.tested_asset.serial or ''
         instance = self._get_queryset().order_by('pk').last()
         self.assertEqual(instance.asset_tag, self.tested_asset.asset_tag)
         self.assertEqual(instance.serial, checked_serial)
@@ -140,7 +135,7 @@ class AssetCreateHwBase():
         # in addition to a new inventoryitem instance in db,
         # it must have matching serial and asset2 must have it assigned
         # blank value for Asset.serial is None, but for Device/Module/IItem.serial it's ''
-        checked_serial = self.tested_asset.serial or '' 
+        checked_serial = self.tested_asset.serial or ''
         instance = self._get_queryset().order_by('pk').last()
         self.assertEqual(instance.asset_tag, self.tested_asset.asset_tag)
         self.assertEqual(instance.serial, checked_serial)
@@ -148,10 +143,13 @@ class AssetCreateHwBase():
         self.assertEqual(instance, self.tested_asset.hardware)
 
 
-class SerialDeviceAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class SerialDeviceAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new Device from Asset with serial
     """
+
     model = Device
 
     def setUp(self):
@@ -166,10 +164,13 @@ class SerialDeviceAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, Vi
         self.tested_asset = self.asset_device_sn
 
 
-class SerialModuleAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class SerialModuleAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new Module from Asset with serial
     """
+
     model = Module
 
     def setUp(self):
@@ -183,10 +184,13 @@ class SerialModuleAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, Vi
         self.tested_asset = self.asset_module_sn
 
 
-class SerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class SerialInventoryItemAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new InventoryItem from Asset with serial
     """
+
     model = InventoryItem
 
     def setUp(self):
@@ -199,10 +203,13 @@ class SerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestC
         self.tested_asset = self.asset_inventoryitem_sn
 
 
-class SerialRackAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class SerialRackAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new Rack from Asset with serial
     """
+
     model = Rack
 
     def setUp(self):
@@ -216,10 +223,13 @@ class SerialRackAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, View
         self.tested_asset = self.asset_rack_sn
 
 
-class NoSerialDeviceAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class NoSerialDeviceAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new Device from Asset with blank serial
     """
+
     model = Device
 
     def setUp(self):
@@ -234,10 +244,13 @@ class NoSerialDeviceAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, 
         self.tested_asset = self.asset_device_no
 
 
-class NoSerialModuleAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class NoSerialModuleAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new Module from Asset with blank serial
     """
+
     model = Module
 
     def setUp(self):
@@ -251,10 +264,13 @@ class NoSerialModuleAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, 
         self.tested_asset = self.asset_module_no
 
 
-class NoSerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class NoSerialInventoryItemAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new InventoryItem from Asset with blank serial
     """
+
     model = InventoryItem
 
     def setUp(self):
@@ -267,10 +283,13 @@ class NoSerialInventoryItemAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTes
         self.tested_asset = self.asset_inventoryitem_no
 
 
-class NoSerialRackAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase):
+class NoSerialRackAssetCreateHwTestCase(
+    AssetCreateHwBase, ModelViewTestCase, ViewTestCases.CreateObjectViewTestCase
+):
     """
     Test creating new Rack from Asset with blank serial
     """
+
     model = Rack
 
     def setUp(self):
@@ -282,4 +301,3 @@ class NoSerialRackAssetCreateHwTestCase(AssetCreateHwBase, ModelViewTestCase, Vi
             'name': 'tested_rack',
         }
         self.tested_asset = self.asset_rack_no
-

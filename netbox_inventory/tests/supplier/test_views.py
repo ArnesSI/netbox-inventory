@@ -13,7 +13,6 @@ class SupplierTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = Supplier
 
     form_data = {
@@ -59,13 +58,12 @@ class ContactAssignmentTestCase(
     ViewTestCases.DeleteObjectViewTestCase,
     ViewTestCases.ListObjectsViewTestCase,
     ViewTestCases.BulkEditObjectsViewTestCase,
-    ViewTestCases.BulkDeleteObjectsViewTestCase
+    ViewTestCases.BulkDeleteObjectsViewTestCase,
 ):
     model = ContactAssignment
 
     @classmethod
     def setUpTestData(cls):
-
         suppliers = (
             Supplier(name='Supplier 1', slug='supplier-1'),
             Supplier(name='Supplier 2', slug='supplier-2'),
@@ -95,19 +93,19 @@ class ContactAssignmentTestCase(
                 object=suppliers[0],
                 contact=contacts[0],
                 role=contact_roles[0],
-                priority=ContactPriorityChoices.PRIORITY_PRIMARY
+                priority=ContactPriorityChoices.PRIORITY_PRIMARY,
             ),
             ContactAssignment(
                 object=suppliers[1],
                 contact=contacts[1],
                 role=contact_roles[1],
-                priority=ContactPriorityChoices.PRIORITY_SECONDARY
+                priority=ContactPriorityChoices.PRIORITY_SECONDARY,
             ),
             ContactAssignment(
                 object=suppliers[2],
                 contact=contacts[2],
                 role=contact_roles[2],
-                priority=ContactPriorityChoices.PRIORITY_TERTIARY
+                priority=ContactPriorityChoices.PRIORITY_TERTIARY,
             ),
         )
         ContactAssignment.objects.bulk_create(assignments)
@@ -134,6 +132,6 @@ class ContactAssignmentTestCase(
             url = reverse('tenancy:contactassignment_add')
             content_type = ContentType.objects.get_for_model(Supplier).pk
             object_id = Supplier.objects.first().pk
-            return f"{url}?object_type={content_type}&object_id={object_id}"
+            return f'{url}?object_type={content_type}&object_id={object_id}'
 
         return super()._get_url(action, instance=instance)

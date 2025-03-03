@@ -13,25 +13,13 @@ class Supplier(NetBoxModel, ContactsMixin):
     This can be the same entity as Manufacturer or a separate one. However
     netbox_inventory keeps track of Suppliers separate from Manufacturers.
     """
-    name = models.CharField(
-        max_length=100,
-        unique=True
-    )
-    slug = models.SlugField(
-        max_length=100,
-        unique=True
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
-    comments = models.TextField(
-        blank=True
-    )
 
-    clone_fields = [
-        'description', 'comments'
-    ]
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True)
+    comments = models.TextField(blank=True)
+
+    clone_fields = ['description', 'comments']
 
     class Meta:
         ordering = ['name']
@@ -47,9 +35,8 @@ class Purchase(NetBoxModel):
     """
     Represents a purchase of a set of Assets from a Supplier.
     """
-    name = models.CharField(
-        max_length=100
-    )
+
+    name = models.CharField(max_length=100)
     supplier = models.ForeignKey(
         help_text='Legal entity this purchase was made at',
         to='netbox_inventory.Supplier',
@@ -68,23 +55,14 @@ class Purchase(NetBoxModel):
         blank=True,
         null=True,
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
-    comments = models.TextField(
-        blank=True
-    )
+    description = models.CharField(max_length=200, blank=True)
+    comments = models.TextField(blank=True)
 
-    clone_fields = [
-        'supplier', 'date', 'status', 'description', 'comments'
-    ]
+    clone_fields = ['supplier', 'date', 'status', 'description', 'comments']
 
     class Meta:
         ordering = ['supplier', 'name']
-        unique_together = (
-            ('supplier', 'name'),
-        )
+        unique_together = (('supplier', 'name'),)
 
     def get_status_color(self):
         return PurchaseStatusChoices.colors.get(self.status)
@@ -101,9 +79,8 @@ class Delivery(NetBoxModel):
     Delivery is a stage in Purchase. Purchase can have multiple deliveries.
     In each Delivery one or more Assets were delivered.
     """
-    name = models.CharField(
-        max_length=100
-    )
+
+    name = models.CharField(max_length=100)
     purchase = models.ForeignKey(
         help_text='Purchase that this delivery is part of',
         to='netbox_inventory.Purchase',
@@ -125,23 +102,14 @@ class Delivery(NetBoxModel):
         blank=True,
         null=True,
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
-    comments = models.TextField(
-        blank=True
-    )
+    description = models.CharField(max_length=200, blank=True)
+    comments = models.TextField(blank=True)
 
-    clone_fields = [
-        'purchase', 'date', 'receiving_contact', 'description', 'comments'
-    ]
+    clone_fields = ['purchase', 'date', 'receiving_contact', 'description', 'comments']
 
     class Meta:
         ordering = ['purchase', 'name']
-        unique_together = (
-            ('purchase', 'name'),
-        )
+        unique_together = (('purchase', 'name'),)
         verbose_name = 'delivery'
         verbose_name_plural = 'deliveries'
 

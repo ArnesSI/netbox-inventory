@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('dcim', '0187_alter_device_vc_position'),
         ('netbox_inventory', '0007_alter_asset_unique_together_and_more'),
@@ -15,11 +14,23 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='asset',
             name='device_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='assets', to='dcim.devicetype'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='assets',
+                to='dcim.devicetype',
+            ),
         ),
         migrations.AlterField(
             model_name='asset',
             name='module_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='assets', to='dcim.moduletype'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='assets',
+                to='dcim.moduletype',
+            ),
         ),
     ]

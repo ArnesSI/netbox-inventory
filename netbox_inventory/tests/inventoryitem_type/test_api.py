@@ -6,23 +6,37 @@ from ..custom import APITestCase
 
 
 class InventoryItemTypeTest(
-        APITestCase, 
-        APIViewTestCases.GetObjectViewTestCase,
-        APIViewTestCases.ListObjectsViewTestCase,
-        APIViewTestCases.CreateObjectViewTestCase,
-        APIViewTestCases.UpdateObjectViewTestCase,
-        APIViewTestCases.DeleteObjectViewTestCase):
+    APITestCase,
+    APIViewTestCases.GetObjectViewTestCase,
+    APIViewTestCases.ListObjectsViewTestCase,
+    APIViewTestCases.CreateObjectViewTestCase,
+    APIViewTestCases.UpdateObjectViewTestCase,
+    APIViewTestCases.DeleteObjectViewTestCase,
+):
     model = InventoryItemType
     brief_fields = ['display', 'id', 'manufacturer', 'model', 'slug', 'url']
 
-
     @classmethod
     def setUpTestData(cls) -> None:
-        manufacturer1 = Manufacturer.objects.create(name='Manufacturer 1', slug='manufacturer1')
+        manufacturer1 = Manufacturer.objects.create(
+            name='Manufacturer 1', slug='manufacturer1'
+        )
         ig1 = InventoryItemGroup.objects.create(name='IG1')
-        InventoryItemType.objects.create(model='InventoryItemType 1', slug='inventoryitemtype1', manufacturer=manufacturer1)
-        InventoryItemType.objects.create(model='InventoryItemType 2', slug='inventoryitemtype2', manufacturer=manufacturer1)
-        InventoryItemType.objects.create(model='InventoryItemType 3', slug='inventoryitemtype3', manufacturer=manufacturer1)
+        InventoryItemType.objects.create(
+            model='InventoryItemType 1',
+            slug='inventoryitemtype1',
+            manufacturer=manufacturer1,
+        )
+        InventoryItemType.objects.create(
+            model='InventoryItemType 2',
+            slug='inventoryitemtype2',
+            manufacturer=manufacturer1,
+        )
+        InventoryItemType.objects.create(
+            model='InventoryItemType 3',
+            slug='inventoryitemtype3',
+            manufacturer=manufacturer1,
+        )
         cls.create_data = [
             {
                 'model': 'InventoryItemType 4',

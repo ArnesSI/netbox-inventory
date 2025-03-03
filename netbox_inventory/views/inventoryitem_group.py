@@ -27,22 +27,26 @@ class InventoryItemGroupView(generic.ObjectView):
             models.Asset,
             'inventoryitem_type__inventoryitem_group',
             'asset_count',
-            cumulative=True
+            cumulative=True,
         )
-        child_groups = models.InventoryItemGroup.objects.add_related_count(
-            child_groups,
-            models.InventoryItemType,
-            'inventoryitem_group',
-            'inventoryitem_type_count',
-            cumulative=True
-        ).restrict(request.user, 'view').filter(
-            parent__in=instance.get_descendants(include_self=True)
+        child_groups = (
+            models.InventoryItemGroup.objects.add_related_count(
+                child_groups,
+                models.InventoryItemType,
+                'inventoryitem_group',
+                'inventoryitem_type_count',
+                cumulative=True,
+            )
+            .restrict(request.user, 'view')
+            .filter(parent__in=instance.get_descendants(include_self=True))
         )
         child_groups_table = tables.InventoryItemGroupTable(child_groups)
         child_groups_table.columns.hide('actions')
         # get all assets from this group and its descendants
         assets = models.Asset.objects.restrict(request.user, 'view').filter(
-            inventoryitem_type__inventoryitem_group__in=instance.get_descendants(include_self=True)
+            inventoryitem_type__inventoryitem_group__in=instance.get_descendants(
+                include_self=True
+            )
         )
         # make table of assets
         asset_table = tables.AssetTable(assets, user=request.user)
@@ -56,7 +60,7 @@ class InventoryItemGroupView(generic.ObjectView):
         type_status_objects = []
         prev_type = 0
         asset_obj = {}
-        total_items = len(type_status_counts)-1 # get last index
+        total_items = len(type_status_counts) - 1  # get last index
         for idx, tsc in enumerate(type_status_counts):
             if prev_type != tsc['inventoryitem_type']:
                 prev_type = tsc['inventoryitem_type']
@@ -66,27 +70,29 @@ class InventoryItemGroupView(generic.ObjectView):
                 asset_obj = {}
 
             # collection of statuses for same types
-            status_list = { 
+            status_list = {
                 'status': tsc['status'],
-                'count': str(tsc['count']), # needs to be a string to render
+                'count': str(tsc['count']),  # needs to be a string to render
                 'color': tsc['color'],
-                'label': tsc['label']
+                'label': tsc['label'],
             }
             if len(asset_obj.keys()) != 0:
                 asset_obj.get('status_list').append(status_list)
             else:
                 # initial list of assets
                 asset_obj = {
-                    'inventoryitem_type__manufacturer__name': tsc['inventoryitem_type__manufacturer__name'],
+                    'inventoryitem_type__manufacturer__name': tsc[
+                        'inventoryitem_type__manufacturer__name'
+                    ],
                     'inventoryitem_type__model': tsc['inventoryitem_type__model'],
                     'inventoryitem_type': tsc['inventoryitem_type'],
-                    'status_list': [status_list]
+                    'status_list': [status_list],
                 }
-            
+
             # make sure we dont forget last item
-            if(total_items == idx):
+            if total_items == idx:
                 type_status_objects.append(asset_obj)
-        
+
         # counts by status, ignoring different inventoryitem_types
         status_counts = asset_counts_status(type_status_counts)
 
@@ -95,7 +101,7 @@ class InventoryItemGroupView(generic.ObjectView):
             'asset_table': asset_table,
             'type_status_counts': type_status_counts,
             'status_counts': status_counts,
-            'type_status_objects': type_status_objects
+            'type_status_objects': type_status_objects,
         }
 
 
@@ -106,14 +112,14 @@ class InventoryItemGroupListView(generic.ObjectListView):
         models.Asset,
         'inventoryitem_type__inventoryitem_group',
         'asset_count',
-        cumulative=True
+        cumulative=True,
     )
     queryset = models.InventoryItemGroup.objects.add_related_count(
         queryset,
         models.InventoryItemType,
         'inventoryitem_group',
         'inventoryitem_type_count',
-        cumulative=True
+        cumulative=True,
     )
     table = tables.InventoryItemGroupTable
     filterset = filtersets.InventoryItemGroupFilterSet
@@ -132,7 +138,9 @@ class InventoryItemGroupDeleteView(generic.ObjectDeleteView):
     queryset = models.InventoryItemGroup.objects.all()
 
 
-@register_model_view(models.InventoryItemGroup, 'bulk_import', path='import', detail=False)
+@register_model_view(
+    models.InventoryItemGroup, 'bulk_import', path='import', detail=False
+)
 class InventoryItemGroupBulkImportView(generic.BulkImportView):
     queryset = models.InventoryItemGroup.objects.all()
     model_form = forms.InventoryItemGroupImportForm
@@ -146,7 +154,9 @@ class InventoryItemGroupBulkEditView(generic.BulkEditView):
     form = forms.InventoryItemGroupBulkEditForm
 
 
-@register_model_view(models.InventoryItemGroup, 'bulk_delete', path='delete', detail=False)
+@register_model_view(
+    models.InventoryItemGroup, 'bulk_delete', path='delete', detail=False
+)
 class InventoryItemGroupBulkDeleteView(generic.BulkDeleteView):
     queryset = models.InventoryItemGroup.objects.all()
     table = tables.InventoryItemGroupTable

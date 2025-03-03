@@ -5,12 +5,13 @@ from ..custom import APITestCase
 
 
 class SupplierTest(
-        APITestCase, 
-        APIViewTestCases.GetObjectViewTestCase,
-        APIViewTestCases.ListObjectsViewTestCase,
-        APIViewTestCases.CreateObjectViewTestCase,
-        APIViewTestCases.UpdateObjectViewTestCase,
-        APIViewTestCases.DeleteObjectViewTestCase):
+    APITestCase,
+    APIViewTestCases.GetObjectViewTestCase,
+    APIViewTestCases.ListObjectsViewTestCase,
+    APIViewTestCases.CreateObjectViewTestCase,
+    APIViewTestCases.UpdateObjectViewTestCase,
+    APIViewTestCases.DeleteObjectViewTestCase,
+):
     model = Supplier
     brief_fields = ['description', 'display', 'id', 'name', 'slug', 'url']
     create_data = [

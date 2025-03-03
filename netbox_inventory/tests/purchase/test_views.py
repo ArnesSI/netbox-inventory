@@ -10,7 +10,6 @@ class PurchaseTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = Purchase
 
     @classmethod

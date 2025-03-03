@@ -21,7 +21,7 @@ class AssetAssignMixin(forms.Form):
     name = forms.CharField(
         required=False,
         label='Asset name',
-        help_text=Asset._meta.get_field('name').help_text
+        help_text=Asset._meta.get_field('name').help_text,
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -44,7 +44,7 @@ class AssetAssignMixin(forms.Form):
 
     def _clean_hardware(self, kind):
         """
-        Args: 
+        Args:
             kind (str): one of device, module, inventoryitem, rack
         """
         hardware = self.cleaned_data[kind]
@@ -54,11 +54,17 @@ class AssetAssignMixin(forms.Form):
                 # field was not changed
                 return hardware
 
-            if getattr(hardware, f'{kind}_type') != getattr(self.instance, f'{kind}_type'):
-                raise forms.ValidationError(f'{kind} type of selected {kind} does not match asset\'s {kind} type')
+            if getattr(hardware, f'{kind}_type') != getattr(
+                self.instance, f'{kind}_type'
+            ):
+                raise forms.ValidationError(
+                    f"{kind} type of selected {kind} does not match asset's {kind} type"
+                )
 
             if Asset.objects.filter(**{kind: hardware}).exists():
-                raise forms.ValidationError(f'{kind} {hardware} already has asset assigned')
+                raise forms.ValidationError(
+                    f'{kind} {hardware} already has asset assigned'
+                )
 
         setattr(self.instance, kind, hardware)
         return hardware
@@ -71,7 +77,7 @@ class AssetAssignMixin(forms.Form):
 
         # Remove Custom Fields from form
         for cf_name in self.custom_fields.keys():
-           self.fields.pop(cf_name, None)
+            self.fields.pop(cf_name, None)
         self.custom_fields = {}
         self.custom_fields_groups = {}
 
@@ -93,7 +99,7 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
             attrs={
                 'data-static-params': '[{"queryParam":"has_asset_assigned","queryValue":"false"}]',
             },
-        )
+        ),
     )
 
     fieldsets = (
@@ -131,7 +137,7 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
             attrs={
                 'data-static-params': '[{"queryParam":"has_asset_assigned","queryValue":"false"}]',
             },
-        )
+        ),
     )
 
     fieldsets = (
@@ -175,7 +181,7 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
             attrs={
                 'data-static-params': '[{"queryParam":"has_asset_assigned","queryValue":"false"}]',
             },
-        )
+        ),
     )
 
     fieldsets = (
@@ -186,7 +192,14 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
 
     class Meta:
         model = Asset
-        fields = ('inventoryitem_type', 'name', 'device', 'inventoryitem', 'tenant', 'contact')
+        fields = (
+            'inventoryitem_type',
+            'name',
+            'device',
+            'inventoryitem',
+            'tenant',
+            'contact',
+        )
         widgets = {'inventoryitem_type': forms.HiddenInput()}
 
     def clean_device(self):
@@ -202,9 +215,11 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
             if self.instance.inventoryitem == inventoryitem:
                 # field was not changed
                 return inventoryitem
-            
+
             if Asset.objects.filter(inventoryitem=inventoryitem).exists():
-                raise forms.ValidationError(f'Inventory item {inventoryitem} already has asset assigned')
+                raise forms.ValidationError(
+                    f'Inventory item {inventoryitem} already has asset assigned'
+                )
 
         self.instance.inventoryitem = inventoryitem
         return inventoryitem
@@ -224,7 +239,11 @@ class AssetRackAssignForm(AssetAssignMixin, NetBoxModelForm):
     )
     rack = DynamicModelChoiceField(
         queryset=Rack.objects.all(),
-        query_params={'rack_type_id': '$rack_type', 'site_id': '$site', 'location_id': '$location'},
+        query_params={
+            'rack_type_id': '$rack_type',
+            'site_id': '$site',
+            'location_id': '$location',
+        },
         label='Rack',
         required=False,
         help_text='Set to empty to unassign asset from rack',
