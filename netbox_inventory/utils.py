@@ -158,7 +158,7 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         * assets_shown - 'all' or 'installed' or 'stored'
     """
     if field_name == 'rack':
-        q_installed = Q(**{f'rack__in': values})
+        q_installed = Q(**{'rack__in': values})
     else:
         q_installed = Q(**{f'rack__{field_name}__in': values})
     q_installed = (
@@ -174,11 +174,11 @@ def query_located(queryset, field_name, values, assets_shown='all'):
         # generate Q() that matches none
         q_stored = Q(pk__in=[])
     elif field_name == 'location':
-        q_stored = Q(**{f'storage_location__in': values}) & Q(
+        q_stored = Q(**{'storage_location__in': values}) & Q(
             status__in=get_all_statuses_for('stored')
         )
     elif field_name == 'site':
-        q_stored = Q(**{f'storage_location__site__in': values}) & Q(
+        q_stored = Q(**{'storage_location__site__in': values}) & Q(
             status__in=get_all_statuses_for('stored')
         )
 

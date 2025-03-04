@@ -154,7 +154,7 @@ deliveries_items = (
 if get_plugin_config('netbox_inventory', 'top_level_menu'):
     # add a top level entry
     menu = PluginMenu(
-        label=f'Inventory',
+        label='Inventory',
         groups=(
             ('Asset Management', assets_items),
             ('Deliveries', deliveries_items),

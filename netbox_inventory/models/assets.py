@@ -553,9 +553,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             and self.warranty_end <= self.warranty_start
         ):
             raise ValidationError(
-                {
-                    'warranty_end': f'Warranty end date must be after warranty start date.'
-                }
+                {'warranty_end': 'Warranty end date must be after warranty start date.'}
             )
 
     def get_absolute_url(self):
