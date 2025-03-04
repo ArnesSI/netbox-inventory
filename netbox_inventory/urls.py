@@ -24,10 +24,18 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'inventoryitemtype')),
     ),
     # Assets
-    path('assets/', include(get_model_urls('netbox_inventory', 'asset', detail=False))),
-    path('assets/<int:pk>/', include(get_model_urls('netbox_inventory', 'asset'))),
     path(
-        'assets/<int:pk>/assign/', views.AssetAssignView.as_view(), name='asset_assign'
+        'assets/',
+        include(get_model_urls('netbox_inventory', 'asset', detail=False)),
+    ),
+    path(
+        'assets/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'asset')),
+    ),
+    path(
+        'assets/<int:pk>/assign/',
+        views.AssetAssignView.as_view(),
+        name='asset_assign',
     ),
     path(
         'assets/device/create/',
@@ -75,7 +83,8 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'supplier', detail=False)),
     ),
     path(
-        'suppliers/<int:pk>/', include(get_model_urls('netbox_inventory', 'supplier'))
+        'suppliers/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'supplier')),
     ),
     # Purchases
     path(
@@ -83,7 +92,8 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'purchase', detail=False)),
     ),
     path(
-        'purchases/<int:pk>/', include(get_model_urls('netbox_inventory', 'purchase'))
+        'purchases/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'purchase')),
     ),
     # Deliveries
     path(
@@ -91,6 +101,7 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'delivery', detail=False)),
     ),
     path(
-        'deliveries/<int:pk>/', include(get_model_urls('netbox_inventory', 'delivery'))
+        'deliveries/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'delivery')),
     ),
 )

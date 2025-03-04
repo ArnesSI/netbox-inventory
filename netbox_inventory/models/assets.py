@@ -58,8 +58,12 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
         on_delete=models.PROTECT,
         related_name='inventoryitem_types',
     )
-    model = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100)
+    model = models.CharField(
+        max_length=100,
+    )
+    slug = models.SlugField(
+        max_length=100,
+    )
     part_number = models.CharField(
         max_length=50,
         blank=True,
@@ -74,7 +78,9 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
         null=True,
         verbose_name='Inventory Item Group',
     )
-    comments = models.TextField(blank=True)
+    comments = models.TextField(
+        blank=True,
+    )
 
     clone_fields = [
         'manufacturer',
@@ -280,7 +286,9 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         verbose_name='Warranty End',
     )
 
-    comments = models.TextField(blank=True)
+    comments = models.TextField(
+        blank=True,
+    )
 
     clone_fields = [
         'name',

@@ -84,43 +84,89 @@ class AssetSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:asset-detail'
     )
     device_type = DeviceTypeSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     device = DeviceSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     module_type = ModuleTypeSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     module = ModuleSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     inventoryitem_type = InventoryItemTypeSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     inventoryitem = InventoryItemSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     rack_type = RackTypeSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
-    rack = RackSerializer(nested=True, required=False, allow_null=True, default=None)
+    rack = RackSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
     storage_location = LocationSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     delivery = DeliverySerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     purchase = PurchaseSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     tenant = TenantSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
     contact = ContactSerializer(
-        nested=True, required=False, allow_null=True, default=None
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
     )
-    owner = TenantSerializer(nested=True, required=False, allow_null=True, default=None)
+    owner = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
 
     def to_internal_value(self, data):
         ret = super().to_internal_value(data)

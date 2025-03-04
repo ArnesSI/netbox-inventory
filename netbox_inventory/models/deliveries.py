@@ -14,10 +14,21 @@ class Supplier(NetBoxModel, ContactsMixin):
     netbox_inventory keeps track of Suppliers separate from Manufacturers.
     """
 
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True)
-    description = models.CharField(max_length=200, blank=True)
-    comments = models.TextField(blank=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True,
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+    comments = models.TextField(
+        blank=True,
+    )
 
     clone_fields = ['description', 'comments']
 
@@ -55,8 +66,13 @@ class Purchase(NetBoxModel):
         blank=True,
         null=True,
     )
-    description = models.CharField(max_length=200, blank=True)
-    comments = models.TextField(blank=True)
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+    comments = models.TextField(
+        blank=True,
+    )
 
     clone_fields = ['supplier', 'date', 'status', 'description', 'comments']
 
@@ -102,8 +118,13 @@ class Delivery(NetBoxModel):
         blank=True,
         null=True,
     )
-    description = models.CharField(max_length=200, blank=True)
-    comments = models.TextField(blank=True)
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+    comments = models.TextField(
+        blank=True,
+    )
 
     clone_fields = ['purchase', 'date', 'receiving_contact', 'description', 'comments']
 
