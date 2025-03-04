@@ -474,7 +474,7 @@ class AssetImportForm(NetBoxModelImportForm):
                 'owner'
             ):
                 self._get_or_create_related('owner')
-        except forms.ValidationError as e:
+        except forms.ValidationError:
             # ValidationErrors are raised by _clean_fields() method
             # this will be called later in the code and will be bound
             # to correct field. So we skiup this kinds of errors here.

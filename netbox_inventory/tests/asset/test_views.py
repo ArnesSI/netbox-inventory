@@ -33,15 +33,15 @@ class AssetTestCase(
             supplier=supplier1,
             status='closed',
         )
-        delivery1 = Delivery.objects.create(
+        Delivery.objects.create(
             name='the_delivery',
             purchase=purchase1,
         )
-        delivery2 = Delivery.objects.create(
+        Delivery.objects.create(
             name='the_delivery',
             purchase=purchase2,
         )
-        site1 = Site.objects.create(
+        Site.objects.create(
             name='site1',
             slug='site1',
             status='active',
@@ -56,7 +56,7 @@ class AssetTestCase(
             manufacturer=manufacturer1,
             u_height=1,
         )
-        role1 = DeviceRole.objects.create(
+        DeviceRole.objects.create(
             name='role1',
             slug='role1',
             color='9e9e9e',
