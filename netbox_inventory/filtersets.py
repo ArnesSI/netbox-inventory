@@ -477,11 +477,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
     def filter_tenant_any(self, queryset, name, value):
         # filter OR for owner and tenant fields
         if name == 'slug':
-            q_list = map(
-                lambda n: Q(tenant__slug__iexact=n) | Q(owner__slug__iexact=n), value
+            q_list = (
+                Q(tenant__slug__iexact=n) | Q(owner__slug__iexact=n) for n in value
             )
         elif name == 'id':
-            q_list = map(lambda n: Q(tenant__pk=n) | Q(owner__pk=n), value)
+            q_list = (Q(tenant__pk=n) | Q(owner__pk=n) for n in value)
         q_list = reduce(lambda a, b: a | b, q_list)
         return queryset.filter(q_list)
 

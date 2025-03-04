@@ -116,12 +116,7 @@ def asset_counts_status(asset_counts):
             'value': k,
             'label': l,
             'color': AssetStatusChoices.colors[k],
-            'count': sum(
-                map(
-                    lambda e: e['count'],
-                    filter(lambda e: e['status'] == k, asset_counts),
-                )
-            ),
+            'count': sum(e['count'] for e in asset_counts if e['status'] == k),
         }
         for k, l in list(AssetStatusChoices)
     }

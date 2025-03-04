@@ -15,7 +15,7 @@ class NetBoxInventoryConfig(PluginConfig):
     default_settings = {
         'top_level_menu': True,
         'used_status_name': 'used',
-        'used_additional_status_names': list(),
+        'used_additional_status_names': [],
         'stored_status_name': 'stored',
         'stored_additional_status_names': [
             'retired',
