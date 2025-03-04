@@ -3,11 +3,19 @@ from typing import Annotated
 import strawberry
 import strawberry_django
 
-from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
-from netbox.graphql.types import (
-    NetBoxObjectType,
-    OrganizationalObjectType,
+from dcim.graphql.types import (
+    DeviceType,
+    DeviceTypeType,
+    LocationType,
+    ManufacturerType,
+    ModuleType,
+    ModuleTypeType,
+    RackType,
+    RackTypeType,
 )
+from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
+from netbox.graphql.types import NetBoxObjectType, OrganizationalObjectType
+from tenancy.graphql.types import ContactType, TenantType
 
 from netbox_inventory.models import (
     Asset,
