@@ -260,10 +260,6 @@ class AssetRackAssignForm(AssetAssignMixin, NetBoxModelForm):
         fields = ('rack_type', 'name', 'site', 'location', 'rack', 'tenant', 'contact')
         widgets = {'rack_type': forms.HiddenInput()}
 
-    def clean_rack(self):
-        # prevents trying to set asset.rack
-        return None
-
     def clean_rack_type(self):
         return self._clean_hardware_type('rack')
 
