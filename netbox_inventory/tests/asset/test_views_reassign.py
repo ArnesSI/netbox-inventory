@@ -17,7 +17,6 @@ from dcim.models import (
     Site,
 )
 from users.models import ObjectPermission
-from utilities.testing import ViewTestCases
 from utilities.testing.utils import post_data
 
 from netbox_inventory.models import Asset, InventoryItemType

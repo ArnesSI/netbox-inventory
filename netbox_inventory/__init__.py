@@ -37,7 +37,7 @@ class NetBoxInventoryConfig(PluginConfig):
 
     def ready(self):
         super().ready()
-        import netbox_inventory.signals
+        from . import signals  # noqa: F401
 
 
 config = NetBoxInventoryConfig

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.db.models.signals import pre_save

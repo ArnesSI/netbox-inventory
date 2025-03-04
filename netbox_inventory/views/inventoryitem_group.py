@@ -3,7 +3,6 @@ from utilities.views import register_model_view
 
 from .. import filtersets, forms, models, tables
 from ..analyzers import asset_counts_status, asset_counts_type_status
-from ..choices import AssetStatusChoices
 
 __all__ = (
     'InventoryItemGroupView',

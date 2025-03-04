@@ -10,7 +10,6 @@ from dcim.models import (
     InventoryItem,
     Manufacturer,
     ModuleType,
-    Rack,
     RackType,
     Site,
 )
