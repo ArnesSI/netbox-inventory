@@ -112,12 +112,12 @@ def asset_counts_status(asset_counts):
     (as returned by asset_counts_type_status) to counts on just status valuies.
     """
     status_counts = {
-        k: {
-            'value': k,
-            'label': l,
-            'color': AssetStatusChoices.colors[k],
-            'count': sum(e['count'] for e in asset_counts if e['status'] == k),
+        key: {
+            'value': key,
+            'label': label,
+            'color': AssetStatusChoices.colors[key],
+            'count': sum(e['count'] for e in asset_counts if e['status'] == key),
         }
-        for k, l in list(AssetStatusChoices)
+        for key, label in list(AssetStatusChoices)
     }
     return status_counts
