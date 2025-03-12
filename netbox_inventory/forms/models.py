@@ -124,7 +124,7 @@ class AssetForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        FieldSet('name', 'asset_tag', 'tags', 'status', name='General'),
+        FieldSet('name', 'asset_tag', 'description', 'tags', 'status', name='General'),
         FieldSet(
             'serial',
             'manufacturer',
@@ -168,6 +168,7 @@ class AssetForm(NetBoxModelForm):
             'contact_group',
             'contact',
             'tags',
+            'description',
             'comments',
             'storage_site',
         )
@@ -328,6 +329,11 @@ class DeliveryForm(NetBoxModelForm):
 
 class InventoryItemTypeForm(NetBoxModelForm):
     slug = SlugField(slug_source='model')
+    inventoryitem_group = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory item group',
+    )
     comments = CommentField()
 
     fieldsets = (
@@ -335,6 +341,7 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'manufacturer',
             'model',
             'slug',
+            'description',
             'part_number',
             'inventoryitem_group',
             'tags',
@@ -348,6 +355,7 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'manufacturer',
             'model',
             'slug',
+            'description',
             'part_number',
             'inventoryitem_group',
             'tags',
@@ -356,15 +364,23 @@ class InventoryItemTypeForm(NetBoxModelForm):
 
 
 class InventoryItemGroupForm(NetBoxModelForm):
+    parent = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Parent',
+    )
     comments = CommentField()
 
-    fieldsets = (FieldSet('name', 'parent', 'tags', name='Inventory Item Group'),)
+    fieldsets = (
+        FieldSet('name', 'parent', 'description', 'tags', name='Inventory Item Group'),
+    )
 
     class Meta:
         model = InventoryItemGroup
         fields = (
             'name',
             'parent',
+            'description',
             'tags',
             'comments',
         )

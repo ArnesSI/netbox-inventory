@@ -78,6 +78,10 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
         null=True,
         verbose_name='Inventory Item Group',
     )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
     comments = models.TextField(
         blank=True,
     )
@@ -124,6 +128,10 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=False,
         default='',
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
     )
     asset_tag = models.CharField(
         help_text='Identifier assigned by owner',

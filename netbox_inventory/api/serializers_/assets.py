@@ -37,6 +37,7 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
             'display',
             'name',
             'parent',
+            'description',
             'comments',
             'tags',
             'custom_fields',
@@ -45,7 +46,7 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
             'asset_count',
             '_depth',
         )
-        brief_fields = ('id', 'url', 'display', 'name', '_depth')
+        brief_fields = ('id', 'url', 'display', 'name', 'description', '_depth')
 
 
 class InventoryItemTypeSerializer(NetBoxModelSerializer):
@@ -69,6 +70,7 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
             'manufacturer',
             'part_number',
             'inventoryitem_group',
+            'description',
             'comments',
             'tags',
             'custom_fields',
@@ -76,7 +78,15 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
             'last_updated',
             'asset_count',
         )
-        brief_fields = ('id', 'url', 'display', 'manufacturer', 'model', 'slug')
+        brief_fields = (
+            'id',
+            'url',
+            'display',
+            'manufacturer',
+            'model',
+            'slug',
+            'description',
+        )
 
 
 class AssetSerializer(NetBoxModelSerializer):
@@ -186,6 +196,7 @@ class AssetSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'name',
+            'description',
             'asset_tag',
             'serial',
             'status',
@@ -212,7 +223,14 @@ class AssetSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'url', 'display', 'serial', 'name')
+        brief_fields = (
+            'id',
+            'url',
+            'display',
+            'serial',
+            'name',
+            'description',
+        )
         # DRF autiomatically creates validator from model's unique_together contraints
         # that doesn't work if we allow some filelds in a unique_together to be null
         # so we remove DRF's auto generated validators and rely on model's validation

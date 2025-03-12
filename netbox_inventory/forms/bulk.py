@@ -51,6 +51,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         initial='',
     )
+    description = forms.CharField(max_length=200, required=False)
     device_type = DynamicModelChoiceField(
         queryset=DeviceType.objects.all(),
         required=False,
@@ -133,7 +134,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Asset
     fieldsets = (
-        FieldSet('name', 'status', name='General'),
+        FieldSet('name', 'status', 'description', name='General'),
         FieldSet(
             'device_type',
             'device',
@@ -156,6 +157,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     )
     nullable_fields = (
         'name',
+        'description',
         'device',
         'module',
         'rack',
@@ -188,6 +190,10 @@ class AssetImportForm(NetBoxModelImportForm):
     part_number = forms.CharField(
         required=False,
         help_text='Discrete part number for model. Only used if creating new model.',
+    )
+    model_description = forms.CharField(
+        required=False,
+        help_text='Description for model. Only used if creating new model.',
     )
     model_comments = forms.CharField(
         required=False,
@@ -266,10 +272,12 @@ class AssetImportForm(NetBoxModelImportForm):
             'asset_tag',
             'serial',
             'status',
+            'description',
             'hardware_kind',
             'manufacturer',
             'model_name',
             'part_number',
+            'model_description',
             'model_comments',
             'storage_site',
             'storage_location',
@@ -423,6 +431,7 @@ class AssetImportForm(NetBoxModelImportForm):
                         'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
+                        'description': self._get_clean_value('model_description'),
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
@@ -436,6 +445,7 @@ class AssetImportForm(NetBoxModelImportForm):
                     defaults={
                         'model': self.data.get('model_name'),
                         'part_number': self._get_clean_value('part_number'),
+                        'description': self._get_clean_value('model_description'),
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
@@ -450,6 +460,7 @@ class AssetImportForm(NetBoxModelImportForm):
                         'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
                         'part_number': self._get_clean_value('part_number'),
+                        'description': self._get_clean_value('model_description'),
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
@@ -463,6 +474,7 @@ class AssetImportForm(NetBoxModelImportForm):
                     defaults={
                         'model': self.data.get('model_name'),
                         'slug': slugify(self.data.get('model_name')),
+                        'description': self._get_clean_value('model_description'),
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
@@ -685,6 +697,7 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
             'model',
             'slug',
             'manufacturer',
+            'description',
             'part_number',
             'inventoryitem_group',
             'comments',
@@ -703,15 +716,21 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label='Inventory Item Group',
     )
+    description = forms.CharField(max_length=200, required=False)
     comments = CommentField(
         required=False,
     )
 
     model = InventoryItemType
     fieldsets = (
-        FieldSet('manufacturer', 'inventoryitem_group', name='Inventory Item Type'),
+        FieldSet(
+            'manufacturer',
+            'inventoryitem_group',
+            'description',
+            name='Inventory Item Type',
+        ),
     )
-    nullable_fields = ('inventoryitem_group',)
+    nullable_fields = ('inventoryitem_group', 'description', 'comments')
 
 
 class InventoryItemGroupImportForm(NetBoxModelImportForm):
@@ -724,17 +743,21 @@ class InventoryItemGroupImportForm(NetBoxModelImportForm):
 
     class Meta:
         model = InventoryItemGroup
-        fields = ('name', 'parent', 'comments', 'tags')
+        fields = ('name', 'parent', 'description', 'comments', 'tags')
 
 
 class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
     parent = DynamicModelChoiceField(
         queryset=InventoryItemGroup.objects.all(), required=False
     )
+    description = forms.CharField(max_length=200, required=False)
     comments = CommentField(
         required=False,
     )
 
     model = InventoryItemGroup
-    fieldsets = (FieldSet('parent'),)
-    nullable_fields = ('parent',)
+    fieldsets = (FieldSet('parent', 'description'),)
+    nullable_fields = (
+        'parent',
+        'description',
+    )
