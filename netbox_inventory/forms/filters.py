@@ -1,16 +1,35 @@
 from django import forms
 
-from dcim.models import Device, DeviceType, DeviceRole, InventoryItemRole, Manufacturer, ModuleType, Site, Location, Rack, RackRole, RackType
+from dcim.models import (
+    Device,
+    DeviceRole,
+    DeviceType,
+    InventoryItemRole,
+    Location,
+    Manufacturer,
+    ModuleType,
+    Rack,
+    RackRole,
+    RackType,
+    Site,
+)
 from netbox.forms import NetBoxModelFilterSetForm
+from tenancy.forms import ContactModelFilterForm
+from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
-from tenancy.forms import ContactModelFilterForm
-from tenancy.models import Contact, ContactGroup, Tenant
-from ..choices import HardwareKindChoices, AssetStatusChoices, PurchaseStatusChoices
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
 
+from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from ..models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
 
 __all__ = (
     'AssetFilterForm',
@@ -27,23 +46,44 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'status'),
         FieldSet(
-            'kind', 'manufacturer_id', 'device_type_id', 'device_role_id',
-            'module_type_id', 'inventoryitem_type_id', 'inventoryitem_group_id',
-            'inventoryitem_role_id', 'rack_type_id', 'rack_role_id', 'is_assigned',
-            name='Hardware'
+            'kind',
+            'manufacturer_id',
+            'device_type_id',
+            'device_role_id',
+            'module_type_id',
+            'inventoryitem_type_id',
+            'inventoryitem_group_id',
+            'inventoryitem_role_id',
+            'rack_type_id',
+            'rack_role_id',
+            'is_assigned',
+            name='Hardware',
         ),
         FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
         FieldSet(
-            'owner_id', 'delivery_id', 'purchase_id', 'supplier_id',
-            'delivery_date_after', 'delivery_date_before', 'purchase_date_after',
-            'purchase_date_before', 'warranty_start_after', 'warranty_start_before',
-            'warranty_end_after', 'warranty_end_before',
-            name='Purchase'
+            'owner_id',
+            'delivery_id',
+            'purchase_id',
+            'supplier_id',
+            'delivery_date_after',
+            'delivery_date_before',
+            'purchase_date_after',
+            'purchase_date_before',
+            'warranty_start_after',
+            'warranty_start_before',
+            'warranty_end_after',
+            'warranty_end_before',
+            name='Purchase',
         ),
         FieldSet(
-            'storage_site_id', 'storage_location_id', 'installed_site_id', 
-            'installed_location_id', 'installed_rack_id', 'installed_device_id',
-            'located_site_id', 'located_location_id',
+            'storage_site_id',
+            'storage_location_id',
+            'installed_site_id',
+            'installed_location_id',
+            'installed_rack_id',
+            'installed_device_id',
+            'located_site_id',
+            'located_location_id',
             name='Location',
         ),
     )
@@ -89,7 +129,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         query_params={
             'manufacturer_id': '$manufacturer',
         },
-        label='Inventory item type'
+        label='Inventory item type',
     )
     inventoryitem_group_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(),
@@ -117,9 +157,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     is_assigned = forms.NullBooleanField(
         required=False,
         label='Is assigned to hardware',
-        widget=forms.Select(
-            choices=BOOLEAN_WITH_BLANK_CHOICES
-        )
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     tenant_id = DynamicModelMultipleChoiceField(
         queryset=Tenant.objects.all(),
@@ -209,7 +247,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Site.objects.all(),
         required=False,
         label='Storage site',
-        help_text="When not in use asset is stored here",
+        help_text='When not in use asset is stored here',
     )
     storage_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
@@ -219,13 +257,13 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'site_id': '$storage_site_id',
         },
         label='Storage location',
-        help_text="When not in use asset is stored here",
+        help_text='When not in use asset is stored here',
     )
     installed_site_id = DynamicModelMultipleChoiceField(
         queryset=Site.objects.all(),
         required=False,
         label='Installed at site',
-        help_text="Currently installed here",
+        help_text='Currently installed here',
     )
     installed_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
@@ -234,7 +272,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'site_id': '$installed_site_id',
         },
         label='Installed at location',
-        help_text="Currently installed here",
+        help_text='Currently installed here',
     )
     installed_rack_id = DynamicModelMultipleChoiceField(
         queryset=Rack.objects.all(),
@@ -244,7 +282,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'location_id': '$installed_location_id',
         },
         label='Installed in rack',
-        help_text="Currently installed here",
+        help_text='Currently installed here',
     )
     installed_device_id = DynamicModelMultipleChoiceField(
         queryset=Device.objects.all(),
@@ -260,7 +298,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Site.objects.all(),
         required=False,
         label='Located at site',
-        help_text="Currently installed or stored here",
+        help_text='Currently installed or stored here',
     )
     located_location_id = DynamicModelMultipleChoiceField(
         queryset=Location.objects.all(),
@@ -269,7 +307,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'site_id': '$located_site_id',
         },
         label='Located at location',
-        help_text="Currently installed or stored here",
+        help_text='Currently installed or stored here',
     )
     tag = TagFilterField(model)
 
@@ -280,7 +318,7 @@ class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
         FieldSet('q', 'filter_id', 'tag'),
         FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
     )
-    
+
     contact_group = DynamicModelMultipleChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
@@ -340,7 +378,8 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
             'receiving_contact_id',
             'date_after',
             'date_before',
-            name='Delivery'),
+            name='Delivery',
+        ),
     )
 
     purchase_id = DynamicModelMultipleChoiceField(
@@ -384,7 +423,9 @@ class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
     model = InventoryItemType
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('manufacturer_id', 'inventoryitem_group_id', name='Inventory Item Type'),
+        FieldSet(
+            'manufacturer_id', 'inventoryitem_group_id', name='Inventory Item Type'
+        ),
     )
     manufacturer_id = DynamicModelMultipleChoiceField(
         queryset=Manufacturer.objects.all(),
@@ -401,12 +442,8 @@ class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
 
 class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     model = InventoryItemGroup
-    fieldsets = (
-        FieldSet('q', 'filter_id', 'tag', 'parent_id'),
-    )
+    fieldsets = (FieldSet('q', 'filter_id', 'tag', 'parent_id'),)
     parent_id = DynamicModelMultipleChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Parent group'
+        queryset=InventoryItemGroup.objects.all(), required=False, label='Parent group'
     )
     tag = TagFilterField(model)

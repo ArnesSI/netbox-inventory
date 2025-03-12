@@ -1,15 +1,15 @@
 import datetime
+
 from utilities.testing import ViewTestCases
 
-from netbox_inventory.tests.custom import ModelViewTestCase
 from netbox_inventory.models import Purchase, Supplier
+from netbox_inventory.tests.custom import ModelViewTestCase
 
 
 class PurchaseTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = Purchase
 
     @classmethod

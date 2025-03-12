@@ -1,17 +1,28 @@
 from utilities.testing import APIViewTestCases
-from ..custom import APITestCase
+
 from ...models import Purchase, Supplier
+from ..custom import APITestCase
 
 
 class PurchaseTest(
-        APITestCase, 
-        APIViewTestCases.GetObjectViewTestCase,
-        APIViewTestCases.ListObjectsViewTestCase,
-        APIViewTestCases.CreateObjectViewTestCase,
-        APIViewTestCases.UpdateObjectViewTestCase,
-        APIViewTestCases.DeleteObjectViewTestCase):
+    APITestCase,
+    APIViewTestCases.GetObjectViewTestCase,
+    APIViewTestCases.ListObjectsViewTestCase,
+    APIViewTestCases.CreateObjectViewTestCase,
+    APIViewTestCases.UpdateObjectViewTestCase,
+    APIViewTestCases.DeleteObjectViewTestCase,
+):
     model = Purchase
-    brief_fields = ['date', 'description', 'display', 'id', 'name', 'status', 'supplier', 'url']
+    brief_fields = [
+        'date',
+        'description',
+        'display',
+        'id',
+        'name',
+        'status',
+        'supplier',
+        'url',
+    ]
 
     bulk_update_data = {
         'description': 'new description',

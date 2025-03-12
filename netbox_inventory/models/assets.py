@@ -4,10 +4,17 @@ from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
 
-from netbox.models import NetBoxModel, NestedGroupModel
+from netbox.models import NestedGroupModel, NetBoxModel
 from netbox.models.features import ImageAttachmentsMixin
-from ..choices import HardwareKindChoices, AssetStatusChoices
-from ..utils import asset_clear_old_hw, asset_set_new_hw, get_prechange_field, get_plugin_setting, get_status_for
+
+from ..choices import AssetStatusChoices, HardwareKindChoices
+from ..utils import (
+    asset_clear_old_hw,
+    asset_set_new_hw,
+    get_plugin_setting,
+    get_prechange_field,
+    get_status_for,
+)
 
 
 class InventoryItemGroup(NestedGroupModel):
@@ -17,24 +24,22 @@ class InventoryItemGroup(NestedGroupModel):
     pluggables, from different manufacturers/with different part numbers.
     Inventory Item Groups can be nested.
     """
-    slug = None # remove field that is defined on NestedGroupModel
 
-    comments = models.TextField(
-        blank=True
-    )
+    slug = None  # remove field that is defined on NestedGroupModel
+
+    comments = models.TextField(blank=True)
 
     class Meta:
         ordering = ['name']
         constraints = (
             models.UniqueConstraint(
-                fields=('parent', 'name'),
-                name='%(app_label)s_%(class)s_parent_name'
+                fields=('parent', 'name'), name='%(app_label)s_%(class)s_parent_name'
             ),
             models.UniqueConstraint(
                 fields=('name',),
                 name='%(app_label)s_%(class)s_name',
                 condition=models.Q(parent__isnull=True),
-                violation_error_message="A top-level group with this name already exists."
+                violation_error_message='A top-level group with this name already exists.',
             ),
         )
 
@@ -47,16 +52,17 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
     Inventory Item Type is a model (make, part number) of an Inventory Item. In
     that it is simmilar to Device Type or Module Type.
     """
+
     manufacturer = models.ForeignKey(
         to='dcim.Manufacturer',
         on_delete=models.PROTECT,
-        related_name='inventoryitem_types'
+        related_name='inventoryitem_types',
     )
     model = models.CharField(
-        max_length=100
+        max_length=100,
     )
     slug = models.SlugField(
-        max_length=100
+        max_length=100,
     )
     part_number = models.CharField(
         max_length=50,
@@ -73,7 +79,7 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
         verbose_name='Inventory Item Group',
     )
     comments = models.TextField(
-        blank=True
+        blank=True,
     )
 
     clone_fields = [
@@ -108,6 +114,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
     An asset that is in use, can be assigned to a Device, Module, InventoryItem or
     Rack.
     """
+
     #
     # fields that identify asset
     #
@@ -280,14 +287,25 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
     )
 
     comments = models.TextField(
-        blank=True
+        blank=True,
     )
 
     clone_fields = [
-        'name', 'asset_tag', 'status', 'device_type', 'module_type',
-        'inventoryitem_type', 'owner', 'purchase', 'delivery',
-        'warranty_start', 'warranty_end', 'tenant', 'contact', 'storage_location',
-        'comments'
+        'name',
+        'asset_tag',
+        'status',
+        'device_type',
+        'module_type',
+        'inventoryitem_type',
+        'owner',
+        'purchase',
+        'delivery',
+        'warranty_start',
+        'warranty_end',
+        'tenant',
+        'contact',
+        'storage_location',
+        'comments',
     ]
 
     @property
@@ -307,7 +325,13 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
 
     @property
     def hardware_type(self):
-        return self.device_type or self.module_type or self.inventoryitem_type or self.rack_type or None
+        return (
+            self.device_type
+            or self.module_type
+            or self.inventoryitem_type
+            or self.rack_type
+            or None
+        )
 
     @property
     def hardware(self):
@@ -422,17 +446,39 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         """
         Ensure only one device/module_type/inventoryitem_type/rack_type is set at a time.
         """
-        if sum(map(bool, [self.device_type, self.module_type, self.inventoryitem_type, self.rack_type])) > 1:
-            raise ValidationError('Only one of device type, module type inventory item type and rack type can be set for the same asset.')
-        if not self.device_type and not self.module_type and not self.inventoryitem_type and not self.rack_type:
-            raise ValidationError('One of device type, module type, inventory item type or rack type must be set.')
+        if (
+            sum(
+                map(
+                    bool,
+                    [
+                        self.device_type,
+                        self.module_type,
+                        self.inventoryitem_type,
+                        self.rack_type,
+                    ],
+                )
+            )
+            > 1
+        ):
+            raise ValidationError(
+                'Only one of device type, module type inventory item type and rack type can be set for the same asset.'
+            )
+        if (
+            not self.device_type
+            and not self.module_type
+            and not self.inventoryitem_type
+            and not self.rack_type
+        ):
+            raise ValidationError(
+                'One of device type, module type, inventory item type or rack type must be set.'
+            )
 
     def validate_hardware(self):
         """
         Ensure only one device/module is set at a time and it matches device/module_type.
         """
         kind = self.kind
-        _type = getattr(self, kind+'_type')
+        _type = getattr(self, kind + '_type')
         hw = getattr(self, kind)
         hw_others = dict(HardwareKindChoices).keys() - [kind]
 
@@ -441,13 +487,19 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         if kind != 'inventoryitem':
             if not getattr(self, '_in_reassign', False):
                 # but don't check if we are reassigning asset to another device
-                if hw and _type != getattr(hw, kind+'_type'):
-                    raise ValidationError({kind: f'{kind} type of {kind} does not match {kind} type of asset'})
+                if hw and _type != getattr(hw, kind + '_type'):
+                    raise ValidationError(
+                        {
+                            kind: f'{kind} type of {kind} does not match {kind} type of asset'
+                        }
+                    )
         # ensure only one hardware is set and that it is correct kind
         # e.g. if self.device_type is set, we cannot have self.module or self.inventoryitem set
         for hw_other in hw_others:
             if getattr(self, hw_other):
-                raise ValidationError(f'Cannot set {hw_other} for asset that is a {kind}')
+                raise ValidationError(
+                    f'Cannot set {hw_other} for asset that is a {kind}'
+                )
 
     def update_status(self):
         """
@@ -498,11 +550,19 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
 
     def clean_delivery(self):
         if self.delivery and self.delivery.purchase != self.purchase:
-            raise ValidationError(f'Assigned delivery must belong to selected purchase ({self.purchase}).')
+            raise ValidationError(
+                f'Assigned delivery must belong to selected purchase ({self.purchase}).'
+            )
 
     def clean_warranty_dates(self):
-        if self.warranty_start and self.warranty_end and self.warranty_end <= self.warranty_start:
-            raise ValidationError({'warranty_end': f'Warranty end date must be after warranty start date.'})
+        if (
+            self.warranty_start
+            and self.warranty_end
+            and self.warranty_end <= self.warranty_start
+        ):
+            raise ValidationError(
+                {'warranty_end': 'Warranty end date must be after warranty start date.'}
+            )
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:asset', args=[self.pk])
@@ -517,7 +577,13 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return f'{self.hardware_type} (id:{self.id})'
 
     class Meta:
-        ordering = ('device_type', 'module_type', 'inventoryitem_type', 'rack_type', 'serial',)
+        ordering = (
+            'device_type',
+            'module_type',
+            'inventoryitem_type',
+            'rack_type',
+            'serial',
+        )
         constraints = (
             models.UniqueConstraint(
                 fields=('device_type', 'serial'),

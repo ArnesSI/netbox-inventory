@@ -1,9 +1,11 @@
 from django.forms import ValidationError
-from django.test import override_settings, TestCase
-from dcim.models import Device, DeviceType, DeviceRole, Manufacturer, Site
+from django.test import TestCase, override_settings
+
+from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from utilities.exceptions import AbortRequest
 
-from netbox_inventory.models import Asset, Supplier, Purchase, Delivery
+from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
+
 from ..settings import CONFIG_SYNC_OFF, CONFIG_SYNC_ON
 
 
@@ -37,14 +39,9 @@ class TestAssetModel(TestCase):
             slug='manufacturer1',
         )
         self.device_type1 = DeviceType.objects.create(
-            manufacturer=self.manufacturer1,
-            model='device_type1',
-            slug='device_type1'
+            manufacturer=self.manufacturer1, model='device_type1', slug='device_type1'
         )
-        self.role1 = DeviceRole.objects.create(
-            name='role1',
-            slug='role1'
-        )
+        self.role1 = DeviceRole.objects.create(name='role1', slug='role1')
         self.asset1 = Asset.objects.create(
             asset_tag='asset1',
             serial='asset1',
@@ -70,30 +67,30 @@ class TestAssetModel(TestCase):
     def test_update_hardware_used_on(self):
         # assign device to asset
         self.asset1.snapshot()
-        self.asset1.device=self.device1
+        self.asset1.device = self.device1
         self.asset1.full_clean()
         self.asset1.save()
         self.assertEqual(self.device1.serial, self.asset1.serial)
         self.assertEqual(self.device1.asset_tag, self.asset1.asset_tag)
-        
+
         # update asset serial updates device serial
         self.asset1.snapshot()
         self.asset1.serial = 'changed'
         self.asset1.full_clean()
         self.asset1.save()
         self.assertEqual(self.device1.serial, 'changed')
-        
+
         # update device serial not allowed
         self.device1.snapshot()
         self.device1.serial = 'notallowed'
         self.device1.full_clean()
         with self.assertRaises(AbortRequest):
             self.device1.save()
-        
+
         # assign defferent device
         self.assertEqual(self.asset1.device, self.device1)
         self.asset1.snapshot()
-        self.asset1.device=self.device2
+        self.asset1.device = self.device2
         self.asset1.full_clean()
         self.asset1.save()
         self.device1.refresh_from_db()
@@ -115,24 +112,23 @@ class TestAssetModel(TestCase):
         self.assertEqual(self.device2.serial, '')
         self.assertEqual(self.device2.asset_tag, None)
 
-
     @override_settings(PLUGINS_CONFIG=CONFIG_SYNC_OFF)
     def test_update_hardware_used_off(self):
         # assign device to asset
         self.asset1.snapshot()
-        self.asset1.device=self.device1
+        self.asset1.device = self.device1
         self.asset1.full_clean()
         self.asset1.save()
         self.assertEqual(self.device1.serial, '')
         self.assertEqual(self.device1.asset_tag, None)
-        
+
         # update asset serial updates device serial
         self.asset1.snapshot()
         self.asset1.serial = 'changed'
         self.asset1.full_clean()
         self.asset1.save()
         self.assertEqual(self.device1.serial, '')
-        
+
         # update device serial is allowed
         self.device1.snapshot()
         self.device1.serial = 'allowed'
@@ -144,7 +140,7 @@ class TestAssetModel(TestCase):
         # assign defferent device
         self.assertEqual(self.asset1.device, self.device1)
         self.asset1.snapshot()
-        self.asset1.device=self.device2
+        self.asset1.device = self.device2
         self.asset1.full_clean()
         self.asset1.save()
         self.device1.refresh_from_db()

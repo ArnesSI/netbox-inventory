@@ -1,11 +1,20 @@
-from dcim.models import DeviceType, Manufacturer, ModuleType, Location, RackType, Site
+from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
-from netbox_inventory.choices import HardwareKindChoices
+from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
-from tenancy.models import Contact, ContactGroup, Tenant
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+
+from netbox_inventory.choices import HardwareKindChoices
+
+from ..models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
@@ -19,7 +28,6 @@ __all__ = (
 
 
 class AssetForm(NetBoxModelForm):
-
     manufacturer = DynamicModelChoiceField(
         queryset=Manufacturer.objects.all(),
         required=False,
@@ -73,7 +81,7 @@ class AssetForm(NetBoxModelForm):
         queryset=Delivery.objects.all(),
         help_text=Asset._meta.get_field('delivery').help_text,
         required=not Asset._meta.get_field('delivery').blank,
-        query_params={'purchase_id': '$purchase'}
+        query_params={'purchase_id': '$purchase'},
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -88,7 +96,7 @@ class AssetForm(NetBoxModelForm):
         help_text='Filter contacts by group',
         initial_params={
             'contacts': '$contact',
-        }
+        },
     )
     contact = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
@@ -117,8 +125,23 @@ class AssetForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet('name', 'asset_tag', 'tags', 'status', name='General'),
-        FieldSet('serial', 'manufacturer', 'device_type', 'module_type', 'inventoryitem_type', 'rack_type', name='Hardware'),
-        FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'),
+        FieldSet(
+            'serial',
+            'manufacturer',
+            'device_type',
+            'module_type',
+            'inventoryitem_type',
+            'rack_type',
+            name='Hardware',
+        ),
+        FieldSet(
+            'owner',
+            'purchase',
+            'delivery',
+            'warranty_start',
+            'warranty_end',
+            name='Purchase',
+        ),
         FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
         FieldSet('storage_site', 'storage_location', name='Location'),
     )
@@ -161,14 +184,20 @@ class AssetForm(NetBoxModelForm):
         # Used for picking the default active tab for hardware type selection
         self.no_hardware_type = True
         if self.instance:
-            if (self.instance.device_type or self.instance.module_type
-                or self.instance.inventoryitem_type or self.instance.rack_type):
+            if (
+                self.instance.device_type
+                or self.instance.module_type
+                or self.instance.inventoryitem_type
+                or self.instance.rack_type
+            ):
                 self.no_hardware_type = False
 
         # if assigned to device/module/... we can't change device_type/...
         if (
-            self.instance.device or self.instance.module
-            or self.instance.inventoryitem or self.instance.rack
+            self.instance.device
+            or self.instance.module
+            or self.instance.inventoryitem
+            or self.instance.rack
         ):
             self.fields['manufacturer'].disabled = True
             for kind in HardwareKindChoices.values():
@@ -207,9 +236,7 @@ class SupplierForm(NetBoxModelForm):
     slug = SlugField(slug_source='name')
     comments = CommentField()
 
-    fieldsets = (
-        FieldSet('name', 'slug', 'description', 'tags', name='Supplier'),
-    )
+    fieldsets = (FieldSet('name', 'slug', 'description', 'tags', name='Supplier'),)
 
     class Meta:
         model = Supplier
@@ -226,7 +253,9 @@ class PurchaseForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        FieldSet('supplier', 'name', 'status', 'date', 'description', 'tags', name='Purchase'),
+        FieldSet(
+            'supplier', 'name', 'status', 'date', 'description', 'tags', name='Purchase'
+        ),
     )
 
     class Meta:
@@ -254,7 +283,7 @@ class DeliveryForm(NetBoxModelForm):
         help_text='Filter receiving contacts by group',
         initial_params={
             'contacts': '$receiving_contact',
-        }
+        },
     )
     receiving_contact = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
@@ -268,7 +297,16 @@ class DeliveryForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        FieldSet('purchase', 'name', 'date', 'contact_group', 'receiving_contact', 'description', 'tags', name='Delivery'),
+        FieldSet(
+            'purchase',
+            'name',
+            'date',
+            'contact_group',
+            'receiving_contact',
+            'description',
+            'tags',
+            name='Delivery',
+        ),
     )
 
     class Meta:
@@ -293,7 +331,15 @@ class InventoryItemTypeForm(NetBoxModelForm):
     comments = CommentField()
 
     fieldsets = (
-        FieldSet('manufacturer', 'model', 'slug', 'part_number', 'inventoryitem_group', 'tags', name='Inventory Item Type'),
+        FieldSet(
+            'manufacturer',
+            'model',
+            'slug',
+            'part_number',
+            'inventoryitem_group',
+            'tags',
+            name='Inventory Item Type',
+        ),
     )
 
     class Meta:
@@ -312,9 +358,7 @@ class InventoryItemTypeForm(NetBoxModelForm):
 class InventoryItemGroupForm(NetBoxModelForm):
     comments = CommentField()
 
-    fieldsets = (
-        FieldSet('name', 'parent', 'tags', name='Inventory Item Group'),
-    )
+    fieldsets = (FieldSet('name', 'parent', 'tags', name='Inventory Item Group'),)
 
     class Meta:
         model = InventoryItemGroup

@@ -1,5 +1,6 @@
 from dcim.models import Device, InventoryItem, Module, Rack
 from netbox.views import generic
+
 from ..forms.create import *
 from ..models import Asset
 

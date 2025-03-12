@@ -2,7 +2,6 @@ from django import forms
 
 from .models import AssetForm
 
-
 __all__ = (
     'AssetBulkAddForm',
     'AssetBulkAddModelForm',
@@ -10,7 +9,8 @@ __all__ = (
 
 
 class AssetBulkAddForm(forms.Form):
-    """ Form for creating multiple Assets by count """
+    """Form for creating multiple Assets by count"""
+
     count = forms.IntegerField(
         min_value=1,
         required=True,

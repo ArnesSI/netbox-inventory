@@ -1,13 +1,13 @@
 import logging
 
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, pre_delete, post_save
 
-from dcim.models import Device, Module, InventoryItem, Rack
+from dcim.models import Device, InventoryItem, Module, Rack
 from utilities.exceptions import AbortRequest
+
 from .models import Asset, Delivery
 from .utils import get_plugin_setting, get_status_for, is_equal_none
-
 
 logger = logging.getLogger('netbox.netbox_inventory.signals')
 
@@ -21,7 +21,7 @@ def prevent_update_serial_asset_tag(instance, **kwargs):
     When a hardware (Device, Module, InventoryItem, Rack) has an Asset assigned and
     user changes serial or asset_tag on hardware, prevent that change
     and inform that change must be made on Asset instance instead.
-    
+
     Only enforces if `sync_hardware_serial_asset_tag` setting is true.
     """
     try:

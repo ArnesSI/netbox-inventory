@@ -1,29 +1,49 @@
 from rest_framework import serializers
 
 from dcim.api.serializers import (
-    DeviceTypeSerializer, DeviceSerializer, ManufacturerSerializer,
-    ModuleTypeSerializer, ModuleSerializer, InventoryItemSerializer,
-    LocationSerializer, RackTypeSerializer, RackSerializer,
+    DeviceSerializer,
+    DeviceTypeSerializer,
+    InventoryItemSerializer,
+    LocationSerializer,
+    ManufacturerSerializer,
+    ModuleSerializer,
+    ModuleTypeSerializer,
+    RackSerializer,
+    RackTypeSerializer,
 )
-from tenancy.api.serializers import ContactSerializer, TenantSerializer
 from netbox.api.serializers import NestedGroupModelSerializer, NetBoxModelSerializer
-from netbox_inventory.models import Asset, InventoryItemType, InventoryItemGroup
-from .nested import *
+from tenancy.api.serializers import ContactSerializer, TenantSerializer
+
+from netbox_inventory.models import Asset, InventoryItemGroup, InventoryItemType
+
 from .deliveries import *
+from .nested import *
 
 
 class InventoryItemGroupSerializer(NestedGroupModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:inventoryitemgroup-detail'
     )
-    parent = NestedInventoryItemGroupSerializer(required=False, allow_null=True, default=None)
+    parent = NestedInventoryItemGroupSerializer(
+        required=False, allow_null=True, default=None
+    )
     asset_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = InventoryItemGroup
         fields = (
-            'id', 'url', 'display', 'name', 'parent', 'comments', 'tags', 'custom_fields',
-            'created', 'last_updated', 'asset_count', '_depth',
+            'id',
+            'url',
+            'display',
+            'name',
+            'parent',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+            'asset_count',
+            '_depth',
         )
         brief_fields = ('id', 'url', 'display', 'name', '_depth')
 
@@ -33,15 +53,28 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:inventoryitemtype-detail'
     )
     manufacturer = ManufacturerSerializer(nested=True)
-    inventoryitem_group = InventoryItemGroupSerializer(nested=True, required=False, allow_null=True, default=None)
+    inventoryitem_group = InventoryItemGroupSerializer(
+        nested=True, required=False, allow_null=True, default=None
+    )
     asset_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = InventoryItemType
         fields = (
-            'id', 'url', 'display', 'model', 'slug', 'manufacturer', 'part_number',
-            'inventoryitem_group', 'comments', 'tags', 'custom_fields', 'created',
-            'last_updated', 'asset_count',
+            'id',
+            'url',
+            'display',
+            'model',
+            'slug',
+            'manufacturer',
+            'part_number',
+            'inventoryitem_group',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+            'asset_count',
         )
         brief_fields = ('id', 'url', 'display', 'manufacturer', 'model', 'slug')
 
@@ -50,20 +83,90 @@ class AssetSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:asset-detail'
     )
-    device_type = DeviceTypeSerializer(nested=True, required=False, allow_null=True, default=None)
-    device = DeviceSerializer(nested=True, required=False, allow_null=True, default=None)
-    module_type = ModuleTypeSerializer(nested=True, required=False, allow_null=True, default=None)
-    module = ModuleSerializer(nested=True, required=False, allow_null=True, default=None)
-    inventoryitem_type = InventoryItemTypeSerializer(nested=True, required=False, allow_null=True, default=None)
-    inventoryitem = InventoryItemSerializer(nested=True, required=False, allow_null=True, default=None)
-    rack_type = RackTypeSerializer(nested=True, required=False, allow_null=True, default=None)
-    rack = RackSerializer(nested=True, required=False, allow_null=True, default=None)
-    storage_location = LocationSerializer(nested=True, required=False, allow_null=True, default=None)
-    delivery = DeliverySerializer(nested=True, required=False, allow_null=True, default=None)
-    purchase = PurchaseSerializer(nested=True, required=False, allow_null=True, default=None)
-    tenant = TenantSerializer(nested=True, required=False, allow_null=True, default=None)
-    contact = ContactSerializer(nested=True, required=False, allow_null=True, default=None)
-    owner = TenantSerializer(nested=True, required=False, allow_null=True, default=None)
+    device_type = DeviceTypeSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    device = DeviceSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    module_type = ModuleTypeSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    module = ModuleSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    inventoryitem_type = InventoryItemTypeSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    inventoryitem = InventoryItemSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    rack_type = RackTypeSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    rack = RackSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    storage_location = LocationSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    delivery = DeliverySerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    purchase = PurchaseSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    tenant = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    contact = ContactSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
+    owner = TenantSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
 
     def to_internal_value(self, data):
         ret = super().to_internal_value(data)
@@ -79,12 +182,35 @@ class AssetSerializer(NetBoxModelSerializer):
     class Meta:
         model = Asset
         fields = (
-            'id', 'url', 'display', 'name', 'asset_tag', 'serial', 'status',
-            'kind', 'device_type', 'device', 'module_type', 'module',
-            'inventoryitem_type','inventoryitem', 'rack_type', 'rack',
-            'tenant', 'contact', 'storage_location', 'owner', 'delivery', 'purchase',
-            'warranty_start', 'warranty_end',
-            'comments', 'tags', 'custom_fields', 'created', 'last_updated'
+            'id',
+            'url',
+            'display',
+            'name',
+            'asset_tag',
+            'serial',
+            'status',
+            'kind',
+            'device_type',
+            'device',
+            'module_type',
+            'module',
+            'inventoryitem_type',
+            'inventoryitem',
+            'rack_type',
+            'rack',
+            'tenant',
+            'contact',
+            'storage_location',
+            'owner',
+            'delivery',
+            'purchase',
+            'warranty_start',
+            'warranty_end',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
         )
         brief_fields = ('id', 'url', 'display', 'serial', 'name')
         # DRF autiomatically creates validator from model's unique_together contraints

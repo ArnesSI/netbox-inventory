@@ -1,6 +1,7 @@
 from netbox.views import generic
 from utilities.query import count_related
 from utilities.views import register_model_view
+
 from .. import filtersets, forms, models, tables
 
 __all__ = (
@@ -20,7 +21,11 @@ class InventoryItemTypeView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         context = super().get_extra_context(request, instance)
-        context['asset_count'] = models.Asset.objects.restrict(request.user, 'view').filter(inventoryitem_type=instance).count()
+        context['asset_count'] = (
+            models.Asset.objects.restrict(request.user, 'view')
+            .filter(inventoryitem_type=instance)
+            .count()
+        )
         return context
 
 
@@ -46,7 +51,9 @@ class InventoryItemTypeDeleteView(generic.ObjectDeleteView):
     queryset = models.InventoryItemType.objects.all()
 
 
-@register_model_view(models.InventoryItemType, 'bulk_import', path='import', detail=False)
+@register_model_view(
+    models.InventoryItemType, 'bulk_import', path='import', detail=False
+)
 class InventoryItemTypeBulkImportView(generic.BulkImportView):
     queryset = models.InventoryItemType.objects.all()
     model_form = forms.InventoryItemTypeImportForm
@@ -60,7 +67,9 @@ class InventoryItemTypeBulkEditView(generic.BulkEditView):
     form = forms.InventoryItemTypeBulkEditForm
 
 
-@register_model_view(models.InventoryItemType, 'bulk_delete', path='delete', detail=False)
+@register_model_view(
+    models.InventoryItemType, 'bulk_delete', path='delete', detail=False
+)
 class InventoryItemTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = models.InventoryItemType.objects.all()
     table = tables.InventoryItemTypeTable

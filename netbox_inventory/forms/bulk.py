@@ -2,18 +2,28 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 
-from dcim.models import DeviceType, Manufacturer, ModuleType, Location, RackType, Site
+from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
+from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import add_blank_choice
 from utilities.forms.fields import (
-    CommentField, CSVChoiceField, CSVModelChoiceField,
-    DynamicModelChoiceField
+    CommentField,
+    CSVChoiceField,
+    CSVModelChoiceField,
+    DynamicModelChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
-from tenancy.models import Contact, ContactGroup, Tenant
+
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from ..models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
+from ..models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
 from ..utils import get_plugin_setting
 
 __all__ = (
@@ -87,14 +97,10 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         required=not Asset._meta.get_field('delivery').blank,
     )
     warranty_start = forms.DateField(
-        label='Warranty start',
-        required=False,
-        widget=DatePicker()
+        label='Warranty start', required=False, widget=DatePicker()
     )
     warranty_end = forms.DateField(
-        label='Warranty end',
-        required=False,
-        widget=DatePicker()
+        label='Warranty end', required=False, widget=DatePicker()
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -128,14 +134,38 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     model = Asset
     fieldsets = (
         FieldSet('name', 'status', name='General'),
-        FieldSet('device_type', 'device', 'module_type', 'module', 'rack_type', 'rack', name='Hardware'),
-        FieldSet('owner', 'purchase', 'delivery', 'warranty_start', 'warranty_end', name='Purchase'), 
-        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'), 
+        FieldSet(
+            'device_type',
+            'device',
+            'module_type',
+            'module',
+            'rack_type',
+            'rack',
+            name='Hardware',
+        ),
+        FieldSet(
+            'owner',
+            'purchase',
+            'delivery',
+            'warranty_start',
+            'warranty_end',
+            name='Purchase',
+        ),
+        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
         FieldSet('storage_location', name='Location'),
     )
     nullable_fields = (
-        'name', 'device', 'module', 'rack', 'owner', 'purchase', 'delivery', 'tenant', 'contact',
-        'warranty_start', 'warranty_end',
+        'name',
+        'device',
+        'module',
+        'rack',
+        'owner',
+        'purchase',
+        'delivery',
+        'tenant',
+        'contact',
+        'warranty_start',
+        'warranty_end',
     )
 
 
@@ -149,7 +179,7 @@ class AssetImportForm(NetBoxModelImportForm):
         queryset=Manufacturer.objects.all(),
         to_field_name='name',
         required=True,
-        help_text='Hardware manufacturer.'
+        help_text='Hardware manufacturer.',
     )
     model_name = forms.CharField(
         required=True,
@@ -208,9 +238,7 @@ class AssetImportForm(NetBoxModelImportForm):
         required=False,
     )
     purchase_status = CSVChoiceField(
-        choices=PurchaseStatusChoices,
-        help_text='Status of purchase',
-        required=False
+        choices=PurchaseStatusChoices, help_text='Status of purchase', required=False
     )
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
@@ -234,12 +262,31 @@ class AssetImportForm(NetBoxModelImportForm):
     class Meta:
         model = Asset
         fields = (
-            'name', 'asset_tag', 'serial', 'status',
-            'hardware_kind', 'manufacturer', 'model_name', 'part_number',
-            'model_comments', 'storage_site', 'storage_location',
-            'owner', 'supplier', 'purchase', 'purchase_date', 'purchase_status',
-            'delivery', 'delivery_date', 'receiving_contact', 'warranty_start',
-            'warranty_end', 'comments', 'tenant', 'contact', 'tags',
+            'name',
+            'asset_tag',
+            'serial',
+            'status',
+            'hardware_kind',
+            'manufacturer',
+            'model_name',
+            'part_number',
+            'model_comments',
+            'storage_site',
+            'storage_location',
+            'owner',
+            'supplier',
+            'purchase',
+            'purchase_date',
+            'purchase_status',
+            'delivery',
+            'delivery_date',
+            'receiving_contact',
+            'warranty_start',
+            'warranty_end',
+            'comments',
+            'tenant',
+            'contact',
+            'tags',
         )
 
     def clean_model_name(self):
@@ -258,9 +305,13 @@ class AssetImportForm(NetBoxModelImportForm):
         elif hardware_kind == 'rack':
             hardware_class = RackType
         try:
-            hardware_type = hardware_class.objects.get(manufacturer=manufacturer, model=model)
+            hardware_type = hardware_class.objects.get(
+                manufacturer=manufacturer, model=model
+            )
         except ObjectDoesNotExist:
-            raise forms.ValidationError(f'Hardware type not found: "{hardware_kind}", "{manufacturer}", "{model}"')
+            raise forms.ValidationError(
+                f'Hardware type not found: "{hardware_kind}", "{manufacturer}", "{model}"'
+            )
         setattr(self.instance, f'{hardware_kind}_type', hardware_type)
         return hardware_type
 
@@ -272,7 +323,9 @@ class AssetImportForm(NetBoxModelImportForm):
         try:
             purchase = Purchase.objects.get(supplier=supplier, name=purchase_name)
         except ObjectDoesNotExist:
-            raise forms.ValidationError(f'Unable to find purchase {supplier} {purchase_name}')
+            raise forms.ValidationError(
+                f'Unable to find purchase {supplier} {purchase_name}'
+            )
         return purchase
 
     def clean_delivery(self):
@@ -283,7 +336,9 @@ class AssetImportForm(NetBoxModelImportForm):
         try:
             delivery = Delivery.objects.get(purchase=purchase, name=delivery_name)
         except ObjectDoesNotExist:
-            raise forms.ValidationError(f'Unable to find delivery {purchase} {delivery_name}')
+            raise forms.ValidationError(
+                f'Unable to find delivery {purchase} {delivery_name}'
+            )
         return delivery
 
     def __init__(self, data=None, *args, **kwargs):
@@ -291,8 +346,14 @@ class AssetImportForm(NetBoxModelImportForm):
 
         if data:
             # filter storage_location queryset on selected storage_site
-            params = {f"site__{self.fields['storage_site'].to_field_name}": data.get('storage_site')}
-            self.fields['storage_location'].queryset = self.fields['storage_location'].queryset.filter(**params)
+            params = {
+                f'site__{self.fields["storage_site"].to_field_name}': data.get(
+                    'storage_site'
+                )
+            }
+            self.fields['storage_location'].queryset = self.fields[
+                'storage_location'
+            ].queryset.filter(**params)
 
     def _clean_fields(self):
         """
@@ -318,24 +379,27 @@ class AssetImportForm(NetBoxModelImportForm):
         exclude.remove('rack_type')
         return exclude
 
-    def _create_related_objects(self):
+    def _create_related_objects(self):  # noqa: C901
         """
         Create missing related objects (Purchase, DeviceType...). Based on plugin
         settings.
         On exceptions we add to form errors so user gets correct feedback that
-        something is wrong. 
+        something is wrong.
         """
         try:
             # handle creating related resources if they don't exist and enabled in settings
-            if (get_plugin_setting('asset_import_create_purchase')
-                and self.data.get('purchase') and self.data.get('supplier')):
+            if (
+                get_plugin_setting('asset_import_create_purchase')
+                and self.data.get('purchase')
+                and self.data.get('supplier')
+            ):
                 purchase, _ = Purchase.objects.get_or_create(
                     name=self.data.get('purchase'),
                     supplier=self._get_or_create_related('supplier'),
                     defaults={
                         'date': self._get_clean_value('purchase_date'),
                         'status': self._get_clean_value('purchase_status'),
-                    }
+                    },
                 )
                 if self.data.get('delivery'):
                     Delivery.objects.get_or_create(
@@ -343,11 +407,15 @@ class AssetImportForm(NetBoxModelImportForm):
                         purchase=purchase,
                         defaults={
                             'date': self._get_clean_value('delivery_date'),
-                            'receiving_contact': self._get_clean_value('receiving_contact'),
-                        }
+                            'receiving_contact': self._get_clean_value(
+                                'receiving_contact'
+                            ),
+                        },
                     )
-            if (get_plugin_setting('asset_import_create_device_type')
-                and self.data.get('hardware_kind') == 'device'):
+            if (
+                get_plugin_setting('asset_import_create_device_type')
+                and self.data.get('hardware_kind') == 'device'
+            ):
                 DeviceType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_related('manufacturer'),
@@ -358,8 +426,10 @@ class AssetImportForm(NetBoxModelImportForm):
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
-            if (get_plugin_setting('asset_import_create_module_type')
-                and self.data.get('hardware_kind') == 'module'):
+            if (
+                get_plugin_setting('asset_import_create_module_type')
+                and self.data.get('hardware_kind') == 'module'
+            ):
                 ModuleType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_related('manufacturer'),
@@ -369,8 +439,10 @@ class AssetImportForm(NetBoxModelImportForm):
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
-            if (get_plugin_setting('asset_import_create_inventoryitem_type')
-                and self.data.get('hardware_kind') == 'inventoryitem'):
+            if (
+                get_plugin_setting('asset_import_create_inventoryitem_type')
+                and self.data.get('hardware_kind') == 'inventoryitem'
+            ):
                 InventoryItemType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_related('manufacturer'),
@@ -381,8 +453,10 @@ class AssetImportForm(NetBoxModelImportForm):
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
-            if (get_plugin_setting('asset_import_create_rack_type')
-                and self.data.get('hardware_kind') == 'rack'):
+            if (
+                get_plugin_setting('asset_import_create_rack_type')
+                and self.data.get('hardware_kind') == 'rack'
+            ):
                 RackType.objects.get_or_create(
                     model__iexact=self.data.get('model_name'),
                     manufacturer=self._get_or_create_related('manufacturer'),
@@ -392,13 +466,15 @@ class AssetImportForm(NetBoxModelImportForm):
                         'comments': self._get_clean_value('model_comments'),
                     },
                 )
-            if (get_plugin_setting('asset_import_create_tenant')
-                and self.data.get('tenant')):
+            if get_plugin_setting('asset_import_create_tenant') and self.data.get(
+                'tenant'
+            ):
                 self._get_or_create_related('tenant')
-            if (get_plugin_setting('asset_import_create_tenant')
-                and self.data.get('owner')):
+            if get_plugin_setting('asset_import_create_tenant') and self.data.get(
+                'owner'
+            ):
                 self._get_or_create_related('owner')
-        except forms.ValidationError as e:
+        except forms.ValidationError:
             # ValidationErrors are raised by _clean_fields() method
             # this will be called later in the code and will be bound
             # to correct field. So we skiup this kinds of errors here.
@@ -424,8 +500,8 @@ class AssetImportForm(NetBoxModelImportForm):
         instance_defaults.update({to_field_name: self.data.get(field_name)})
         instance, _ = klass.objects.get_or_create(
             # filter on field specified in column header
-            **{to_field_name+'__iexact':self.data.get(field_name)},
-            defaults=instance_defaults
+            **{to_field_name + '__iexact': self.data.get(field_name)},
+            defaults=instance_defaults,
         )
         return instance
 
@@ -447,9 +523,7 @@ class AssetImportForm(NetBoxModelImportForm):
 class SupplierImportForm(NetBoxModelImportForm):
     class Meta:
         model = Supplier
-        fields = (
-            'name', 'slug', 'description', 'comments', 'tags'
-        )
+        fields = ('name', 'slug', 'description', 'comments', 'tags')
 
 
 class SupplierBulkEditForm(NetBoxModelBulkEditForm):
@@ -461,9 +535,7 @@ class SupplierBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     model = Supplier
-    fieldsets = (
-        FieldSet('description', name='General'),
-    )
+    fieldsets = (FieldSet('description', name='General'),)
     nullable_fields = ('description',)
 
 
@@ -482,7 +554,13 @@ class PurchaseImportForm(NetBoxModelImportForm):
     class Meta:
         model = Purchase
         fields = (
-            'name', 'date', 'status', 'supplier', 'description', 'comments', 'tags'
+            'name',
+            'date',
+            'status',
+            'supplier',
+            'description',
+            'comments',
+            'tags',
         )
 
 
@@ -492,11 +570,7 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         initial='',
     )
-    date = forms.DateField(
-        label='Date',
-        required=False,
-        widget=DatePicker()
-    )
+    date = forms.DateField(label='Date', required=False, widget=DatePicker())
     supplier = DynamicModelChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
@@ -510,10 +584,11 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     model = Purchase
-    fieldsets = (
-        FieldSet('date', 'status', 'supplier', 'description', name='General'),
+    fieldsets = (FieldSet('date', 'status', 'supplier', 'description', name='General'),)
+    nullable_fields = (
+        'date',
+        'description',
     )
-    nullable_fields = ('date', 'description',)
 
 
 class DeliveryImportForm(NetBoxModelImportForm):
@@ -529,20 +604,22 @@ class DeliveryImportForm(NetBoxModelImportForm):
         help_text='Contact that accepted this delivery. It must exist when importing.',
         required=False,
     )
-    
+
     class Meta:
         model = Delivery
         fields = (
-            'name', 'date', 'purchase', 'receiving_contact', 'description', 'comments', 'tags'
+            'name',
+            'date',
+            'purchase',
+            'receiving_contact',
+            'description',
+            'comments',
+            'tags',
         )
 
 
 class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
-    date = forms.DateField(
-        label='Date',
-        required=False,
-        widget=DatePicker()
-    )
+    date = forms.DateField(label='Date', required=False, widget=DatePicker())
     purchase = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
         required=False,
@@ -572,9 +649,20 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Delivery
     fieldsets = (
-        FieldSet('date', 'purchase', 'contact_group', 'receiving_contact', 'description', name='General'),
+        FieldSet(
+            'date',
+            'purchase',
+            'contact_group',
+            'receiving_contact',
+            'description',
+            name='General',
+        ),
     )
-    nullable_fields = ('date', 'description', 'receiving_contact',)
+    nullable_fields = (
+        'date',
+        'description',
+        'receiving_contact',
+    )
 
 
 class InventoryItemTypeImportForm(NetBoxModelImportForm):
@@ -594,7 +682,13 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
     class Meta:
         model = InventoryItemType
         fields = (
-            'model', 'slug', 'manufacturer', 'part_number', 'inventoryitem_group', 'comments', 'tags'
+            'model',
+            'slug',
+            'manufacturer',
+            'part_number',
+            'inventoryitem_group',
+            'comments',
+            'tags',
         )
 
 
@@ -617,9 +711,7 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         FieldSet('manufacturer', 'inventoryitem_group', name='Inventory Item Type'),
     )
-    nullable_fields = (
-        'inventoryitem_group',
-    )
+    nullable_fields = ('inventoryitem_group',)
 
 
 class InventoryItemGroupImportForm(NetBoxModelImportForm):
@@ -627,26 +719,22 @@ class InventoryItemGroupImportForm(NetBoxModelImportForm):
         queryset=InventoryItemGroup.objects.all(),
         required=False,
         to_field_name='name',
-        help_text='Name of parent group'
+        help_text='Name of parent group',
     )
+
     class Meta:
         model = InventoryItemGroup
-        fields = (
-            'name', 'parent', 'comments', 'tags'
-        )
+        fields = ('name', 'parent', 'comments', 'tags')
 
 
 class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
     parent = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False
+        queryset=InventoryItemGroup.objects.all(), required=False
     )
     comments = CommentField(
         required=False,
     )
 
     model = InventoryItemGroup
-    fieldsets = (
-        FieldSet('parent'),
-    )
+    fieldsets = (FieldSet('parent'),)
     nullable_fields = ('parent',)

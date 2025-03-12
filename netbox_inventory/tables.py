@@ -1,14 +1,21 @@
-from django.db.models.functions import Coalesce
 import django_tables2 as tables
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import columns, NetBoxTable
-from tenancy.tables import ContactsColumnMixin
-from .models import Asset, Delivery, InventoryItemType, InventoryItemGroup, Purchase, Supplier
-from .template_content import WARRANTY_PROGRESSBAR
-
 from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
+from netbox.tables import NetBoxTable, columns
+from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
+
+from .models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
+)
+from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
@@ -23,6 +30,7 @@ __all__ = (
 #
 # Assets
 #
+
 
 class InventoryItemGroupTable(NetBoxTable):
     name = columns.MPTTColumn(
@@ -183,7 +191,6 @@ class AssetTable(NetBoxTable):
     delivery_date = columns.DateColumn(
         accessor='delivery__date',
         verbose_name='Delivery Date',
-
     )
     current_site = tables.Column(
         linkify=True,
@@ -196,7 +203,7 @@ class AssetTable(NetBoxTable):
     warranty_progress = columns.TemplateColumn(
         template_code=WARRANTY_PROGRESSBAR,
         order_by='warranty_end',
-        #orderable=False,
+        # orderable=False,
         verbose_name='Warranty remaining',
     )
     comments = columns.MarkdownColumn()
@@ -236,7 +243,10 @@ class AssetTable(NetBoxTable):
         queryset, _ = self.order_manufacturer(queryset, is_descending)
         queryset = queryset.annotate(
             model=Coalesce(
-                'device_type__model', 'module_type__model', 'inventoryitem_type__model', 'rack_type__model'
+                'device_type__model',
+                'module_type__model',
+                'inventoryitem_type__model',
+                'rack_type__model',
             )
         ).order_by(
             ('-' if is_descending else '') + 'manufacturer',
@@ -248,7 +258,10 @@ class AssetTable(NetBoxTable):
     def order_hardware(self, queryset, is_descending):
         queryset = queryset.annotate(
             hw=Coalesce(
-                'device__name', 'module__device__name', 'inventoryitem__device__name', 'rack__name'
+                'device__name',
+                'module__device__name',
+                'inventoryitem__device__name',
+                'rack__name',
             )
         ).order_by(
             ('-' if is_descending else '') + 'hw',
@@ -273,17 +286,26 @@ class AssetTable(NetBoxTable):
     def _order_annotate_installed(self, queryset):
         return queryset.annotate(
             site_name=Coalesce(
-                'device__site__name', 'module__device__site__name', 'inventoryitem__device__site__name', 'rack__site__name'
+                'device__site__name',
+                'module__device__site__name',
+                'inventoryitem__device__site__name',
+                'rack__site__name',
             ),
             location_name=Coalesce(
-                'device__location__name', 'module__device__location__name', 'inventoryitem__device__location__name', 'rack__location__name'
+                'device__location__name',
+                'module__device__location__name',
+                'inventoryitem__device__location__name',
+                'rack__location__name',
             ),
             rack_name=Coalesce(
-                'device__rack__name', 'module__device__rack__name', 'inventoryitem__device__rack__name', 'rack__name'
+                'device__rack__name',
+                'module__device__rack__name',
+                'inventoryitem__device__rack__name',
+                'rack__name',
             ),
             device_name=Coalesce(
                 'device__name', 'module__device__name', 'inventoryitem__device__name'
-            )
+            ),
         )
 
     def order_installed_site(self, queryset, is_descending):
@@ -381,6 +403,7 @@ class AssetTable(NetBoxTable):
 #
 # Deliveries
 #
+
 
 class SupplierTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(
@@ -539,7 +562,7 @@ asset_count = columns.LinkedCountColumn(
     viewname='plugins:netbox_inventory:asset_list',
     url_params={'device_type_id': 'pk'},
     verbose_name=_('Assets'),
-    accessor="assets__count",
+    accessor='assets__count',
 )
 
 register_table_column(asset_count, 'assets', DeviceTypeTable)
@@ -549,7 +572,7 @@ asset_count = columns.LinkedCountColumn(
     viewname='plugins:netbox_inventory:asset_list',
     url_params={'module_type_id': 'pk'},
     verbose_name=_('Assets'),
-    accessor="assets__count",
+    accessor='assets__count',
 )
 
 register_table_column(asset_count, 'assets', ModuleTypeTable)
@@ -559,7 +582,7 @@ asset_count = columns.LinkedCountColumn(
     viewname='plugins:netbox_inventory:asset_list',
     url_params={'rack_type_id': 'pk'},
     verbose_name=_('Assets'),
-    accessor="assets__count",
+    accessor='assets__count',
 )
 
 register_table_column(asset_count, 'assets', RackTypeTable)

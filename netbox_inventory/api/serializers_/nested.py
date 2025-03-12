@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import WritableNestedSerializer
+
 from netbox_inventory.models import InventoryItemGroup
 
-__all__ = (
-    'NestedInventoryItemGroupSerializer',
-)
+__all__ = ('NestedInventoryItemGroupSerializer',)
 
 
 class NestedInventoryItemGroupSerializer(WritableNestedSerializer):

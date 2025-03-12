@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('netbox_inventory', '0005_delivery_asset_delivery'),
     ]

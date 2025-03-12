@@ -1,15 +1,17 @@
 from utilities.testing import APIViewTestCases
-from ..custom import APITestCase
+
 from ...models import InventoryItemGroup
+from ..custom import APITestCase
 
 
 class InventoryItemGroupTest(
-        APITestCase, 
-        APIViewTestCases.GetObjectViewTestCase,
-        APIViewTestCases.ListObjectsViewTestCase,
-        APIViewTestCases.CreateObjectViewTestCase,
-        APIViewTestCases.UpdateObjectViewTestCase,
-        APIViewTestCases.DeleteObjectViewTestCase):
+    APITestCase,
+    APIViewTestCases.GetObjectViewTestCase,
+    APIViewTestCases.ListObjectsViewTestCase,
+    APIViewTestCases.CreateObjectViewTestCase,
+    APIViewTestCases.UpdateObjectViewTestCase,
+    APIViewTestCases.DeleteObjectViewTestCase,
+):
     model = InventoryItemGroup
     brief_fields = ['_depth', 'display', 'id', 'name', 'url']
     create_data = [

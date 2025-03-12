@@ -1,10 +1,10 @@
 from .schema import (
     AssetQuery,
-    SupplierQuery,
-    PurchaseQuery,
     DeliveryQuery,
-    InventoryItemTypeQuery,
     InventoryItemGroupQuery,
+    InventoryItemTypeQuery,
+    PurchaseQuery,
+    SupplierQuery,
 )
 
 schema = [

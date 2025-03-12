@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.template import Template
+
 from netbox.views import generic
 from utilities.forms import ConfirmationForm, restrict_form_fields
 from utilities.views import register_model_view
@@ -73,7 +74,7 @@ class AssetBulkCreateView(generic.BulkCreateView):
             # Reinstantiate the model form each time to avoid overwriting the same instance. Use a mutable
             # copy of the POST QueryDict so that we can update the target field value.
             model_form = self.model_form(request.POST.copy())
-            del(model_form.data['count'])
+            del model_form.data['count']
 
             # Validate each new object independently.
             if model_form.is_valid():
@@ -107,9 +108,9 @@ class AssetDeleteView(generic.ObjectDeleteView):
         intersection_of_tags = set(asset_tags).intersection(protected_tags)
 
         if intersection_of_tags:
-            error_msg = "Cannot delete asset {} protected by tags: {}.".format(
+            error_msg = 'Cannot delete asset {} protected by tags: {}.'.format(
                 asset,
-                ", ".join(intersection_of_tags),
+                ', '.join(intersection_of_tags),
             )
             logger.info(error_msg)
             messages.warning(request, error_msg)
@@ -168,7 +169,7 @@ class AssetBulkEditView(generic.BulkEditView):
                 queryset = self.queryset.filter(pk__in=pk_list)
 
                 for asset in queryset:
-                    asset_tags = set(asset.tags.all().values_list("slug", flat=True))
+                    asset_tags = set(asset.tags.all().values_list('slug', flat=True))
                     intersection_of_tags = set(asset_tags).intersection(
                         protected_fields_by_tags.keys()
                     )
@@ -192,16 +193,16 @@ class AssetBulkEditView(generic.BulkEditView):
                                 protected_fields
                             ).union(nullable.intersection(protected_fields))
                             errors.append(
-                                "Cannot edit asset {} fields protected by tag {}: {}.".format(
+                                'Cannot edit asset {} fields protected by tag {}: {}.'.format(
                                     asset,
                                     tag,
-                                    ",".join(fields),
+                                    ','.join(fields),
                                 )
                             )
                 if errors:
-                    error_msg_protected_assets = f"Edit failed for all assets. Because of trying to modify protected fields on assets: {', '.join(map(str, set(protected_assets)))}."
+                    error_msg_protected_assets = f'Edit failed for all assets. Because of trying to modify protected fields on assets: {", ".join(map(str, set(protected_assets)))}.'
                     logger.info(errors + [error_msg_protected_assets])
-                    messages.warning(request, " ".join(errors))
+                    messages.warning(request, ' '.join(errors))
                     messages.warning(request, error_msg_protected_assets)
                     return redirect(self.get_return_url(request))
         return super().post(request, **kwargs)
@@ -231,7 +232,7 @@ class AssetBulkDeleteView(generic.BulkDeleteView):
 
         if protected_assets:
             error_msg = "Cannot delete assets protected by tags: {}. Assets that can't be deleted: {}".format(
-                ", ".join(protected_tags), ", ".join(map(str, protected_assets))
+                ', '.join(protected_tags), ', '.join(map(str, protected_assets))
             )
             logger.info(error_msg)
             messages.warning(request, error_msg)

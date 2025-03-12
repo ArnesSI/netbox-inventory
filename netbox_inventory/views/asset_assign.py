@@ -3,9 +3,7 @@ from netbox.views import generic
 from ..forms.assign import *
 from ..models import Asset
 
-__all__ = (
-    'AssetAssignView',
-)
+__all__ = ('AssetAssignView',)
 
 
 class AssetAssignView(generic.ObjectEditView):

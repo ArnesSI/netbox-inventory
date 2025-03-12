@@ -1,14 +1,13 @@
 from utilities.testing import ViewTestCases
 
-from netbox_inventory.tests.custom import ModelViewTestCase
 from netbox_inventory.models import InventoryItemGroup
+from netbox_inventory.tests.custom import ModelViewTestCase
 
 
 class InventoryItemGroupTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-
     model = InventoryItemGroup
 
     @classmethod
@@ -17,7 +16,6 @@ class InventoryItemGroupTestCase(
         iig1 = InventoryItemGroup.objects.create(name='IIG1')
         iig2 = InventoryItemGroup.objects.create(name='IIG2')
         iig3 = InventoryItemGroup.objects.create(name='IIG3')
-
 
         cls.form_data = {
             'name': 'InventoryItemGroup',

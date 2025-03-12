@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+
+      - uses: isort/isort-action@v1
+        with:
+          sort-paths: "./netbox_inventory"
+
+      - uses: astral-sh/ruff-action@v3
+        with:
+          src: "./netbox_inventory"
