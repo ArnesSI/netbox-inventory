@@ -54,10 +54,14 @@ class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = InventoryItemGroup
-        fields = ('id', 'name')
+        fields = (
+            'id',
+            'name',
+            'description',
+        )
 
     def search(self, queryset, name, value):
-        query = Q(name__icontains=value)
+        query = Q(Q(name__icontains=value) | Q(description__icontains=value))
         return queryset.filter(query)
 
 
@@ -87,12 +91,17 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
             'manufacturer',
             'model',
             'slug',
+            'description',
             'part_number',
             'inventoryitem_group_id',
         )
 
     def search(self, queryset, name, value):
-        query = Q(Q(model__icontains=value) | Q(part_number__icontains=value))
+        query = Q(
+            Q(model__icontains=value)
+            | Q(part_number__icontains=value)
+            | Q(description__icontains=value)
+        )
         return queryset.filter(query)
 
 
@@ -389,13 +398,14 @@ class AssetFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = Asset
-        fields = ('id', 'name', 'serial', 'asset_tag')
+        fields = ('id', 'name', 'serial', 'asset_tag', 'description')
 
     def search(self, queryset, name, value):
         query = (
             Q(id__contains=value)
             | Q(serial__icontains=value)
             | Q(name__icontains=value)
+            | Q(description__icontains=value)
             | Q(asset_tag__icontains=value)
             | Q(device_type__model__icontains=value)
             | Q(module_type__model__icontains=value)

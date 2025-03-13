@@ -18,6 +18,7 @@ class InventoryItemGroupIndex(SearchIndex):
     model = InventoryItemGroup
     fields = (
         ('name', 100),
+        ('description', 500),
         ('comments', 5000),
     )
 
@@ -27,6 +28,7 @@ class InventoryItemTypeIndex(SearchIndex):
     fields = (
         ('model', 100),
         ('part_number', 100),
+        ('description', 500),
         ('comments', 5000),
     )
 
@@ -37,6 +39,7 @@ class AssetIndex(SearchIndex):
         ('name', 100),
         ('asset_tag', 50),
         ('serial', 60),
+        ('description', 500),
         ('comments', 5000),
     )
     display_attrs = ('name', 'asset_tag', 'status')

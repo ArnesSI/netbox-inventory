@@ -13,7 +13,7 @@ class InventoryItemGroupTest(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = InventoryItemGroup
-    brief_fields = ['_depth', 'display', 'id', 'name', 'url']
+    brief_fields = ['_depth', 'description', 'display', 'id', 'name', 'url']
     create_data = [
         {
             'name': 'InventoryItemGroup 4',

@@ -14,7 +14,15 @@ class InventoryItemTypeTest(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = InventoryItemType
-    brief_fields = ['display', 'id', 'manufacturer', 'model', 'slug', 'url']
+    brief_fields = [
+        'description',
+        'display',
+        'id',
+        'manufacturer',
+        'model',
+        'slug',
+        'url',
+    ]
 
     @classmethod
     def setUpTestData(cls) -> None:

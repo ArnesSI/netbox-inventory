@@ -15,4 +15,4 @@ class NestedInventoryItemGroupSerializer(WritableNestedSerializer):
 
     class Meta:
         model = InventoryItemGroup
-        fields = ('id', 'url', 'display', 'name', '_depth')
+        fields = ('id', 'url', 'display', 'name', 'description', '_depth')
