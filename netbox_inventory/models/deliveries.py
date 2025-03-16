@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 
 from netbox.models.features import ContactsMixin
 
@@ -20,9 +19,6 @@ class Supplier(NamedModel, ContactsMixin):
     )
 
     clone_fields = ['description', 'comments']
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:supplier', args=[self.pk])
 
 
 class Purchase(NamedModel):
@@ -61,9 +57,6 @@ class Purchase(NamedModel):
 
     def __str__(self):
         return f'{self.supplier} {self.name}'
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:purchase', args=[self.pk])
 
 
 class Delivery(NamedModel):
@@ -105,6 +98,3 @@ class Delivery(NamedModel):
 
     def __str__(self):
         return f'{self.purchase} {self.name}'
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:delivery', args=[self.pk])

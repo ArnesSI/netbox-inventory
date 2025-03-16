@@ -2,7 +2,6 @@ from datetime import date
 
 from django.db import models
 from django.forms import ValidationError
-from django.urls import reverse
 
 from netbox.models import NestedGroupModel
 from netbox.models.features import ImageAttachmentsMixin
@@ -41,9 +40,6 @@ class InventoryItemGroup(NestedGroupModel, NamedModel):
                 violation_error_message='A top-level group with this name already exists.',
             ),
         )
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])
 
 
 class InventoryItemType(NamedModel, ImageAttachmentsMixin):
@@ -93,9 +89,6 @@ class InventoryItemType(NamedModel, ImageAttachmentsMixin):
 
     def __str__(self):
         return self.model
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:inventoryitemtype', args=[self.pk])
 
 
 class Asset(NamedModel, ImageAttachmentsMixin):
@@ -557,9 +550,6 @@ class Asset(NamedModel, ImageAttachmentsMixin):
             raise ValidationError(
                 {'warranty_end': 'Warranty end date must be after warranty start date.'}
             )
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:asset', args=[self.pk])
 
     def get_status_color(self):
         return AssetStatusChoices.colors.get(self.status)
