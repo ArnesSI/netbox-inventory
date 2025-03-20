@@ -21,6 +21,7 @@ class NetBoxInventoryConfig(PluginConfig):
             'retired',
         ],
         'sync_hardware_serial_asset_tag': False,
+        'asset_sync_ignored_custom_fields': [],
         'asset_import_create_purchase': False,
         'asset_import_create_device_type': False,
         'asset_import_create_module_type': False,

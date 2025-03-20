@@ -44,7 +44,10 @@ class AssetCreateMixin:
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial[kind_type] = asset.hardware_type.id
 
+            ignored_fields = get_plugin_setting('asset_sync_ignored_custom_fields')
             for field_name, value in asset.custom_field_data.items():
+                if field_name in ignored_fields:
+                    continue
                 if f'cf_{field_name}' in self.fields:
                     self.fields[f'cf_{field_name}'].disabled = True
                     self.initial[f'cf_{field_name}'] = value
