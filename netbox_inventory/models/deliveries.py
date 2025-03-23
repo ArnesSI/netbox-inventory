@@ -4,7 +4,7 @@ from django.urls import reverse
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 
-from ..choices import PurchaseStatusChoices
+from ..choices import BOMStatusChoices, PurchaseStatusChoices
 
 
 class Supplier(NetBoxModel, ContactsMixin):
@@ -41,6 +41,41 @@ class Supplier(NetBoxModel, ContactsMixin):
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:supplier', args=[self.pk])
 
+
+class BOM(NetBoxModel):
+    """
+    Represents a set of Assets with the consideration of Purchase.
+    """
+
+    name = models.CharField(max_length=100)
+    status = models.CharField(
+        max_length=30,
+        choices=BOMStatusChoices,
+        help_text='Status of purchase',
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+    comments = models.TextField(
+        blank=True,
+    )
+
+    clone_fields = ['status', 'description', 'comments']
+
+    class Meta:
+        ordering = ['name']
+        unique_together = (('name'),)
+
+    def get_status_color(self):
+        return BOMStatusChoices.colors.get(self.status)
+
+    def __str__(self):
+        return f'{self.name}'
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:bom', args=[self.pk])
+    
 
 class Purchase(NetBoxModel):
     """

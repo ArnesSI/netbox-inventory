@@ -29,6 +29,15 @@ class HardwareKindChoices(ChoiceSet):
 #
 
 
+class BOMStatusChoices(ChoiceSet):
+    key = 'BOM.status'
+
+    CHOICES = [
+        ('planned', 'Planned', 'gray'),
+        ('quoted', 'Quoted', 'green'),
+    ]
+
+
 class PurchaseStatusChoices(ChoiceSet):
     key = 'Purchase.status'
 
