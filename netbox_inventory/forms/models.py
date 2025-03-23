@@ -19,12 +19,82 @@ from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
     'AssetForm',
-    'SupplierForm',
-    'PurchaseForm',
     'DeliveryForm',
-    'InventoryItemTypeForm',
     'InventoryItemGroupForm',
+    'InventoryItemTypeForm',
+    'PurchaseForm',
+    'SupplierForm',
 )
+
+
+#
+# Assets
+#
+
+
+class InventoryItemGroupForm(NetBoxModelForm):
+    parent = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Parent',
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'parent',
+            'description',
+            'tags',
+            name='Inventory Item Group',
+        ),
+    )
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'name',
+            'parent',
+            'description',
+            'tags',
+            'comments',
+        )
+
+
+class InventoryItemTypeForm(NetBoxModelForm):
+    slug = SlugField(slug_source='model')
+    inventoryitem_group = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory item group',
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'manufacturer',
+            'model',
+            'slug',
+            'description',
+            'part_number',
+            'inventoryitem_group',
+            'tags',
+            name='Inventory Item Type',
+        ),
+    )
+
+    class Meta:
+        model = InventoryItemType
+        fields = (
+            'manufacturer',
+            'model',
+            'slug',
+            'description',
+            'part_number',
+            'inventoryitem_group',
+            'tags',
+            'comments',
+        )
 
 
 class AssetForm(NetBoxModelForm):
@@ -226,11 +296,16 @@ class AssetForm(NetBoxModelForm):
 
     def clean(self):
         super().clean()
-        # if only delivery set, infer pruchase from it
+        # if only delivery set, infer purchase from it
         delivery = self.cleaned_data['delivery']
         purchase = self.cleaned_data['purchase']
         if delivery and not purchase:
             self.cleaned_data['purchase'] = delivery.purchase
+
+
+#
+# Deliveries
+#
 
 
 class SupplierForm(NetBoxModelForm):
@@ -325,62 +400,3 @@ class DeliveryForm(NetBoxModelForm):
         widgets = {
             'date': DatePicker(),
         }
-
-
-class InventoryItemTypeForm(NetBoxModelForm):
-    slug = SlugField(slug_source='model')
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory item group',
-    )
-    comments = CommentField()
-
-    fieldsets = (
-        FieldSet(
-            'manufacturer',
-            'model',
-            'slug',
-            'description',
-            'part_number',
-            'inventoryitem_group',
-            'tags',
-            name='Inventory Item Type',
-        ),
-    )
-
-    class Meta:
-        model = InventoryItemType
-        fields = (
-            'manufacturer',
-            'model',
-            'slug',
-            'description',
-            'part_number',
-            'inventoryitem_group',
-            'tags',
-            'comments',
-        )
-
-
-class InventoryItemGroupForm(NetBoxModelForm):
-    parent = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Parent',
-    )
-    comments = CommentField()
-
-    fieldsets = (
-        FieldSet('name', 'parent', 'description', 'tags', name='Inventory Item Group'),
-    )
-
-    class Meta:
-        model = InventoryItemGroup
-        fields = (
-            'name',
-            'parent',
-            'description',
-            'tags',
-            'comments',
-        )

@@ -33,12 +33,62 @@ from ..models import (
 
 __all__ = (
     'AssetFilterForm',
+    'DeliveryFilterForm',
+    'InventoryItemGroupFilterForm',
+    'InventoryItemTypeFilterForm',
     'SupplierFilterForm',
     'PurchaseFilterForm',
-    'DeliveryFilterForm',
-    'InventoryItemTypeFilterForm',
-    'InventoryItemGroupFilterForm',
 )
+
+
+#
+# Assets
+#
+
+
+class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemGroup
+    fieldsets = (
+        FieldSet(
+            'q',
+            'filter_id',
+            'tag',
+            'parent_id',
+        ),
+    )
+    parent_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Parent group',
+    )
+    tag = TagFilterField(model)
+
+
+class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemType
+    fieldsets = (
+        FieldSet(
+            'q',
+            'filter_id',
+            'tag',
+        ),
+        FieldSet(
+            'manufacturer_id',
+            'inventoryitem_group_id',
+            name='Inventory Item Type',
+        ),
+    )
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    inventoryitem_group_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
+    )
+    tag = TagFilterField(model)
 
 
 class AssetFilterForm(NetBoxModelFilterSetForm):
@@ -312,6 +362,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
 
+#
+# Deliveries
+#
+
+
 class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
     model = Supplier
     fieldsets = (
@@ -415,35 +470,5 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label='Delivered on or before',
         widget=DatePicker,
-    )
-    tag = TagFilterField(model)
-
-
-class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
-    model = InventoryItemType
-    fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet(
-            'manufacturer_id', 'inventoryitem_group_id', name='Inventory Item Type'
-        ),
-    )
-    manufacturer_id = DynamicModelMultipleChoiceField(
-        queryset=Manufacturer.objects.all(),
-        required=False,
-        label='Manufacturer',
-    )
-    inventoryitem_group_id = DynamicModelMultipleChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory Item Group',
-    )
-    tag = TagFilterField(model)
-
-
-class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
-    model = InventoryItemGroup
-    fieldsets = (FieldSet('q', 'filter_id', 'tag', 'parent_id'),)
-    parent_id = DynamicModelMultipleChoiceField(
-        queryset=InventoryItemGroup.objects.all(), required=False, label='Parent group'
     )
     tag = TagFilterField(model)

@@ -29,146 +29,108 @@ from ..utils import get_plugin_setting
 __all__ = (
     'AssetBulkEditForm',
     'AssetImportForm',
-    'SupplierImportForm',
-    'SupplierBulkEditForm',
-    'PurchaseImportForm',
-    'PurchaseBulkEditForm',
-    'DeliveryImportForm',
     'DeliveryBulkEditForm',
-    'InventoryItemTypeImportForm',
-    'InventoryItemTypeBulkEditForm',
-    'InventoryItemGroupImportForm',
+    'DeliveryImportForm',
     'InventoryItemGroupBulkEditForm',
+    'InventoryItemGroupImportForm',
+    'PurchaseBulkEditForm',
+    'PurchaseImportForm',
+    'SupplierBulkEditForm',
+    'SupplierImportForm',
+    'InventoryItemTypeBulkEditForm',
+    'InventoryItemTypeImportForm',
 )
 
 
-class AssetBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(
+#
+# Assets
+#
+
+
+class InventoryItemGroupImportForm(NetBoxModelImportForm):
+    parent = CSVModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
         required=False,
+        to_field_name='name',
+        help_text='Name of parent group',
     )
-    status = forms.ChoiceField(
-        choices=add_blank_choice(AssetStatusChoices),
-        required=False,
-        initial='',
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = ('name', 'parent', 'description', 'comments', 'tags')
+
+
+class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
+    parent = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(), required=False
     )
     description = forms.CharField(max_length=200, required=False)
-    device_type = DynamicModelChoiceField(
-        queryset=DeviceType.objects.all(),
-        required=False,
-        label='Device type',
-    )
-    # FIXME figure out how to only show set null checkbox
-    device = forms.CharField(
-        disabled=True,
-        required=False,
-    )
-    module_type = DynamicModelChoiceField(
-        queryset=ModuleType.objects.all(),
-        required=False,
-        label='Module type',
-    )
-    # FIXME figure out how to only show set null checkbox
-    module = forms.CharField(
-        disabled=True,
-        required=False,
-    )
-    rack_type = DynamicModelChoiceField(
-        queryset=RackType.objects.all(),
-        required=False,
-        label='Rack type',
-    )
-    # FIXME figure out how to only show set null checkbox
-    rack = forms.CharField(
-        disabled=True,
-        required=False,
-    )
-    owner = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
-        help_text=Asset._meta.get_field('owner').help_text,
-        required=not Asset._meta.get_field('owner').blank,
-    )
-    purchase = DynamicModelChoiceField(
-        queryset=Purchase.objects.all(),
-        help_text=Asset._meta.get_field('purchase').help_text,
-        required=not Asset._meta.get_field('purchase').blank,
-    )
-    delivery = DynamicModelChoiceField(
-        queryset=Delivery.objects.all(),
-        help_text=Asset._meta.get_field('delivery').help_text,
-        required=not Asset._meta.get_field('delivery').blank,
-    )
-    warranty_start = forms.DateField(
-        label='Warranty start', required=False, widget=DatePicker()
-    )
-    warranty_end = forms.DateField(
-        label='Warranty end', required=False, widget=DatePicker()
-    )
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
-        help_text=Asset._meta.get_field('tenant').help_text,
-        required=not Asset._meta.get_field('tenant').blank,
-    )
-    contact_group = DynamicModelChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-        help_text='Filter contacts by group',
-    )
-    contact = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
-        help_text=Asset._meta.get_field('contact').help_text,
-        required=not Asset._meta.get_field('contact').blank,
-        query_params={
-            'group_id': '$contact_group',
-        },
-    )
-    storage_location = DynamicModelChoiceField(
-        queryset=Location.objects.all(),
-        help_text=Asset._meta.get_field('storage_location').help_text,
-        required=False,
-    )
     comments = CommentField(
         required=False,
     )
 
-    model = Asset
-    fieldsets = (
-        FieldSet('name', 'status', 'description', name='General'),
-        FieldSet(
-            'device_type',
-            'device',
-            'module_type',
-            'module',
-            'rack_type',
-            'rack',
-            name='Hardware',
-        ),
-        FieldSet(
-            'owner',
-            'purchase',
-            'delivery',
-            'warranty_start',
-            'warranty_end',
-            name='Purchase',
-        ),
-        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
-        FieldSet('storage_location', name='Location'),
-    )
+    model = InventoryItemGroup
+    fieldsets = (FieldSet('parent', 'description'),)
     nullable_fields = (
-        'name',
+        'parent',
         'description',
-        'device',
-        'module',
-        'rack',
-        'owner',
-        'purchase',
-        'delivery',
-        'tenant',
-        'contact',
-        'warranty_start',
-        'warranty_end',
     )
+
+
+class InventoryItemTypeImportForm(NetBoxModelImportForm):
+    manufacturer = CSVModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        to_field_name='name',
+        help_text='Manufacturer. It must exist before import.',
+        required=True,
+    )
+    inventoryitem_group = CSVModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        to_field_name='name',
+        help_text='Group of inventory item types. It must exist before import.',
+        required=False,
+    )
+
+    class Meta:
+        model = InventoryItemType
+        fields = (
+            'model',
+            'slug',
+            'manufacturer',
+            'description',
+            'part_number',
+            'inventoryitem_group',
+            'comments',
+            'tags',
+        )
+
+
+class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
+    manufacturer = DynamicModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    inventoryitem_group = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
+    )
+    description = forms.CharField(max_length=200, required=False)
+    comments = CommentField(
+        required=False,
+    )
+
+    model = InventoryItemType
+    fieldsets = (
+        FieldSet(
+            'manufacturer',
+            'inventoryitem_group',
+            'description',
+            name='Inventory Item Type',
+        ),
+    )
+    nullable_fields = ('inventoryitem_group', 'description', 'comments')
 
 
 class AssetImportForm(NetBoxModelImportForm):
@@ -532,6 +494,140 @@ class AssetImportForm(NetBoxModelImportForm):
             raise
 
 
+class AssetBulkEditForm(NetBoxModelBulkEditForm):
+    name = forms.CharField(
+        required=False,
+    )
+    status = forms.ChoiceField(
+        choices=add_blank_choice(AssetStatusChoices),
+        required=False,
+        initial='',
+    )
+    description = forms.CharField(max_length=200, required=False)
+    device_type = DynamicModelChoiceField(
+        queryset=DeviceType.objects.all(),
+        required=False,
+        label='Device type',
+    )
+    # FIXME figure out how to only show set null checkbox
+    device = forms.CharField(
+        disabled=True,
+        required=False,
+    )
+    module_type = DynamicModelChoiceField(
+        queryset=ModuleType.objects.all(),
+        required=False,
+        label='Module type',
+    )
+    # FIXME figure out how to only show set null checkbox
+    module = forms.CharField(
+        disabled=True,
+        required=False,
+    )
+    rack_type = DynamicModelChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack type',
+    )
+    # FIXME figure out how to only show set null checkbox
+    rack = forms.CharField(
+        disabled=True,
+        required=False,
+    )
+    owner = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        help_text=Asset._meta.get_field('owner').help_text,
+        required=not Asset._meta.get_field('owner').blank,
+    )
+    purchase = DynamicModelChoiceField(
+        queryset=Purchase.objects.all(),
+        help_text=Asset._meta.get_field('purchase').help_text,
+        required=not Asset._meta.get_field('purchase').blank,
+    )
+    delivery = DynamicModelChoiceField(
+        queryset=Delivery.objects.all(),
+        help_text=Asset._meta.get_field('delivery').help_text,
+        required=not Asset._meta.get_field('delivery').blank,
+    )
+    warranty_start = forms.DateField(
+        label='Warranty start', required=False, widget=DatePicker()
+    )
+    warranty_end = forms.DateField(
+        label='Warranty end', required=False, widget=DatePicker()
+    )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        help_text=Asset._meta.get_field('tenant').help_text,
+        required=not Asset._meta.get_field('tenant').blank,
+    )
+    contact_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+        help_text='Filter contacts by group',
+    )
+    contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Asset._meta.get_field('contact').help_text,
+        required=not Asset._meta.get_field('contact').blank,
+        query_params={
+            'group_id': '$contact_group',
+        },
+    )
+    storage_location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        help_text=Asset._meta.get_field('storage_location').help_text,
+        required=False,
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = Asset
+    fieldsets = (
+        FieldSet('name', 'status', 'description', name='General'),
+        FieldSet(
+            'device_type',
+            'device',
+            'module_type',
+            'module',
+            'rack_type',
+            'rack',
+            name='Hardware',
+        ),
+        FieldSet(
+            'owner',
+            'purchase',
+            'delivery',
+            'warranty_start',
+            'warranty_end',
+            name='Purchase',
+        ),
+        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
+        FieldSet('storage_location', name='Location'),
+    )
+    nullable_fields = (
+        'name',
+        'description',
+        'device',
+        'module',
+        'rack',
+        'owner',
+        'purchase',
+        'delivery',
+        'tenant',
+        'contact',
+        'warranty_start',
+        'warranty_end',
+    )
+
+
+#
+# Deliveries
+#
+
+
 class SupplierImportForm(NetBoxModelImportForm):
     class Meta:
         model = Supplier
@@ -674,90 +770,4 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
         'date',
         'description',
         'receiving_contact',
-    )
-
-
-class InventoryItemTypeImportForm(NetBoxModelImportForm):
-    manufacturer = CSVModelChoiceField(
-        queryset=Manufacturer.objects.all(),
-        to_field_name='name',
-        help_text='Manufacturer. It must exist before import.',
-        required=True,
-    )
-    inventoryitem_group = CSVModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        to_field_name='name',
-        help_text='Group of inventory item types. It must exist before import.',
-        required=False,
-    )
-
-    class Meta:
-        model = InventoryItemType
-        fields = (
-            'model',
-            'slug',
-            'manufacturer',
-            'description',
-            'part_number',
-            'inventoryitem_group',
-            'comments',
-            'tags',
-        )
-
-
-class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
-    manufacturer = DynamicModelChoiceField(
-        queryset=Manufacturer.objects.all(),
-        required=False,
-        label='Manufacturer',
-    )
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory Item Group',
-    )
-    description = forms.CharField(max_length=200, required=False)
-    comments = CommentField(
-        required=False,
-    )
-
-    model = InventoryItemType
-    fieldsets = (
-        FieldSet(
-            'manufacturer',
-            'inventoryitem_group',
-            'description',
-            name='Inventory Item Type',
-        ),
-    )
-    nullable_fields = ('inventoryitem_group', 'description', 'comments')
-
-
-class InventoryItemGroupImportForm(NetBoxModelImportForm):
-    parent = CSVModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        to_field_name='name',
-        help_text='Name of parent group',
-    )
-
-    class Meta:
-        model = InventoryItemGroup
-        fields = ('name', 'parent', 'description', 'comments', 'tags')
-
-
-class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
-    parent = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(), required=False
-    )
-    description = forms.CharField(max_length=200, required=False)
-    comments = CommentField(
-        required=False,
-    )
-
-    model = InventoryItemGroup
-    fieldsets = (FieldSet('parent', 'description'),)
-    nullable_fields = (
-        'parent',
-        'description',
     )
