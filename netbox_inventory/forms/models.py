@@ -9,6 +9,7 @@ from netbox_inventory.choices import HardwareKindChoices
 
 from ..models import (
     Asset,
+    BOM,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -20,6 +21,7 @@ from ..utils import get_tags_and_edit_protected_asset_fields
 __all__ = (
     'AssetForm',
     'SupplierForm',
+    'BOMForm',
     'PurchaseForm',
     'DeliveryForm',
     'InventoryItemTypeForm',
@@ -244,6 +246,26 @@ class SupplierForm(NetBoxModelForm):
         fields = (
             'name',
             'slug',
+            'description',
+            'comments',
+            'tags',
+        )
+
+
+class BOMForm(NetBoxModelForm):
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name', 'status', 'description', 'tags', name='BOM'
+        ),
+    )
+
+    class Meta:
+        model = BOM
+        fields = (
+            'name',
+            'status',
             'description',
             'comments',
             'tags',

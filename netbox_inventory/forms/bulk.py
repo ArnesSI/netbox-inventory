@@ -15,9 +15,15 @@ from utilities.forms.fields import (
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from ..choices import (
+    AssetStatusChoices,
+    BOMStatusChoices,
+    HardwareKindChoices,
+    PurchaseStatusChoices
+)
 from ..models import (
     Asset,
+    BOM,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -31,6 +37,8 @@ __all__ = (
     'AssetImportForm',
     'SupplierImportForm',
     'SupplierBulkEditForm',
+    'BOMImportForm',
+    'BOMBulkEditForm',
     'PurchaseImportForm',
     'PurchaseBulkEditForm',
     'DeliveryImportForm',
@@ -549,6 +557,43 @@ class SupplierBulkEditForm(NetBoxModelBulkEditForm):
     model = Supplier
     fieldsets = (FieldSet('description', name='General'),)
     nullable_fields = ('description',)
+
+
+class BOMImportForm(NetBoxModelImportForm):
+    status = CSVChoiceField(
+        choices=BOMStatusChoices,
+        help_text='Status of BOM',
+    )
+
+    class Meta:
+        model = Purchase
+        fields = (
+            'name',
+            'status',
+            'description',
+            'comments',
+            'tags',
+        )
+
+
+class BOMBulkEditForm(NetBoxModelBulkEditForm):
+    status = forms.ChoiceField(
+        choices=add_blank_choice(BOMStatusChoices),
+        required=False,
+        initial='',
+    )
+    description = forms.CharField(
+        required=False,
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = BOM
+    fieldsets = (FieldSet('status', 'description', name='General'),)
+    nullable_fields = (
+        'description',
+    )
 
 
 class PurchaseImportForm(NetBoxModelImportForm):

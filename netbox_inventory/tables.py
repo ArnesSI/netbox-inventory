@@ -9,6 +9,7 @@ from utilities.tables import register_table_column
 
 from .models import (
     Asset,
+    BOM,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -20,6 +21,7 @@ from .template_content import WARRANTY_PROGRESSBAR
 __all__ = (
     'AssetTable',
     'SupplierTable',
+    'BOMTable',
     'PurchaseTable',
     'DeliveryTable',
     'InventoryItemTypeTable',
@@ -450,6 +452,47 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
         )
         default_columns = (
             'name',
+            'asset_count',
+        )
+
+
+class BOMTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    status = columns.ChoiceFieldColumn()
+    purchase_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:purchase_list',
+        url_params={'bom_id': 'pk'},
+        verbose_name='Purchases',
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'purchase_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = BOM
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'status',
+            'description',
+            'comments',
+            'purchase_count',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'purchase_count',
             'asset_count',
         )
 

@@ -21,9 +21,15 @@ from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterFie
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from ..choices import (
+    AssetStatusChoices,
+    BOMStatusChoices,
+    HardwareKindChoices,
+    PurchaseStatusChoices
+)
 from ..models import (
     Asset,
+    BOM,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -34,6 +40,7 @@ from ..models import (
 __all__ = (
     'AssetFilterForm',
     'SupplierFilterForm',
+    'BOMFilterForm',
     'PurchaseFilterForm',
     'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
@@ -335,6 +342,20 @@ class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
         label='Contact',
     )
 
+    tag = TagFilterField(model)
+
+
+class BOMFilterForm(NetBoxModelFilterSetForm):
+    model = BOM
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('status', name='BOM'),
+    )
+
+    status = forms.MultipleChoiceField(
+        choices=BOMStatusChoices,
+        required=False,
+    )
     tag = TagFilterField(model)
 
 
