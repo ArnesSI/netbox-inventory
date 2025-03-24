@@ -5,6 +5,7 @@ from utilities.query import count_related
 from .. import filtersets, models
 from .serializers import (
     AssetSerializer,
+    BOMSerializer,
     DeliverySerializer,
     InventoryItemGroupSerializer,
     InventoryItemTypeSerializer,
@@ -91,6 +92,15 @@ class SupplierViewSet(NetBoxModelViewSet):
     )
     serializer_class = SupplierSerializer
     filterset_class = filtersets.SupplierFilterSet
+
+
+class BOMViewSet(NetBoxModelViewSet):
+    queryset = models.BOM.objects.prefetch_related('tags').annotate(
+        # purchase_count=count_related(models.Purchase, 'purchase'),
+        asset_count=count_related(models.Asset, 'purchase'),
+    )
+    serializer_class = BOMSerializer
+    filterset_class = filtersets.BOMFilterSet
 
 
 class PurchaseViewSet(NetBoxModelViewSet):

@@ -3,7 +3,12 @@ from rest_framework import serializers
 from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers import ContactSerializer
 
-from netbox_inventory.models import Delivery, Purchase, Supplier
+from netbox_inventory.models import (
+    BOM,
+    Delivery,
+    Purchase,
+    Supplier
+)
 
 from .nested import *
 
@@ -35,6 +40,33 @@ class SupplierSerializer(NetBoxModelSerializer):
             'delivery_count',
         )
         brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
+
+
+class BOMSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:bom-detail'
+    )
+    purchase_count = serializers.IntegerField(read_only=True)
+    asset_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = BOM
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'status',
+            'description',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+            'purchase_count',
+            'asset_count',
+        )
+        brief_fields = ('id', 'url', 'display', 'name', 'status', 'description')
 
 
 class PurchaseSerializer(NetBoxModelSerializer):
