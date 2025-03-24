@@ -24,9 +24,15 @@ from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
 
-from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from .choices import (
+    AssetStatusChoices,
+    BOMStatusChoices,
+    HardwareKindChoices,
+    PurchaseStatusChoices
+)
 from .models import (
     Asset,
+    BOM,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -540,6 +546,23 @@ class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
         query = Q(
             Q(name__icontains=value)
             | Q(slug__icontains=value)
+            | Q(description__icontains=value)
+        )
+        return queryset.filter(query)
+
+
+class BOMFilterSet(NetBoxModelFilterSet):
+    status = django_filters.MultipleChoiceFilter(
+        choices=BOMStatusChoices,
+    )
+
+    class Meta:
+        model = BOM
+        fields = ('id', 'name', 'description')
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(name__icontains=value)
             | Q(description__icontains=value)
         )
         return queryset.filter(query)
