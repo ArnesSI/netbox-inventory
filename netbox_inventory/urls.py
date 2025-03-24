@@ -86,6 +86,15 @@ urlpatterns = (
         'suppliers/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'supplier')),
     ),
+    # BOMs
+    path(
+        'boms/',
+        include(get_model_urls('netbox_inventory', 'bom', detail=False)),
+    ),
+    path(
+        'boms/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'bom')),
+    ),
     # Purchases
     path(
         'purchases/',

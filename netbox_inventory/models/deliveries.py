@@ -42,7 +42,7 @@ class Supplier(NetBoxModel, ContactsMixin):
         return reverse('plugins:netbox_inventory:supplier', args=[self.pk])
 
 
-class BOM(NetBoxModel):
+class BOM(NetBoxModel, ContactsMixin):
     """
     Represents a set of Assets with the consideration of Purchase.
     """
@@ -51,7 +51,7 @@ class BOM(NetBoxModel):
     status = models.CharField(
         max_length=30,
         choices=BOMStatusChoices,
-        help_text='Status of purchase',
+        help_text='Status of BOM',
     )
     description = models.CharField(
         max_length=200,

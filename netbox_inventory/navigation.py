@@ -95,6 +95,21 @@ supplier_buttons = [
     ),
 ]
 
+bom_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:bom_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_inventory.add_bom'],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:bom_bulk_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        permissions=['netbox_inventory.add_bom'],
+    ),
+]
+
 purchase_buttons = [
     PluginMenuButton(
         link='plugins:netbox_inventory:purchase_add',
@@ -131,6 +146,12 @@ deliveries_items = (
         link_text='Suppliers',
         permissions=['netbox_inventory.view_supplier'],
         buttons=supplier_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:bom_list',
+        link_text='BOMs',
+        permissions=['netbox_inventory.view_bom'],
+        buttons=bom_buttons,
     ),
     PluginMenuItem(
         link='plugins:netbox_inventory:purchase_list',
