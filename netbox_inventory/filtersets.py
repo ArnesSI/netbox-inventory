@@ -566,22 +566,15 @@ class BOMFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=BOMStatusChoices,
     )
-    purchase_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='purchase',
-        queryset=Purchase.objects.all(),
-        label='Purchase (ID)',
-    )
 
     class Meta:
         model = BOM
-        fields = ('id', 'name', 'description', 'purchase')
+        fields = ('id', 'name', 'description')
 
     def search(self, queryset, name, value):
         query = Q(
             Q(name__icontains=value)
             | Q(description__icontains=value)
-            | Q(purchase__name__icontains=value)
-            | Q(purchase__supplier__name__icontains=value)
         )
         return queryset.filter(query)
 
@@ -591,6 +584,11 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
         field_name='supplier',
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
+    )
+    boms = django_filters.ModelMultipleChoiceFilter(
+        field_name='boms',
+        queryset=BOM.objects.all(),
+        label='BOMs (ID)',
     )
     status = django_filters.MultipleChoiceFilter(
         choices=PurchaseStatusChoices,
@@ -606,6 +604,7 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value)
             | Q(description__icontains=value)
             | Q(supplier__name__icontains=value)
+            | Q(boms__name__icontains=value)
         )
         return queryset.filter(query)
 

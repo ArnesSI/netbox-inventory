@@ -1,7 +1,11 @@
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.fields import (
+    CommentField,
+    DynamicModelChoiceField,
+    SlugField
+)
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
@@ -265,7 +269,7 @@ class BOMForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            'name', 'status', 'purchase', 'description', 'tags', name='BOM'
+            'name', 'status', 'description', 'tags', name='BOM'
         ),
     )
 
@@ -274,7 +278,6 @@ class BOMForm(NetBoxModelForm):
         fields = (
             'name',
             'status',
-            'purchase',
             'description',
             'comments',
             'tags',
@@ -286,7 +289,7 @@ class PurchaseForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            'supplier', 'name', 'status', 'date', 'description', 'tags', name='Purchase'
+            'supplier', 'boms', 'name', 'status', 'date', 'description', 'tags', name='Purchase'
         ),
     )
 
@@ -294,6 +297,7 @@ class PurchaseForm(NetBoxModelForm):
         model = Purchase
         fields = (
             'supplier',
+            'boms',
             'name',
             'status',
             'date',

@@ -10,7 +10,9 @@ from utilities.forms.fields import (
     CommentField,
     CSVChoiceField,
     CSVModelChoiceField,
+    CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
@@ -596,11 +598,6 @@ class BOMBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         initial='',
     )
-    purchase = DynamicModelChoiceField(
-        queryset=Purchase.objects.all(),
-        required=False,
-        label='Purchase',
-    )
     description = forms.CharField(
         required=False,
     )
@@ -609,9 +606,8 @@ class BOMBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     model = BOM
-    fieldsets = (FieldSet('status', 'purchase', 'description', name='General'),)
+    fieldsets = (FieldSet('status', 'description', name='General'),)
     nullable_fields = (
-        'purchase',
         'description',
     )
 
@@ -622,6 +618,13 @@ class PurchaseImportForm(NetBoxModelImportForm):
         to_field_name='name',
         help_text='Legal entity this purchase was made at. It must exist when importing.',
         required=True,
+    )
+    boms = CSVModelMultipleChoiceField(
+        queryset=BOM.objects.all(),
+        to_field_name='name',
+        help_text='BOM names separated by commas, encased with double quotes (e.g. "BOM1,BOM2,BOM3")',
+        required=False,
+        label='BOMs',
     )
     status = CSVChoiceField(
         choices=PurchaseStatusChoices,
@@ -635,6 +638,7 @@ class PurchaseImportForm(NetBoxModelImportForm):
             'date',
             'status',
             'supplier',
+            'boms',
             'description',
             'comments',
             'tags',
@@ -653,6 +657,11 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label='Supplier',
     )
+    boms = DynamicModelMultipleChoiceField(
+        queryset=BOM.objects.all(),
+        required=False,
+        label='BOMs',
+    )
     description = forms.CharField(
         required=False,
     )
@@ -661,9 +670,10 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     model = Purchase
-    fieldsets = (FieldSet('date', 'status', 'supplier', 'description', name='General'),)
+    fieldsets = (FieldSet('date', 'status', 'supplier', 'boms', 'description', name='General'),)
     nullable_fields = (
         'date',
+        'boms',
         'description',
     )
 

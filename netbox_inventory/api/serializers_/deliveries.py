@@ -42,11 +42,37 @@ class SupplierSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
 
 
+class BOMSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:bom-detail'
+    )
+    asset_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = BOM
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'status',
+            'description',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+            'asset_count',
+        )
+        brief_fields = ('id', 'url', 'display', 'name', 'status', 'description')
+
+
 class PurchaseSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:purchase-detail'
     )
     supplier = SupplierSerializer(nested=True)
+    boms = BOMSerializer(nested=True, many=True)
     asset_count = serializers.IntegerField(read_only=True)
     delivery_count = serializers.IntegerField(read_only=True)
 
@@ -57,6 +83,7 @@ class PurchaseSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'supplier',
+            'boms',
             'name',
             'status',
             'date',
@@ -74,38 +101,12 @@ class PurchaseSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'supplier',
+            'boms',
             'name',
             'status',
             'date',
             'description',
         )
-
-
-class BOMSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:bom-detail'
-    )
-    purchase = PurchaseSerializer(nested=True)
-    asset_count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = BOM
-        fields = (
-            'id',
-            'url',
-            'display',
-            'name',
-            'status',
-            'description',
-            'comments',
-            'tags',
-            'custom_fields',
-            'created',
-            'last_updated',
-            'purchase',
-            'asset_count',
-        )
-        brief_fields = ('id', 'url', 'display', 'name', 'status', 'description')
 
 
 class DeliverySerializer(NetBoxModelSerializer):

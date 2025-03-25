@@ -23,10 +23,6 @@
             <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
           </tr>
           <tr>
-            <th scope="row">Purchase</th>
-            <td>{{ object.purchase|linkify|placeholder }}</td>
-          </tr>
-          <tr>
             <th scope="row">Description</th>
             <td>{{ object.description|placeholder }}</td>
           </tr>

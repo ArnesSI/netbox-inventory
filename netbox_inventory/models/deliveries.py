@@ -48,14 +48,6 @@ class BOM(NetBoxModel, ContactsMixin):
     """
 
     name = models.CharField(max_length=100)
-    purchase = models.ForeignKey(
-        help_text='Purchase made from this BOM',
-        to='netbox_inventory.Purchase',
-        on_delete=models.PROTECT,
-        related_name='BOMs',
-        blank=True,
-        null=True,
-    )
     status = models.CharField(
         max_length=30,
         choices=BOMStatusChoices,
@@ -101,6 +93,14 @@ class Purchase(NetBoxModel):
         blank=False,
         null=False,
     )
+    boms = models.ManyToManyField(
+        help_text='BOMs that this purchase is part of',
+        to='netbox_inventory.BOM',
+        related_name='purchases',
+        blank=True,
+        null=True,
+        verbose_name='BOMs',
+    )
     status = models.CharField(
         max_length=30,
         choices=PurchaseStatusChoices,
@@ -119,7 +119,7 @@ class Purchase(NetBoxModel):
         blank=True,
     )
 
-    clone_fields = ['supplier', 'date', 'status', 'description', 'comments']
+    clone_fields = ['supplier', 'boms', 'date', 'status', 'description', 'comments']
 
     class Meta:
         ordering = ['supplier', 'name']
