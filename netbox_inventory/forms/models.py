@@ -265,7 +265,7 @@ class BOMForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            'name', 'status', 'description', 'tags', name='BOM'
+            'name', 'status', 'purchase', 'description', 'tags', name='BOM'
         ),
     )
 
@@ -274,6 +274,7 @@ class BOMForm(NetBoxModelForm):
         fields = (
             'name',
             'status',
+            'purchase',
             'description',
             'comments',
             'tags',

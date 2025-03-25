@@ -48,6 +48,14 @@ class BOM(NetBoxModel, ContactsMixin):
     """
 
     name = models.CharField(max_length=100)
+    purchase = models.ForeignKey(
+        help_text='Purchase made from this BOM',
+        to='netbox_inventory.Purchase',
+        on_delete=models.PROTECT,
+        related_name='BOMs',
+        blank=True,
+        null=True,
+    )
     status = models.CharField(
         max_length=30,
         choices=BOMStatusChoices,

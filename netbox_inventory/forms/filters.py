@@ -356,12 +356,17 @@ class BOMFilterForm(NetBoxModelFilterSetForm):
     model = BOM
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('status', name='BOM'),
+        FieldSet('status', 'purchase_id', name='BOM'),
     )
 
     status = forms.MultipleChoiceField(
         choices=BOMStatusChoices,
         required=False,
+    )
+    purchase_id = DynamicModelMultipleChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
     )
     tag = TagFilterField(model)
 

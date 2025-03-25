@@ -596,6 +596,11 @@ class BOMBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         initial='',
     )
+    purchase = DynamicModelChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
+    )
     description = forms.CharField(
         required=False,
     )
@@ -604,8 +609,9 @@ class BOMBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     model = BOM
-    fieldsets = (FieldSet('status', 'description', name='General'),)
+    fieldsets = (FieldSet('status', 'purchase', 'description', name='General'),)
     nullable_fields = (
+        'purchase',
         'description',
     )
 

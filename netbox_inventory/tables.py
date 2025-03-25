@@ -509,6 +509,11 @@ class PurchaseTable(NetBoxTable):
         linkify=True,
     )
     status = columns.ChoiceFieldColumn()
+    bom_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:bom_list',
+        url_params={'purchase_id': 'pk'},
+        verbose_name='BOMs',
+    )
     delivery_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:delivery_list',
         url_params={'purchase_id': 'pk'},
@@ -533,6 +538,7 @@ class PurchaseTable(NetBoxTable):
             'date',
             'description',
             'comments',
+            'bom_count',
             'delivery_count',
             'asset_count',
             'tags',
