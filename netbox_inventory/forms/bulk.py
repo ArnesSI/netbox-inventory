@@ -236,6 +236,12 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Tenant that owns this asset. It must exist before import.',
         required=False,
     )
+    bom = CSVModelChoiceField(
+        queryset=BOM.objects.all(),
+        to_field_name='name',
+        help_text='BOM that this asset is part of. It must exist before import.',
+        required=False,
+    )
     delivery = forms.CharField(
         help_text='Delivery that delivered this asset. See "Import settings" for more info.',
         required=False,
@@ -298,6 +304,7 @@ class AssetImportForm(NetBoxModelImportForm):
             'storage_location',
             'owner',
             'supplier',
+            'bom',
             'purchase',
             'purchase_date',
             'purchase_status',
