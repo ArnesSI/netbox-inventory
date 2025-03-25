@@ -465,10 +465,8 @@ class BOMTable(NetBoxTable):
         linkify=True,
     )
     status = columns.ChoiceFieldColumn()
-    purchase_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:purchase_list',
-        url_params={'bom_id': 'pk'},
-        verbose_name='Purchases',
+    purchase = tables.Column(
+        linkify=True,
     )
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
@@ -487,7 +485,7 @@ class BOMTable(NetBoxTable):
             'status',
             'description',
             'comments',
-            'purchase_count',
+            'purchase',
             'asset_count',
             'tags',
             'created',
@@ -496,7 +494,8 @@ class BOMTable(NetBoxTable):
         )
         default_columns = (
             'name',
-            'purchase_count',
+            'status',
+            'purchase',
             'asset_count',
         )
 
