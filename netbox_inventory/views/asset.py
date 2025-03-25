@@ -51,6 +51,7 @@ class AssetListView(generic.ObjectListView):
         'inventoryitem__role',
         'rack__role',
         'owner',
+        'bom',
         'purchase__supplier',
         'delivery',
         'storage_location',

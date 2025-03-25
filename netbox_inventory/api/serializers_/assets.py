@@ -147,6 +147,12 @@ class AssetSerializer(NetBoxModelSerializer):
         allow_null=True,
         default=None,
     )
+    bom = BOMSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
     delivery = DeliverySerializer(
         nested=True,
         required=False,
@@ -213,6 +219,7 @@ class AssetSerializer(NetBoxModelSerializer):
             'contact',
             'storage_location',
             'owner',
+            'bom',
             'delivery',
             'purchase',
             'warranty_start',

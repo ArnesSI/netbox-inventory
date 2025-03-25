@@ -265,6 +265,15 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=True,
     )
+    bom = models.ForeignKey(
+        help_text='BOM this asset is part of',
+        to='netbox_inventory.BOM',
+        on_delete=models.PROTECT,
+        related_name='assets',
+        blank=True,
+        null=True,
+        verbose_name='BOM',
+    )
     delivery = models.ForeignKey(
         help_text='Delivery this asset was part of',
         to='netbox_inventory.Delivery',

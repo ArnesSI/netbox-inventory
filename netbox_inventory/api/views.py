@@ -97,7 +97,7 @@ class SupplierViewSet(NetBoxModelViewSet):
 class BOMViewSet(NetBoxModelViewSet):
     queryset = models.BOM.objects.prefetch_related('tags').annotate(
         # purchase_count=count_related(models.Purchase, 'purchase'),
-        asset_count=count_related(models.Asset, 'purchase'),
+        asset_count=count_related(models.Asset, 'bom'),
     )
     serializer_class = BOMSerializer
     filterset_class = filtersets.BOMFilterSet

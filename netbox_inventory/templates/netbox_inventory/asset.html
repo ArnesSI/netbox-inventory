@@ -159,6 +159,10 @@
             <td>{{ object.owner|linkify|placeholder }}</td>
           </tr>
           <tr>
+            <th scope="row">BOM</th>
+            <td>{{ object.bom|linkify|placeholder }}</td>
+          </tr>
+          <tr>
             <th scope="row">Purchase</th>
             <td>{{ object.purchase|linkify|placeholder }}{% if object.purchase.date %} on {{ object.purchase.date|isodate }}{% endif %}</td>
           </tr>

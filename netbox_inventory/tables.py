@@ -178,6 +178,9 @@ class AssetTable(NetBoxTable):
     owner = tables.Column(
         linkify=True,
     )
+    bom = tables.Column(
+        linkify=True,
+    )
     supplier = tables.Column(
         accessor='purchase__supplier',
         linkify=True,
@@ -376,6 +379,7 @@ class AssetTable(NetBoxTable):
             'current_site',
             'current_location',
             'owner',
+            'bom',
             'supplier',
             'purchase',
             'delivery',

@@ -95,6 +95,11 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('owner').help_text,
         required=not Asset._meta.get_field('owner').blank,
     )
+    bom = DynamicModelChoiceField(
+        queryset=BOM.objects.all(),
+        help_text=Asset._meta.get_field('bom').help_text,
+        required=not Asset._meta.get_field('bom').blank,
+    )
     purchase = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
         help_text=Asset._meta.get_field('purchase').help_text,
@@ -154,6 +159,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         ),
         FieldSet(
             'owner',
+            'bom',
             'purchase',
             'delivery',
             'warranty_start',
@@ -170,6 +176,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         'module',
         'rack',
         'owner',
+        'bom',
         'purchase',
         'delivery',
         'tenant',

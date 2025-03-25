@@ -9,6 +9,8 @@ class AssetStatusChoices(ChoiceSet):
     key = 'Asset.status'
 
     CHOICES = [
+        ('planned', 'Planned', 'orange'),
+        ('ordered', 'Ordered', 'cyan'),
         ('stored', 'Stored', 'green'),
         ('used', 'Used', 'blue'),
         ('retired', 'Retired', 'gray'),
@@ -33,8 +35,8 @@ class BOMStatusChoices(ChoiceSet):
     key = 'BOM.status'
 
     CHOICES = [
-        ('planned', 'Planned', 'gray'),
-        ('quoted', 'Quoted', 'green'),
+        ('planned', 'Planned', 'orange'),
+        ('quoted', 'Quoted', 'cyan'),
     ]
 
 
