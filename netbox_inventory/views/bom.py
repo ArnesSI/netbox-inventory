@@ -21,24 +21,20 @@ __all__ = (
 class BOMView(generic.ObjectView):
     queryset = models.BOM.objects.all()
 
-    # def get_extra_context(self, request, instance):
-    #     return {
-    #         'asset_count': models.Asset.objects.filter(
-    #             purchase__supplier=instance
-    #         ).count(),
-    #         'purchase_count': models.Purchase.objects.filter(supplier=instance).count(),
-    #         'delivery_count': models.Delivery.objects.filter(
-    #             purchase__supplier=instance
-    #         ).count(),
-    #     }
+    def get_extra_context(self, request, instance):
+        return {
+            # 'purchase_count': models.Purchase.objects.filter(bom=instance).count(),
+            'asset_count': models.Asset.objects.filter(
+                bom=instance
+            ).count(),
+        }
 
 
 @register_model_view(models.BOM, 'list', path='', detail=False)
 class BOMListView(generic.ObjectListView):
     queryset = models.BOM.objects.annotate(
         purchase_count=count_related(models.Purchase, 'supplier'),
-        delivery_count=count_related(models.Delivery, 'purchase__supplier'),
-        asset_count=count_related(models.Asset, 'purchase__supplier'),
+        asset_count=count_related(models.Asset, 'bom'),
     )
     table = tables.BOMTable
     filterset = filtersets.BOMFilterSet

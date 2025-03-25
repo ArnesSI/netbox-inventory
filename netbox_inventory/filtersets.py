@@ -304,6 +304,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='icontains',
         label='Owner (name)',
     )
+    bom_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=BOM.objects.all(),
+        field_name='bom',
+        label='BOM (ID)',
+    )
+    bom = django_filters.CharFilter(
+        field_name='bom__name',
+        lookup_expr='iexact',
+        label='BOM (name)',
+    )
     delivery_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Delivery.objects.all(),
         field_name='delivery',
@@ -425,6 +435,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
             | Q(purchase__supplier__name__icontains=value)
             | Q(tenant__name__icontains=value)
             | Q(owner__name__icontains=value)
+            | Q(bom__name__icontains=value)
         )
         custom_field_filters = get_asset_custom_fields_search_filters()
         for custom_field_filter in custom_field_filters:

@@ -69,6 +69,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
         FieldSet(
             'owner_id',
+            'bom_id',
             'delivery_id',
             'purchase_id',
             'supplier_id',
@@ -192,6 +193,12 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         required=False,
         null_option='None',
         label='Owner',
+    )
+    bom_id = DynamicModelMultipleChoiceField(
+        queryset=BOM.objects.all(),
+        required=False,
+        null_option='None',
+        label='BOM',
     )
     delivery_id = DynamicModelMultipleChoiceField(
         queryset=Delivery.objects.all(),
