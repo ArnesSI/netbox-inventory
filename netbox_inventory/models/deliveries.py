@@ -65,6 +65,8 @@ class BOM(NetBoxModel, ContactsMixin):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'BOM'
+        verbose_name_plural = 'BOMs'
         unique_together = (('name'),)
 
     def get_status_color(self):
