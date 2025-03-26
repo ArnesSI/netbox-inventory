@@ -17,6 +17,8 @@ from utilities.forms.fields import (
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
+from .models import AssetForm
+
 from ..choices import (
     AssetStatusChoices,
     BOMStatusChoices,
@@ -35,6 +37,8 @@ from ..models import (
 from ..utils import get_plugin_setting
 
 __all__ = (
+    'AssetBulkAddForm',
+    'AssetBulkAddModelForm',
     'AssetBulkEditForm',
     'AssetImportForm',
     'SupplierImportForm',
@@ -50,6 +54,23 @@ __all__ = (
     'InventoryItemGroupImportForm',
     'InventoryItemGroupBulkEditForm',
 )
+
+
+class AssetBulkAddForm(forms.Form):
+    """Form for creating multiple Assets by count"""
+
+    count = forms.IntegerField(
+        min_value=1,
+        required=True,
+        help_text='How many assets to create',
+    )
+
+
+class AssetBulkAddModelForm(AssetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['asset_tag'].disabled = True
+        self.fields['serial'].disabled = True
 
 
 class AssetBulkEditForm(NetBoxModelBulkEditForm):
