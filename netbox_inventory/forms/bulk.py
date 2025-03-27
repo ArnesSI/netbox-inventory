@@ -17,6 +17,8 @@ from utilities.forms.fields import (
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
+from .fields import BigTextField
+
 from .models import AssetForm
 
 from ..choices import (
@@ -40,6 +42,7 @@ __all__ = (
     'AssetBulkAddForm',
     'AssetBulkAddModelForm',
     'AssetBulkEditForm',
+    'AssetBulkScanForm',
     'AssetImportForm',
     'SupplierImportForm',
     'SupplierBulkEditForm',
@@ -207,6 +210,19 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         'warranty_start',
         'warranty_end',
     )
+
+
+class AssetBulkScanForm(forms.Form):
+    serial_numbers = BigTextField(
+        required=True,
+        help_text='Scan barcode or manually enter serial numbers.',
+        label='Serial numbers',
+    )
+    # asset_tags = BigTextField(
+    #     required=True,
+    #     help_text='Scan or manually enter asset tags.',
+    #     label='Asset tags',
+    # )
 
 
 class AssetImportForm(NetBoxModelImportForm):

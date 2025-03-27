@@ -1,0 +1,23 @@
+{% extends 'generic/object_list.html' %}
+{% load buttons %}
+{% load scan_button %}
+{% load helpers %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% load i18n %}
+
+
+{% block bulk_buttons %}
+  <div class="bulk-actions">
+    {% if 'bulk_edit' in actions %}
+      {% bulk_edit_button model query_params=request.GET %}
+    {% endif %}
+    {% if 'bulk_scan' in actions %}
+      {% bulk_scan_button model query_params=request.GET %}
+    {% endif %}
+    {% if 'bulk_delete' in actions %}
+      {% bulk_delete_button model query_params=request.GET %}
+    {% endif %}
+  </div>
+{% endblock %}

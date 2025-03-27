@@ -629,3 +629,6 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
                 violation_error_message='Asset with this Asset Tag and no Owner already exists.',
             ),
         )
+        permissions = (
+            ('bulk_scan', 'Can bulk scan assets'),
+        )
