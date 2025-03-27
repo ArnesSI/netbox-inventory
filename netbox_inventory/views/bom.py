@@ -23,6 +23,9 @@ class BOMView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         return {
+            'purchase_count': models.Purchase.objects.filter(
+                boms=instance
+            ).count(),
             'asset_count': models.Asset.objects.filter(
                 bom=instance
             ).count(),
@@ -32,6 +35,7 @@ class BOMView(generic.ObjectView):
 @register_model_view(models.BOM, 'list', path='', detail=False)
 class BOMListView(generic.ObjectListView):
     queryset = models.BOM.objects.annotate(
+        purchase_count=count_related(models.Purchase, 'boms'),
         asset_count=count_related(models.Asset, 'bom'),
     )
     table = tables.BOMTable

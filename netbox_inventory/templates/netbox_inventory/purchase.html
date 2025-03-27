@@ -26,13 +26,7 @@
           <tr>
             <th scope="row">BOMs</th>
             <td>
-              {% if object.boms.exists %}
-                {% for bom in object.boms.all %}
-                  <a href="{{ bom.get_absolute_url }}">{{ bom.name }}</a>{% if not forloop.last %}, {% endif %}
-                {% endfor %}
-              {% else %}
-                <span class="text-muted">None</span>
-              {% endif %}
+              <a href="{% url 'plugins:netbox_inventory:bom_list' %}?purchase_id={{ object.pk }}">{{ object.boms.count }}</a>
             </td>
           </tr>
           <tr>
@@ -72,6 +66,19 @@
   </div>
   <div class="row mb-3">
     <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">
+          BOMs
+          <!-- {% if perms.netbox_inventory.add_bom %}
+            <div class="card-actions">
+              <a href="{% url 'plugins:netbox_inventory:bom_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a BOM
+              </a>
+            </div>
+          {% endif %} -->
+        </h5>
+        {% htmx_table 'plugins:netbox_inventory:bom_list' purchase_id=object.pk %}
+      </div>
       <div class="card">
         <h5 class="card-header">
           Deliveries

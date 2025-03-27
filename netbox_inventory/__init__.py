@@ -14,6 +14,10 @@ class NetBoxInventoryConfig(PluginConfig):
     min_version = '4.2.1'
     default_settings = {
         'top_level_menu': True,
+        'planned_status_name': 'planned',
+        'planned_additional_status_names': [],
+        'ordered_status_name': 'ordered',
+        'ordered_additional_status_names': [],
         'used_status_name': 'used',
         'used_additional_status_names': [],
         'stored_status_name': 'stored',

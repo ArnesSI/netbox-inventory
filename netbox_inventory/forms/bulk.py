@@ -125,6 +125,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         queryset=BOM.objects.all(),
         help_text=Asset._meta.get_field('bom').help_text,
         required=not Asset._meta.get_field('bom').blank,
+        label='BOM',
     )
     purchase = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
