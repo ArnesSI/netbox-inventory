@@ -27,6 +27,12 @@
             <td>{{ object.description|placeholder }}</td>
           </tr>
           <tr>
+            <th scope="row">Purchases</th>
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:purchase_list' %}?boms={{ object.pk }}">{{ purchase_count }}</a>
+            </td>
+          </tr>
+          <tr>
             <th scope="row">Assets</th>
             <td>
               <a href="{% url 'plugins:netbox_inventory:asset_list' %}?bom_id={{ object.pk }}">{{ asset_count }}</a>
@@ -45,6 +51,21 @@
   </div>
   <div class="row mb-3">
     <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">
+          Purchases
+          {% if perms.netbox_inventory.add_purchase %}
+            <div class="card-actions">
+              <a href="{% url 'plugins:netbox_inventory:purchase_add' %}?boms={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Purchase
+              </a>
+            </div>
+          {% endif %}
+        </h5>
+        {% htmx_table 'plugins:netbox_inventory:purchase_list' boms=object.pk %}
+      </div>
+      {% plugin_full_width_page object %}
+    </div>
       <div class="card">
         <h5 class="card-header">
           BOM Assets
