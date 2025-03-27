@@ -526,6 +526,8 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         old_hw = get_prechange_field(self, self.kind)
         new_hw = getattr(self, self.kind)
         old_status = get_prechange_field(self, 'status')
+        planned_status = get_status_for('planned')
+        ordered_status = get_status_for('ordered')
         stored_status = get_status_for('stored')
         used_status = get_status_for('used')
         if old_status != self.status:
@@ -533,8 +535,20 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return
         if used_status and new_hw and not old_hw:
             self.status = used_status
+            return
         elif stored_status and not new_hw and old_hw:
             self.status = stored_status
+            return
+        if self.delivery:
+            return
+        old_purchase = get_prechange_field(self, self.purchase)
+        if ordered_status and self.purchase and not old_purchase:
+            self.status = ordered_status
+            return
+        old_bom = get_prechange_field(self, self.bom)
+        if planned_status and self.bom and not old_bom:
+            self.status = planned_status
+            return
 
     def update_hardware_used(self, clear_old_hw=True):
         """
