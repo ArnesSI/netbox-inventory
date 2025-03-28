@@ -7,14 +7,7 @@ from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
 
-from .models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from .models import *
 from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
@@ -555,6 +548,43 @@ class DeliveryTable(NetBoxTable):
             'date',
             'asset_count',
         )
+
+
+#
+# Audit
+#
+
+
+class BaseFlowTable(NetBoxTable):
+    """
+    Internal base table class for audit flow models.
+    """
+
+    name = tables.Column(
+        linkify=True,
+    )
+    object_type = columns.ContentTypeColumn()
+
+    class Meta(NetBoxTable.Meta):
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'description',
+            'object_type',
+            'object_filter',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'object_type',
+        )
+
+
+class AuditFlowPageTable(BaseFlowTable):
+    class Meta(BaseFlowTable.Meta):
+        model = AuditFlowPage
 
 
 # ========================

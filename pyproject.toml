@@ -42,6 +42,9 @@ quote-style = "single"
 
 [tool.isort]
 profile = "black"
+skip = [
+    "netbox_inventory/migrations",
+]
 sections = [
     "FUTURE",
     "STDLIB",

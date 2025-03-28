@@ -104,4 +104,13 @@ urlpatterns = (
         'deliveries/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'delivery')),
     ),
+    # AuditFlowPages
+    path(
+        'audit/flowpages/',
+        include(get_model_urls('netbox_inventory', 'auditflowpage', detail=False)),
+    ),
+    path(
+        'audit/flowpages/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'auditflowpage')),
+    ),
 )

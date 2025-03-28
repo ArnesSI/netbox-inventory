@@ -1,24 +1,27 @@
+from django.utils.translation import gettext_lazy as _
+
+from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.fields import (
+    CommentField,
+    ContentTypeChoiceField,
+    DynamicModelChoiceField,
+    JSONField,
+    SlugField,
+)
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from netbox_inventory.choices import HardwareKindChoices
 
-from ..models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from ..models import *
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
     'AssetForm',
+    'AuditFlowPageForm',
     'DeliveryForm',
     'InventoryItemGroupForm',
     'InventoryItemTypeForm',
@@ -400,3 +403,54 @@ class DeliveryForm(NetBoxModelForm):
         widgets = {
             'date': DatePicker(),
         }
+
+
+#
+# Audit
+#
+
+
+class BaseFlowForm(NetBoxModelForm):
+    """
+    Internal base form class for audit flow models.
+    """
+
+    object_type = ContentTypeChoiceField(
+        queryset=ObjectType.objects.public(),
+    )
+    object_filter = JSONField(
+        required=False,
+        help_text=_(
+            'Enter object filter in <a href="https://json.org/">JSON</a> format, '
+            'mapping attributes to values.'
+        ),
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'description',
+            'tags',
+        ),
+        FieldSet(
+            'object_type',
+            'object_filter',
+            name=_('Assignment'),
+        ),
+    )
+
+    class Meta:
+        fields = (
+            'name',
+            'description',
+            'tags',
+            'object_type',
+            'object_filter',
+            'comments',
+        )
+
+
+class AuditFlowPageForm(BaseFlowForm):
+    class Meta(BaseFlowForm.Meta):
+        model = AuditFlowPage

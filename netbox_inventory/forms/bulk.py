@@ -1,7 +1,9 @@
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
+from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
 from tenancy.models import Contact, ContactGroup, Tenant
@@ -9,6 +11,7 @@ from utilities.forms import add_blank_choice
 from utilities.forms.fields import (
     CommentField,
     CSVChoiceField,
+    CSVContentTypeField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
 )
@@ -16,19 +19,13 @@ from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from ..models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from ..models import *
 from ..utils import get_plugin_setting
 
 __all__ = (
     'AssetBulkEditForm',
     'AssetImportForm',
+    'AuditFlowPageImportForm',
     'DeliveryBulkEditForm',
     'DeliveryImportForm',
     'InventoryItemGroupBulkEditForm',
@@ -771,3 +768,33 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
         'description',
         'receiving_contact',
     )
+
+
+#
+# Audit
+#
+
+
+class BaseFlowImportForm(NetBoxModelImportForm):
+    """
+    Internal base bulk import class for audit flow models.
+    """
+
+    object_type = CSVContentTypeField(
+        queryset=ObjectType.objects.public(), help_text=_('Object Type')
+    )
+
+    class Meta:
+        fields = (
+            'name',
+            'description',
+            'tags',
+            'object_type',
+            'object_filter',
+            'comments',
+        )
+
+
+class AuditFlowPageImportForm(BaseFlowImportForm):
+    class Meta(BaseFlowImportForm.Meta):
+        model = AuditFlowPage

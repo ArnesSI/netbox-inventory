@@ -1,0 +1,45 @@
+{% extends 'generic/object.html' %}
+{% load plugins %}
+{% load i18n %}
+
+{% block content %}
+<div class="row mb-3">
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">{% block flow_title %}{% endblock %}</h5>
+      <table class="table table-hover attr-table">
+        <tr>
+          <th scope="row">{% trans "Name" %}</th>
+          <td>{{ object.name }}</td>
+        </tr>
+        <tr>
+          <th scope="row">{% trans "Description" %}</th>
+          <td>{{ object.description }}</td>
+        </tr>
+        <tr>
+          <th scope="row">{% trans "Object Type" %}</th>
+          <td>{{ object.object_type }}</td>
+        </tr>
+        {% block enabled_fieled %}{% endblock %}
+      </table>
+    </div>
+    <div class="card">
+      <h5 class="card-header">{% trans "Object Filter" %}</h5>
+      <div class="card-body">
+        {% if object.object_filter %}
+          <pre>{{ object.object_filter|json }}</pre>
+        {% else %}
+          <span class="text-muted">{% trans "No filter defined" %}</span>
+        {% endif %}
+      </div>
+    </div>
+    {% include 'inc/panels/custom_fields.html' %}
+    {% plugin_left_page object %}
+  </div>
+  <div class="col col-md-6">
+    {% include 'inc/panels/tags.html' %}
+    {% include 'inc/panels/comments.html' %}
+    {% plugin_right_page object %}
+  </div>
+</div>
+{% endblock content %}

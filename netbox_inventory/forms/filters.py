@@ -1,5 +1,6 @@
 from django import forms
 
+from core.models import ObjectType
 from dcim.models import (
     Device,
     DeviceRole,
@@ -17,22 +18,20 @@ from netbox.forms import NetBoxModelFilterSetForm
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
-from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
+from utilities.forms.fields import (
+    ContentTypeChoiceField,
+    DynamicModelMultipleChoiceField,
+    TagFilterField,
+)
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from ..models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from ..models import *
 
 __all__ = (
     'AssetFilterForm',
+    'AuditFlowPageFilterForm',
     'DeliveryFilterForm',
     'InventoryItemGroupFilterForm',
     'InventoryItemTypeFilterForm',
@@ -472,3 +471,23 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         widget=DatePicker,
     )
     tag = TagFilterField(model)
+
+
+#
+# Audit
+#
+
+
+class BaseFlowFilterForm(NetBoxModelFilterSetForm):
+    """
+    Internal base filter form class for audit flow models.
+    """
+
+    object_type = ContentTypeChoiceField(
+        required=False,
+        queryset=ObjectType.objects.all(),
+    )
+
+
+class AuditFlowPageFilterForm(BaseFlowFilterForm):
+    model = AuditFlowPage

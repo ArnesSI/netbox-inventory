@@ -25,15 +25,22 @@ from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
 
 from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from .models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from .models import *
 from .utils import get_asset_custom_fields_search_filters, query_located
+
+__all__ = (
+    'AssetFilterSet',
+    'AuditFlowPageFilterSet',
+    'DeliveryFilterSet',
+    'DeviceAssetFilterSet',
+    'InventoryItemAssetFilterSet',
+    'InventoryItemGroupFilterSet',
+    'InventoryItemTypeFilterSet',
+    'ModuleAssetFilterSet',
+    'PurchaseFilterSet',
+    'SupplierFilterSet',
+)
+
 
 #
 # Assets
@@ -612,3 +619,31 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             | Q(receiving_contact__name__icontains=value)
         )
         return queryset.filter(query)
+
+
+#
+# Audit
+#
+
+
+class BaseflowFilterSet(NetBoxModelFilterSet):
+    """
+    Internal base filterset class for audit flow models.
+    """
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'description',
+            'object_type',
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(Q(name__icontains=value) | Q(description__icontains=value))
+        return queryset.filter(query)
+
+
+class AuditFlowPageFilterSet(BaseflowFilterSet):
+    class Meta(BaseflowFilterSet.Meta):
+        model = AuditFlowPage
