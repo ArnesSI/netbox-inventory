@@ -566,6 +566,14 @@ class BOMFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=BOMStatusChoices,
     )
+    purchase_id = django_filters.ModelChoiceFilter(
+        queryset=Purchase.objects.all(),
+        method='filter_by_purchase',
+        label='Purchase (ID)',
+    )
+
+    def filter_by_purchase(self, queryset, name, value):
+        return queryset.filter(purchases=value)
 
     class Meta:
         model = BOM
