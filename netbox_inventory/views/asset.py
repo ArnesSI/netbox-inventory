@@ -289,6 +289,7 @@ class AssetBulkScanView(generic.BulkEditView):
             messages.warning(request, ' '.join(errors))
             messages.warning(request, error_msg_protected_assets)
             return redirect(self.get_return_url(request))
+        return super().post(request, **kwargs)
 
 
 @register_model_view(models.Asset, 'bulk_delete', path='delete', detail=False)

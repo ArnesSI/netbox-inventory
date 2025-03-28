@@ -212,17 +212,20 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
     )
 
 
-class AssetBulkScanForm(forms.Form):
+class AssetBulkScanForm(NetBoxModelBulkEditForm):
     serial_numbers = BigTextField(
         required=True,
         help_text='Scan barcode or manually enter serial numbers.',
         label='Serial numbers',
     )
+
     # asset_tags = BigTextField(
     #     required=True,
     #     help_text='Scan or manually enter asset tags.',
     #     label='Asset tags',
     # )
+
+    model = Asset
 
 
 class AssetImportForm(NetBoxModelImportForm):
