@@ -601,7 +601,15 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=PurchaseStatusChoices,
     )
+    delivery_id = django_filters.ModelChoiceFilter(
+        queryset=Delivery.objects.all(),
+        method='filter_by_delivery',
+        label='Delivery (ID)',
+    )
     date = django_filters.DateFromToRangeFilter()
+
+    def filter_by_delivery(self, queryset, name, value):
+        return queryset.filter(orders=value)
 
     class Meta:
         model = Purchase
