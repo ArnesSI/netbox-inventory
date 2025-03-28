@@ -17,7 +17,11 @@ from netbox.forms import NetBoxModelFilterSetForm
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
-from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
+from utilities.forms.fields import (
+    DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
+    TagFilterField
+)
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
@@ -356,12 +360,17 @@ class BOMFilterForm(NetBoxModelFilterSetForm):
     model = BOM
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('status', name='BOM'),
+        FieldSet('status', 'purchase_id', name='BOM'),
     )
 
     status = forms.MultipleChoiceField(
         choices=BOMStatusChoices,
         required=False,
+    )
+    purchase_id = DynamicModelChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        label='Purchase',
     )
     tag = TagFilterField(model)
 
