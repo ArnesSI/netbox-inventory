@@ -1,0 +1,122 @@
+{% extends 'generic/_base.html' %}
+{% load helpers %}
+{% load form_helpers %}
+{% load render_table from django_tables2 %}
+{% load i18n %}
+
+{% comment %}
+Blocks:
+  - title:    Page title
+  - tabs:     Page tabs
+  - content:  Primary page content
+
+Context:
+  - model:       The model class of the objects being modified
+  - form:        The bulk edit form class
+  - table:       The table class for rendering list of objects being modified
+  - return_url:  The URL to which the user is redirected after submitting the form
+{% endcomment %}
+
+{% block title %}
+  Adding Serial Numbers to {{ table.rows|length }} {{ model|meta:"verbose_name_plural"|bettertitle }}
+{% endblock %}
+
+{% block tabs %}
+  <ul class="nav nav-tabs">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="edit-form-tab" data-bs-toggle="tab" data-bs-target="#edit-form" type="button" role="tab" aria-controls="edit-form" aria-selected="true">
+        Bulk Scan
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="object-list-tab" data-bs-toggle="tab" data-bs-target="#object-list" type="button" role="tab" aria-controls="object-list" aria-selected="false">
+        {% trans "Selected Objects" %}
+        {% badge table.rows|length %}
+      </button>
+    </li>
+  </ul>
+{% endblock tabs %}
+
+{% block content %}
+
+  {# Edit form #}
+  <div class="tab-pane show active" id="edit-form" role="tabpanel" aria-labelledby="edit-form-tab">
+    <form action="" method="post" class="form form-horizontal mt-5">
+      <div id="form_fields" hx-disinherit="hx-select hx-swap">
+        {% csrf_token %}
+        {% if request.POST.return_url %}
+          <input type="hidden" name="return_url" value="{{ request.POST.return_url }}" />
+        {% endif %}
+        {% for field in form.hidden_fields %}
+          {{ field }}
+        {% endfor %}
+
+        {% if form.fieldsets %}
+
+          {# Render grouped fields according to declared fieldsets #}
+          {% for fieldset in form.fieldsets %}
+            {% render_fieldset form fieldset %}
+          {% endfor %}
+
+          {# Render tag add/remove fields #}
+          {% if form.add_tags and form.remove_tags %}
+            <div class="field-group mb-5">
+              <div class="row">
+                <h2 class="col-9 offset-3">{% trans "Tags" %}</h2>
+              </div>
+              {% render_field form.add_tags %}
+              {% render_field form.remove_tags %}
+            </div>
+          {% endif %}
+
+          {# Render custom fields #}
+          {% if form.custom_fields %}
+            <div class="field-group mb-5">
+              <div class="row">
+                <h2 class="col-9 offset-3">{% trans "Custom Fields" %}</h2>
+              </div>
+              {% render_custom_fields form %}
+            </div>
+          {% endif %}
+
+          {# Render comments #}
+          {% if form.comments %}
+            <div class="field-group mb-5">
+              <div class="row">
+                <h2 class="col-9 offset-3">{% trans "Comments" %}</h2>
+              </div>
+              {% render_field form.comments bulk_nullable=True %}
+            </div>
+          {% endif %}
+
+        {% else %}
+
+          {# Render all fields #}
+          {% for field in form.visible_fields %}
+            {% if field.name in form.nullable_fields %}
+              {% render_field field bulk_nullable=True %}
+            {% else %}
+              {% render_field field %}
+            {% endif %}
+          {% endfor %}
+
+        {% endif %}
+
+        <div class="btn-float-group-right">
+          <a href="{{ return_url }}" class="btn btn-outline-secondary btn-float">{% trans "Cancel" %}</a>
+          <button type="submit" name="_apply" class="btn btn-primary">{% trans "Apply" %}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {# Selected objects list #}
+  <div class="tab-pane" id="object-list" role="tabpanel" aria-labelledby="object-list-tab">
+    <div class="card">
+      <div class="card-body table-responsive">
+        {% render_table table 'inc/table.html' %}
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
