@@ -379,7 +379,7 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
     model = Purchase
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('supplier_id', 'boms', 'status', 'date_after', 'date_before', name='Purchase'),
+        FieldSet('supplier_id', 'boms', 'status', 'delivery_id', 'date_after', 'date_before', name='Purchase'),
     )
 
     supplier_id = DynamicModelMultipleChoiceField(
@@ -395,6 +395,11 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
     status = forms.MultipleChoiceField(
         choices=PurchaseStatusChoices,
         required=False,
+    )
+    delivery_id = DynamicModelChoiceField(
+        queryset=Delivery.objects.all(),
+        required=False,
+        label='Delivery',
     )
     date_after = forms.DateField(
         required=False,
