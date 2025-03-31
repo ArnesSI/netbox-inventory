@@ -16,6 +16,22 @@ from ..utils import (
     get_tags_that_protect_asset_from_deletion,
 )
 
+import logging
+
+from django.contrib import messages
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRel
+from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.db import transaction, IntegrityError
+from django.db.models import ManyToManyField
+from django.db.models.fields.reverse_related import ManyToManyRel
+from django.shortcuts import redirect, render
+from django.utils.translation import gettext as _
+from mptt.models import MPTTModel
+
+from core.signals import clear_events
+from utilities.exceptions import AbortRequest, PermissionsViolation
+from utilities.forms import ConfirmationForm, restrict_form_fields
+
 __all__ = (
     'AssetView',
     'AssetListView',
@@ -220,6 +236,156 @@ class AssetBulkScanView(generic.BulkEditView):
     form = forms.AssetBulkScanForm
     template_name = 'netbox_inventory/asset_bulk_scan.html'
 
+    def _update_objects(self, form, request):
+        custom_fields = getattr(form, 'custom_fields', {})
+        standard_fields = [
+            field for field in form.fields if field not in list(custom_fields) + ['pk']
+        ]
+        nullified_fields = request.POST.getlist('_nullify')
+        updated_objects = []
+        model_fields = {}
+        m2m_fields = {}
+
+        # Build list of model fields and m2m fields for later iteration
+        for name in standard_fields:
+            try:
+                model_field = self.queryset.model._meta.get_field(name)
+                if isinstance(model_field, (ManyToManyField, ManyToManyRel)):
+                    m2m_fields[name] = model_field
+                elif isinstance(model_field, GenericRel):
+                    # Ignore generic relations (these may be used for other purposes in the form)
+                    continue
+                else:
+                    model_fields[name] = model_field
+            except FieldDoesNotExist:
+                # This form field is used to modify a field rather than set its value directly
+                model_fields[name] = None
+
+        # Parse serial numbers, one per line
+        if form.cleaned_data['serial_numbers']:
+            serial_numbers = form.cleaned_data['serial_numbers'].splitlines()
+            # Remove empty lines
+            serial_numbers = [sn.strip() for sn in serial_numbers if sn.strip()]
+            # Remove duplicates
+            serial_numbers = list(set(serial_numbers))
+
+        # If the number of serial numbers is not equal to the number of selected objects, raise an error
+        if len(serial_numbers) != len(form.cleaned_data['pk']):
+            raise ValidationError(
+                _("The number of serial numbers must match the number of selected assets.")
+            )
+
+        # Iterate over the selected objects and update their fields
+        # with the corresponding serial numbers
+        for i, obj in enumerate(self.queryset.filter(pk__in=form.cleaned_data['pk'])):
+            # Take a snapshot of change-logged models
+            if hasattr(obj, 'snapshot'):
+                obj.snapshot()
+
+            # Update standard fields. If a field is listed in _nullify, delete its value.
+            for name, model_field in model_fields.items():
+                setattr(obj, name, form.cleaned_data[name])
+
+            # Set the serial number for the current object
+            obj.serial_number = serial_numbers[i]
+
+            # Store M2M values for validation
+            obj._m2m_values = {}
+            for field in obj._meta.local_many_to_many:
+                if value := form.cleaned_data.get(field.name):
+                    obj._m2m_values[field.name] = list(value)
+                elif field.name in nullified_fields:
+                    obj._m2m_values[field.name] = []
+
+            obj.full_clean()
+            obj.save()
+            updated_objects.append(obj)
+
+            # Handle M2M fields after save
+            for name in m2m_fields.items():
+                getattr(obj, name).set(form.cleaned_data[name])
+        # Rebuild the tree for MPTT models
+        if issubclass(self.queryset.model, MPTTModel):
+            self.queryset.model.objects.rebuild()
+        return updated_objects
+
+
+    def _super_post(self, request, **kwargs):
+        logger = logging.getLogger('netbox.views.BulkEditView')
+        model = self.queryset.model
+
+        # If we are editing *all* objects in the queryset, replace the PK list with all matched objects.
+        if request.POST.get('_all') and self.filterset is not None:
+            pk_list = self.filterset(request.GET, self.queryset.values_list('pk', flat=True), request=request).qs
+        else:
+            pk_list = request.POST.getlist('pk')
+
+        print ("pk_list at super post", pk_list)
+
+        # Include the PK list as initial data for the form
+        initial_data = {'pk': pk_list}
+
+        # Check for other contextual data needed for the form. We avoid passing all of request.GET because the
+        # filter values will conflict with the bulk edit form fields.
+        # TODO: Find a better way to accomplish this
+        if 'device' in request.GET:
+            initial_data['device'] = request.GET.get('device')
+        elif 'device_type' in request.GET:
+            initial_data['device_type'] = request.GET.get('device_type')
+        elif 'virtual_machine' in request.GET:
+            initial_data['virtual_machine'] = request.GET.get('virtual_machine')
+
+        form = self.form(request.POST, initial=initial_data)
+        restrict_form_fields(form, request.user)
+
+        if '_apply' in request.POST:
+            if form.is_valid():
+                logger.debug("Form validation was successful")
+                try:
+                    with transaction.atomic():
+                        updated_objects = self._update_objects(form, request)
+
+                        # Enforce object-level permissions
+                        object_count = self.queryset.filter(pk__in=[obj.pk for obj in updated_objects]).count()
+                        if object_count != len(updated_objects):
+                            raise PermissionsViolation
+
+                    if updated_objects:
+                        msg = f'Updated {len(updated_objects)} {model._meta.verbose_name_plural}'
+                        logger.info(msg)
+                        messages.success(self.request, msg)
+
+                    return redirect(self.get_return_url(request))
+
+                except ValidationError as e:
+                    messages.error(self.request, ", ".join(e.messages))
+                    clear_events.send(sender=self)
+
+                except (AbortRequest, PermissionsViolation) as e:
+                    logger.debug(e.message)
+                    form.add_error(None, e.message)
+                    clear_events.send(sender=self)
+
+            else:
+                logger.debug("Form validation failed")
+
+        # Retrieve objects being edited
+        table = self.table(self.queryset.filter(pk__in=pk_list), orderable=False)
+        if not table.rows:
+            messages.warning(
+                request,
+                _("No {object_type} were selected.").format(object_type=model._meta.verbose_name_plural)
+            )
+            return redirect(self.get_return_url(request))
+
+        return render(request, self.template_name, {
+            'model': model,
+            'form': form,
+            'table': table,
+            'return_url': self.get_return_url(request),
+            **self.get_extra_context(request),
+        })
+
     def post(self, request, **kwargs):
         """Override post method to check if assets are protected from editing"""
 
@@ -233,19 +399,23 @@ class AssetBulkScanView(generic.BulkEditView):
         else:
             pk_list = request.POST.getlist('pk')
 
+        print("pk_list at post", pk_list)
+
         # Include the PK list as initial data for the form
         initial_data = {'pk': pk_list}
         protected_fields_by_tags = get_tags_and_edit_protected_asset_fields()
 
         errors = []
         protected_assets = []
+
         if '_apply' not in request.POST:
-            return super().post(request, **kwargs)
+            return self._super_post(request, **kwargs)
 
         form = self.form(request.POST, initial=initial_data)
         restrict_form_fields(form, request.user)
+
         if not form.is_valid():
-            return super().post(request, **kwargs)
+            return self._super_post(request, **kwargs)
 
         nullified_fields = set(request.POST.getlist('_nullify'))
 
@@ -259,6 +429,7 @@ class AssetBulkScanView(generic.BulkEditView):
 
             # Check if asset is protected from editing
             for tag in intersection_of_tags:
+                # TODO: Check if custom fields can be protected
                 protected_fields = set(protected_fields_by_tags[tag])
 
                 modified_fields = set(form.changed_data)
@@ -289,7 +460,7 @@ class AssetBulkScanView(generic.BulkEditView):
             messages.warning(request, ' '.join(errors))
             messages.warning(request, error_msg_protected_assets)
             return redirect(self.get_return_url(request))
-        return super().post(request, **kwargs)
+        return self._super_post(request, **kwargs)
 
 
 @register_model_view(models.Asset, 'bulk_delete', path='delete', detail=False)

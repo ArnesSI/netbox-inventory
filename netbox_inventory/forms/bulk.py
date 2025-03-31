@@ -226,6 +226,16 @@ class AssetBulkScanForm(forms.Form):
     #     label='Asset tags',
     # )
 
+    pk = forms.ModelMultipleChoiceField(
+        queryset=None,  # Set from self.model on init
+        widget=forms.MultipleHiddenInput
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['pk'].queryset = self.model.objects.all()
+
     model = Asset
 
 
