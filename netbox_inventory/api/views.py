@@ -88,7 +88,7 @@ class SupplierViewSet(NetBoxModelViewSet):
     queryset = models.Supplier.objects.prefetch_related('tags').annotate(
         asset_count=count_related(models.Asset, 'purchase__supplier'),
         purchase_count=count_related(models.Purchase, 'supplier'),
-        delivery_count=count_related(models.Delivery, 'purchase__supplier'),
+        delivery_count=count_related(models.Delivery, 'purchases__supplier'),
     )
     serializer_class = SupplierSerializer
     filterset_class = filtersets.SupplierFilterSet
@@ -106,7 +106,7 @@ class BOMViewSet(NetBoxModelViewSet):
 class PurchaseViewSet(NetBoxModelViewSet):
     queryset = models.Purchase.objects.prefetch_related('tags').annotate(
         asset_count=count_related(models.Asset, 'purchase'),
-        delivery_count=count_related(models.Delivery, 'purchase'),
+        delivery_count=count_related(models.Delivery, 'purchases'),
     )
     serializer_class = PurchaseSerializer
     filterset_class = filtersets.PurchaseFilterSet

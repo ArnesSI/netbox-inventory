@@ -4,12 +4,14 @@
 
 {% block breadcrumbs %}
   {{ block.super }}
-  <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?supplier_id={{ object.purchase.supplier.pk }}">{{ object.purchase.supplier }}</a>
-  </li>
-  <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.purchase.pk }}">{{ object.purchase }}</a>
-  </li>
+  {% for purchase in object.purchases.all %}
+    <li class="breadcrumb-item">
+      <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?supplier_id={{ purchase.supplier.pk }}">{{ purchase.supplier }}</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ purchase.pk }}">{{ purchase }}</a>
+    </li>
+  {% endfor %}
 {% endblock %}
 
 {% block content %}
@@ -23,8 +25,10 @@
             <td>{{ object.name }}</td>
           </tr>
           <tr>
-            <th scope="row">Purchase</th>
-            <td>{{ object.purchase|linkify }}</td>
+            <th scope="row">Purchases</th>
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:purchase_list' %}?delivery_id={{ object.pk }}">{{ object.purchases.count }}</a>
+            </td>
           </tr>
           <tr>
             <th scope="row">Receiving Contact</th>

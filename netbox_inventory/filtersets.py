@@ -627,12 +627,12 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
 
 class DeliveryFilterSet(NetBoxModelFilterSet):
     purchase_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='purchase',
+        field_name='purchases',
         queryset=Purchase.objects.all(),
         label='Purchase (ID)',
     )
     supplier_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='purchase__supplier',
+        field_name='purchases__supplier',
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
     )
@@ -656,15 +656,13 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             'date',
             'description',
             'receiving_contact',
-            'purchase',
+            'purchases',
         )
 
     def search(self, queryset, name, value):
         query = Q(
             Q(name__icontains=value)
             | Q(description__icontains=value)
-            | Q(purchase__name__icontains=value)
-            | Q(purchase__supplier__name__icontains=value)
             | Q(receiving_contact__name__icontains=value)
         )
         return queryset.filter(query)

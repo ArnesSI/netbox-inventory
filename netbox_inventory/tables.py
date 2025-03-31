@@ -555,8 +555,8 @@ class DeliveryTable(NetBoxTable):
         accessor=columns.Accessor('purchase__supplier'),
         linkify=True,
     )
-    purchase = tables.Column(
-        linkify=True,
+    purchases = tables.ManyToManyColumn(
+        linkify_item=True,
     )
     date = columns.DateColumn(
         verbose_name='Delivery Date',
@@ -585,7 +585,7 @@ class DeliveryTable(NetBoxTable):
             'pk',
             'id',
             'name',
-            'purchase',
+            'purchases',
             'supplier',
             'date',
             'purchase_date',
@@ -600,7 +600,7 @@ class DeliveryTable(NetBoxTable):
         )
         default_columns = (
             'name',
-            'purchase',
+            'purchases',
             'date',
             'asset_count',
         )

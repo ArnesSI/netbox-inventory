@@ -76,4 +76,7 @@ def handle_delivery_purchase_change(instance, created, **kwargs):
     Update child Assets if Delivery Purchase has changed.
     """
     if not created:
-        Asset.objects.filter(delivery=instance).update(purchase=instance.purchase)
+        Asset.objects.filter(delivery=instance).update(purchase=None)
+
+        for purchase in instance.purchases.all():
+            Asset.objects.filter(delivery=instance).update(purchase=purchase)

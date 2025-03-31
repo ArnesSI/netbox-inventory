@@ -580,10 +580,13 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
                 asset_set_new_hw(asset=self, hw=new_hw)
 
     def clean_delivery(self):
-        if self.delivery and self.delivery.purchase != self.purchase:
-            raise ValidationError(
-                f'Assigned delivery must belong to selected purchase ({self.purchase}).'
-            )
+        if self.delivery:
+            if self.purchase and self.purchase not in self.delivery.purchases.all():
+                raise ValidationError(
+                    {
+                        "purchase": "The selected purchase is not associated with the delivery."
+                    }
+                )
 
     def clean_warranty_dates(self):
         if (

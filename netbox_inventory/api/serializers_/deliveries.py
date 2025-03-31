@@ -113,7 +113,7 @@ class DeliverySerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:delivery-detail'
     )
-    purchase = PurchaseSerializer(nested=True)
+    purchases = PurchaseSerializer(nested=True, many=True)
     receiving_contact = ContactSerializer(
         nested=True, required=False, allow_null=True, default=None
     )
@@ -125,7 +125,7 @@ class DeliverySerializer(NetBoxModelSerializer):
             'id',
             'url',
             'display',
-            'purchase',
+            'purchases',
             'name',
             'date',
             'description',

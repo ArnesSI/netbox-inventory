@@ -334,7 +334,7 @@ class DeliveryForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            'purchase',
+            'purchases',
             'name',
             'date',
             'contact_group',
@@ -348,7 +348,7 @@ class DeliveryForm(NetBoxModelForm):
     class Meta:
         model = Delivery
         fields = (
-            'purchase',
+            'purchases',
             'name',
             'date',
             'contact_group',

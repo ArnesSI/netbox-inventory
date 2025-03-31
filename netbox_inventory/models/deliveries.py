@@ -98,7 +98,6 @@ class Purchase(NetBoxModel):
         to='netbox_inventory.BOM',
         related_name='purchases',
         blank=True,
-        null=True,
         verbose_name='BOMs',
     )
     status = models.CharField(
@@ -142,13 +141,11 @@ class Delivery(NetBoxModel):
     """
 
     name = models.CharField(max_length=100)
-    purchase = models.ForeignKey(
-        help_text='Purchase that this delivery is part of',
+    purchases = models.ManyToManyField(
+        help_text='Purchases that this delivery is part of',
         to='netbox_inventory.Purchase',
-        on_delete=models.PROTECT,
         related_name='orders',
         blank=False,
-        null=False,
     )
     date = models.DateField(
         help_text='Date when this delivery was made',
@@ -171,16 +168,16 @@ class Delivery(NetBoxModel):
         blank=True,
     )
 
-    clone_fields = ['purchase', 'date', 'receiving_contact', 'description', 'comments']
+    clone_fields = ['purchases', 'date', 'receiving_contact', 'description', 'comments']
 
     class Meta:
-        ordering = ['purchase', 'name']
-        unique_together = (('purchase', 'name'),)
+        ordering = ['name']
+        unique_together = (('name'),)
         verbose_name = 'delivery'
         verbose_name_plural = 'deliveries'
 
     def __str__(self):
-        return f'{self.purchase} {self.name}'
+        return self.name
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:delivery', args=[self.pk])
