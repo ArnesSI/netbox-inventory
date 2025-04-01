@@ -6,7 +6,7 @@ from netbox_inventory.models import Asset, AuditFlowPage
 from netbox_inventory.tests.custom import APITestCase
 
 
-class DeliveryTest(
+class AuditFlowPageTest(
     APITestCase,
     APIViewTestCases.GetObjectViewTestCase,
     APIViewTestCases.ListObjectsViewTestCase,

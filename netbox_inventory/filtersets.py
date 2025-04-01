@@ -3,6 +3,7 @@ from functools import reduce
 import django_filters
 from django.db.models import Q
 
+from core.models import ObjectType
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
 from dcim.models import (
     Device,
@@ -23,6 +24,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
+from utilities.filters import ContentTypeFilter
 
 from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from .models import *
@@ -626,10 +628,15 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
 #
 
 
-class BaseflowFilterSet(NetBoxModelFilterSet):
+class BaseFlowFilterSet(NetBoxModelFilterSet):
     """
     Internal base filterset class for audit flow models.
     """
+
+    object_type_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ObjectType.objects.all(),
+    )
+    object_type = ContentTypeFilter()
 
     class Meta:
         fields = (
@@ -640,10 +647,13 @@ class BaseflowFilterSet(NetBoxModelFilterSet):
         )
 
     def search(self, queryset, name, value):
-        query = Q(Q(name__icontains=value) | Q(description__icontains=value))
-        return queryset.filter(query)
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(name__icontains=value) | Q(description__icontains=value)
+        )
 
 
-class AuditFlowPageFilterSet(BaseflowFilterSet):
-    class Meta(BaseflowFilterSet.Meta):
+class AuditFlowPageFilterSet(BaseFlowFilterSet):
+    class Meta(BaseFlowFilterSet.Meta):
         model = AuditFlowPage
