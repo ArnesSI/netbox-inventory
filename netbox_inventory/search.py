@@ -2,6 +2,8 @@ from netbox.search import SearchIndex
 
 from .models import (
     Asset,
+    BOM,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -58,6 +60,13 @@ class SupplierIndex(SearchIndex):
         ('comments', 5000),
     )
 
+class BOMIndex(SearchIndex):
+    model = BOM
+    fields = (
+        ('name', 100),
+        ('description', 500),
+        ('comments', 5000),
+    )
 
 class PurchaseIndex(SearchIndex):
     model = Purchase
@@ -77,11 +86,26 @@ class DeliveryIndex(SearchIndex):
     )
 
 
+#
+# Transit
+#
+
+
+class CourierIndex(SearchIndex):
+    model = Courier
+    fields = (
+        ('name', 100),
+        ('description', 500),
+        ('comments', 5000),
+    )
+
 indexes = [
     InventoryItemGroupIndex,
     InventoryItemTypeIndex,
     AssetIndex,
     SupplierIndex,
+    BOMIndex,
     PurchaseIndex,
     DeliveryIndex,
+    CourierIndex,
 ]
