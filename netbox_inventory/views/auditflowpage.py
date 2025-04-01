@@ -26,8 +26,8 @@ class AuditFlowPageListView(generic.ObjectListView):
     filterset_form = forms.AuditFlowPageFilterForm
 
 
-@register_model_view(models.AuditFlowPage, 'edit')
 @register_model_view(models.AuditFlowPage, 'add', detail=False)
+@register_model_view(models.AuditFlowPage, 'edit')
 class AuditFlowPageEditView(generic.ObjectEditView):
     queryset = models.AuditFlowPage.objects.all()
     form = forms.AuditFlowPageForm

@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext as _
 
 from core.models import ObjectType
 from dcim.models import (
@@ -31,6 +32,7 @@ from ..models import *
 
 __all__ = (
     'AssetFilterForm',
+    'AuditFlowFilterForm',
     'AuditFlowPageFilterForm',
     'DeliveryFilterForm',
     'InventoryItemGroupFilterForm',
@@ -490,4 +492,22 @@ class BaseFlowFilterForm(NetBoxModelFilterSetForm):
 
 
 class AuditFlowPageFilterForm(BaseFlowFilterForm):
+    assigned_flow_id = DynamicModelMultipleChoiceField(
+        queryset=AuditFlow.objects.all(),
+        required=False,
+        label=_('Flow'),
+    )
+
     model = AuditFlowPage
+
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'assigned_flow_id',
+            name='Assignments',
+        ),
+    )
+
+
+class AuditFlowFilterForm(BaseFlowFilterForm):
+    model = AuditFlow

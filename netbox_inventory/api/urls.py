@@ -20,7 +20,9 @@ router.register('purchases', views.PurchaseViewSet)
 router.register('deliveries', views.DeliveryViewSet)
 
 # Audit
-router.register('audit/flowpages', views.AuditFlowPageViewSet)
+router.register('audit-flows', views.AuditFlowViewSet)
+router.register('audit-flowpages', views.AuditFlowPageViewSet)
+router.register('audit-flowpage-assignments', views.AuditFlowPageAssignmentViewSet)
 
 
 urlpatterns = router.urls

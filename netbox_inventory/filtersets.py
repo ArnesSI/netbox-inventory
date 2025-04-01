@@ -2,6 +2,7 @@ from functools import reduce
 
 import django_filters
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
 from core.models import ObjectType
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
@@ -32,6 +33,7 @@ from .utils import get_asset_custom_fields_search_filters, query_located
 
 __all__ = (
     'AssetFilterSet',
+    'AuditFlowFilterSet',
     'AuditFlowPageFilterSet',
     'DeliveryFilterSet',
     'DeviceAssetFilterSet',
@@ -655,5 +657,27 @@ class BaseFlowFilterSet(NetBoxModelFilterSet):
 
 
 class AuditFlowPageFilterSet(BaseFlowFilterSet):
+    assigned_flow_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=AuditFlow.objects.all(),
+        field_name='assigned_flows',
+        label=_('Assigned Audit Flow (ID)'),
+    )
+
     class Meta(BaseFlowFilterSet.Meta):
         model = AuditFlowPage
+        fields = BaseFlowFilterSet.Meta.fields + ('assigned_flow_id',)
+
+
+class AuditFlowFilterSet(BaseFlowFilterSet):
+    page_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=AuditFlowPage.objects.all(),
+        field_name='pages',
+        label=_('Audit Flow Page (ID)'),
+    )
+
+    class Meta(BaseFlowFilterSet.Meta):
+        model = AuditFlow
+        fields = BaseFlowFilterSet.Meta.fields + (
+            'enabled',
+            'page_id',
+        )

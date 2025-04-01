@@ -12,6 +12,9 @@ from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
+    'AuditFlowPageAssignmentTable',
+    'AuditFlowPageTable',
+    'AuditFlowTable',
     'SupplierTable',
     'PurchaseTable',
     'DeliveryTable',
@@ -585,6 +588,40 @@ class BaseFlowTable(NetBoxTable):
 class AuditFlowPageTable(BaseFlowTable):
     class Meta(BaseFlowTable.Meta):
         model = AuditFlowPage
+
+
+class AuditFlowTable(BaseFlowTable):
+    enabled = columns.BooleanColumn()
+
+    class Meta(BaseFlowTable.Meta):
+        model = AuditFlow
+        fields = BaseFlowTable.Meta.fields + ('enabled',)
+        default_columns = BaseFlowTable.Meta.default_columns + ('enabled',)
+
+
+class AuditFlowPageAssignmentTable(NetBoxTable):
+    flow = tables.Column(
+        linkify=True,
+    )
+    page = tables.Column(
+        linkify=True,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditFlowPageAssignment
+        fields = (
+            'pk',
+            'id',
+            'flow',
+            'page',
+            'weight',
+            'actions',
+        )
+        default_columns = (
+            'flow',
+            'page',
+            'weight',
+        )
 
 
 # ========================

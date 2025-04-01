@@ -16,11 +16,14 @@ from utilities.forms.widgets import DatePicker
 
 from netbox_inventory.choices import HardwareKindChoices
 
+from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
 from ..models import *
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
     'AssetForm',
+    'AuditFlowForm',
+    'AuditFlowPageAssignmentForm',
     'AuditFlowPageForm',
     'DeliveryForm',
     'InventoryItemGroupForm',
@@ -454,3 +457,48 @@ class BaseFlowForm(NetBoxModelForm):
 class AuditFlowPageForm(BaseFlowForm):
     class Meta(BaseFlowForm.Meta):
         model = AuditFlowPage
+
+
+class AuditFlowForm(BaseFlowForm):
+    # Restrict inherited object_type to those object types that represent physical
+    # locations.
+    object_type = ContentTypeChoiceField(
+        queryset=ObjectType.objects.public(),
+        limit_choices_to=AUDITFLOW_OBJECT_TYPE_CHOICES,
+    )
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'description',
+            'tags',
+            'enabled',
+        ),
+        FieldSet(
+            'object_type',
+            'object_filter',
+            name=_('Assignment'),
+        ),
+    )
+
+    class Meta(BaseFlowForm.Meta):
+        model = AuditFlow
+        fields = BaseFlowForm.Meta.fields + ('enabled',)
+
+
+class AuditFlowPageAssignmentForm(NetBoxModelForm):
+    fieldsets = (
+        FieldSet(
+            'flow',
+            'page',
+            'weight',
+        ),
+    )
+
+    class Meta:
+        model = AuditFlowPageAssignment
+        fields = (
+            'flow',
+            'page',
+            'weight',
+        )

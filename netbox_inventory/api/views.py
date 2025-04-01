@@ -7,7 +7,9 @@ from .serializers import *
 
 __all__ = (
     'AssetViewSet',
+    'AuditFlowPageAssignmentViewSet',
     'AuditFlowPageViewSet',
+    'AuditFlowViewSet',
     'DeliveryViewSet',
     'DeviceAssetViewSet',
     'InventoryItemAssetViewSet',
@@ -124,3 +126,13 @@ class DeliveryViewSet(NetBoxModelViewSet):
 class AuditFlowPageViewSet(NetBoxModelViewSet):
     queryset = models.AuditFlowPage.objects.prefetch_related('object_type', 'tags')
     serializer_class = AuditFlowPageSerializer
+
+
+class AuditFlowViewSet(NetBoxModelViewSet):
+    queryset = models.AuditFlow.objects.prefetch_related('object_type', 'pages', 'tags')
+    serializer_class = AuditFlowSerializer
+
+
+class AuditFlowPageAssignmentViewSet(NetBoxModelViewSet):
+    queryset = models.AuditFlowPageAssignment.objects.prefetch_related('flow', 'page')
+    serializer_class = AuditFlowPageAssignmentSerializer

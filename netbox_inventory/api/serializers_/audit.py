@@ -2,9 +2,13 @@ from core.models import ObjectType
 from netbox.api.fields import ContentTypeField
 from netbox.api.serializers import NetBoxModelSerializer
 
-from netbox_inventory.models import AuditFlowPage
+from netbox_inventory.models import AuditFlow, AuditFlowPage, AuditFlowPageAssignment
 
-__all__ = ('AuditFlowPageSerializer',)
+__all__ = (
+    'AuditFlowPageAssignmentSerializer',
+    'AuditFlowPageSerializer',
+    'AuditFlowSerializer',
+)
 
 
 class BaseFlowSerializer(NetBoxModelSerializer):
@@ -43,3 +47,38 @@ class BaseFlowSerializer(NetBoxModelSerializer):
 class AuditFlowPageSerializer(BaseFlowSerializer):
     class Meta(BaseFlowSerializer.Meta):
         model = AuditFlowPage
+
+
+class AuditFlowSerializer(BaseFlowSerializer):
+    class Meta(BaseFlowSerializer.Meta):
+        model = AuditFlow
+        fields = BaseFlowSerializer.Meta.fields + ('enabled',)
+
+
+class AuditFlowPageAssignmentSerializer(NetBoxModelSerializer):
+    flow = AuditFlowSerializer(
+        nested=True,
+    )
+    page = AuditFlowPageSerializer(
+        nested=True,
+    )
+
+    class Meta:
+        model = AuditFlowPageAssignment
+        fields = (
+            'id',
+            'url',
+            'display',
+            'flow',
+            'page',
+            'weight',
+            'created',
+            'last_updated',
+        )
+        brief_fields = (
+            'id',
+            'url',
+            'display',
+            'flow',
+            'page',
+        )

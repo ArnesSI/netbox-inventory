@@ -2,7 +2,9 @@ from .asset import *
 from .asset_assign import *
 from .asset_create import *
 from .asset_reassign import *
+from .auditflow import *
 from .auditflowpage import *
+from .auditflowpageassignments import *
 from .delivery import *
 from .inventoryitem_group import *
 from .inventoryitem_type import *

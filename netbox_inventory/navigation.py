@@ -153,6 +153,25 @@ deliveries_items = (
 
 audit_admin_items = (
     PluginMenuItem(
+        link='plugins:netbox_inventory:auditflow_list',
+        link_text='Flows',
+        permissions=['netbox_inventory.view_auditflow'],
+        buttons=[
+            PluginMenuButton(
+                link='plugins:netbox_inventory:auditflow_add',
+                title='Add',
+                icon_class='mdi mdi-plus-thick',
+                permissions=['netbox_inventory.add_auditflow'],
+            ),
+            PluginMenuButton(
+                link='plugins:netbox_inventory:auditflow_bulk_import',
+                title='Import',
+                icon_class='mdi mdi-upload',
+                permissions=['netbox_inventory.add_auditflow'],
+            ),
+        ],
+    ),
+    PluginMenuItem(
         link='plugins:netbox_inventory:auditflowpage_list',
         link_text='Flow Pages',
         permissions=['netbox_inventory.view_auditflowpage'],

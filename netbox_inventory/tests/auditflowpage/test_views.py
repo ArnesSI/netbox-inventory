@@ -40,6 +40,7 @@ class AuditFlowPageViewTestCase(
             'name': 'Page',
             'description': 'Page description',
             'object_type': object_type.pk,
+            'object_filter': '{"status": "stored"}',
             'comments': 'Page comments',
         }
         cls.csv_data = (

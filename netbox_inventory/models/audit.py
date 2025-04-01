@@ -1,13 +1,25 @@
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from core.models import ObjectType
+from core.models import ObjectChange, ObjectType
+from netbox.models.features import (
+    ChangeLoggingMixin,
+    CloningMixin,
+    EventRulesMixin,
+)
 from utilities.query import dict_to_filter_params
+from utilities.querysets import RestrictedQuerySet
 
+from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
 from .mixins import NamedModel
 
-__all__ = ('AuditFlowPage',)
+__all__ = (
+    'AuditFlow',
+    'AuditFlowPage',
+    'AuditFlowPageAssignment',
+)
 
 
 class BaseFlow(NamedModel):
@@ -78,8 +90,95 @@ class BaseFlow(NamedModel):
 
 class AuditFlowPage(BaseFlow):
     """
-    An `AuditFlowPage' defines a specific page in the audit flow. It is used to display
-    a specific type of asset to be audited.
+    An `AuditFlowPage' defines a specific page in an `AuditFlow`. It is used to display
+    a specific type of object to be audited.
     """
 
     pass
+
+
+class AuditFlow(BaseFlow):
+    """
+    An `AuditFlow` defines a self-contained sequence of actions within the inventory
+    audit process, meaning it groups all `AuditFlowPage` objects presented to the user.
+    It is associated with a specific NetBox object type (e.g. `Site`, `Location` or
+    `Rack`), from which the audit workflow can be initiated.
+    """
+
+    # Restrict inherited object_type to those object types that represent physical
+    # locations.
+    object_type = models.ForeignKey(
+        ObjectType,
+        related_name='+',
+        on_delete=models.PROTECT,
+        limit_choices_to=AUDITFLOW_OBJECT_TYPE_CHOICES,
+    )
+
+    enabled = models.BooleanField(
+        verbose_name=_('enabled'),
+        default=True,
+    )
+    pages = models.ManyToManyField(
+        AuditFlowPage,
+        through='AuditFlowPageAssignment',
+        related_name='assigned_flows',
+    )
+
+    clone_fields = (
+        'object_type',
+        'object_filter',
+        'enabled',
+    )
+
+
+class AuditFlowPageAssignment(
+    ChangeLoggingMixin,
+    CloningMixin,
+    EventRulesMixin,
+):
+    """
+    Mapping between `AuditFlow` and `AuditFlowPage` to add additional metadata.
+    """
+
+    flow = models.ForeignKey(
+        AuditFlow,
+        related_name='+',
+        on_delete=models.CASCADE,
+    )
+    page = models.ForeignKey(
+        AuditFlowPage,
+        related_name='+',
+        on_delete=models.PROTECT,
+    )
+    weight = models.PositiveSmallIntegerField(
+        verbose_name=_('display weight'),
+        default=100,
+        help_text=_('Assignments with higher weights appear later in an audit flow.'),
+    )
+
+    objects = RestrictedQuerySet.as_manager()
+
+    clone_fields = (
+        'flow',
+        'weight',
+    )
+
+    class Meta:
+        ordering = ('weight',)
+        constraints = (
+            models.UniqueConstraint(
+                fields=['flow', 'page'],
+                name='%(app_label)s_%(class)s_unique_flow_page',
+            ),
+        )
+
+    def __str__(self) -> str:
+        return str(f'{self.flow} -> {self.page}')
+
+    def get_absolute_url(self) -> str:
+        return reverse('plugins:netbox_inventory:auditflowpage', args=[self.page.pk])
+
+    def to_objectchange(self, action) -> ObjectChange:
+        objectchange = super().to_objectchange(action)
+        objectchange.related_object = self.flow
+        return objectchange
