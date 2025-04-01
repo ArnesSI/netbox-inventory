@@ -10,6 +10,7 @@ from utilities.tables import register_table_column
 from .models import (
     Asset,
     BOM,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -26,6 +27,7 @@ __all__ = (
     'DeliveryTable',
     'InventoryItemTypeTable',
     'InventoryItemGroupTable',
+    'CourierTable',
 )
 
 
@@ -602,6 +604,57 @@ class DeliveryTable(NetBoxTable):
             'name',
             'purchases',
             'date',
+            'asset_count',
+        )
+
+
+#
+# Transit
+#
+
+
+class CourierTable(ContactsColumnMixin, NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    purchase_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:purchase_list',
+        url_params={'supplier_id': 'pk'},
+        verbose_name='Purchases',
+    )
+    delivery_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:delivery_list',
+        url_params={'supplier_id': 'pk'},
+        verbose_name='Deliveries',
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'supplier_id': 'pk'},
+        verbose_name='Assets',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Courier
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'slug',
+            'description',
+            'comments',
+            'contacts',
+            'purchase_count',
+            'delivery_count',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
             'asset_count',
         )
 

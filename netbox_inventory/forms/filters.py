@@ -34,6 +34,7 @@ from ..choices import (
 from ..models import (
     Asset,
     BOM,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -49,6 +50,7 @@ __all__ = (
     'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
+    'CourierFilterForm',
 )
 
 
@@ -493,4 +495,30 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     parent_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(), required=False, label='Parent group'
     )
+    tag = TagFilterField(model)
+
+
+class CourierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
+    model = Courier
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
+    )
+
+    contact_group = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+    )
+    contact = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$contact_group',
+        },
+        label='Contact',
+    )
+
     tag = TagFilterField(model)

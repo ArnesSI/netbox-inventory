@@ -33,6 +33,7 @@ from .choices import (
 from .models import (
     Asset,
     BOM,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -664,5 +665,29 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value)
             | Q(description__icontains=value)
             | Q(receiving_contact__name__icontains=value)
+        )
+        return queryset.filter(query)
+
+
+#
+# Transit
+#
+
+
+class CourierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
+    class Meta:
+        model = Courier
+        fields = (
+            'id',
+            'name',
+            'slug',
+            'description',
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(name__icontains=value)
+            | Q(slug__icontains=value)
+            | Q(description__icontains=value)
         )
         return queryset.filter(query)

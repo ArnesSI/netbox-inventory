@@ -26,6 +26,7 @@ from ..choices import (
 from ..models import (
     Asset,
     BOM,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -49,6 +50,8 @@ __all__ = (
     'InventoryItemTypeBulkEditForm',
     'InventoryItemGroupImportForm',
     'InventoryItemGroupBulkEditForm',
+    'CourierImportForm',
+    'CourierBulkEditForm'
 )
 
 
@@ -837,3 +840,22 @@ class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
         'parent',
         'description',
     )
+
+
+class CourierImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = Courier
+        fields = ('name', 'slug', 'description', 'comments', 'tags')
+
+
+class CourierBulkEditForm(NetBoxModelBulkEditForm):
+    description = forms.CharField(
+        required=False,
+    )
+    comments = CommentField(
+        required=False,
+    )
+
+    model = Courier
+    fieldsets = (FieldSet('description', name='General'),)
+    nullable_fields = ('description',)

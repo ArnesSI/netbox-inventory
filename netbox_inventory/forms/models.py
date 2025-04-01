@@ -14,6 +14,7 @@ from netbox_inventory.choices import HardwareKindChoices
 from ..models import (
     Asset,
     BOM,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -30,6 +31,7 @@ __all__ = (
     'DeliveryForm',
     'InventoryItemTypeForm',
     'InventoryItemGroupForm',
+    'CourierForm',
 )
 
 
@@ -418,4 +420,21 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'description',
             'tags',
             'comments',
+        )
+
+
+class CourierForm(NetBoxModelForm):
+    slug = SlugField(slug_source='name')
+    comments = CommentField()
+
+    fieldsets = (FieldSet('name', 'slug', 'description', 'tags', name='Supplier'),)
+
+    class Meta:
+        model = Courier
+        fields = (
+            'name',
+            'slug',
+            'description',
+            'comments',
+            'tags',
         )
