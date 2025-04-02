@@ -6,6 +6,7 @@ from .. import filtersets, models
 from .serializers import (
     AssetSerializer,
     BOMSerializer,
+    CourierSerializer,
     DeliverySerializer,
     InventoryItemGroupSerializer,
     InventoryItemTypeSerializer,
@@ -118,3 +119,17 @@ class DeliveryViewSet(NetBoxModelViewSet):
     )
     serializer_class = DeliverySerializer
     filterset_class = filtersets.DeliveryFilterSet
+
+
+#
+# Transit
+#
+
+
+class CourierViewSet(NetBoxModelViewSet):
+    queryset = models.Courier.objects.prefetch_related('tags').annotate(
+        # TODO: Transfer model
+        # transfer_count=count_related(models.Transfer, 'courier'),
+    )
+    serializer_class = CourierSerializer
+    filterset_class = filtersets.CourierFilterSet

@@ -617,20 +617,10 @@ class CourierTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
-    purchase_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:purchase_list',
-        url_params={'supplier_id': 'pk'},
-        verbose_name='Purchases',
-    )
-    delivery_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:delivery_list',
-        url_params={'supplier_id': 'pk'},
-        verbose_name='Deliveries',
-    )
-    asset_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:asset_list',
-        url_params={'supplier_id': 'pk'},
-        verbose_name='Assets',
+    transfer_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:transfer_list',
+        url_params={'courier_id': 'pk'},
+        verbose_name='Transfers',
     )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
@@ -645,9 +635,7 @@ class CourierTable(ContactsColumnMixin, NetBoxTable):
             'description',
             'comments',
             'contacts',
-            'purchase_count',
-            'delivery_count',
-            'asset_count',
+            'transfer_count',
             'tags',
             'created',
             'last_updated',
@@ -655,7 +643,7 @@ class CourierTable(ContactsColumnMixin, NetBoxTable):
         )
         default_columns = (
             'name',
-            'asset_count',
+            'transfer_count',
         )
 
 
