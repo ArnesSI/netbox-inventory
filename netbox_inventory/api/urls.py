@@ -22,5 +22,6 @@ router.register('deliveries', views.DeliveryViewSet)
 
 # Transit
 router.register('couriers', views.CourierViewSet)
+router.register('transfers', views.TransferViewSet)
 
 urlpatterns = router.urls

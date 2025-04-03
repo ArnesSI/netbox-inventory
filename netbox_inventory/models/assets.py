@@ -282,6 +282,14 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=True,
     )
+    transfer = models.ForeignKey(
+        help_text='Transfer this asset is part of',
+        to='netbox_inventory.Transfer',
+        on_delete=models.PROTECT,
+        related_name='assets',
+        blank=True,
+        null=True,
+    )
     purchase = models.ForeignKey(
         help_text='Purchase through which this asset was purchased',
         to='netbox_inventory.Purchase',

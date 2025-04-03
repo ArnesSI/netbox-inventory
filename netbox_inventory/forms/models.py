@@ -20,6 +20,7 @@ from ..models import (
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 from ..utils import get_tags_and_edit_protected_asset_fields
 
@@ -32,6 +33,7 @@ __all__ = (
     'InventoryItemTypeForm',
     'InventoryItemGroupForm',
     'CourierForm',
+    'TransferForm',
 )
 
 
@@ -97,6 +99,11 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field('delivery').blank,
         query_params={'purchase_id': '$purchase'},
     )
+    transfer = DynamicModelChoiceField(
+        queryset=Transfer.objects.all(),
+        help_text=Asset._meta.get_field('transfer').help_text,
+        required=not Asset._meta.get_field('transfer').blank,
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         help_text=Asset._meta.get_field('tenant').help_text,
@@ -153,6 +160,7 @@ class AssetForm(NetBoxModelForm):
             'bom',
             'purchase',
             'delivery',
+            'transfer',
             'warranty_start',
             'warranty_end',
             name='Purchase',
@@ -178,6 +186,7 @@ class AssetForm(NetBoxModelForm):
             'bom',
             'purchase',
             'delivery',
+            'transfer',
             'warranty_start',
             'warranty_end',
             'tenant',
@@ -438,3 +447,104 @@ class CourierForm(NetBoxModelForm):
             'comments',
             'tags',
         )
+    
+
+
+class TransferForm(NetBoxModelForm):
+    
+    sender_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Sender Group',
+        help_text='Filter senders by group',
+        initial_params={
+            'contacts': '$sender',
+        },
+    )
+    sender = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Transfer._meta.get_field('sender').help_text,
+        required=not Transfer._meta.get_field('sender').blank,
+        query_params={
+            'group_id': '$sender_group',
+        },
+    )
+    recipient_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Recipient Group',
+        help_text='Filter recipients by group',
+        initial_params={
+            'contacts': '$recipient',
+        },
+    )
+    recipient = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Transfer._meta.get_field('recipient').help_text,
+        required=not Transfer._meta.get_field('recipient').blank,
+        query_params={
+            'group_id': '$recipient_group',
+        },
+    )
+    site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        help_text=Transfer._meta.get_field('site').help_text,
+        required=True,
+        initial_params={
+            'locations': '$location',
+        },
+    )
+    location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        help_text=Transfer._meta.get_field('location').help_text,
+        required=False,
+        query_params={
+            'site_id': '$site',
+        },
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'courier',
+            'shipping_number',
+            'instructions',
+            'status',
+            name='General'
+        ),
+        FieldSet(
+            'sender',
+            'recipient',
+            'site',
+            'location',
+            'pickup_date',
+            'received_date',
+            'tags',
+            name='Transfer'
+        ),
+    )
+
+    class Meta:
+        model = Transfer
+        fields = (
+            'name',
+            'courier',
+            'shipping_number',
+            'instructions',
+            'status',
+            'sender',
+            'recipient',
+            'site',
+            'location',
+            'pickup_date',
+            'received_date',
+            'tags',
+            'comments',
+        )
+        widgets = {
+            'pickup_date': DatePicker(),
+            'received_date': DatePicker(),
+        }

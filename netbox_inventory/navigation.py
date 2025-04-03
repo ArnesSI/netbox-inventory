@@ -187,12 +187,33 @@ courier_buttons = [
     ),
 ]
 
+transfer_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:transfer_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_inventory.add_transfer'],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:transfer_bulk_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        permissions=['netbox_inventory.add_transfer'],
+    ),
+]
+
 transit_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:courier_list',
         link_text='Couriers',
         permissions=['netbox_inventory.view_courier'],
         buttons=courier_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:transfer_list',
+        link_text='Transfers',
+        permissions=['netbox_inventory.view_transfer'],
+        buttons=transfer_buttons,
     ),
 )
 

@@ -12,6 +12,7 @@ from .serializers import (
     InventoryItemTypeSerializer,
     PurchaseSerializer,
     SupplierSerializer,
+    TransferSerializer,
 )
 
 #
@@ -128,8 +129,15 @@ class DeliveryViewSet(NetBoxModelViewSet):
 
 class CourierViewSet(NetBoxModelViewSet):
     queryset = models.Courier.objects.prefetch_related('tags').annotate(
-        # TODO: Transfer model
-        # transfer_count=count_related(models.Transfer, 'courier'),
+        transfer_count=count_related(models.Transfer, 'courier'),
     )
     serializer_class = CourierSerializer
     filterset_class = filtersets.CourierFilterSet
+
+
+class TransferViewSet(NetBoxModelViewSet):
+    queryset = models.Transfer.objects.prefetch_related('tags').annotate(
+        asset_count=count_related(models.Asset, 'transfer'),
+    )
+    serializer_class = TransferSerializer
+    filterset_class = filtersets.TransferFilterSet

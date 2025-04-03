@@ -29,7 +29,8 @@ from ..choices import (
     AssetStatusChoices,
     BOMStatusChoices,
     HardwareKindChoices,
-    PurchaseStatusChoices
+    PurchaseStatusChoices,
+    TransferStatusChoices,
 )
 from ..models import (
     Asset,
@@ -40,6 +41,7 @@ from ..models import (
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 
 __all__ = (
@@ -51,6 +53,7 @@ __all__ = (
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
     'CourierFilterForm',
+    'TransferFilterForm',
 )
 
 
@@ -79,6 +82,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'delivery_id',
             'purchase_id',
             'supplier_id',
+            'transfer_id',
             'delivery_date_after',
             'delivery_date_before',
             'purchase_date_after',
@@ -222,6 +226,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Supplier.objects.all(),
         required=False,
         label='Supplier',
+    )
+    transfer_id = DynamicModelMultipleChoiceField(
+        queryset=Transfer.objects.all(),
+        required=False,
+        label='Transfer',
     )
     delivery_date_after = forms.DateField(
         required=False,
@@ -521,4 +530,109 @@ class CourierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
         label='Contact',
     )
 
+    tag = TagFilterField(model)
+
+
+class TransferFilterForm(NetBoxModelFilterSetForm):
+    model = Transfer
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag', 'status'),
+        FieldSet('asset_id', 'courier_id', name='General'),
+        FieldSet(
+            'sender_group_id',
+            'sender_id',
+            'recipient_group_id',
+            'recipient_id', 
+            name='Contacts'
+        ),
+        FieldSet(
+            'site_id',
+            'location_id',
+            'pickup_date_after',
+            'pickup_date_before',
+            'received_date_after',
+            'received_date_before',
+            name='Transfer'
+        ),
+    )
+
+    asset_id = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        label='Assets',
+    )
+    courier_id = DynamicModelMultipleChoiceField(
+        queryset=Courier.objects.all(),
+        required=False,
+        label='Courier',
+    )
+    status = forms.MultipleChoiceField(
+        choices=TransferStatusChoices,
+        required=False,
+    )
+    sender_group_id = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Sender Group',
+    )
+    sender_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$sender_group_id',
+        },
+        label='Sender',
+    )
+    recipient_group_id = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Recipient Group',
+    )
+    recipient_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$recipient_group_id',
+        },
+        label='Recipient',
+    )
+    site_id = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label='Delivered at site',
+        help_text='Transfer delivered here',
+    )
+    location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        query_params={
+            'site_id': '$site_id',
+        },
+        label='Delivered at location on site',
+        help_text='Transfer delivered here',
+    )
+    pickup_date_after = forms.DateField(
+        required=False,
+        label='Transfer picked up on or after',
+        widget=DatePicker,
+    )
+    pickup_date_before = forms.DateField(
+        required=False,
+        label='Transfer picked up on or before',
+        widget=DatePicker,
+    )
+    received_date_after = forms.DateField(
+        required=False,
+        label='Transfer received on or after',
+        widget=DatePicker,
+    )
+    received_date_before = forms.DateField(
+        required=False,
+        label='Transfer received on or before',
+        widget=DatePicker,
+    )
     tag = TagFilterField(model)

@@ -23,18 +23,16 @@ class CourierView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         return {
-            # TODO: Transfer model
-            # 'transfer_count': models.Transfer.objects.filter(
-            #     courier=instance
-            # ).count(),
+            'transfer_count': models.Transfer.objects.filter(
+                courier=instance
+            ).count(),
         }
 
 
 @register_model_view(models.Courier, 'list', path='', detail=False)
 class CourierListView(generic.ObjectListView):
     queryset = models.Courier.objects.annotate(
-        # TODO: Transfer model
-        # transfer_count=count_related(models.Transfer, 'courier'),
+        transfer_count=count_related(models.Transfer, 'courier'),
     )
     table = tables.CourierTable
     filterset = filtersets.CourierFilterSet

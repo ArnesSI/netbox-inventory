@@ -122,4 +122,13 @@ urlpatterns = (
         'couriers/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'courier')),
     ),
+    # Transfers
+    path(
+        'transfers/',
+        include(get_model_urls('netbox_inventory', 'transfer', detail=False)),
+    ),
+    path(
+        'transfers/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'transfer')),
+    ),
 )

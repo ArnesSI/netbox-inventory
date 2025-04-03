@@ -16,6 +16,7 @@ from .models import (
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 from .template_content import WARRANTY_PROGRESSBAR
 
@@ -28,6 +29,7 @@ __all__ = (
     'InventoryItemTypeTable',
     'InventoryItemGroupTable',
     'CourierTable',
+    'TransferTable',
 )
 
 
@@ -191,6 +193,9 @@ class AssetTable(NetBoxTable):
         linkify=True,
     )
     delivery = tables.Column(
+        linkify=True,
+    )
+    transfer = tables.Column(
         linkify=True,
     )
     purchase_date = columns.DateColumn(
@@ -387,6 +392,7 @@ class AssetTable(NetBoxTable):
             'delivery',
             'purchase_date',
             'delivery_date',
+            'transfer',
             'warranty_start',
             'warranty_end',
             'warranty_progress',
@@ -644,6 +650,78 @@ class CourierTable(ContactsColumnMixin, NetBoxTable):
         default_columns = (
             'name',
             'transfer_count',
+        )
+
+    
+class TransferTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'transfer_id': 'pk'},
+        verbose_name='Assets',
+    )
+    courier = tables.Column(
+        linkify=True,
+    )
+    shipping_number = tables.Column(
+        linkify=True,
+    )
+    instructions = columns.MarkdownColumn()
+    status = columns.ChoiceFieldColumn()
+    sender = tables.Column(
+        linkify=True,
+    )
+    recipient = tables.Column(
+        linkify=True,
+    )
+    site = tables.Column(
+        linkify=True,
+    )
+    location = tables.Column(
+        linkify=True,
+    )
+    pickup_date = columns.DateColumn(
+        verbose_name='Pickup Date',
+    )
+    received_date = columns.DateColumn(
+        verbose_name='Received Date',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Transfer
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'asset_count',
+            'courier',
+            'shipping_number',
+            'instructions',
+            'status',
+            'sender',
+            'recipient',
+            'site',
+            'location',
+            'pickup_date',
+            'received_date',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'asset_count',
+            'courier',
+            'status',
+            'sender',
+            'pickup_date',
+            'received_date',
         )
 
 

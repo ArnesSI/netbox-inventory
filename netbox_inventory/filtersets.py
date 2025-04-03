@@ -28,7 +28,8 @@ from .choices import (
     AssetStatusChoices,
     BOMStatusChoices,
     HardwareKindChoices,
-    PurchaseStatusChoices
+    PurchaseStatusChoices,
+    TransferStatusChoices,
 )
 from .models import (
     Asset,
@@ -39,6 +40,7 @@ from .models import (
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 from .utils import get_asset_custom_fields_search_filters, query_located
 
@@ -345,6 +347,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='iexact',
         label='Supplier (name)',
     )
+    transfer_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Transfer.objects.all(),
+        field_name='transfer',
+        label='Transfer (ID)',
+    )
+    transfer = django_filters.CharFilter(
+        field_name='transfer__name',
+        lookup_expr='iexact',
+        label='Transfer (name)',
+    )
     warranty_start = django_filters.DateFromToRangeFilter()
     warranty_end = django_filters.DateFromToRangeFilter()
     delivery_date = django_filters.DateFromToRangeFilter(
@@ -437,6 +449,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
             | Q(tenant__name__icontains=value)
             | Q(owner__name__icontains=value)
             | Q(bom__name__icontains=value)
+            | Q(transfer__name__icontains=value)
         )
         custom_field_filters = get_asset_custom_fields_search_filters()
         for custom_field_filter in custom_field_filters:
@@ -691,3 +704,65 @@ class CourierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
             | Q(description__icontains=value)
         )
         return queryset.filter(query)
+    
+
+class TransferFilterSet(NetBoxModelFilterSet):
+    courier_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='courier',
+        queryset=Courier.objects.all(),
+        label='Courier (ID)',
+    )
+    asset_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Asset.objects.all(),
+        field_name='assets__id',
+        to_field_name='id',
+        label='Asset (ID)',
+    )
+    status = django_filters.MultipleChoiceFilter(
+        choices=AssetStatusChoices,
+    )
+    sender_group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ContactGroup.objects.all(),
+        field_name='sender__group',
+        label='Sender Group (ID)',
+    )
+    sender_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Contact.objects.all(),
+        field_name='sender',
+        label='Sender (ID)',
+    )
+    recipient_group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ContactGroup.objects.all(),
+        field_name='recipient__group',
+        label='Recipient Group (ID)',
+    )
+    recipient_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Contact.objects.all(),
+        field_name='recipient',
+        label='Recipient (ID)',
+    )
+    site_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Site.objects.all(),
+        field_name='location__site',
+        label='Site (ID)',
+    )
+    location_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Location.objects.all(),
+        field_name='location',
+        label='Location (ID)',
+    )
+    pickup_date = django_filters.DateFromToRangeFilter()
+    received_date = django_filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = Transfer
+        fields = ('id', 'name', 'shipping_number', 'status', 'sender')
+
+    def search(self, queryset, name, value):
+        query = (
+            Q(id__contains=value)
+            | Q(shipping_number__icontains=value)
+            | Q(name__icontains=value)
+            | Q(instructions__icontains=value)
+            | Q(sender__name__icontains=value)
+        )

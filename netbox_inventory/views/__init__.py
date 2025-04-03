@@ -9,3 +9,4 @@ from .inventoryitem_group import *
 from .inventoryitem_type import *
 from .purchase import *
 from .supplier import *
+from .transfer import *

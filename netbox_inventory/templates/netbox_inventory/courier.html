@@ -31,11 +31,9 @@
           </tr>
             <tr>
               <th scope="row">Transfers</th>
-              {% comment "TODO: Transfer model" %}
                 <td>
                   <a href="{% url 'plugins:netbox_inventory:transfer_list' %}?courier_id={{ object.pk }}">{{ transfer_count }}</a>
                 </td>
-              {% endcomment %}
             </tr>
         </table>
       </div>
@@ -51,10 +49,17 @@
   <div class="row mb-3">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Transfers</h5>
-        {% comment "TODO: Transfer model" %}
+        <h5 class="card-header">
+          Transfers
+          {% if perms.netbox_inventory.add_transfer %}
+            <div class="card-actions">
+              <a href="{% url 'plugins:netbox_inventory:transfer_add' %}?courier={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Transfer
+              </a>
+            </div>
+          {% endif %}
+        </h5>
           {% htmx_table 'plugins:netbox_inventory:transfer_list' courier_id=object.pk %}
-        {% endcomment %}
       </div>
       {% plugin_full_width_page object %}
     </div>
