@@ -142,7 +142,7 @@ class AuditFlowPageAssignment(
 
     flow = models.ForeignKey(
         AuditFlow,
-        related_name='+',
+        related_name='assigned_pages',
         on_delete=models.CASCADE,
     )
     page = models.ForeignKey(

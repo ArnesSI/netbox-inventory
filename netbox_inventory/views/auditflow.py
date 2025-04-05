@@ -1,3 +1,5 @@
+from django.db.models import QuerySet
+from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
@@ -35,10 +37,8 @@ class AuditFlowAssignedPagesView(generic.ObjectChildrenView):
         weight=1000,
     )
 
-    def get_children(self, request, parent):
-        return self.child_model.objects.restrict(request.user, 'view').filter(
-            flow=parent
-        )
+    def get_children(self, request: HttpRequest, parent: models.AuditFlow) -> QuerySet:
+        return parent.assigned_pages.restrict(request.user, 'view')
 
     def get_table(self, *args, **kwargs):
         table = super().get_table(*args, **kwargs)
