@@ -16,7 +16,7 @@ class BaseFlowModelTestCases:
                 **self.model_data,
             )
 
-        def test_object_filter_validation(self) -> None:
+        def test_clean_object_filter(self) -> None:
             # No error
             obj = self._get_flow_object()
             obj.object_filter = self.object_filter

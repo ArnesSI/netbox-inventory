@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from core.models import ObjectChange, ObjectType
+from dcim.models import Location, Rack, Site
 from netbox.models.features import (
     ChangeLoggingMixin,
     CloningMixin,
@@ -172,6 +173,18 @@ class AuditFlowPageAssignment(
             ),
         )
 
+    def clean(self) -> None:
+        super().clean()
+
+        # Validate that a page can actually be used for the specific flow by verifying
+        # that a filter lookup can be generated.
+        try:
+            self._get_filter_lookup()
+        except FieldError as e:
+            raise ValidationError(
+                {'page': _('Cannot use page for this flow: {error}').format(error=e)}
+            ) from e
+
     def __str__(self) -> str:
         return str(f'{self.flow} -> {self.page}')
 
@@ -182,3 +195,81 @@ class AuditFlowPageAssignment(
         objectchange = super().to_objectchange(action)
         objectchange.related_object = self.flow
         return objectchange
+
+    @staticmethod
+    def _get_lookup_paths(model: models.Model) -> list[tuple[models.Model, str | None]]:
+        """
+        Get a list of location lookup paths for `model`.
+
+        A model is bound to a specific type of location, e.g. a `Location`. However, an
+        `AuditFlow` might deal with an `object_type` in a higher hierarchy level. This
+        method will generate a list of possible relationships between these two objects,
+        even if there is no direct relationship.
+
+        For example, if objects are to be filtered by `Site` and there is no direct
+        relationship but only a `rack' field, objects can also be filtered by the `Site`
+        field of the `Rack`.
+
+
+        :param model: Model class used in `AuditFlow`.
+
+        :returns: A tuple of the related model and its required lookup suffix. The list
+            is returned from the most specific to the least specific field.
+        """
+        paths = [(model, None)]
+        if model == Location:
+            paths.append((Rack, 'location'))
+        elif model == Site:
+            paths.extend(
+                [
+                    (Location, 'site'),
+                    (Rack, 'site'),
+                ]
+            )
+
+        return paths
+
+    def _get_filter_lookup(self) -> str:
+        """
+        Get the field lookup needed to filter page objects in an `AuditFlow`.
+        """
+        flow_model = self.flow.object_type.model_class()
+        page_model = self.page.object_type.model_class()
+
+        lookup_paths = self._get_lookup_paths(flow_model)
+        related_models = {model for model, _ in lookup_paths}
+
+        # Get all applicable ForeignKey fields of the page object type that map directly
+        # or indirectly to the flow object type.
+        related_fields = {
+            field.related_model: field.name
+            for field in page_model._meta.fields
+            if (
+                isinstance(field, models.ForeignKey)
+                and field.related_model in related_models
+            )
+        }
+
+        # Iterate over possible lookup paths. Return the first applicable path with the
+        # highest precedence.
+        for model, suffix in lookup_paths:
+            lookup = related_fields.get(model)
+            if lookup:
+                if suffix:
+                    lookup += f'__{suffix}'
+                return lookup
+
+        raise FieldError(f'No relation between {page_model} and {flow_model}')
+
+    def get_objects(self, flow_start_object: models.Model) -> models.QuerySet:
+        """
+        Get audit objects for `flow_start_object`.
+
+        This method filters the `AuditFlowPage` objects restricted to the `AuditFlow`
+        location specified in `flow_start_object`.
+
+
+        :param flow_start_object: Object used to start the `AuditFlow`, e.g. a `Site`.
+        """
+        filter_name = self._get_filter_lookup()
+        return self.page.get_objects().filter(**{filter_name: flow_start_object})
