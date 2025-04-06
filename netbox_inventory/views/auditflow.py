@@ -1,9 +1,11 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
+from django.urls import resolve, reverse
 from django.utils.translation import gettext_lazy as _
 
 from netbox.views import generic
-from utilities.views import ViewTab, register_model_view
+from utilities.views import ViewTab, get_viewname, register_model_view
 
 from .. import filtersets, forms, models, tables
 
@@ -16,7 +18,13 @@ __all__ = (
     'AuditFlowBulkImportView',
     'AuditFlowBulkEditView',
     'AuditFlowBulkDeleteView',
+    'AuditFlowRunView',
 )
+
+
+#
+# Admin
+#
 
 
 @register_model_view(models.AuditFlow)
@@ -84,3 +92,61 @@ class AuditFlowBulkEditView(generic.BulkEditView):
 class AuditFlowBulkDeleteView(generic.BulkDeleteView):
     queryset = models.AuditFlow.objects.all()
     table = tables.AuditFlowTable
+
+
+#
+# Run
+#
+
+
+@register_model_view(models.AuditFlow, 'run')
+class AuditFlowRunView(generic.ObjectChildrenView):
+    """
+    Run an `AuditFlow` for a specific start object (e.g. a specific `Location`).
+    """
+
+    queryset = models.AuditFlow.objects.all()
+    template_name = 'netbox_inventory/auditflow_run.html'
+
+    def get_current_page(
+        self,
+        request: HttpRequest,
+        parent: models.AuditFlow,
+    ) -> models.AuditFlowPageAssignment:
+        """
+        Get the currently selected `AuditFlowPage` of the `AuditFlow` based on the `tab`
+        query parameter. Defaults to the first assigned page.
+        """
+        assignment_id = request.GET.get('tab')
+        if assignment_id:
+            return get_object_or_404(parent.assigned_pages, pk=assignment_id)
+        return parent.assigned_pages.first()
+
+    def get_children(self, request: HttpRequest, parent: models.AuditFlow) -> QuerySet:
+        # Each AuditFlowPage handles one specific object type. To support different
+        # types of objects with this view, dynamically retrieve the object type model
+        # and set class properties for use in other methods and templates.
+        page = self.get_current_page(request, parent)
+        self.tab = page.pk
+        self.child_model = page.page.object_type.model_class()
+
+        # Attributes related to displaying the list of child objects are copied from the
+        # object's list view. This allows reusing the existing logic and displaying the
+        # objects with the preferences defined by the user.
+        view = resolve(reverse(get_viewname(self.child_model, 'list'))).func.view_class
+        self.table = getattr(view, 'table', None)
+        self.filterset = getattr(view, 'filterset', None)
+
+        # Get the flow start object (e.g. a Site or Location) and limit the page object
+        # queryset to that limited audit location.
+        self.start_object = get_object_or_404(
+            parent.get_objects(),
+            pk=request.GET.get('object_id'),
+        )
+        return page.get_objects(self.start_object)
+
+    def get_extra_context(self, request: HttpRequest, parent: models.AuditFlow) -> dict:
+        return {
+            'flow_pages': parent.assigned_pages.all(),
+            'start_object': self.start_object,
+        }

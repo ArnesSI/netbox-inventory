@@ -1,6 +1,6 @@
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext_lazy as _
 
 from core.models import ObjectChange, ObjectType
@@ -12,6 +12,7 @@ from netbox.models.features import (
 )
 from utilities.query import dict_to_filter_params
 from utilities.querysets import RestrictedQuerySet
+from utilities.views import get_viewname
 
 from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
 from .mixins import NamedModel
@@ -95,7 +96,22 @@ class AuditFlowPage(BaseFlow):
     a specific type of object to be audited.
     """
 
-    pass
+    def clean(self):
+        super().clean()
+
+        # Validate that the object_type is usable when running the audit by verifying
+        # that a list view is available for its model class.
+        try:
+            model = self.object_type.model_class()
+            reverse(get_viewname(model, 'list'))
+        except NoReverseMatch as e:
+            raise ValidationError(
+                {
+                    'object_type': _(
+                        'Object type not supported: No list view for {model}'
+                    ).format(model=model)
+                }
+            ) from e
 
 
 class AuditFlow(BaseFlow):
@@ -261,15 +277,15 @@ class AuditFlowPageAssignment(
 
         raise FieldError(f'No relation between {page_model} and {flow_model}')
 
-    def get_objects(self, flow_start_object: models.Model) -> models.QuerySet:
+    def get_objects(self, start_object: models.Model) -> models.QuerySet:
         """
-        Get audit objects for `flow_start_object`.
+        Get audit objects for `start_object`.
 
         This method filters the `AuditFlowPage` objects restricted to the `AuditFlow`
-        location specified in `flow_start_object`.
+        location specified in `start_object`.
 
 
-        :param flow_start_object: Object used to start the `AuditFlow`, e.g. a `Site`.
+        :param start_object: Object used to start the `AuditFlow`, e.g. a `Site`.
         """
         filter_name = self._get_filter_lookup()
-        return self.page.get_objects().filter(**{filter_name: flow_start_object})
+        return self.page.get_objects().filter(**{filter_name: start_object})

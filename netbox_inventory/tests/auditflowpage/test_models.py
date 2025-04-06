@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from core.models import ObjectType
-from dcim.models import DeviceType, Manufacturer
+from dcim.models import DeviceType, InterfaceTemplate, Manufacturer
 
 from netbox_inventory.models import Asset, AuditFlowPage
 from netbox_inventory.models.audit import BaseFlow
@@ -91,3 +91,18 @@ class TestAuditFlowPageModel(BaseFlowModelTestCases.ObjectFilterTestCase):
         cls.object_filter = {
             'asset_tag': assets[0].asset_tag,
         }
+
+    def test_clean_object_type(self) -> None:
+        # No error
+        page1 = AuditFlowPage(
+            name='Page 1',
+            object_type=ObjectType.objects.get_for_model(Asset),
+        )
+        page1.full_clean()
+
+        # No list view
+        page2 = AuditFlowPage(
+            name='Page 1',
+            object_type=ObjectType.objects.get_for_model(InterfaceTemplate),
+        )
+        self.assertRaises(ValidationError, page2.full_clean)
