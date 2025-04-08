@@ -302,7 +302,7 @@ class AuditFlowRunButton(PluginTemplateExtension):
                 enabled=True,
                 pages__isnull=False,  # Filter flows with no pages assigned
             )
-            .restrict(request.user, 'view')
+            .restrict(request.user, 'run')
             .distinct()
         )
 

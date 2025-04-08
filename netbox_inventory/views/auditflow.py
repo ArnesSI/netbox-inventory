@@ -1,4 +1,5 @@
-from django.db.models import QuerySet
+from django.core.exceptions import PermissionDenied
+from django.db.models import Model, QuerySet
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.urls import resolve, reverse
@@ -108,6 +109,9 @@ class AuditFlowRunView(generic.ObjectChildrenView):
     queryset = models.AuditFlow.objects.all()
     template_name = 'netbox_inventory/auditflow_run.html'
 
+    def get_required_permission(self):
+        return 'netbox_inventory.run_auditflow'
+
     def get_current_page(
         self,
         request: HttpRequest,
@@ -121,6 +125,21 @@ class AuditFlowRunView(generic.ObjectChildrenView):
         if assignment_id:
             return get_object_or_404(parent.assigned_pages, pk=assignment_id)
         return parent.assigned_pages.first()
+
+    @staticmethod
+    def get_object_or_raise(
+        queryset: QuerySet,
+        request: HttpRequest,
+        **kwargs,
+    ) -> Model:
+        """
+        Get an object from `queryset` and raise exceptions either if the object can't be
+        found or if the `request` user doesn't have permissions to view the object.
+        """
+        obj = get_object_or_404(queryset, **kwargs)
+        if not queryset.restrict(request.user, 'view'):
+            raise PermissionDenied()
+        return obj
 
     def get_children(self, request: HttpRequest, parent: models.AuditFlow) -> QuerySet:
         # Each AuditFlowPage handles one specific object type. To support different
@@ -139,8 +158,9 @@ class AuditFlowRunView(generic.ObjectChildrenView):
 
         # Get the flow start object (e.g. a Site or Location) and limit the page object
         # queryset to that limited audit location.
-        self.start_object = get_object_or_404(
+        self.start_object = self.get_object_or_raise(
             parent.get_objects(),
+            request,
             pk=request.GET.get('object_id'),
         )
         return page.get_objects(self.start_object)

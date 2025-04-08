@@ -113,6 +113,8 @@ class AuditFlowViewTestCase(
 
     @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
     def test_auditflow_run(self):
+        self.add_permissions('netbox_inventory.run_auditflow')
+
         audit_flow = AuditFlow.objects.first()
         site = Site.objects.first()
 
@@ -129,7 +131,7 @@ class AuditFlowViewTestCase(
 class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
     user_permissions = [
         'dcim.view_site',
-        'netbox_inventory.view_auditflow',
+        'netbox_inventory.run_auditflow',
     ]
 
     def test_view_object_with_run_button(self):
