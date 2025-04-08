@@ -1,6 +1,6 @@
-# NetBox Inventory Plugin
+# NetBox Inventory Plus Plugin
 
-A [Netbox](https://github.com/netbox-community/netbox) plugin for hardware inventory.
+A fork of [NetBox Inventory](https://github.com/ArnesSI/netbox-inventory) that expands on the functionality of the core plugin.
 
 ## Features
 
@@ -29,6 +29,10 @@ of a certain type of hardware you still have spare.
 Inventory item groups can be nested, so you can for example model all pluggables
 as one top-level group with child groups for SFP+ modules, SFP28 modules and so
 on.
+
+### Focus on logistics
+NetBox Inventory Plus expands on the core functionality of NetBox Inventory with a focus on logistics. Create BOMs (Bills of Management) to define assets that are yet to be purchased. Couriers and Transfers are new models that can be used to define assets that are currently in transit between sites and locations in
+your organisation. 
 
 ### Automatic management of asset status
 
