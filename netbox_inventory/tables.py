@@ -607,6 +607,13 @@ class AuditFlowPageAssignmentTable(NetBoxTable):
         linkify=True,
     )
 
+    actions = columns.ActionsColumn(
+        actions=(
+            'edit',
+            'delete',
+        ),
+    )
+
     class Meta(NetBoxTable.Meta):
         model = AuditFlowPageAssignment
         fields = (
