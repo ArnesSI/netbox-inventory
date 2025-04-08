@@ -1,0 +1,12 @@
+{% extends 'generic/object_list.html' %}
+
+{% block title %}Bulk Assign Assets to {{ purchase_name }}{% endblock %}
+
+{% block bulk_buttons %}
+  <form method="post" action="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?purchase_id={{ purchase_id }}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      Assign Assets to Purchase {{ purchase_name }}
+    </button>
+  </form>
+{% endblock %}

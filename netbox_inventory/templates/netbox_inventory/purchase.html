@@ -84,9 +84,9 @@
           Deliveries
           {% if perms.netbox_inventory.add_delivery %}
             <div class="card-actions">
-              <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+              <a href="{% url 'plugins:netbox_inventory:delivery_add' %}?purchases={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
                 <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Delivery
-              </a>
+            </a>
             </div>
           {% endif %}
         </h5>
@@ -98,7 +98,10 @@
           {% if perms.netbox_inventory.add_asset %}
             <div class="card-actions">
               <a href="{% url 'plugins:netbox_inventory:asset_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
-                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add an Asset
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add New Asset
+              </a>
+              <a href="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?purchase_id={{ object.pk }}&purchase_name={{ object.name }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i> Bulk Assign Assets
               </a>
             </div>
           {% endif %}

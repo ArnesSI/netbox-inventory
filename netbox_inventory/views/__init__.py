@@ -1,4 +1,5 @@
 from .asset import *
+from .asset_bulk_assign import *
 from .asset_assign import *
 from .asset_create import *
 from .asset_reassign import *

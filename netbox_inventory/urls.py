@@ -37,6 +37,10 @@ urlpatterns = (
         views.AssetAssignView.as_view(),
         name='asset_assign',
     ),
+    path('assets/bulk-assign/',
+        views.AssetBulkAssignView.as_view(),
+        name='asset_bulk_assign'
+    ),
     path(
         'assets/device/create/',
         views.AssetDeviceCreateView.as_view(),
