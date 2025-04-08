@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import ObjectChange, ObjectType
 from dcim.models import Location, Rack, Site
+from netbox.models import NestedGroupModel
 from netbox.models.features import (
     ChangeLoggingMixin,
     CloningMixin,
@@ -277,7 +278,10 @@ class AuditFlowPageAssignment(
 
         raise FieldError(f'No relation between {page_model} and {flow_model}')
 
-    def get_objects(self, start_object: models.Model) -> models.QuerySet:
+    def get_objects(
+        self,
+        start_object: models.Model | NestedGroupModel,
+    ) -> models.QuerySet:
         """
         Get audit objects for `start_object`.
 
@@ -288,4 +292,12 @@ class AuditFlowPageAssignment(
         :param start_object: Object used to start the `AuditFlow`, e.g. a `Site`.
         """
         filter_name = self._get_filter_lookup()
+
+        # If the start object supports nesting, child locations are also searched to
+        # allow easy auditing even if a specific location is subdivided into
+        # sub-locations.
+        if isinstance(start_object, NestedGroupModel):
+            filter_name += '__in'
+            start_object = start_object.get_descendants(include_self=True)
+
         return self.page.get_objects().filter(**{filter_name: start_object})

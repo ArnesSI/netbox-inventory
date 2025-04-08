@@ -76,7 +76,7 @@ class TestAuditFlowPageAssignmentModel(TestCase):
         )
         self.assertEqual(obj.get_objects(self.locations[0]).model, Asset)
 
-    def test_get_objects_filter(self) -> None:
+    def test_get_objects_location(self) -> None:
         manufacturer = Manufacturer.objects.create(
             name='manufacturer 1',
             slug='manufacturer-1',
@@ -112,3 +112,55 @@ class TestAuditFlowPageAssignmentModel(TestCase):
         ).get_objects(location)
         self.assertEqual(objects.count(), 1)
         self.assertEqual(objects.first().storage_location, location)
+
+    def test_get_objects_nested(self) -> None:
+        manufacturer = Manufacturer.objects.create(
+            name='manufacturer 1',
+            slug='manufacturer-1',
+        )
+        device_type = DeviceType.objects.create(
+            manufacturer=manufacturer,
+            model='DeviceType 1',
+            slug='devicetype-1',
+        )
+
+        parent_location = self.locations[0]
+        child_location = Location(
+            site=parent_location.site,
+            name='Child Location 1',
+            slug='child-location-1',
+            status='active',
+            parent=parent_location,
+        )
+        child_location.full_clean()
+        child_location.save()
+
+        assets = (
+            Asset(
+                asset_tag='asset1',
+                serial='asset1',
+                status='stored',
+                device_type=device_type,
+                storage_location=parent_location,
+            ),
+            Asset(
+                asset_tag='asset2',
+                serial='asset2',
+                status='stored',
+                device_type=device_type,
+                storage_location=child_location,
+            ),
+        )
+        Asset.objects.bulk_create(assets)
+
+        objects = (
+            AuditFlowPageAssignment(
+                flow=self.audit_flows[0],
+                page=self.audit_flow_pages[0],
+            )
+            .get_objects(parent_location)
+            .order_by('pk')
+        )
+        self.assertEqual(objects.count(), 2)
+        self.assertEqual(objects[0].storage_location, parent_location)
+        self.assertEqual(objects[1].storage_location, child_location)
