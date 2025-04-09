@@ -1,12 +1,12 @@
 {% extends 'generic/object_list.html' %}
 
-{% block title %}Bulk Assign Assets to {{ related_name }}{% endblock %}
+{% block title %}Bulk Assign Deliveries to {{ related_name }}{% endblock %}
 
 {% block bulk_buttons %}
   <form method="post" action="?related_type={{ related_type }}&related_id={{ related_id }}">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">
-      Assign Assets to {{ related_name }}
+      Assign Deliveries to {{ related_name }}
     </button>
   </form>
 {% endblock %}

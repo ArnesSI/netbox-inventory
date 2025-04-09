@@ -108,6 +108,10 @@ urlpatterns = (
         'purchases/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'purchase')),
     ),
+    path('purchases/bulk-assign/',
+        views.PurchaseBulkAssignView.as_view(),
+        name='purchase_bulk_assign'
+    ),
     # Deliveries
     path(
         'deliveries/',
@@ -116,6 +120,10 @@ urlpatterns = (
     path(
         'deliveries/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'delivery')),
+    ),
+    path('deliveries/bulk-assign/',
+        views.DeliveryBulkAssignView.as_view(),
+        name='delivery_bulk_assign'
     ),
     # Couriers
     path(
