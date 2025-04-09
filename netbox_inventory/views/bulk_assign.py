@@ -18,7 +18,7 @@ __all__ = (
 class GenericBulkAssignView(generic.ObjectListView):
     queryset = None  
     table = None  
-    template_name = None  
+    template_name = 'netbox_inventory/bulk_assign.html'  
     related_mapping = {}
     """
     related_mapping is represnted as a dict, and should be formatted as:
@@ -81,27 +81,39 @@ class GenericBulkAssignView(generic.ObjectListView):
 class AssetBulkAssignView(GenericBulkAssignView):
     queryset = models.Asset.objects.all()
     table = tables.AssetTable
-    template_name = 'netbox_inventory/asset_bulk_assign.html'
     related_mapping = {
         'bom': (models.BOM, 'bom'),
         'delivery': (models.Delivery, 'delivery'),
         'purchase': (models.Purchase, 'purchase'),
     }
 
+    def get_extra_context(self, request):
+        context = super().get_extra_context(request)
+        context['object_type_plural'] = 'assets'
+        return context
+
 
 class DeliveryBulkAssignView(GenericBulkAssignView):
     queryset = models.Delivery.objects.all()
     table = tables.DeliveryTable
-    template_name = 'netbox_inventory/delivery_bulk_assign.html'
     related_mapping = {
         'purchase': (models.Purchase, 'purchases'),
     }
+
+    def get_extra_context(self, request):
+        context = super().get_extra_context(request)
+        context['object_type_plural'] = 'deliveries'
+        return context
 
 
 class PurchaseBulkAssignView(GenericBulkAssignView):
     queryset = models.Purchase.objects.all()
     table = tables.PurchaseTable
-    template_name = 'netbox_inventory/purchase_bulk_assign.html'
     related_mapping = {
         'bom': (models.BOM, 'boms'),
     }
+
+    def get_extra_context(self, request):
+        context = super().get_extra_context(request)
+        context['object_type_plural'] = 'purchases'
+        return context
