@@ -29,7 +29,7 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'asset', detail=False)),
     ),
     path('assets/bulk-assign/',
-        views.AssetBulkAssignView.as_view(),
+        views.AssignToAssetView.as_view(),
         name='asset_bulk_assign'
     ),
     path(
@@ -97,7 +97,7 @@ urlpatterns = (
     ),
     path(
         'boms/bulk-assign/',
-        views.BOMBulkAssignView.as_view(),
+        views.AssignBOMsToPurchaseView.as_view(),
         name='bom_bulk_assign',
     ),
     path(
@@ -110,7 +110,7 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'purchase', detail=False)),
     ),
     path('purchases/bulk-assign/',
-        views.PurchaseBulkAssignView.as_view(),
+        views.AssignToPurchaseView.as_view(),
         name='purchase_bulk_assign'
     ),
     path(
@@ -128,11 +128,11 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'delivery', detail=False)),
     ),
     path('deliveries/bulk-assign/',
-        views.DeliveryBulkAssignView.as_view(),
+        views.AssignToDeliveryView.as_view(),
         name='delivery_bulk_assign'
     ),
     path('deliveries/bulk-assign-purchases/',
-        views.DeliveryBulkAssignPurchasesView.as_view(),
+        views.AssignPurchasesToDeliveryView.as_view(),
         name='delivery_bulk_assign_purchases'
     ),
     path(

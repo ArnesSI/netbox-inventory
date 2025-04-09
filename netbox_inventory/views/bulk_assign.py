@@ -8,19 +8,24 @@ from netbox.views import generic
 from .. import models, tables
 
 __all__ = (
-    'GenericBulkAssignView',
-    'GenericBulkAssignNoFieldView',
-    'AssetBulkAssignView',
-    'BOMBulkAssignView',
-    'DeliveryBulkAssignView',
-    'DeliveryBulkAssignPurchasesView',
-    'PurchaseBulkAssignView',
+    'BulkAssignView',
+    'BulkAssignRelatedView',
+    'AssignToAssetView',
+    'AssignToDeliveryView',
+    'AssignToPurchaseView',
+    'AssignBOMsToPurchaseView',
+    'AssignPurchasesToDeliveryView',
 )
 
 
-class GenericBulkAssignView(generic.ObjectListView):
+#
+# Generic Bulk Assign Views
+#
+
+class BulkAssignView(generic.ObjectListView):
     """
-    A template view for bulk assignment of objects that have a corresponding field.
+    A generic view for bulk assignment of objects where the corresponding field exists
+    on the target object.
     """   
     queryset = None  
     table = None  
@@ -66,9 +71,6 @@ class GenericBulkAssignView(generic.ObjectListView):
         except ValueError:
             messages.error(request, f"Invalid related type: {related_type}.")
             return redirect(error_redirect_path)
-        
-        try:
-            related_instance = related_model.objects.get(pk=related_id)
         except related_model.DoesNotExist:
             messages.error(request, f"Related object with ID {related_id} does not exist.")
             return redirect(error_redirect_path)
@@ -90,10 +92,11 @@ class GenericBulkAssignView(generic.ObjectListView):
         return redirect(reverse(f'plugins:netbox_inventory:{related_type}', args=[related_id]))
     
 
-class GenericBulkAssignNoFieldView(GenericBulkAssignView):
+class BulkAssignRelatedView(BulkAssignView):
     """
-    A template view for bulk assignment of objects that do not have a corresponding field.
-    """   
+    A generic view for bulk assignment of objects where the corresponding field does not
+    exist on the target object, and instead exists on the source object.
+    """     
     def post(self, request, *args, **kwargs):
         related_type = request.GET.get('related_type')
         related_id = request.GET.get('related_id')
@@ -119,7 +122,11 @@ class GenericBulkAssignNoFieldView(GenericBulkAssignView):
         return redirect(related_instance.get_absolute_url())
     
 
-class AssetBulkAssignView(GenericBulkAssignView):
+#
+# Bulk Assign Views
+#
+
+class AssignToAssetView(BulkAssignView):
     queryset = models.Asset.objects.all()
     table = tables.AssetTable
     related_mapping = {
@@ -134,20 +141,8 @@ class AssetBulkAssignView(GenericBulkAssignView):
         return context
     
 
-class BOMBulkAssignView(GenericBulkAssignNoFieldView):
-    queryset = models.BOM.objects.all()
-    table = tables.BOMTable
-    related_mapping = {
-        'purchase': (models.Purchase, 'boms'), 
-    }
 
-    def get_extra_context(self, request):
-        context = super().get_extra_context(request)
-        context['object_type_plural'] = 'BOMs'
-        return context
-
-
-class DeliveryBulkAssignView(GenericBulkAssignView):
+class AssignToDeliveryView(BulkAssignView):
     queryset = models.Delivery.objects.all()
     table = tables.DeliveryTable
     related_mapping = {
@@ -160,24 +155,41 @@ class DeliveryBulkAssignView(GenericBulkAssignView):
         return context
 
 
-class DeliveryBulkAssignPurchasesView(GenericBulkAssignNoFieldView):
+class AssignToPurchaseView(BulkAssignView):
     queryset = models.Purchase.objects.all()
     table = tables.PurchaseTable
     related_mapping = {
-        'delivery': (models.Delivery, 'purchases'), 
+        'bom': (models.BOM, 'boms'),
     }
 
     def get_extra_context(self, request):
         context = super().get_extra_context(request)
         context['object_type_plural'] = 'purchases'
         return context
+    
 
+#
+# Bulk Assign Related Views
+#
 
-class PurchaseBulkAssignView(GenericBulkAssignView):
+class AssignBOMsToPurchaseView(BulkAssignRelatedView):
+    queryset = models.BOM.objects.all()
+    table = tables.BOMTable
+    related_mapping = {
+        'purchase': (models.Purchase, 'boms'), 
+    }
+
+    def get_extra_context(self, request):
+        context = super().get_extra_context(request)
+        context['object_type_plural'] = 'BOMs'
+        return context
+    
+
+class AssignPurchasesToDeliveryView(BulkAssignRelatedView):
     queryset = models.Purchase.objects.all()
     table = tables.PurchaseTable
     related_mapping = {
-        'bom': (models.BOM, 'boms'),
+        'delivery': (models.Delivery, 'purchases'), 
     }
 
     def get_extra_context(self, request):
