@@ -69,13 +69,16 @@
       <div class="card">
         <h5 class="card-header">
           BOMs
-          <!-- {% if perms.netbox_inventory.add_bom %}
+          {% if perms.netbox_inventory.add_bom %}
             <div class="card-actions">
-              <a href="{% url 'plugins:netbox_inventory:bom_add' %}?purchase={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
-                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a BOM
+              <a href="{% url 'plugins:netbox_inventory:purchase_create_bom' purchase_id=object.pk %}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add New BOM
+              </a>
+              <a href="{% url 'plugins:netbox_inventory:bom_bulk_assign' %}?related_type=purchase&related_id={{ object.pk }}&related_name={{ object.name }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i> Bulk Assign BOMs
               </a>
             </div>
-          {% endif %} -->
+          {% endif %}
         </h5>
         {% htmx_table 'plugins:netbox_inventory:bom_list' purchase_id=object.pk %}
       </div>
