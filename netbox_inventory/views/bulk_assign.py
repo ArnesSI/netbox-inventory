@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from netbox.views import generic
 
-from .. import models, tables
+from .. import filtersets, models, tables
 
 __all__ = (
     'BulkAssignView',
@@ -129,6 +129,7 @@ class BulkAssignRelatedView(BulkAssignView):
 class AssignToAssetView(BulkAssignView):
     queryset = models.Asset.objects.all()
     table = tables.AssetTable
+    filterset = filtersets.AssetFilterSet
     related_mapping = {
         'bom': (models.BOM, 'bom'),
         'delivery': (models.Delivery, 'delivery'),
@@ -145,6 +146,7 @@ class AssignToAssetView(BulkAssignView):
 class AssignToDeliveryView(BulkAssignView):
     queryset = models.Delivery.objects.all()
     table = tables.DeliveryTable
+    filterset = filtersets.DeliveryFilterSet
     related_mapping = {
         'purchase': (models.Purchase, 'purchases'),
     }
@@ -158,6 +160,7 @@ class AssignToDeliveryView(BulkAssignView):
 class AssignToPurchaseView(BulkAssignView):
     queryset = models.Purchase.objects.all()
     table = tables.PurchaseTable
+    filterset = filtersets.PurchaseFilterSet
     related_mapping = {
         'bom': (models.BOM, 'boms'),
     }
@@ -175,6 +178,7 @@ class AssignToPurchaseView(BulkAssignView):
 class AssignBOMsToPurchaseView(BulkAssignRelatedView):
     queryset = models.BOM.objects.all()
     table = tables.BOMTable
+    filterset = filtersets.BOMFilterSet
     related_mapping = {
         'purchase': (models.Purchase, 'boms'), 
     }
@@ -188,6 +192,7 @@ class AssignBOMsToPurchaseView(BulkAssignRelatedView):
 class AssignPurchasesToDeliveryView(BulkAssignRelatedView):
     queryset = models.Purchase.objects.all()
     table = tables.PurchaseTable
+    filterset = filtersets.PurchaseFilterSet
     related_mapping = {
         'delivery': (models.Delivery, 'purchases'), 
     }
