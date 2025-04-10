@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Q
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
@@ -80,3 +81,15 @@ def handle_delivery_purchase_change(instance, created, **kwargs):
 
         for purchase in instance.purchases.all():
             Asset.objects.filter(delivery=instance).update(purchase=purchase)
+
+@receiver(post_save, sender=Asset)
+def close_bom_if_all_assets_delivered(instance, **kwargs):
+    """
+    Close BOM if all Assets are delivered.
+    """
+    if instance.bom:
+        all_assets_delivered = not instance.bom.assets.filter(Q(delivery__isnull=True)).exists()
+        if all_assets_delivered:
+            instance.bom.status = 'closed'
+            instance.bom.save()
+            logger.info(f"BOM {instance.bom} marked as 'Closed' because all associated assets are delivered.")
