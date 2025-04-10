@@ -38,6 +38,7 @@ class BOMStatusChoices(ChoiceSet):
     CHOICES = [
         ('planned', 'Planned', 'orange'),
         ('quoted', 'Quoted', 'cyan'),
+        ('closed', 'Closed', 'green'),
     ]
 
 
