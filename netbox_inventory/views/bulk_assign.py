@@ -134,6 +134,7 @@ class AssignToAssetView(BulkAssignView):
         'bom': (models.BOM, 'bom'),
         'delivery': (models.Delivery, 'delivery'),
         'purchase': (models.Purchase, 'purchase'),
+        'transfer': (models.Transfer, 'transfer'),
     }
 
     def get_extra_context(self, request):

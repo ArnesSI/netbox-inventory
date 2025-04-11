@@ -156,10 +156,12 @@ class Transfer(NetBoxModel):
         return TransferStatusChoices.colors.get(self.status)
 
     def __str__(self):
+        if self.name:
+            return self.name
         if self.shipping_number:
-            return self.shipping_number
+            return f'{self.shipping_number} (id:{self.id})'
         else:
-            return f'{self.name} (id:{self.id})'
+            return f'(id:{self.id})'
 
     class Meta:
         ordering = (
