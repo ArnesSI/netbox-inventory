@@ -112,8 +112,8 @@ class AuditFlowRunView(generic.ObjectChildrenView):
     def get_required_permission(self):
         return 'netbox_inventory.run_auditflow'
 
+    @staticmethod
     def get_current_page(
-        self,
         request: HttpRequest,
         parent: models.AuditFlow,
     ) -> models.AuditFlowPageAssignment:
