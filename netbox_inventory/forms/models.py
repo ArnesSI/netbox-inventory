@@ -255,7 +255,7 @@ class AssetForm(NetBoxModelForm):
         delivery = self.cleaned_data['delivery']
         purchase = self.cleaned_data['purchase']
         if delivery and not purchase:
-            self.cleaned_data['purchase'] = delivery.purchase
+            self.cleaned_data['purchase'] = delivery.purchases.first()
 
 
 class SupplierForm(NetBoxModelForm):
