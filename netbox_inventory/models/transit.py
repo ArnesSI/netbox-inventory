@@ -1,10 +1,12 @@
 from django.db import models
+from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 
 from ..choices import TransferStatusChoices
+from ..models import Asset
 
 
 class Courier(NetBoxModel, ContactsMixin):
@@ -148,6 +150,26 @@ class Transfer(NetBoxModel):
         'received_date',
         'comments',
     ]
+
+    def clean(self):
+        self.validate_dates()
+        return super().clean()
+    
+    def validate_dates(self):
+        """
+        Ensure that the received_date is after the pickup_date.
+        """
+        if self.pickup_date and self.received_date:
+            if self.received_date < self.pickup_date:
+                raise ValidationError({
+                    'received_date': 'Received date must be after pickup date.',
+                })
+
+    def get_assets(self):
+        """
+        Return all assets that are part of this transfer.
+        """
+        return Asset.objects.filter(transfer_id=self.pk)
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:transfer', args=[self.pk])

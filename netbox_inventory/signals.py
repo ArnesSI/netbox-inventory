@@ -7,7 +7,8 @@ from django.dispatch import receiver
 from dcim.models import Device, InventoryItem, Module, Rack
 from utilities.exceptions import AbortRequest
 
-from .models import Asset, Delivery
+from .choices import AssetStatusChoices
+from .models import Asset, Delivery, Transfer
 from .utils import get_plugin_setting, get_status_for, is_equal_none
 
 logger = logging.getLogger('netbox.netbox_inventory.signals')
@@ -82,6 +83,7 @@ def handle_delivery_purchase_change(instance, created, **kwargs):
         for purchase in instance.purchases.all():
             Asset.objects.filter(delivery=instance).update(purchase=purchase)
 
+
 @receiver(post_save, sender=Asset)
 def close_bom_if_all_assets_delivered(instance, **kwargs):
     """
@@ -93,3 +95,18 @@ def close_bom_if_all_assets_delivered(instance, **kwargs):
             instance.bom.status = 'closed'
             instance.bom.save()
             logger.info(f"BOM {instance.bom} marked as 'Closed' because all associated assets are delivered.")
+
+
+@receiver(post_save, sender=Transfer)
+def update_assets_status_on_pickup(instance, **kwargs):
+    """
+    Update the status of all transferred Assets to 'In Transit' when the pickup_date is set.
+    """
+    transit_status = get_status_for('transit')
+    stored_status = get_status_for('stored')
+    assets_to_update = instance.get_assets()
+
+    if instance.pickup_date and not instance.received_date:
+        assets_to_update.update(status=transit_status)
+    else:
+        assets_to_update.update(status=stored_status)
