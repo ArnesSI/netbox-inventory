@@ -43,6 +43,10 @@ class AssetCreateMixin:
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial[kind_type] = asset.hardware_type.id
+            
+            if asset.storage_location and asset.storage_location.site:
+                self.initial['site'] = asset.storage_location.site
+                self.initial['location'] = asset.storage_location
 
             ignored_fields = get_plugin_setting('asset_sync_ignored_custom_fields')
             for field_name, value in asset.custom_field_data.items():

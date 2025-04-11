@@ -61,7 +61,7 @@
             <th scope="row" title="Where is this asset stored when not in use">Storage Location</th>
             <td>
               {% if object.storage_location %}
-                {{ object.storage_location.site }} /
+                {{ object.storage_location.site|linkify|placeholder }} /
               {% endif %}
               {{ object.storage_location|linkify|placeholder }}</td>
           </tr>
