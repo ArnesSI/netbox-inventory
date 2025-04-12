@@ -137,7 +137,7 @@ class AuditFlowRunView(generic.ObjectChildrenView):
         found or if the `request` user doesn't have permissions to view the object.
         """
         obj = get_object_or_404(queryset, **kwargs)
-        if not queryset.restrict(request.user, 'view'):
+        if not queryset.restrict(request.user, 'view').contains(obj):
             raise PermissionDenied()
         return obj
 
