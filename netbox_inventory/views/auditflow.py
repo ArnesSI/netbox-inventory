@@ -309,7 +309,7 @@ class AuditFlowRunView(generic.ObjectChildrenView):
 
     def get_extra_context(self, request: HttpRequest, parent: models.AuditFlow) -> dict:
         return {
-            'flow_pages': parent.assigned_pages.all(),
+            'flow_pages': parent.assigned_pages.prefetch_related('page'),
             'start_object': self.start_object,
             'buttons': self.get_buttons(),
         }
