@@ -97,6 +97,10 @@ class AuditFlowPage(BaseFlow):
     a specific type of object to be audited.
     """
 
+    class Meta(BaseFlow.Meta):
+        verbose_name = _('audit flow page')
+        verbose_name_plural = _('audit flow pages')
+
     def clean(self):
         super().clean()
 
@@ -148,6 +152,10 @@ class AuditFlow(BaseFlow):
         'enabled',
     )
 
+    class Meta(BaseFlow.Meta):
+        verbose_name = _('audit flow')
+        verbose_name_plural = _('audit flows')
+
 
 class AuditFlowPageAssignment(
     ChangeLoggingMixin,
@@ -189,6 +197,8 @@ class AuditFlowPageAssignment(
                 name='%(app_label)s_%(class)s_unique_flow_page',
             ),
         )
+        verbose_name = _('audit flow page assignment')
+        verbose_name_plural = _('audit flow page assignments')
 
     def clean(self) -> None:
         super().clean()
