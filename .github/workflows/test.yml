@@ -1,5 +1,9 @@
 name: Run tests under netbox
-on: [push]
+
+on:
+  - push
+  - pull_request
+
 jobs:
   test-netbox:
     runs-on: ubuntu-latest
