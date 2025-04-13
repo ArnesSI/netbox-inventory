@@ -66,6 +66,15 @@ to assets, it can be used to audit any object managed in NetBox.
   pages and their defined NetBox objects, restricted to the location for which the flow
   is running.
 
+#### Required Permissions
+
+To run an audit flow, users need the `run` permission on the specific audit flow object.
+View permissions are also required for the object from which the audit flow is initiated
+(e.g. the `Site` or `Location`).
+
+Audited objects within the audit flow can be viewed without additional permissions.
+However, permissions are required to add, edit, or delete audited objects.
+
 ## Compatibility
 
 This plugin requires netbox version 4.1 to work. Older versions of the plugin
