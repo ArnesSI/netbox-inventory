@@ -1,5 +1,6 @@
 {% extends 'generic/object_children.html' %}
 {% load helpers %}
+{% load perms %}
 
 {% block subtitle %}{% endblock subtitle %}
 
@@ -18,7 +19,11 @@
   {% endwith %}
 {% endblock breadcrumbs %}
 
-{% block controls %}{% endblock %}
+{% block controls %}
+  {% if request.user|can_add:child_model %}
+    {% include "netbox_inventory/inc/buttons/auditflow_add_object.html" %}
+  {% endif %}
+{% endblock %}
 
 {% block tabs %}
   <ul class="nav nav-tabs" role="tablist">

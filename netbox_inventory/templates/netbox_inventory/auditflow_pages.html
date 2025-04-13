@@ -6,7 +6,8 @@
   {% if perms.netbox_inventory.add_auditflowpageassignment %}
     {% with viewname=object|viewname:"pages" %}
       <a href="{% url 'plugins:netbox_inventory:auditflowpageassignment_add' %}?flow={{ object.pk }}&return_url={% url viewname pk=object.pk %}" class="btn btn-primary">
-        <i class="mdi mdi-plus-thick" aria-hidden="true"></i> {% trans "Assign page" %}
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
+        {% trans "Assign page" %}
       </a>
     {% endwith %}
   {% endif %}

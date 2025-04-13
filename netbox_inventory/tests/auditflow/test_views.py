@@ -1,8 +1,9 @@
+from django.db.models import Model
 from django.test import override_settings
 from django.urls import reverse
 
 from core.models import ObjectType
-from dcim.models import Site
+from dcim.models import DeviceType, Manufacturer, Site
 from utilities.object_types import object_type_identifier
 from utilities.testing import TestCase, ViewTestCases
 
@@ -15,7 +16,7 @@ from netbox_inventory.models import (
 from netbox_inventory.tests.custom import ModelViewTestCase
 
 
-class AuditFlowTestDataMixin:
+class AuditFlowTestDataMixin(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.sites = (
@@ -61,6 +62,18 @@ class AuditFlowTestDataMixin:
             AuditFlowPageAssignment(flow=audit_flows[0], page=audit_flow_pages[2]),
         )
         AuditFlowPageAssignment.objects.bulk_create(audit_flow_page_assignments)
+
+    def _run_audit_flow(self, audit_flow: AuditFlow, start_object: Model):
+        response = self.client.get(
+            reverse(
+                'plugins:netbox_inventory:auditflow_run',
+                kwargs={'pk': audit_flow.pk},
+            )
+            + f'?object_id={start_object.pk}'
+        )
+
+        self.assertHttpStatus(response, 200)
+        return response
 
 
 class AuditFlowViewTestCase(
@@ -115,17 +128,7 @@ class AuditFlowViewTestCase(
     def test_auditflow_run(self):
         self.add_permissions('netbox_inventory.run_auditflow')
 
-        audit_flow = AuditFlow.objects.first()
-        site = Site.objects.first()
-
-        url = (
-            reverse(
-                'plugins:netbox_inventory:auditflow_run',
-                kwargs={'pk': audit_flow.pk},
-            )
-            + f'?object_id={site.pk}'
-        )
-        self.assertHttpStatus(self.client.get(url), 200)
+        self._run_audit_flow(AuditFlow.objects.first(), Site.objects.first())
 
 
 class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
@@ -134,7 +137,7 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
         'netbox_inventory.run_auditflow',
     ]
 
-    def test_view_object_with_run_button(self):
+    def test_view_object_with_run_button(self) -> None:
         sites = Site.objects.order_by('name')
         audit_flow = AuditFlow.objects.first()
 
@@ -144,7 +147,7 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
 
         # Site 1: with button
         response = self.client.get(sites[0].get_absolute_url(), follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertHttpStatus(response, 200)
         self.assertIn(
             f'/audit-flows/{audit_flow.pk}/run/?object_id={sites[0].pk}',
             str(response.content),
@@ -152,8 +155,83 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
 
         # Site 2: No button displayed
         response = self.client.get(sites[1].get_absolute_url(), follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertHttpStatus(response, 200)
         self.assertNotIn(
             f'/audit-flows/{audit_flow.pk}/run/',
             str(response.content),
         )
+
+    def test_add_object_button_hidden_if_no_permission(self) -> None:
+        response = self._run_audit_flow(AuditFlow.objects.first(), Site.objects.first())
+
+        # User has no permissions to add Asset.
+        self.assertNotIn(
+            reverse('plugins:netbox_inventory:asset_add'),
+            str(response.content),
+        )
+
+    def test_add_object_button_params_location(self) -> None:
+        self.add_permissions('netbox_inventory.add_asset')
+
+        audit_flow = AuditFlow.objects.first()
+        for site in Site.objects.all():
+            with self.subTest(site=site.name):
+                response = self._run_audit_flow(audit_flow, site)
+
+                # Generic add button for Asset has site field pre-populated.
+                self.assertIn(
+                    f'storage_site={site.pk}',
+                    str(response.content),
+                )
+
+    def test_add_object_button_params_variants(self, num_links: int = 4) -> None:
+        self.add_permissions('netbox_inventory.add_asset')
+
+        audit_flow = AuditFlow.objects.first()
+
+        audit_flow_page: AuditFlowPage = audit_flow.pages.first()
+        audit_flow_page.object_filter = {
+            'status__in': ['stored', 'used', 'retired'],
+            'device_type__manufacturer__name': 'Manufacturer 1',  # 1 option
+            'device_type__model__startswith': 'DeviceType',  # 2 options
+        }
+        audit_flow_page.full_clean()
+        audit_flow_page.save()
+
+        # 4 options: 3 (status) + 1 (generic), no choices for device_type available
+        response = self._run_audit_flow(audit_flow, Site.objects.first())
+        self.assertEqual(
+            str(response.content).count(reverse('plugins:netbox_inventory:asset_add')),
+            num_links,
+        )
+
+    def test_add_object_button_params_variants_related_objects(self) -> None:
+        manufacturer = Manufacturer.objects.create(
+            name='Manufacturer 1',
+            slug='manufacturer-1',
+        )
+
+        # 4 options: No increase as just one choice of Manufacturer
+        self.test_add_object_button_params_variants()
+
+        device_types = (
+            DeviceType(
+                manufacturer=manufacturer,
+                model='DeviceType 1',
+                slug='devicetype-1',
+            ),
+            DeviceType(
+                manufacturer=manufacturer,
+                model='DeviceType 2',
+                slug='devicetype-2',
+            ),
+            DeviceType(
+                manufacturer=manufacturer,
+                model='Foo',  # Ignored by object_filter
+                slug='foo',
+            ),
+        )
+        DeviceType.objects.bulk_create(device_types)
+
+        # 7 options: 3 (status) * 1 (manufacturer) * 2 (device type) + 1 generic
+        self.test_add_object_button_params_variants(num_links=7)
