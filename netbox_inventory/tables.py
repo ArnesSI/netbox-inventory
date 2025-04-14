@@ -477,7 +477,7 @@ class BOMTable(NetBoxTable):
     status = columns.ChoiceFieldColumn()
     asset_count = columns.LinkedCountColumn(
         viewname='plugins:netbox_inventory:asset_list',
-        url_params={'purchase_id': 'pk'},
+        url_params={'bom_id': 'pk'},
         verbose_name='Assets',
     )
     comments = columns.MarkdownColumn()

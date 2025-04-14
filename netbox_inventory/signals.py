@@ -116,3 +116,19 @@ def update_assets_status_on_pickup(instance, **kwargs):
             status=stored_status,
             storage_location=instance.location
         )
+
+@receiver(post_save, sender=Asset)
+def update_asset_status(instance, **kwargs):
+    planned_status = get_status_for('planned')
+    ordered_status = get_status_for('ordered')
+    stored_status = get_status_for('stored')
+
+    if instance.purchase and instance.delivery:
+        new_status = stored_status
+    elif instance.purchase and not instance.delivery:
+        new_status = ordered_status
+    else:
+        new_status = planned_status
+
+    if instance.status != new_status:
+        Asset.objects.filter(pk=instance.pk).update(status=new_status)
