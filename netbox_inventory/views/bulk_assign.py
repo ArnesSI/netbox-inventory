@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.db.models import ForeignKey, ManyToManyField
 from django.shortcuts import redirect
 from django.urls import reverse
+from utilities.query import count_related
 
 from netbox.views import generic
 
@@ -127,7 +128,22 @@ class BulkAssignRelatedView(BulkAssignView):
 #
 
 class AssignToAssetView(BulkAssignView):
-    queryset = models.Asset.objects.all()
+    queryset = models.Asset.objects.prefetch_related(
+        'device_type__manufacturer',
+        'module_type__manufacturer',
+        'inventoryitem_type__manufacturer',
+        'rack_type__manufacturer',
+        'device__role',
+        'module__module_bay',
+        'module__module_type',
+        'inventoryitem__role',
+        'rack__role',
+        'owner',
+        'bom',
+        'purchase__supplier',
+        'delivery',
+        'storage_location',
+    )
     table = tables.AssetTable
     filterset = filtersets.AssetFilterSet
     related_mapping = {
@@ -145,7 +161,9 @@ class AssignToAssetView(BulkAssignView):
 
 
 class AssignToDeliveryView(BulkAssignView):
-    queryset = models.Delivery.objects.all()
+    queryset = models.Delivery.objects.annotate(
+        asset_count=count_related(models.Asset, 'delivery'),
+    )
     table = tables.DeliveryTable
     filterset = filtersets.DeliveryFilterSet
     related_mapping = {
@@ -159,7 +177,10 @@ class AssignToDeliveryView(BulkAssignView):
 
 
 class AssignToPurchaseView(BulkAssignView):
-    queryset = models.Purchase.objects.all()
+    queryset = models.Purchase.objects.annotate(
+        asset_count=count_related(models.Asset, 'purchase'),
+        delivery_count=count_related(models.Delivery, 'purchases'),
+    )
     table = tables.PurchaseTable
     filterset = filtersets.PurchaseFilterSet
     related_mapping = {
@@ -177,7 +198,10 @@ class AssignToPurchaseView(BulkAssignView):
 #
 
 class AssignBOMsToPurchaseView(BulkAssignRelatedView):
-    queryset = models.BOM.objects.all()
+    queryset = models.BOM.objects.annotate(
+        purchase_count=count_related(models.Purchase, 'boms'),
+        asset_count=count_related(models.Asset, 'bom'),
+    )
     table = tables.BOMTable
     filterset = filtersets.BOMFilterSet
     related_mapping = {
@@ -191,7 +215,10 @@ class AssignBOMsToPurchaseView(BulkAssignRelatedView):
     
 
 class AssignPurchasesToDeliveryView(BulkAssignRelatedView):
-    queryset = models.Purchase.objects.all()
+    queryset = models.Purchase.objects.annotate(
+        asset_count=count_related(models.Asset, 'purchase'),
+        delivery_count=count_related(models.Delivery, 'purchases'),
+    )
     table = tables.PurchaseTable
     filterset = filtersets.PurchaseFilterSet
     related_mapping = {

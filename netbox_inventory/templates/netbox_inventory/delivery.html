@@ -78,7 +78,7 @@
               <a href="{% url 'plugins:netbox_inventory:asset_add' %}?delivery={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
                 <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add New Asset
               </a>
-              <a href="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?related_type=delivery&related_id={{ object.pk }}&related_name={{ object.name }}" class="btn btn-ghost-primary btn-sm">
+              <a href="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?related_type=delivery&related_id={{ object.pk }}&related_name={{ object.name }}{% for purchase in object.purchases.all %}&purchase_id={{ purchase.pk }}{% endfor %}" class="btn btn-ghost-primary btn-sm">
                 <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i> Bulk Assign Assets
               </a>
             </div>

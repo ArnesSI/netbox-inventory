@@ -107,6 +107,12 @@ def update_assets_status_on_pickup(instance, **kwargs):
     assets_to_update = instance.get_assets()
 
     if instance.pickup_date and not instance.received_date:
-        assets_to_update.update(status=transit_status)
+        assets_to_update.update(
+            status=transit_status,
+            storage_location=None
+        )
     else:
-        assets_to_update.update(status=stored_status)
+        assets_to_update.update(
+            status=stored_status,
+            storage_location=instance.location
+        )
