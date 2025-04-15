@@ -1,5 +1,6 @@
-from netbox.api.serializers import NetBoxModelSerializer
 from rest_framework import serializers
+
+from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers import ContactSerializer
 
 from netbox_inventory.models import BOM, Delivery, Purchase, Supplier

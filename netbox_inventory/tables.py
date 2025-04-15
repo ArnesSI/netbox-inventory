@@ -1,7 +1,8 @@
 import django_tables2 as tables
-from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
+
+from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column

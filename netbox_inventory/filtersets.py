@@ -1,6 +1,8 @@
 from functools import reduce
 
 import django_filters
+from django.db.models import Q
+
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
 from dcim.models import (
     Device,
@@ -17,7 +19,6 @@ from dcim.models import (
     RackType,
     Site,
 )
-from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant

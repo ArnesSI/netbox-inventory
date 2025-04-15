@@ -1,3 +1,5 @@
+from django import forms
+
 from dcim.models import (
     Device,
     DeviceRole,
@@ -11,7 +13,6 @@ from dcim.models import (
     RackType,
     Site,
 )
-from django import forms
 from netbox.forms import NetBoxModelFilterSetForm
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
