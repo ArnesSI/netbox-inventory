@@ -1,5 +1,4 @@
 from django import forms
-from django.templatetags.static import static
 
 from . import widgets
 

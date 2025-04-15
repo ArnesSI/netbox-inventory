@@ -79,7 +79,7 @@ class AssetBulkCreateView(generic.BulkCreateView):
 
     def _create_objects(self, form, request):
         new_objects = []
-        for _ in range(form.cleaned_data["count"]):
+        for i in range(form.cleaned_data["count"]):
             # Reinstantiate the model form each time to avoid overwriting the same instance. Use a mutable
             # copy of the POST QueryDict so that we can update the target field value.
             model_form = self.model_form(request.POST.copy())
@@ -264,6 +264,34 @@ class AssetBulkScanView(generic.BulkEditView):
             self.queryset.model.objects.rebuild()
         return updated_objects
 
+    def _apply(self, form, request, model, logger):
+        try:
+            with transaction.atomic():
+                updated_objects = self._update_objects(form, request)
+
+                # Enforce object-level permissions
+                object_count = self.queryset.filter(
+                    pk__in=[obj.pk for obj in updated_objects]
+                ).count()
+                if object_count != len(updated_objects):
+                    raise PermissionsViolation
+
+            if updated_objects:
+                msg = f"Updated {len(updated_objects)} {model._meta.verbose_name_plural}"
+                logger.info(msg)
+                messages.success(self.request, msg)
+
+            return redirect(self.get_return_url(request))
+
+        except ValidationError as e:
+            messages.error(self.request, ", ".join(e.messages))
+            clear_events.send(sender=self)
+
+        except (AbortRequest, PermissionsViolation) as e:
+            logger.debug(e.message)
+            form.add_error(None, e.message)
+            clear_events.send(sender=self)
+
     def _super_post(self, request, **kwargs):
         logger = logging.getLogger("netbox.views.BulkEditView")
         model = self.queryset.model
@@ -295,33 +323,7 @@ class AssetBulkScanView(generic.BulkEditView):
         if "_apply" in request.POST:
             if form.is_valid():
                 logger.debug("Form validation was successful")
-                try:
-                    with transaction.atomic():
-                        updated_objects = self._update_objects(form, request)
-
-                        # Enforce object-level permissions
-                        object_count = self.queryset.filter(
-                            pk__in=[obj.pk for obj in updated_objects]
-                        ).count()
-                        if object_count != len(updated_objects):
-                            raise PermissionsViolation
-
-                    if updated_objects:
-                        msg = f"Updated {len(updated_objects)} {model._meta.verbose_name_plural}"
-                        logger.info(msg)
-                        messages.success(self.request, msg)
-
-                    return redirect(self.get_return_url(request))
-
-                except ValidationError as e:
-                    messages.error(self.request, ", ".join(e.messages))
-                    clear_events.send(sender=self)
-
-                except (AbortRequest, PermissionsViolation) as e:
-                    logger.debug(e.message)
-                    form.add_error(None, e.message)
-                    clear_events.send(sender=self)
-
+                self._apply(form, request, model, logger)
             else:
                 logger.debug("Form validation failed")
 
