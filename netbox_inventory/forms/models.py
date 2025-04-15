@@ -5,8 +5,6 @@ from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugFi
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from netbox_inventory.choices import HardwareKindChoices
-
 from ..models import (
     Asset,
     Delivery,
@@ -16,6 +14,7 @@ from ..models import (
     Supplier,
 )
 from ..utils import get_tags_and_edit_protected_asset_fields
+from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',

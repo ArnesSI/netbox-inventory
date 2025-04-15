@@ -38,6 +38,7 @@ extend-select = ["E4", "E7", "E9", "F", "W", "C", "I"]
 ignore = ["F403", "F405"]
 
 [tool.ruff.lint.isort]
+known-local-folder = ["netbox_inventory"]
 known-first-party = [
     "netbox",
     "core",
