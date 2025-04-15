@@ -17,7 +17,7 @@ class BaseFlowSerializer(NetBoxModelSerializer):
     """
 
     object_type = ContentTypeField(
-        queryset=ObjectType.objects.all(),
+        queryset=ObjectType.objects.public(),
     )
 
     class Meta:

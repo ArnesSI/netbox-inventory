@@ -636,7 +636,7 @@ class BaseFlowFilterSet(NetBoxModelFilterSet):
     """
 
     object_type_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=ObjectType.objects.all(),
+        queryset=ObjectType.objects.public(),
     )
     object_type = ContentTypeFilter()
 

@@ -486,8 +486,8 @@ class BaseFlowFilterForm(NetBoxModelFilterSetForm):
     """
 
     object_type = ContentTypeChoiceField(
+        queryset=ObjectType.objects.public(),
         required=False,
-        queryset=ObjectType.objects.all(),
     )
 
 
