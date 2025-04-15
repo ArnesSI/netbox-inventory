@@ -237,29 +237,7 @@ class AssetBulkScanView(generic.BulkEditView):
     template_name = 'netbox_inventory/asset_bulk_scan.html'
 
     def _update_objects(self, form, request):
-        custom_fields = getattr(form, 'custom_fields', {})
-        standard_fields = [
-            field for field in form.fields if field not in list(custom_fields) + ['pk']
-        ]
-        nullified_fields = request.POST.getlist('_nullify')
         updated_objects = []
-        model_fields = {}
-        m2m_fields = {}
-
-        # Build list of model fields and m2m fields for later iteration
-        for name in standard_fields:
-            try:
-                model_field = self.queryset.model._meta.get_field(name)
-                if isinstance(model_field, (ManyToManyField, ManyToManyRel)):
-                    m2m_fields[name] = model_field
-                elif isinstance(model_field, GenericRel):
-                    # Ignore generic relations (these may be used for other purposes in the form)
-                    continue
-                else:
-                    model_fields[name] = model_field
-            except FieldDoesNotExist:
-                # This form field is used to modify a field rather than set its value directly
-                model_fields[name] = None
 
         # Parse serial numbers, one per line
         if form.cleaned_data['serial_numbers']:
@@ -279,31 +257,17 @@ class AssetBulkScanView(generic.BulkEditView):
         # with the corresponding serial numbers
         for i, obj in enumerate(self.queryset.filter(pk__in=form.cleaned_data['pk'])):
             # Take a snapshot of change-logged models
+
             if hasattr(obj, 'snapshot'):
                 obj.snapshot()
-
-            # Update standard fields. If a field is listed in _nullify, delete its value.
-            for name, model_field in model_fields.items():
-                setattr(obj, name, form.cleaned_data[name])
-
-            # Set the serial number for the current object
+            setattr(obj, 'serial', serial_numbers[i])
             obj.serial_number = serial_numbers[i]
-
-            # Store M2M values for validation
-            obj._m2m_values = {}
-            for field in obj._meta.local_many_to_many:
-                if value := form.cleaned_data.get(field.name):
-                    obj._m2m_values[field.name] = list(value)
-                elif field.name in nullified_fields:
-                    obj._m2m_values[field.name] = []
 
             obj.full_clean()
             obj.save()
             updated_objects.append(obj)
 
-            # Handle M2M fields after save
-            for name in m2m_fields.items():
-                getattr(obj, name).set(form.cleaned_data[name])
+            self.post_save_operations(form, obj)
         # Rebuild the tree for MPTT models
         if issubclass(self.queryset.model, MPTTModel):
             self.queryset.model.objects.rebuild()
@@ -319,8 +283,6 @@ class AssetBulkScanView(generic.BulkEditView):
             pk_list = self.filterset(request.GET, self.queryset.values_list('pk', flat=True), request=request).qs
         else:
             pk_list = request.POST.getlist('pk')
-
-        print ("pk_list at super post", pk_list)
 
         # Include the PK list as initial data for the form
         initial_data = {'pk': pk_list}
@@ -398,8 +360,6 @@ class AssetBulkScanView(generic.BulkEditView):
             ).qs
         else:
             pk_list = request.POST.getlist('pk')
-
-        print("pk_list at post", pk_list)
 
         # Include the PK list as initial data for the form
         initial_data = {'pk': pk_list}
