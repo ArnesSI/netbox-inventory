@@ -485,9 +485,10 @@ class BaseFlowFilterForm(NetBoxModelFilterSetForm):
     Internal base filter form class for audit flow models.
     """
 
-    object_type = ContentTypeChoiceField(
+    object_type_id = ContentTypeChoiceField(
         queryset=ObjectType.objects.public(),
         required=False,
+        label=_('Object type'),
     )
 
 
@@ -495,7 +496,7 @@ class AuditFlowPageFilterForm(BaseFlowFilterForm):
     assigned_flow_id = DynamicModelMultipleChoiceField(
         queryset=AuditFlow.objects.all(),
         required=False,
-        label=_('Flow'),
+        label=_('Audit flow'),
     )
 
     model = AuditFlowPage
@@ -503,11 +504,20 @@ class AuditFlowPageFilterForm(BaseFlowFilterForm):
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
         FieldSet(
+            'object_type_id',
             'assigned_flow_id',
-            name='Assignments',
+            name='Assignment',
         ),
     )
 
 
 class AuditFlowFilterForm(BaseFlowFilterForm):
     model = AuditFlow
+
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'object_type_id',
+            name='Assignment',
+        ),
+    )
