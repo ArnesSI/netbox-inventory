@@ -8,27 +8,44 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('extras', '0122_charfield_null_choices'),
-        ('netbox_inventory', '0010_asset_description_inventoryitemtype_description'),
+        ("extras", "0122_charfield_null_choices"),
+        ("netbox_inventory", "0010_asset_description_inventoryitemtype_description"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BOM',
+            name="BOM",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('name', models.CharField(max_length=100)),
-                ('status', models.CharField(max_length=30)),
-                ('description', models.CharField(blank=True, max_length=200)),
-                ('comments', models.TextField(blank=True)),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("status", models.CharField(max_length=30)),
+                ("description", models.CharField(blank=True, max_length=200)),
+                ("comments", models.TextField(blank=True)),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'ordering': ['name'],
-                'unique_together': {('name',)},
+                "ordering": ["name"],
+                "unique_together": {("name",)},
             },
         ),
     ]

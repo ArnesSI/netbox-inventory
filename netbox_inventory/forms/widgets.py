@@ -1,7 +1,8 @@
 from django import forms
 
+
 class BigTextWidget(forms.Textarea):
-    template_name = 'netbox_inventory/widgets/big_text_input.html'
+    template_name = "netbox_inventory/widgets/big_text_input.html"
 
     def __init__(self, attrs=None):
         default_attrs = {

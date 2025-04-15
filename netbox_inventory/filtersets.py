@@ -1,8 +1,6 @@
 from functools import reduce
 
 import django_filters
-from django.db.models import Q
-
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
 from dcim.models import (
     Device,
@@ -19,6 +17,7 @@ from dcim.models import (
     RackType,
     Site,
 )
+from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
@@ -28,11 +27,11 @@ from .choices import (
     AssetStatusChoices,
     BOMStatusChoices,
     HardwareKindChoices,
-    PurchaseStatusChoices
+    PurchaseStatusChoices,
 )
 from .models import (
-    Asset,
     BOM,
+    Asset,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -49,21 +48,21 @@ from .utils import get_asset_custom_fields_search_filters, query_located
 class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
     parent_id = django_filters.ModelMultipleChoiceFilter(
         queryset=InventoryItemGroup.objects.all(),
-        label='Parent group (ID)',
+        label="Parent group (ID)",
     )
     ancestor_id = filters.TreeNodeMultipleChoiceFilter(
         queryset=InventoryItemGroup.objects.all(),
-        field_name='parent',
-        lookup_expr='in',
-        label='Inventory item group (ID)',
+        field_name="parent",
+        lookup_expr="in",
+        label="Inventory item group (ID)",
     )
 
     class Meta:
         model = InventoryItemGroup
         fields = (
-            'id',
-            'name',
-            'description',
+            "id",
+            "name",
+            "description",
         )
 
     def search(self, queryset, name, value):
@@ -73,33 +72,33 @@ class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
 
 class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
     manufacturer_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='manufacturer',
+        field_name="manufacturer",
         queryset=Manufacturer.objects.all(),
-        label='Manufacturer (ID)',
+        label="Manufacturer (ID)",
     )
     manufacturer = django_filters.ModelMultipleChoiceFilter(
-        field_name='manufacturer__slug',
+        field_name="manufacturer__slug",
         queryset=Manufacturer.objects.all(),
-        label='Manufacturer (slug)',
+        label="Manufacturer (slug)",
     )
     inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
-        field_name='inventoryitem_group',
+        field_name="inventoryitem_group",
         queryset=InventoryItemGroup.objects.all(),
-        lookup_expr='in',
-        label='Inventory item group (ID)',
+        lookup_expr="in",
+        label="Inventory item group (ID)",
     )
 
     class Meta:
         model = InventoryItemType
         fields = (
-            'id',
-            'manufacturer_id',
-            'manufacturer',
-            'model',
-            'slug',
-            'description',
-            'part_number',
-            'inventoryitem_group_id',
+            "id",
+            "manufacturer_id",
+            "manufacturer",
+            "model",
+            "slug",
+            "description",
+            "part_number",
+            "inventoryitem_group_id",
         )
 
     def search(self, queryset, name, value):
@@ -116,305 +115,305 @@ class AssetFilterSet(NetBoxModelFilterSet):
         choices=AssetStatusChoices,
     )
     kind = filters.MultiValueCharFilter(
-        method='filter_kind',
-        label='Type of hardware',
+        method="filter_kind",
+        label="Type of hardware",
     )
     manufacturer_id = filters.MultiValueCharFilter(
-        method='filter_manufacturer',
-        label='Manufacturer (ID)',
+        method="filter_manufacturer",
+        label="Manufacturer (ID)",
     )
     manufacturer_name = filters.MultiValueCharFilter(
-        method='filter_manufacturer',
-        label='Manufacturer (name)',
+        method="filter_manufacturer",
+        label="Manufacturer (name)",
     )
     device = filters.MultiValueCharFilter(
-        field_name='device__name',
-        lookup_expr='iexact',
-        label='Device (name)',
+        field_name="device__name",
+        lookup_expr="iexact",
+        label="Device (name)",
     )
     device_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='device',
+        field_name="device",
         queryset=Device.objects.all(),
-        label='Device (ID)',
+        label="Device (ID)",
     )
     device_type_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='device_type',
+        field_name="device_type",
         queryset=DeviceType.objects.all(),
-        label='Device type (ID)',
+        label="Device type (ID)",
     )
     device_type = filters.MultiValueCharFilter(
-        field_name='device_type__slug',
-        lookup_expr='iexact',
-        label='Device type (slug)',
+        field_name="device_type__slug",
+        lookup_expr="iexact",
+        label="Device type (slug)",
     )
     device_type_model = filters.MultiValueCharFilter(
-        field_name='device_type__model',
-        lookup_expr='icontains',
-        label='Device type (model)',
+        field_name="device_type__model",
+        lookup_expr="icontains",
+        label="Device type (model)",
     )
     device_role_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='device__role',
+        field_name="device__role",
         queryset=DeviceRole.objects.all(),
-        label='Device role (ID)',
+        label="Device role (ID)",
     )
     device_role = filters.MultiValueCharFilter(
-        field_name='device__role__slug',
-        lookup_expr='iexact',
-        label='Device role (slug)',
+        field_name="device__role__slug",
+        lookup_expr="iexact",
+        label="Device role (slug)",
     )
     module_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='module',
+        field_name="module",
         queryset=Module.objects.all(),
-        label='Module (ID)',
+        label="Module (ID)",
     )
     module_type_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='module_type',
+        field_name="module_type",
         queryset=ModuleType.objects.all(),
-        label='Module type (ID)',
+        label="Module type (ID)",
     )
     module_type_model = filters.MultiValueCharFilter(
-        field_name='module_type__model',
-        lookup_expr='icontains',
-        label='Module type (model)',
+        field_name="module_type__model",
+        lookup_expr="icontains",
+        label="Module type (model)",
     )
     inventoryitem = filters.MultiValueCharFilter(
-        field_name='inventoryitem__name',
-        lookup_expr='iexact',
-        label='Inventory item (name)',
+        field_name="inventoryitem__name",
+        lookup_expr="iexact",
+        label="Inventory item (name)",
     )
     inventoryitem_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='inventoryitem',
+        field_name="inventoryitem",
         queryset=InventoryItem.objects.all(),
-        label='Inventory item (ID)',
+        label="Inventory item (ID)",
     )
     inventoryitem_type_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='inventoryitem_type',
+        field_name="inventoryitem_type",
         queryset=InventoryItemType.objects.all(),
-        label='Inventory item type (ID)',
+        label="Inventory item type (ID)",
     )
     inventoryitem_type = filters.MultiValueCharFilter(
-        field_name='inventoryitem_type__slug',
-        lookup_expr='iexact',
-        label='Inventory item type (slug)',
+        field_name="inventoryitem_type__slug",
+        lookup_expr="iexact",
+        label="Inventory item type (slug)",
     )
     inventoryitem_type_model = filters.MultiValueCharFilter(
-        field_name='inventoryitem_type__model',
-        lookup_expr='icontains',
-        label='Inventory item type (model)',
+        field_name="inventoryitem_type__model",
+        lookup_expr="icontains",
+        label="Inventory item type (model)",
     )
     inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
-        field_name='inventoryitem_type__inventoryitem_group',
+        field_name="inventoryitem_type__inventoryitem_group",
         queryset=InventoryItemGroup.objects.all(),
-        lookup_expr='in',
-        label='Inventory item group (ID)',
+        lookup_expr="in",
+        label="Inventory item group (ID)",
     )
     inventoryitem_group_name = filters.MultiValueCharFilter(
-        field_name='inventoryitem_type__inventoryitem_group__name',
-        lookup_expr='icontains',
-        label='Inventory item group (name)',
+        field_name="inventoryitem_type__inventoryitem_group__name",
+        lookup_expr="icontains",
+        label="Inventory item group (name)",
     )
     inventoryitem_role_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='inventoryitem__role',
+        field_name="inventoryitem__role",
         queryset=InventoryItemRole.objects.all(),
-        label='Inventory item role (ID)',
+        label="Inventory item role (ID)",
     )
     inventoryitem_role = filters.MultiValueCharFilter(
-        field_name='inventoryitem__role__slug',
-        lookup_expr='iexact',
-        label='Inventory item role (slug)',
+        field_name="inventoryitem__role__slug",
+        lookup_expr="iexact",
+        label="Inventory item role (slug)",
     )
     rack = filters.MultiValueCharFilter(
-        field_name='rack__name',
-        lookup_expr='iexact',
-        label='Rack (name)',
+        field_name="rack__name",
+        lookup_expr="iexact",
+        label="Rack (name)",
     )
     rack_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='rack',
+        field_name="rack",
         queryset=Rack.objects.all(),
-        label='Rack (ID)',
+        label="Rack (ID)",
     )
     rack_type_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='rack_type',
+        field_name="rack_type",
         queryset=RackType.objects.all(),
-        label='Rack type (ID)',
+        label="Rack type (ID)",
     )
     rack_type = filters.MultiValueCharFilter(
-        field_name='rack_type__slug',
-        lookup_expr='iexact',
-        label='Rack type (slug)',
+        field_name="rack_type__slug",
+        lookup_expr="iexact",
+        label="Rack type (slug)",
     )
     rack_type_model = filters.MultiValueCharFilter(
-        field_name='rack_type__model',
-        lookup_expr='icontains',
-        label='Rack type (model)',
+        field_name="rack_type__model",
+        lookup_expr="icontains",
+        label="Rack type (model)",
     )
     rack_role_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='rack__role',
+        field_name="rack__role",
         queryset=RackRole.objects.all(),
-        label='Rack role (ID)',
+        label="Rack role (ID)",
     )
     rack_role = filters.MultiValueCharFilter(
-        field_name='rack__role__slug',
-        lookup_expr='iexact',
-        label='Rack role (slug)',
+        field_name="rack__role__slug",
+        lookup_expr="iexact",
+        label="Rack role (slug)",
     )
     is_assigned = django_filters.BooleanFilter(
-        method='filter_is_assigned',
-        label='Is assigned to hardware',
+        method="filter_is_assigned",
+        label="Is assigned to hardware",
     )
     tenant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        field_name='tenant',
-        label='Tenant (ID)',
+        field_name="tenant",
+        label="Tenant (ID)",
     )
     tenant = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        field_name='tenant__slug',
-        to_field_name='slug',
-        label='Tenant (slug)',
+        field_name="tenant__slug",
+        to_field_name="slug",
+        label="Tenant (slug)",
     )
     tenant_name = filters.MultiValueCharFilter(
-        field_name='tenant__name',
-        lookup_expr='icontains',
-        label='Tenant (name)',
+        field_name="tenant__name",
+        lookup_expr="icontains",
+        label="Tenant (name)",
     )
     contact_group_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ContactGroup.objects.all(),
-        field_name='contact__group',
-        label='Contact Group (ID)',
+        field_name="contact__group",
+        label="Contact Group (ID)",
     )
     contact_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Contact.objects.all(),
-        field_name='contact',
-        label='Contact (ID)',
+        field_name="contact",
+        label="Contact (ID)",
     )
     owner_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        field_name='owner',
-        label='Owner (ID)',
+        field_name="owner",
+        label="Owner (ID)",
     )
     owner = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        field_name='owner__slug',
-        to_field_name='slug',
-        label='Owner (slug)',
+        field_name="owner__slug",
+        to_field_name="slug",
+        label="Owner (slug)",
     )
     owner_name = filters.MultiValueCharFilter(
-        field_name='owner__name',
-        lookup_expr='icontains',
-        label='Owner (name)',
+        field_name="owner__name",
+        lookup_expr="icontains",
+        label="Owner (name)",
     )
     bom_id = django_filters.ModelMultipleChoiceFilter(
         queryset=BOM.objects.all(),
-        field_name='bom',
-        label='BOM (ID)',
+        field_name="bom",
+        label="BOM (ID)",
     )
     bom = django_filters.CharFilter(
-        field_name='bom__name',
-        lookup_expr='iexact',
-        label='BOM (name)',
+        field_name="bom__name",
+        lookup_expr="iexact",
+        label="BOM (name)",
     )
     delivery_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Delivery.objects.all(),
-        field_name='delivery',
-        label='Delivery (ID)',
+        field_name="delivery",
+        label="Delivery (ID)",
     )
     delivery = django_filters.CharFilter(
-        field_name='delivery__name',
-        lookup_expr='iexact',
-        label='Delivery (name)',
+        field_name="delivery__name",
+        lookup_expr="iexact",
+        label="Delivery (name)",
     )
     purchase_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Purchase.objects.all(),
-        field_name='purchase',
-        label='Purchase (ID)',
+        field_name="purchase",
+        label="Purchase (ID)",
     )
     purchase = django_filters.CharFilter(
-        field_name='purchase__name',
-        lookup_expr='iexact',
-        label='Purchase (name)',
+        field_name="purchase__name",
+        lookup_expr="iexact",
+        label="Purchase (name)",
     )
     supplier_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Supplier.objects.all(),
-        field_name='purchase__supplier',
-        label='Supplier (ID)',
+        field_name="purchase__supplier",
+        label="Supplier (ID)",
     )
     supplier = django_filters.CharFilter(
-        field_name='purchase__supplier__name',
-        lookup_expr='iexact',
-        label='Supplier (name)',
+        field_name="purchase__supplier__name",
+        lookup_expr="iexact",
+        label="Supplier (name)",
     )
     warranty_start = django_filters.DateFromToRangeFilter()
     warranty_end = django_filters.DateFromToRangeFilter()
     delivery_date = django_filters.DateFromToRangeFilter(
-        field_name='delivery__date',
+        field_name="delivery__date",
     )
     purchase_date = django_filters.DateFromToRangeFilter(
-        field_name='purchase__date',
+        field_name="purchase__date",
     )
     storage_site_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Site.objects.all(),
-        field_name='storage_location__site',
-        label='Storage site (ID)',
+        field_name="storage_location__site",
+        label="Storage site (ID)",
     )
     storage_location_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Location.objects.all(),
-        field_name='storage_location',
-        label='Storage location (ID)',
+        field_name="storage_location",
+        label="Storage location (ID)",
     )
     installed_site_slug = filters.MultiValueCharFilter(
-        method='filter_installed_site_slug',
-        label='Installed site (slug)',
+        method="filter_installed_site_slug",
+        label="Installed site (slug)",
     )
     installed_site_id = filters.MultiValueCharFilter(
-        method='filter_installed',
-        field_name='site',
-        label='Installed site (ID)',
+        method="filter_installed",
+        field_name="site",
+        label="Installed site (ID)",
     )
     installed_location_id = filters.MultiValueCharFilter(
-        method='filter_installed',
-        field_name='location',
-        label='Installed location (ID)',
+        method="filter_installed",
+        field_name="location",
+        label="Installed location (ID)",
     )
     installed_rack_id = filters.MultiValueCharFilter(
-        method='filter_installed',
-        field_name='rack',
-        label='Installed rack (ID)',
+        method="filter_installed",
+        field_name="rack",
+        label="Installed rack (ID)",
     )
     installed_device_id = filters.MultiValueCharFilter(
-        method='filter_installed_device',
-        field_name='id',
-        label='Installed device (ID)',
+        method="filter_installed_device",
+        field_name="id",
+        label="Installed device (ID)",
     )
     installed_device_name = filters.MultiValueCharFilter(
-        method='filter_installed_device',
-        field_name='name',
-        label='Installed device (name)',
+        method="filter_installed_device",
+        field_name="name",
+        label="Installed device (name)",
     )
     located_site_id = filters.MultiValueCharFilter(
-        method='filter_located',
-        field_name='site',
-        label='Located site (ID)',
+        method="filter_located",
+        field_name="site",
+        label="Located site (ID)",
     )
     located_location_id = filters.MultiValueCharFilter(
-        method='filter_located',
-        field_name='location',
-        label='Located location (ID)',
+        method="filter_located",
+        field_name="location",
+        label="Located location (ID)",
     )
     tenant_any_id = filters.MultiValueCharFilter(
-        method='filter_tenant_any',
-        field_name='id',
-        label='Any tenant (slug)',
+        method="filter_tenant_any",
+        field_name="id",
+        label="Any tenant (slug)",
     )
     tenant_any = filters.MultiValueCharFilter(
-        method='filter_tenant_any',
-        field_name='slug',
-        label='Any tenant (slug)',
+        method="filter_tenant_any",
+        field_name="slug",
+        label="Any tenant (slug)",
     )
 
     class Meta:
         model = Asset
-        fields = ('id', 'name', 'serial', 'asset_tag', 'description')
+        fields = ("id", "name", "serial", "asset_tag", "description")
 
     def search(self, queryset, name, value):
         query = (
@@ -447,7 +446,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
         query = None
         for kind in HardwareKindChoices.values():
             if kind in value:
-                q = Q(**{f'{kind}_type__isnull': False})
+                q = Q(**{f"{kind}_type__isnull": False})
                 if query:
                     query = query | q
                 else:
@@ -458,13 +457,13 @@ class AssetFilterSet(NetBoxModelFilterSet):
             return queryset
 
     def filter_manufacturer(self, queryset, name, value):
-        if name == 'manufacturer_id':
+        if name == "manufacturer_id":
             return queryset.filter(
                 Q(device_type__manufacturer__in=value)
                 | Q(module_type__manufacturer__in=value)
                 | Q(inventoryitem_type__manufacturer__in=value)
             )
-        elif name == 'manufacturer_name':
+        elif name == "manufacturer_name":
             # OR for every passed value and for all hardware types
             q = Q()
             for v in value:
@@ -490,24 +489,24 @@ class AssetFilterSet(NetBoxModelFilterSet):
             )
 
     def filter_installed(self, queryset, name, value):
-        return query_located(queryset, name, value, assets_shown='installed')
+        return query_located(queryset, name, value, assets_shown="installed")
 
     def filter_installed_site_slug(self, queryset, name, value):
-        return query_located(queryset, 'site__slug', value, assets_shown='installed')
+        return query_located(queryset, "site__slug", value, assets_shown="installed")
 
     def filter_installed_device(self, queryset, name, value):
-        return query_located(queryset, name, value, assets_shown='installed')
+        return query_located(queryset, name, value, assets_shown="installed")
 
     def filter_located(self, queryset, name, value):
         return query_located(queryset, name, value)
 
     def filter_tenant_any(self, queryset, name, value):
         # filter OR for owner and tenant fields
-        if name == 'slug':
+        if name == "slug":
             q_list = (
                 Q(tenant__slug__iexact=n) | Q(owner__slug__iexact=n) for n in value
             )
-        elif name == 'id':
+        elif name == "id":
             q_list = (Q(tenant__pk=n) | Q(owner__pk=n) for n in value)
         q_list = reduce(lambda a, b: a | b, q_list)
         return queryset.filter(q_list)
@@ -515,8 +514,8 @@ class AssetFilterSet(NetBoxModelFilterSet):
 
 class HasAssetFilterMixin(NetBoxModelFilterSet):
     has_asset_assigned = django_filters.BooleanFilter(
-        method='_has_asset_assigned',
-        label='Has an asset assigned',
+        method="_has_asset_assigned",
+        label="Has an asset assigned",
     )
 
     def _has_asset_assigned(self, queryset, name, value):
@@ -547,10 +546,10 @@ class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
     class Meta:
         model = Supplier
         fields = (
-            'id',
-            'name',
-            'slug',
-            'description',
+            "id",
+            "name",
+            "slug",
+            "description",
         )
 
     def search(self, queryset, name, value):
@@ -568,8 +567,8 @@ class BOMFilterSet(NetBoxModelFilterSet):
     )
     purchase_id = django_filters.ModelChoiceFilter(
         queryset=Purchase.objects.all(),
-        method='filter_by_purchase',
-        label='Purchase (ID)',
+        method="filter_by_purchase",
+        label="Purchase (ID)",
     )
 
     def filter_by_purchase(self, queryset, name, value):
@@ -577,34 +576,31 @@ class BOMFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = BOM
-        fields = ('id', 'name', 'description')
+        fields = ("id", "name", "description")
 
     def search(self, queryset, name, value):
-        query = Q(
-            Q(name__icontains=value)
-            | Q(description__icontains=value)
-        )
+        query = Q(Q(name__icontains=value) | Q(description__icontains=value))
         return queryset.filter(query)
 
 
 class PurchaseFilterSet(NetBoxModelFilterSet):
     supplier_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='supplier',
+        field_name="supplier",
         queryset=Supplier.objects.all(),
-        label='Supplier (ID)',
+        label="Supplier (ID)",
     )
     boms = django_filters.ModelMultipleChoiceFilter(
-        field_name='boms',
+        field_name="boms",
         queryset=BOM.objects.all(),
-        label='BOMs (ID)',
+        label="BOMs (ID)",
     )
     status = django_filters.MultipleChoiceFilter(
         choices=PurchaseStatusChoices,
     )
     delivery_id = django_filters.ModelChoiceFilter(
         queryset=Delivery.objects.all(),
-        method='filter_by_delivery',
-        label='Delivery (ID)',
+        method="filter_by_delivery",
+        label="Delivery (ID)",
     )
     date = django_filters.DateFromToRangeFilter()
 
@@ -613,7 +609,7 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = Purchase
-        fields = ('id', 'supplier', 'name', 'date', 'description')
+        fields = ("id", "supplier", "name", "date", "description")
 
     def search(self, queryset, name, value):
         query = Q(
@@ -627,36 +623,36 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
 
 class DeliveryFilterSet(NetBoxModelFilterSet):
     purchase_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='purchase',
+        field_name="purchase",
         queryset=Purchase.objects.all(),
-        label='Purchase (ID)',
+        label="Purchase (ID)",
     )
     supplier_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='purchase__supplier',
+        field_name="purchase__supplier",
         queryset=Supplier.objects.all(),
-        label='Supplier (ID)',
+        label="Supplier (ID)",
     )
     contact_group_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ContactGroup.objects.all(),
-        field_name='receiving_contact__group',
-        label='Contact Group (ID)',
+        field_name="receiving_contact__group",
+        label="Contact Group (ID)",
     )
     receiving_contact_id = django_filters.ModelMultipleChoiceFilter(
-        field_name='receiving_contact',
+        field_name="receiving_contact",
         queryset=Contact.objects.all(),
-        label='Contact (ID)',
+        label="Contact (ID)",
     )
     date = django_filters.DateFromToRangeFilter()
 
     class Meta:
         model = Delivery
         fields = (
-            'id',
-            'name',
-            'date',
-            'description',
-            'receiving_contact',
-            'purchase',
+            "id",
+            "name",
+            "date",
+            "description",
+            "receiving_contact",
+            "purchase",
         )
 
     def search(self, queryset, name, value):
