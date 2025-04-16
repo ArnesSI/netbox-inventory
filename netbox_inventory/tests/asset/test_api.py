@@ -1,3 +1,4 @@
+import json
 from copy import copy
 
 from rest_framework import status
@@ -115,7 +116,8 @@ class AssetTest(
         response = self.client.post(
             self._get_list_url(), create_data, format='json', **self.header
         )
-        instance = self._get_queryset().get(pk=response.data['id'])
+        data = json.loads(response.content)
+        instance = self._get_queryset().get(pk=data['id'])
         self.assertEqual(instance.purchase, self.purchase1)
 
     def test_serial_asset_tag_empty(self):
@@ -182,7 +184,7 @@ class AssetTest(
             name='Purchase1', supplier=supplier1, status='closed'
         )
         cls.delivery1 = Delivery.objects.create(name='Delivery1')
-        cls.delivery1.purchases.set([cls.purchase1])
+        cls.delivery1.orders.set([cls.purchase1])
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)
         Asset.objects.create(name='Asset 2', serial='asset2', device_type=device_type1)

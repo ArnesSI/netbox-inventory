@@ -35,7 +35,7 @@ class AssetTestCase(
         )
         delivery1 = Delivery.objects.create(name='the_delivery')
         delivery1.purchases.set([purchase1])
-        delivery2 = Delivery.objects.create(name='the_delivery')
+        delivery2 = Delivery.objects.create(name='the_second_delivery')
         delivery2.purchases.set([purchase2])
         Site.objects.create(
             name='site1',
@@ -81,7 +81,7 @@ class AssetTestCase(
         cls.csv_data = (
             'serial,status,hardware_kind,manufacturer,model_name,supplier,purchase,delivery',
             'csv1,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_delivery',
-            'csv2,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_delivery',
+            'csv2,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_second_delivery',
             'csv3,stored,device,manufacturer_csv,device_type_csv,,,',
         )
         cls.csv_update_data = (

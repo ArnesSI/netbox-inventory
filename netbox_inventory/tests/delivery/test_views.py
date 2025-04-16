@@ -40,7 +40,7 @@ class DeliveryTestCase(
         delivery3.purchases.set([purchase2])
         cls.form_data = {
             'name': 'Delivery',
-            'purchase': purchase1.pk,
+            'purchases': [purchase1.pk],
             'description': 'Delivery description',
             'date': datetime.date(day=1, month=1, year=2023),
         }
@@ -52,9 +52,9 @@ class DeliveryTestCase(
         )
         cls.csv_update_data = (
             'id,description,purchase',
-            f'{delivery1.pk},description 1,{delivery1.purchase.pk}',
-            f'{delivery2.pk},description 2,{delivery2.purchase.pk}',
-            f'{delivery3.pk},description 3,{delivery3.purchase.pk}',
+            f'{delivery1.pk},description 1,{delivery1.purchases.first().pk}',
+            f'{delivery2.pk},description 2,{delivery2.purchases.first().pk}',
+            f'{delivery3.pk},description 3,{delivery3.purchases.first().pk}',
         )
         cls.bulk_edit_data = {
             'description': 'bulk description',
