@@ -56,5 +56,5 @@ jobs:
           echo "Extracted version: $VERSION"
           
           gh release create "$VERSION" dist/netbox_inventory-*.tar.gz dist/netbox_inventory-*.whl \
-            --title "NetBox CMDB $VERSION" \
+            --title "NetBox Inventory Plus $VERSION" \
             --notes "Release $VERSION"
