@@ -55,8 +55,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          gh release create $VERSION dist/* --title "NetBox CMDB $VERSION" --notes "Release $VERSION"
+          echo "Creating release for version $VERSION"
+          ls -l dist/ 
+          gh release create "$VERSION" dist/* --title "NetBox Inventory Plus $VERSION" --notes "Release $VERSION"
 
       - name: Upload assets to release
         env:
