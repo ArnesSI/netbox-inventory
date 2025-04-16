@@ -7,7 +7,6 @@ from django.dispatch import receiver
 from dcim.models import Device, InventoryItem, Module, Rack
 from utilities.exceptions import AbortRequest
 
-from .choices import AssetStatusChoices
 from .models import Asset, Delivery, Transfer
 from .utils import get_plugin_setting, get_status_for, is_equal_none
 
