@@ -19,7 +19,7 @@ jobs:
           python-version: 3.11
       
       - name: Install dependencies
-        run: pip install --upgrade setuptools wheel
+        run: pip install --upgrade pip setuptools wheel build
       
       - name: Build the package
         run: python -m build
