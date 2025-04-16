@@ -1,7 +1,5 @@
 from copy import copy
 
-from rest_framework import status
-
 from core.models import ObjectType
 from dcim.models import (
     Device,
@@ -13,6 +11,7 @@ from dcim.models import (
     RackType,
     Site,
 )
+from rest_framework import status
 from users.models import ObjectPermission
 from utilities.testing import APIViewTestCases, disable_warnings
 
@@ -182,7 +181,7 @@ class AssetTest(
             name='Purchase1', supplier=supplier1, status='closed'
         )
         cls.delivery1 = Delivery.objects.create(
-            name='Delivery1', purchase=cls.purchase1
+            name='Delivery1', purchases=cls.purchase1
         )
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)

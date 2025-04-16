@@ -34,15 +34,15 @@ class DeliveryTestCase(
         )
         delivery1 = Delivery.objects.create(
             name='Delivery 1',
-            purchase=purchase1,
+            purchases=purchase1,
         )
         delivery2 = Delivery.objects.create(
             name='Delivery 2',
-            purchase=purchase1,
+            purchases=purchase1,
         )
         delivery3 = Delivery.objects.create(
             name='Delivery 1',
-            purchase=purchase2,
+            purchases=purchase2,
         )
         cls.form_data = {
             'name': 'Delivery',

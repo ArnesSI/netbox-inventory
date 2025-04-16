@@ -1,7 +1,6 @@
-from django.test import override_settings
-
 from core.models import ObjectType
 from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
+from django.test import override_settings
 from users.models import ObjectPermission
 from utilities.testing import ViewTestCases, post_data
 
@@ -35,11 +34,11 @@ class AssetTestCase(
         )
         Delivery.objects.create(
             name='the_delivery',
-            purchase=purchase1,
+            purchases=purchase1,
         )
         Delivery.objects.create(
             name='the_delivery',
-            purchase=purchase2,
+            purchases=purchase2,
         )
         Site.objects.create(
             name='site1',
@@ -170,7 +169,7 @@ class AssetTestCase(
         )
         delivery1 = Delivery.objects.create(
             name='Delivery1-autoset',
-            purchase=purchase1,
+            purchases=purchase1,
         )
 
         form_data = {

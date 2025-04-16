@@ -25,20 +25,20 @@ class DeliveryTest(
         purchase1 = Purchase.objects.create(
             name='Purchase1', supplier=supplier1, status='closed'
         )
-        Delivery.objects.create(name='Delivery 1', purchase=purchase1)
-        Delivery.objects.create(name='Delivery 2', purchase=purchase1)
-        Delivery.objects.create(name='Delivery 3', purchase=purchase1)
+        Delivery.objects.create(name='Delivery 1', purchases=purchase1)
+        Delivery.objects.create(name='Delivery 2', purchases=purchase1)
+        Delivery.objects.create(name='Delivery 3', purchases=purchase1)
         cls.create_data = [
             {
                 'name': 'Delivery 4',
-                'purchase': purchase1.pk,
+                'purchases': purchase1.pk,
             },
             {
                 'name': 'Delivery 5',
-                'purchase': purchase1.pk,
+                'purchases': purchase1.pk,
             },
             {
                 'name': 'Delivery 6',
-                'purchase': purchase1.pk,
+                'purchases': purchase1.pk,
             },
         ]

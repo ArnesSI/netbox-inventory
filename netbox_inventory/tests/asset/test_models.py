@@ -27,7 +27,7 @@ class TestAssetModel(TestCase):
         )
         self.delivery1 = Delivery.objects.create(
             name='Delivery1',
-            purchase=self.purchase1,
+            purchases=self.purchase1,
         )
         self.site1 = Site.objects.create(
             name='site1',
@@ -208,7 +208,7 @@ class TestAssetModel(TestCase):
         self.asset1.delivery = self.delivery1
         self.asset1.full_clean()
         self.asset1.save()
-        self.delivery1.purchase = self.purchase2
+        self.delivery1.purchases = self.purchase2
         self.delivery1.full_clean()
         self.delivery1.save()
         self.asset1.refresh_from_db()

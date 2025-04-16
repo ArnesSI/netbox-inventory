@@ -550,6 +550,10 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             self.status = stored_status
             return
 
+        if stored_status and not self.hardware and self.purchase and self.delivery:
+            self.status = stored_status
+            return
+
         if self.delivery:
             return
 
