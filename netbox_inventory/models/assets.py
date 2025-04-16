@@ -543,26 +543,29 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             # status has also been changed manually, don't change it automatically
             return
 
+        # Used: Asset was assigned
         if used_status and new_hw and not old_hw:
             self.status = used_status
             return
+
+        # Stored: Asset was unassigned
         elif stored_status and not new_hw and old_hw:
             self.status = stored_status
             return
 
+        # Stored: Unassigned but fully delivered and purchased
         if stored_status and not self.hardware and self.purchase and self.delivery:
             self.status = stored_status
             return
 
-        if self.delivery:
-            return
-
-        old_purchase = get_prechange_field(self, self.purchase)
+        # Ordered: Purchase just got created
+        old_purchase = get_prechange_field(self, 'purchase')
         if ordered_status and self.purchase and not old_purchase:
             self.status = ordered_status
             return
 
-        old_bom = get_prechange_field(self, self.bom)
+        # Planned: BOM just added
+        old_bom = get_prechange_field(self, 'bom')
         if planned_status and self.bom and not old_bom:
             self.status = planned_status
             return
