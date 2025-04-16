@@ -52,7 +52,7 @@ jobs:
       - name: Create GitHub Release
         run: |
           echo "Finding version from dist/ filename..."
-          VERSION=$(ls dist/netbox_inventory-*.tar.gz | sed -E 's/.*netbox_inventory-([0-9.]+)\.tar\.gz/\1/')
+          VERSION="v$(ls dist/netbox_inventory-*.tar.gz | sed -E 's/.*netbox_inventory-([0-9.]+)\.tar\.gz/\1/')"
           echo "Extracted version: $VERSION"
           
           gh release create "$VERSION" dist/netbox_inventory-*.tar.gz dist/netbox_inventory-*.whl \
