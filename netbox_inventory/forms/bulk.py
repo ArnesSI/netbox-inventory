@@ -388,7 +388,7 @@ class AssetImportForm(NetBoxModelImportForm):
         if not delivery_name:
             return None
         try:
-            delivery = Delivery.objects.get(purchase=purchase, name=delivery_name)
+            delivery = Delivery.objects.get(purchases=purchase, name=delivery_name)
         except ObjectDoesNotExist:
             raise forms.ValidationError(
                 f'Unable to find delivery {purchase} {delivery_name}'

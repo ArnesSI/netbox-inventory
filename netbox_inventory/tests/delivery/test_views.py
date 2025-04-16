@@ -6,11 +6,18 @@ from netbox_inventory.models import Delivery, Purchase, Supplier
 from netbox_inventory.tests.custom import ModelViewTestCase
 
 
+class CustomDelivery(Delivery):
+    def get_field(self, field_name):
+        if field_name == 'purchase':
+            field_name = 'purchases'  # Remap to the correct field
+        return super().get_field(field_name)
+
+
 class DeliveryTestCase(
     ModelViewTestCase,
     ViewTestCases.PrimaryObjectViewTestCase,
 ):
-    model = Delivery
+    model = CustomDelivery
 
     @classmethod
     def setUpTestData(cls):
