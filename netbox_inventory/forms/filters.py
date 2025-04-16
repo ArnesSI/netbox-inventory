@@ -20,7 +20,7 @@ from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
-    TagFilterField
+    TagFilterField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
@@ -33,8 +33,8 @@ from ..choices import (
     TransferStatusChoices,
 )
 from ..models import (
-    Asset,
     BOM,
+    Asset,
     Courier,
     Delivery,
     InventoryItemGroup,

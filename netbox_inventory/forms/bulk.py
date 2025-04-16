@@ -12,7 +12,7 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
-    DynamicModelMultipleChoiceField
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
@@ -25,8 +25,8 @@ from ..choices import (
     TransferStatusChoices,
 )
 from ..models import (
-    Asset,
     BOM,
+    Asset,
     Courier,
     Delivery,
     InventoryItemGroup,

@@ -1,19 +1,15 @@
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import (
-    CommentField,
-    DynamicModelChoiceField,
-    SlugField
-)
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from netbox_inventory.choices import HardwareKindChoices
 
 from ..models import (
-    Asset,
     BOM,
+    Asset,
     Courier,
     Delivery,
     InventoryItemGroup,

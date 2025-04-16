@@ -8,8 +8,8 @@ from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
 
 from .models import (
-    Asset,
     BOM,
+    Asset,
     Courier,
     Delivery,
     InventoryItemGroup,

@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 
 from netbox.views import generic
 
-from .. import models, forms
+from .. import forms, models
 
 __all__ = (
     'CreateAndAssignView',

@@ -32,8 +32,8 @@ from .choices import (
     TransferStatusChoices,
 )
 from .models import (
-    Asset,
     BOM,
+    Asset,
     Courier,
     Delivery,
     InventoryItemGroup,

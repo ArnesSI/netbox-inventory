@@ -2,9 +2,9 @@ from django.contrib import messages
 from django.db.models import ForeignKey, ManyToManyField
 from django.shortcuts import redirect
 from django.urls import reverse
-from utilities.query import count_related
 
 from netbox.views import generic
+from utilities.query import count_related
 
 from .. import filtersets, models, tables
 

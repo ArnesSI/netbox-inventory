@@ -6,6 +6,7 @@ from netbox_inventory.models import Courier, Transfer
 
 from .nested import *
 
+
 class CourierSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:courier-detail'

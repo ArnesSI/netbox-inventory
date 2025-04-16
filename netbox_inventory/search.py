@@ -1,8 +1,8 @@
 from netbox.search import SearchIndex
 
 from .models import (
-    Asset,
     BOM,
+    Asset,
     Courier,
     Delivery,
     InventoryItemGroup,
