@@ -24,6 +24,7 @@ keywords = ["netbox", "netbox-plugin", "inventory"]
 
 [tool.setuptools]
 include-package-data = true
+packages = ["netbox_inventory"]
 
 [tool.setuptools.packages.find]
 include = ["netbox_inventory*"]
