@@ -51,7 +51,7 @@ class DeliveryTestCase(
             f'Delivery 6,{purchase1.pk},2023-03-26',
         )
         cls.csv_update_data = (
-            'id,description,purchase',
+            'id,description,purchases',
             f'{delivery1.pk},description 1,{delivery1.purchases.first().pk}',
             f'{delivery2.pk},description 2,{delivery2.purchases.first().pk}',
             f'{delivery3.pk},description 3,{delivery3.purchases.first().pk}',
