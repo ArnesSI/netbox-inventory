@@ -25,7 +25,8 @@ jobs:
         run: python setup.py sdist
       
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/download-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/*
