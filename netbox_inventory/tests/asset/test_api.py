@@ -52,6 +52,12 @@ class AssetTest(
             self._get_list_url(), self.create_data[0], format='json', **self.header
         )
         data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+
         instance = self._get_queryset().get(pk=data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
@@ -77,6 +83,12 @@ class AssetTest(
             self._get_list_url(), self.create_data[0], format='json', **self.header
         )
         data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+
         instance = self._get_queryset().get(pk=data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
@@ -99,6 +111,11 @@ class AssetTest(
             self._get_list_url(), self.create_data[0], format='json', **self.header
         )
         data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
         instance = self._get_queryset().get(pk=data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
@@ -120,6 +137,11 @@ class AssetTest(
             self._get_list_url(), create_data, format='json', **self.header
         )
         data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
         instance = self._get_queryset().get(pk=data['id'])
         self.assertEqual(instance.purchase, self.purchase1)
 
@@ -140,6 +162,12 @@ class AssetTest(
             self._get_list_url(), create_data, format='json', **self.header
         )
         data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+
         instance = self._get_queryset().get(pk=data['id'])
         self.assertEqual(instance.serial, None)
         self.assertEqual(instance.asset_tag, None)
