@@ -33,14 +33,10 @@ class AssetTestCase(
             supplier=supplier1,
             status='closed',
         )
-        Delivery.objects.create(
-            name='the_delivery',
-            purchases=purchase1,
-        )
-        Delivery.objects.create(
-            name='the_delivery',
-            purchases=purchase2,
-        )
+        delivery1 = Delivery.objects.create(name='the_delivery')
+        delivery1.purchases.set([purchase1])
+        delivery2 = Delivery.objects.create(name='the_delivery')
+        delivery2.purchases.set([purchase2])
         Site.objects.create(
             name='site1',
             slug='site1',
@@ -168,10 +164,8 @@ class AssetTestCase(
             supplier=supplier1,
             status='closed',
         )
-        delivery1 = Delivery.objects.create(
-            name='Delivery1-autoset',
-            purchases=purchase1,
-        )
+        delivery1 = Delivery.objects.create(name='Delivery1-autoset')
+        delivery1.purchases.set([purchase1])
 
         form_data = {
             'status': 'stored',
@@ -216,7 +210,7 @@ class AssetBulkAddTestCase(
 
         cls.bulk_create_data = {
             'count': 3,
-            'status': 'stored',
+            'status': 'planned',
             'device_type': device_type1.pk,
         }
 

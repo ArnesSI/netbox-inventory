@@ -189,14 +189,14 @@ class AssetReassignBase:
             changed_object_type=ContentType.objects.get_for_model(instance),
             changed_object_id=instance.pk,
         )
-        self.assertEqual(len(objectchanges), 1)
+        self.assertEqual(len(objectchanges), 2)
         self.assertEqual(
             objectchanges[0].action, ObjectChangeActionChoices.ACTION_UPDATE
         )
 
         # check for changes on asset instances
         self.asset_old.refresh_from_db()
-        self.assertEqual(self.asset_old.status, 'stored')
+        self.assertEqual(self.asset_old.status, 'planned')
         self.assertEqual(self.asset_old.hardware, None)
         objectchanges = ObjectChange.objects.filter(
             changed_object_type=ContentType.objects.get_for_model(self.asset_old),

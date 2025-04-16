@@ -181,9 +181,8 @@ class AssetTest(
         cls.purchase1 = Purchase.objects.create(
             name='Purchase1', supplier=supplier1, status='closed'
         )
-        cls.delivery1 = Delivery.objects.create(
-            name='Delivery1', purchases=cls.purchase1
-        )
+        cls.delivery1 = Delivery.objects.create(name='Delivery1')
+        cls.delivery1.purchases.set([cls.purchase1])
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)
         Asset.objects.create(name='Asset 2', serial='asset2', device_type=device_type1)

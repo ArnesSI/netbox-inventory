@@ -32,18 +32,12 @@ class DeliveryTestCase(
             supplier=supplier2,
             status='closed',
         )
-        delivery1 = Delivery.objects.create(
-            name='Delivery 1',
-            purchases=purchase1,
-        )
-        delivery2 = Delivery.objects.create(
-            name='Delivery 2',
-            purchases=purchase1,
-        )
-        delivery3 = Delivery.objects.create(
-            name='Delivery 1',
-            purchases=purchase2,
-        )
+        delivery1 = Delivery.objects.create(name='Delivery 1')
+        delivery1.purchases.set([purchase1])
+        delivery2 = Delivery.objects.create(name='Delivery 2')
+        delivery2.purchases.set([purchase1])
+        delivery3 = Delivery.objects.create(name='Delivery 3')
+        delivery3.purchases.set([purchase2])
         cls.form_data = {
             'name': 'Delivery',
             'purchase': purchase1.pk,

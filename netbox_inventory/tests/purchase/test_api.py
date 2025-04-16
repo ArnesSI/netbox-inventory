@@ -31,15 +31,12 @@ class PurchaseTest(
     @classmethod
     def setUpTestData(cls) -> None:
         supplier1 = Supplier.objects.create(name='Supplier 1')
-        Purchase.objects.create(
-            name='Purchase 1', supplier=supplier1, status='closed', boms=[]
-        )
-        Purchase.objects.create(
-            name='Purchase 2', supplier=supplier1, status='closed', boms=[]
-        )
-        Purchase.objects.create(
-            name='Purchase 3', supplier=supplier1, status='closed', boms=[]
-        )
+        purchase1 = Purchase.objects.create(name='Purchase 1', supplier=supplier1, status='closed')
+        purchase1.boms.set([])
+        purchase2 = Purchase.objects.create(name='Purchase 2', supplier=supplier1, status='closed')
+        purchase2.boms.set([])
+        purchase3 = Purchase.objects.create(name='Purchase 3', supplier=supplier1, status='closed')
+        purchase3.boms.set([])
         cls.create_data = [
             {
                 'name': 'Purchase 4',
