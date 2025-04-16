@@ -23,6 +23,11 @@ jobs:
       
       - name: Build the package
         run: python -m build
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
       
       - name: Upload artifact
         uses: actions/upload-artifact@v3
