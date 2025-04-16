@@ -594,10 +594,7 @@ class BOMFilterSet(NetBoxModelFilterSet):
         fields = ('id', 'name', 'description')
 
     def search(self, queryset, name, value):
-        query = Q(
-            Q(name__icontains=value)
-            | Q(description__icontains=value)
-        )
+        query = Q(Q(name__icontains=value) | Q(description__icontains=value))
         return queryset.filter(query)
 
 
@@ -704,7 +701,7 @@ class CourierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
             | Q(description__icontains=value)
         )
         return queryset.filter(query)
-    
+
 
 class TransferFilterSet(NetBoxModelFilterSet):
     courier_id = django_filters.ModelMultipleChoiceFilter(
@@ -719,7 +716,7 @@ class TransferFilterSet(NetBoxModelFilterSet):
         label='Asset (ID)',
     )
     status = django_filters.MultipleChoiceFilter(
-        choices=AssetStatusChoices,
+        choices=TransferStatusChoices,
     )
     sender_group_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ContactGroup.objects.all(),
@@ -766,3 +763,4 @@ class TransferFilterSet(NetBoxModelFilterSet):
             | Q(instructions__icontains=value)
             | Q(sender__name__icontains=value)
         )
+        return queryset.filter(query)

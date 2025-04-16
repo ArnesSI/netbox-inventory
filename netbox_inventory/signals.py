@@ -90,11 +90,15 @@ def close_bom_if_all_assets_delivered(instance, **kwargs):
     Close BOM if all Assets are delivered.
     """
     if instance.bom:
-        all_assets_delivered = not instance.bom.assets.filter(Q(delivery__isnull=True)).exists()
+        all_assets_delivered = not instance.bom.assets.filter(
+            Q(delivery__isnull=True)
+        ).exists()
         if all_assets_delivered:
             instance.bom.status = 'closed'
             instance.bom.save()
-            logger.info(f"BOM {instance.bom} marked as 'Closed' because all associated assets are delivered.")
+            logger.info(
+                f"BOM {instance.bom} marked as 'Closed' because all associated assets are delivered."
+            )
 
 
 @receiver(post_save, sender=Transfer)
@@ -107,15 +111,12 @@ def update_assets_status_on_pickup(instance, **kwargs):
     assets_to_update = instance.get_assets()
 
     if instance.pickup_date and not instance.received_date:
-        assets_to_update.update(
-            status=transit_status,
-            storage_location=None
-        )
+        assets_to_update.update(status=transit_status, storage_location=None)
     else:
         assets_to_update.update(
-            status=stored_status,
-            storage_location=instance.location
+            status=stored_status, storage_location=instance.location
         )
+
 
 @receiver(post_save, sender=Asset)
 def update_asset_status(instance, **kwargs):

@@ -42,7 +42,7 @@ class Courier(NetBoxModel, ContactsMixin):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:courier', args=[self.pk])
-    
+
 
 class Transfer(NetBoxModel):
     """
@@ -154,16 +154,18 @@ class Transfer(NetBoxModel):
     def clean(self):
         self.validate_dates()
         return super().clean()
-    
+
     def validate_dates(self):
         """
         Ensure that the received_date is after the pickup_date.
         """
         if self.pickup_date and self.received_date:
             if self.received_date < self.pickup_date:
-                raise ValidationError({
-                    'received_date': 'Received date must be after pickup date.',
-                })
+                raise ValidationError(
+                    {
+                        'received_date': 'Received date must be after pickup date.',
+                    }
+                )
 
     def get_assets(self):
         """

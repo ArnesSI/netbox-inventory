@@ -1,5 +1,4 @@
 from netbox.views import generic
-from tenancy.views import ObjectContactsView
 from utilities.query import count_related
 from utilities.views import register_model_view
 
@@ -22,9 +21,7 @@ class TransferView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         return {
-            'asset_count': models.Asset.objects.filter(
-                transfer=instance
-            ).count(),
+            'asset_count': models.Asset.objects.filter(transfer=instance).count(),
         }
 
 

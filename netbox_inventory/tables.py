@@ -537,8 +537,7 @@ class PurchaseTable(NetBoxTable):
             'id',
             'name',
             'supplier',
-            'boms'
-            'status',
+            'bomsstatus',
             'date',
             'description',
             'comments',
@@ -652,7 +651,7 @@ class CourierTable(ContactsColumnMixin, NetBoxTable):
             'transfer_count',
         )
 
-    
+
 class TransferTable(NetBoxTable):
     name = tables.Column(
         linkify=True,

@@ -629,9 +629,7 @@ class BOMBulkEditForm(NetBoxModelBulkEditForm):
 
     model = BOM
     fieldsets = (FieldSet('status', 'description', name='General'),)
-    nullable_fields = (
-        'description',
-    )
+    nullable_fields = ('description',)
 
 
 class PurchaseImportForm(NetBoxModelImportForm):
@@ -692,7 +690,9 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     model = Purchase
-    fieldsets = (FieldSet('date', 'status', 'supplier', 'boms', 'description', name='General'),)
+    fieldsets = (
+        FieldSet('date', 'status', 'supplier', 'boms', 'description', name='General'),
+    )
     nullable_fields = (
         'date',
         'boms',

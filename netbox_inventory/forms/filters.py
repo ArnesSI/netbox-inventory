@@ -390,7 +390,15 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
     model = Purchase
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('supplier_id', 'boms', 'status', 'delivery_id', 'date_after', 'date_before', name='Purchase'),
+        FieldSet(
+            'supplier_id',
+            'boms',
+            'status',
+            'delivery_id',
+            'date_after',
+            'date_before',
+            name='Purchase',
+        ),
     )
 
     supplier_id = DynamicModelMultipleChoiceField(
@@ -542,8 +550,8 @@ class TransferFilterForm(NetBoxModelFilterSetForm):
             'sender_group_id',
             'sender_id',
             'recipient_group_id',
-            'recipient_id', 
-            name='Contacts'
+            'recipient_id',
+            name='Contacts',
         ),
         FieldSet(
             'site_id',
@@ -552,7 +560,7 @@ class TransferFilterForm(NetBoxModelFilterSetForm):
             'pickup_date_before',
             'received_date_after',
             'received_date_before',
-            name='Transfer'
+            name='Transfer',
         ),
     )
 

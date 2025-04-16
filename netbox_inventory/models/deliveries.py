@@ -77,7 +77,7 @@ class BOM(NetBoxModel, ContactsMixin):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:bom', args=[self.pk])
-    
+
 
 class Purchase(NetBoxModel):
     """

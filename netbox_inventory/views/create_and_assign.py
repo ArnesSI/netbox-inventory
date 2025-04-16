@@ -16,15 +16,18 @@ class CreateAndAssignView(generic.ObjectEditView):
     """
     A generic view for creating a new object and associating it with a field on a related object.
     """
+
     related_model = None
     related_field = None
     related_instance = None
     template_name = 'netbox_inventory/create_and_assign.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.related_instance = get_object_or_404(self.related_model, pk=kwargs['related_id'])
+        self.related_instance = get_object_or_404(
+            self.related_model, pk=kwargs['related_id']
+        )
         return super().dispatch(request, *args, **kwargs)
-    
+
     def get_object(self, **kwargs):
         # Override to ensure a new object is created
         return self.queryset.model()
@@ -34,18 +37,20 @@ class CreateAndAssignView(generic.ObjectEditView):
             'related_instance': self.related_instance,
             'return_url': self.related_instance.get_absolute_url(),
         }
-    
+
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
         if form.is_valid():
             obj = form.save()
             getattr(self.related_instance, self.related_field).add(obj)
-            messages.success(request, f'{obj} has been added to {self.related_instance}.')
+            messages.success(
+                request, f'{obj} has been added to {self.related_instance}.'
+            )
             return redirect(self.related_instance.get_absolute_url())
         else:
-            messages.error(request, "There was an error creating the object.")
+            messages.error(request, 'There was an error creating the object.')
         return self.get(request, *args, **kwargs)
-    
+
 
 class DeliveryCreatePurchaseView(CreateAndAssignView):
     queryset = models.Purchase.objects.all()

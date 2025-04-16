@@ -274,11 +274,7 @@ class SupplierForm(NetBoxModelForm):
 class BOMForm(NetBoxModelForm):
     comments = CommentField()
 
-    fieldsets = (
-        FieldSet(
-            'name', 'status', 'description', 'tags', name='BOM'
-        ),
-    )
+    fieldsets = (FieldSet('name', 'status', 'description', 'tags', name='BOM'),)
 
     class Meta:
         model = BOM
@@ -296,7 +292,14 @@ class PurchaseForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            'supplier', 'boms', 'name', 'status', 'date', 'description', 'tags', name='Purchase'
+            'supplier',
+            'boms',
+            'name',
+            'status',
+            'date',
+            'description',
+            'tags',
+            name='Purchase',
         ),
     )
 
@@ -443,11 +446,9 @@ class CourierForm(NetBoxModelForm):
             'comments',
             'tags',
         )
-    
 
 
 class TransferForm(NetBoxModelForm):
-    
     sender_group = DynamicModelChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
@@ -509,7 +510,7 @@ class TransferForm(NetBoxModelForm):
             'shipping_number',
             'instructions',
             'status',
-            name='General'
+            name='General',
         ),
         FieldSet(
             'sender',
@@ -519,7 +520,7 @@ class TransferForm(NetBoxModelForm):
             'pickup_date',
             'received_date',
             'tags',
-            name='Transfer'
+            name='Transfer',
         ),
     )
 

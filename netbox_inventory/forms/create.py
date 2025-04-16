@@ -43,7 +43,7 @@ class AssetCreateMixin:
             self.initial['serial'] = asset.serial
             self.initial['asset_tag'] = asset.asset_tag if asset.asset_tag else None
             self.initial[kind_type] = asset.hardware_type.id
-            
+
             if asset.storage_location and asset.storage_location.site:
                 self.initial['site'] = asset.storage_location.site
                 self.initial['location'] = asset.storage_location
