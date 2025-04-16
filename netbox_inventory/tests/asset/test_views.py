@@ -1,6 +1,7 @@
+from django.test import override_settings
+
 from core.models import ObjectType
 from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
-from django.test import override_settings
 from users.models import ObjectPermission
 from utilities.testing import ViewTestCases, post_data
 

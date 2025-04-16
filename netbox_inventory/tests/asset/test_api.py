@@ -1,5 +1,7 @@
 from copy import copy
 
+from rest_framework import status
+
 from core.models import ObjectType
 from dcim.models import (
     Device,
@@ -11,7 +13,6 @@ from dcim.models import (
     RackType,
     Site,
 )
-from rest_framework import status
 from users.models import ObjectPermission
 from utilities.testing import APIViewTestCases, disable_warnings
 
