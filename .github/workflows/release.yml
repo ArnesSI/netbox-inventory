@@ -58,3 +58,9 @@ jobs:
           gh release create "$VERSION" dist/netbox_inventory-*.tar.gz dist/netbox_inventory-*.whl \
             --title "NetBox Inventory Plus $VERSION" \
             --notes "Release $VERSION"
+
+      - name: Clean up
+        run: |
+          echo "Cleaning up..."
+          rm -rf dist
+          echo "Cleanup complete."

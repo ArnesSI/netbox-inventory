@@ -5,6 +5,32 @@ on:
   - pull_request
 
 jobs:
+  isort:
+    name: Run isort and check import order
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install isort
+        run: pip install isort
+
+      - name: Run isort on the codebase
+        run: isort .
+
+      - name: Check for isort changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "❌ isort made changes! Please commit them."
+            git diff
+            exit 1
+          fi
+  
   lint:
     runs-on: ubuntu-latest
 
