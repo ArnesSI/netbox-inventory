@@ -388,7 +388,8 @@ class AssetImportForm(NetBoxModelImportForm):
         if not delivery_name:
             return None
         try:
-            delivery = Delivery.objects.get(purchases=purchase, name=delivery_name)
+            delivery = Delivery.objects.get(name=delivery_name)
+            delivery.purchases.set([purchase])
         except ObjectDoesNotExist:
             raise forms.ValidationError(
                 f'Unable to find delivery {purchase} {delivery_name}'
@@ -701,7 +702,7 @@ class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class DeliveryImportForm(NetBoxModelImportForm):
-    purchase = CSVModelChoiceField(
+    purchases = CSVModelMultipleChoiceField(
         queryset=Purchase.objects.all(),
         to_field_name='id',
         help_text='Purchase that this delivery is part of. It must exist when importing.',
@@ -719,7 +720,7 @@ class DeliveryImportForm(NetBoxModelImportForm):
         fields = (
             'name',
             'date',
-            'purchase',
+            'purchases',
             'receiving_contact',
             'description',
             'comments',
@@ -729,10 +730,10 @@ class DeliveryImportForm(NetBoxModelImportForm):
 
 class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
     date = forms.DateField(label='Date', required=False, widget=DatePicker())
-    purchase = DynamicModelChoiceField(
+    purchases = DynamicModelMultipleChoiceField(
         queryset=Purchase.objects.all(),
         required=False,
-        label='Purchase',
+        label='Purchases',
     )
     contact_group = DynamicModelChoiceField(
         queryset=ContactGroup.objects.all(),
@@ -760,7 +761,7 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         FieldSet(
             'date',
-            'purchase',
+            'purchases',
             'contact_group',
             'receiving_contact',
             'description',

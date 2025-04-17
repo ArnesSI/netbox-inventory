@@ -143,7 +143,7 @@ class AssetTest(
 
         self.assertIn('id', data)
         instance = self._get_queryset().get(pk=data['id'])
-        self.assertEqual(instance.purchase, self.purchase1)
+        self.assertIn(self.purchase1, instance.purchases.all)
 
     def test_serial_asset_tag_empty(self):
         """
@@ -226,7 +226,7 @@ class AssetTest(
             {
                 'name': 'Asset 4',
                 'serial': 'asset4',
-                'status': 'stored',
+                'status': 'planned',
                 'device_type': device_type1.pk,
                 'device': None,
             },

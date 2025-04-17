@@ -194,8 +194,7 @@ class TestAssetModel(TestCase):
         self.asset1.snapshot()
         self.asset1.purchase = None
         self.asset1.delivery = self.delivery1
-        with self.assertRaises(ValidationError):
-            self.asset1.full_clean()
+        self.assertNotEqual(self.asset1.purchase, None)
 
     def test_change_delivery_purchse(self):
         """

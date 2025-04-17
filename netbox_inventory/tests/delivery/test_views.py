@@ -45,7 +45,7 @@ class DeliveryTestCase(
             'date': datetime.date(day=1, month=1, year=2023),
         }
         cls.csv_data = (
-            'name,purchase,date',
+            'name,purchases,date',
             f'Delivery 4,{purchase1.pk},2023-03-26',
             f'Delivery 5,{purchase1.pk},2023-03-26',
             f'Delivery 6,{purchase1.pk},2023-03-26',

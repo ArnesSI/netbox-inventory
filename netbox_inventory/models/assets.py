@@ -539,6 +539,9 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         stored_status = get_status_for('stored')
         used_status = get_status_for('used')
 
+        old_purchase = get_prechange_field(self, 'purchase')
+        old_bom = get_prechange_field(self, 'bom')
+
         if old_status != self.status:
             # status has also been changed manually, don't change it automatically
             return
@@ -548,24 +551,17 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             self.status = used_status
             return
 
-        # Stored: Asset was unassigned
-        elif stored_status and not new_hw and old_hw:
-            self.status = stored_status
-            return
-
         # Stored: Unassigned but fully delivered and purchased
-        if stored_status and not self.hardware and self.purchase and self.delivery:
+        if stored_status and not new_hw and self.purchase and self.delivery:
             self.status = stored_status
             return
 
         # Ordered: Purchase just got created
-        old_purchase = get_prechange_field(self, 'purchase')
         if ordered_status and self.purchase and not old_purchase:
             self.status = ordered_status
             return
 
         # Planned: BOM just added
-        old_bom = get_prechange_field(self, 'bom')
         if planned_status and self.bom and not old_bom:
             self.status = planned_status
             return
