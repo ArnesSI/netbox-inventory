@@ -190,6 +190,19 @@ audit_admin_items = (
             ),
         ],
     ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:audittrail_list',
+        link_text='Audit Trails',
+        permissions=['netbox_inventory.view_audittrail'],
+        buttons=[
+            PluginMenuButton(
+                link='plugins:netbox_inventory:audittrail_bulk_import',
+                title='Import',
+                icon_class='mdi mdi-upload',
+                permissions=['netbox_inventory.add_audittrail'],
+            ),
+        ],
+    ),
 )
 
 #

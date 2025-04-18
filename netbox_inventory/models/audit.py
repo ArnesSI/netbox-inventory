@@ -1,6 +1,9 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
 from django.urls import NoReverseMatch, reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import ObjectChange, ObjectType
@@ -9,7 +12,9 @@ from netbox.models import NestedGroupModel
 from netbox.models.features import (
     ChangeLoggingMixin,
     CloningMixin,
+    CustomValidationMixin,
     EventRulesMixin,
+    ExportTemplatesMixin,
 )
 from utilities.query import dict_to_filter_params
 from utilities.querysets import RestrictedQuerySet
@@ -22,6 +27,7 @@ __all__ = (
     'AuditFlow',
     'AuditFlowPage',
     'AuditFlowPageAssignment',
+    'AuditTrail',
 )
 
 
@@ -161,6 +167,7 @@ class AuditFlowPageAssignment(
     ChangeLoggingMixin,
     CloningMixin,
     EventRulesMixin,
+    models.Model,
 ):
     """
     Mapping between `AuditFlow` and `AuditFlowPage` to add additional metadata.
@@ -311,3 +318,47 @@ class AuditFlowPageAssignment(
             start_object = start_object.get_descendants(include_self=True)
 
         return self.page.get_objects().filter(**{filter_name: start_object})
+
+
+class AuditTrail(
+    ChangeLoggingMixin,
+    CustomValidationMixin,
+    ExportTemplatesMixin,
+    EventRulesMixin,
+    models.Model,
+):
+    object_type = models.ForeignKey(
+        to=ContentType,
+        on_delete=models.CASCADE,
+    )
+    object_id = models.PositiveBigIntegerField()
+    object = GenericForeignKey(
+        ct_field='object_type',
+        fk_field='object_id',
+    )
+
+    objects = RestrictedQuerySet.as_manager()
+
+    class Meta:
+        ordering = (
+            '-created',
+            'object_type',
+        )
+        indexes = (models.Index(fields=('object_type', 'object_id')),)
+
+    def __str__(self) -> str:
+        created = timezone.localtime(self.created)
+        return (
+            f'{created.date().isoformat()} '
+            f'{created.time().isoformat(timespec="minutes")} '
+            f'({self.object})'
+        )
+
+    def get_absolute_url(self) -> None:
+        # Audit trails are only visible in the list view.
+        return None
+
+    def to_objectchange(self, action) -> ObjectChange:
+        objectchange = super().to_objectchange(action)
+        objectchange.related_object = self.object
+        return objectchange

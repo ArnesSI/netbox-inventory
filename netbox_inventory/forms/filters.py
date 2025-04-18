@@ -34,6 +34,7 @@ __all__ = (
     'AssetFilterForm',
     'AuditFlowFilterForm',
     'AuditFlowPageFilterForm',
+    'AuditTrailFilterForm',
     'DeliveryFilterForm',
     'InventoryItemGroupFilterForm',
     'InventoryItemTypeFilterForm',
@@ -516,6 +517,18 @@ class AuditFlowFilterForm(BaseFlowFilterForm):
 
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'object_type_id',
+            name='Assignment',
+        ),
+    )
+
+
+class AuditTrailFilterForm(BaseFlowFilterForm):
+    model = AuditTrail
+
+    fieldsets = (
+        FieldSet('q', 'filter_id'),
         FieldSet(
             'object_type_id',
             name='Assignment',

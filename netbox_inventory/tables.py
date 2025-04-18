@@ -15,6 +15,7 @@ __all__ = (
     'AuditFlowPageAssignmentTable',
     'AuditFlowPageTable',
     'AuditFlowTable',
+    'AuditTrailTable',
     'SupplierTable',
     'PurchaseTable',
     'DeliveryTable',
@@ -566,7 +567,9 @@ class BaseFlowTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
-    object_type = columns.ContentTypeColumn()
+    object_type = columns.ContentTypeColumn(
+        verbose_name=_('Object Type'),
+    )
 
     class Meta(NetBoxTable.Meta):
         fields = (
@@ -628,6 +631,40 @@ class AuditFlowPageAssignmentTable(NetBoxTable):
             'flow',
             'page',
             'weight',
+        )
+
+
+class AuditTrailTable(NetBoxTable):
+    object_type = columns.ContentTypeColumn(
+        verbose_name=_('Object Type'),
+    )
+    object = tables.Column(
+        verbose_name=_('Object'),
+        linkify=True,
+        orderable=False,
+    )
+    actions = columns.ActionsColumn(
+        actions=(
+            'delete',
+        ),
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditTrail
+        fields = (
+            'pk',
+            'id',
+            'object_type',
+            'object',
+            'created',
+            'last_changed',
+            'actions',
+        )
+        default_columns = (
+            'pk',
+            'created',
+            'object_type',
+            'object',
         )
 
 

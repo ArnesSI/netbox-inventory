@@ -22,6 +22,7 @@ __all__ = (
     'AssetImportForm',
     'AuditFlowImportForm',
     'AuditFlowPageImportForm',
+    'AuditTrailImportForm',
     'DeliveryImportForm',
     'InventoryItemGroupImportForm',
     'PurchaseImportForm',
@@ -543,3 +544,12 @@ class AuditFlowImportForm(BaseFlowImportForm):
     class Meta(BaseFlowImportForm.Meta):
         model = AuditFlow
         fields = BaseFlowImportForm.Meta.fields + ('enabled',)
+
+
+class AuditTrailImportForm(BaseFlowImportForm):
+    class Meta:
+        model = AuditTrail
+        fields = (
+            'object_type',
+            'object_id',
+        )

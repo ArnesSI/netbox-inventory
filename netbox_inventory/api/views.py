@@ -10,6 +10,7 @@ __all__ = (
     'AuditFlowPageAssignmentViewSet',
     'AuditFlowPageViewSet',
     'AuditFlowViewSet',
+    'AuditTrailViewSet',
     'DeliveryViewSet',
     'DeviceAssetViewSet',
     'InventoryItemAssetViewSet',
@@ -136,3 +137,8 @@ class AuditFlowViewSet(NetBoxModelViewSet):
 class AuditFlowPageAssignmentViewSet(NetBoxModelViewSet):
     queryset = models.AuditFlowPageAssignment.objects.prefetch_related('flow', 'page')
     serializer_class = AuditFlowPageAssignmentSerializer
+
+
+class AuditTrailViewSet(NetBoxModelViewSet):
+    queryset = models.AuditTrail.objects.prefetch_related('object')
+    serializer_class = AuditTrailSerializer

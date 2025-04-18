@@ -35,6 +35,7 @@ __all__ = (
     'AssetFilterSet',
     'AuditFlowFilterSet',
     'AuditFlowPageFilterSet',
+    'AuditTrailFilterSet',
     'DeliveryFilterSet',
     'DeviceAssetFilterSet',
     'InventoryItemAssetFilterSet',
@@ -645,7 +646,6 @@ class BaseFlowFilterSet(NetBoxModelFilterSet):
             'id',
             'name',
             'description',
-            'object_type',
         )
 
     def search(self, queryset, name, value):
@@ -680,4 +680,19 @@ class AuditFlowFilterSet(BaseFlowFilterSet):
         fields = BaseFlowFilterSet.Meta.fields + (
             'enabled',
             'page_id',
+        )
+
+
+class AuditTrailFilterSet(NetBoxModelFilterSet):
+    # Disable inherited filters for nonexistent fields.
+    tag = None
+
+    object_type = ContentTypeFilter()
+
+    class Meta:
+        model = AuditTrail
+        fields = (
+            'id',
+            'object_type_id',
+            'object_id',
         )

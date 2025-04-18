@@ -133,4 +133,13 @@ urlpatterns = (
         'audit-flowpage-assignments/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'auditflowpageassignment')),
     ),
+    # AuditTrails
+    path(
+        'audit-trails/',
+        include(get_model_urls('netbox_inventory', 'audittrail', detail=False)),
+    ),
+    path(
+        'audit-trails/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'audittrail')),
+    ),
 )
