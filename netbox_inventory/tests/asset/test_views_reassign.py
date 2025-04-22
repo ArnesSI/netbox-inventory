@@ -127,25 +127,25 @@ class AssetReassignBase:
         self.asset_device_new = Asset.objects.create(
             asset_tag='asset_device2',
             serial='asset_device2',
-            status='stored',
+            status='planned',
             device_type=self.device_type1,
         )
         self.asset_module_new = Asset.objects.create(
             asset_tag='asset_module2',
             serial='asset_module2',
-            status='stored',
+            status='planned',
             module_type=self.module_type1,
         )
         self.asset_inventoryitem_new = Asset.objects.create(
             asset_tag='asset_inventoryitem2',
             serial='asset_inventoryitem2',
-            status='stored',
+            status='planned',
             inventoryitem_type=self.inventoryitem_type2,
         )
         self.asset_rack_new = Asset.objects.create(
             asset_tag='asset_rack2',
             serial='asset_rack2',
-            status='stored',
+            status='planned',
             rack_type=self.rack_type1,
         )
 
@@ -189,7 +189,7 @@ class AssetReassignBase:
             changed_object_type=ContentType.objects.get_for_model(instance),
             changed_object_id=instance.pk,
         )
-        self.assertEqual(len(objectchanges), 2)
+        self.assertEqual(len(objectchanges), 1)
         self.assertEqual(
             objectchanges[0].action, ObjectChangeActionChoices.ACTION_UPDATE
         )
@@ -232,7 +232,7 @@ class DeviceReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         self.form_data = {
             'device_type': self.device1.device_type.pk,
             'assigned_asset': self.asset_device_new.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.device1
         self.asset_new = self.asset_device_new
@@ -251,7 +251,7 @@ class ModuleReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         self.form_data = {
             'module_type': self.module1.module_type.pk,
             'assigned_asset': self.asset_module_new.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.module1
         self.asset_new = self.asset_module_new
@@ -269,7 +269,7 @@ class InventoryItemReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         super().setUp()
         self.form_data = {
             'assigned_asset': self.asset_inventoryitem_new.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.inventoryitem1
         self.asset_new = self.asset_inventoryitem_new
@@ -303,7 +303,7 @@ class RackReassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         self.form_data = {
             'rack_type': self.rack1.rack_type.pk,
             'assigned_asset': self.asset_rack_new.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.rack1
         self.asset_new = self.asset_rack_new
@@ -321,7 +321,7 @@ class DeviceUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         super().setUp()
         self.form_data = {
             'device_type': self.device1.device_type.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.device1
         self.asset_new = None
@@ -339,7 +339,7 @@ class ModuleUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         super().setUp()
         self.form_data = {
             'module_type': self.module1.module_type.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.module1
         self.asset_new = None
@@ -356,7 +356,7 @@ class InventoryItemUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
     def setUp(self):
         super().setUp()
         self.form_data = {
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.inventoryitem1
         self.asset_new = None
@@ -388,7 +388,7 @@ class RackUnassignAssetTestCase(AssetReassignBase, ModelViewTestCase):
         super().setUp()
         self.form_data = {
             'rack_type': self.rack1.rack_type.pk,
-            'asset_status': 'stored',
+            'asset_status': 'planned',
         }
         self.tested_hardware = self.rack1
         self.asset_new = None

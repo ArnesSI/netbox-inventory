@@ -18,6 +18,8 @@ class NetBoxInventoryConfig(PluginConfig):
         'planned_additional_status_names': [],
         'ordered_status_name': 'ordered',
         'ordered_additional_status_names': [],
+        'retired_status_name': 'retired',
+        'retired_additional_status_names': [],
         'stored_status_name': 'stored',
         'stored_additional_status_names': [
             'retired',

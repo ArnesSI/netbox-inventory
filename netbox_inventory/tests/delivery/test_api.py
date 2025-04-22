@@ -13,7 +13,7 @@ class DeliveryTest(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = Delivery
-    brief_fields = ['date', 'description', 'display', 'id', 'name', 'url']
+    brief_fields = ['date', 'description', 'display', 'id', 'name', 'purchases', 'url']
 
     bulk_update_data = {
         'description': 'new description',
@@ -34,14 +34,19 @@ class DeliveryTest(
         cls.create_data = [
             {
                 'name': 'Delivery 4',
-                'purchases': [purchase1.pk],
+                'purchase_ids': [purchase1.pk],
             },
             {
                 'name': 'Delivery 5',
-                'purchases': [purchase1.pk],
+                'purchase_ids': [purchase1.pk],
             },
             {
                 'name': 'Delivery 6',
-                'purchases': [purchase1.pk],
+                'purchase_ids': [purchase1.pk],
             },
         ]
+
+    def serialize_data(self, instance):
+        data = super().serialize_data(instance)
+        data.pop('purchase_ids', None)  # exclude write-only field
+        return data

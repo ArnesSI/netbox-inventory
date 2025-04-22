@@ -67,6 +67,13 @@ class PurchaseSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:purchase-detail'
     )
     supplier = SupplierSerializer(nested=True)
+    bom_ids = serializers.PrimaryKeyRelatedField(
+        source='boms',
+        queryset=BOM.objects.all(),
+        many=True,
+        required=False,
+        write_only=True
+    )
     boms = BOMSerializer(nested=True, many=True, read_only=True)
     asset_count = serializers.IntegerField(read_only=True)
     delivery_count = serializers.IntegerField(read_only=True)
@@ -78,6 +85,7 @@ class PurchaseSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'supplier',
+            'bom_ids',
             'boms',
             'name',
             'status',
@@ -108,6 +116,12 @@ class DeliverySerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_inventory-api:delivery-detail'
     )
+    purchase_ids = serializers.PrimaryKeyRelatedField(
+        source='purchases',
+        queryset=Purchase.objects.all(),
+        many=True,
+        write_only=True
+    )
     purchases = PurchaseSerializer(nested=True, many=True, read_only=True)
     receiving_contact = ContactSerializer(
         nested=True, required=False, allow_null=True, default=None
@@ -120,6 +134,7 @@ class DeliverySerializer(NetBoxModelSerializer):
             'id',
             'url',
             'display',
+            'purchase_ids',
             'purchases',
             'name',
             'date',
@@ -132,4 +147,4 @@ class DeliverySerializer(NetBoxModelSerializer):
             'last_updated',
             'asset_count',
         )
-        brief_fields = ('id', 'url', 'display', 'name', 'date', 'description')
+        brief_fields = ('id', 'url', 'display', 'purchases', 'name', 'date', 'description')

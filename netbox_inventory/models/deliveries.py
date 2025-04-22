@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
@@ -169,6 +170,11 @@ class Delivery(NetBoxModel):
     )
 
     clone_fields = ['purchases', 'date', 'receiving_contact', 'description', 'comments']
+
+    def clean(self):
+        super().clean()
+        if self.pk and self.purchases.count() == 0:
+            raise ValidationError('A delivery must have at least one purchase.')
 
     class Meta:
         ordering = ['name']

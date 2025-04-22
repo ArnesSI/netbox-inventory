@@ -14,6 +14,7 @@ class PurchaseTest(
 ):
     model = Purchase
     brief_fields = [
+        'boms',
         'date',
         'description',
         'display',

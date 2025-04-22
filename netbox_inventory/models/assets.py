@@ -531,23 +531,23 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         If asset was assigned or unassigned to a particular device, module, inventoryitem, rack
         update asset.status. Depending on plugin configuration.
         """
-        old_hw = get_prechange_field(self, self.kind)
+        # Retired: Asset is retired; do not change status automatically
+        if self.status == get_status_for('retired'):
+            return
+
         new_hw = getattr(self, self.kind)
         old_status = get_prechange_field(self, 'status')
-        planned_status = get_status_for('planned')
-        ordered_status = get_status_for('ordered')
-        stored_status = get_status_for('stored')
         used_status = get_status_for('used')
+        stored_status = get_status_for('stored')
+        ordered_status = get_status_for('ordered')
+        planned_status = get_status_for('planned')
 
-        old_purchase = get_prechange_field(self, 'purchase')
-        old_bom = get_prechange_field(self, 'bom')
-
+        # Manual Assignment: Status has been set manually; do not change it
         if old_status != self.status:
-            # status has also been changed manually, don't change it automatically
             return
 
         # Used: Asset was assigned
-        if used_status and new_hw and not old_hw:
+        if used_status and new_hw:
             self.status = used_status
             return
 
@@ -557,14 +557,12 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return
 
         # Ordered: Purchase just got created
-        if ordered_status and self.purchase and not old_purchase:
+        if ordered_status and self.purchase:
             self.status = ordered_status
             return
 
-        # Planned: BOM just added
-        if planned_status and self.bom and not old_bom:
-            self.status = planned_status
-            return
+        # Planned: Default status
+        self.status = planned_status
 
     def update_hardware_used(self, clear_old_hw=True):
         """

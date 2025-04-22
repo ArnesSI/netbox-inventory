@@ -43,7 +43,7 @@ class TestAssetModel(TestCase):
         self.asset1 = Asset.objects.create(
             asset_tag='asset1',
             serial='asset1',
-            status='stored',
+            status='planned',
             device_type=self.device_type1,
         )
         self.device1 = Device.objects.create(
@@ -171,7 +171,7 @@ class TestAssetModel(TestCase):
         self.asset1.device = None
         self.asset1.full_clean()
         self.asset1.save()
-        self.assertEqual(self.asset1.status, 'stored')
+        self.assertEqual(self.asset1.status, 'planned')
 
     def test_status_device_deleted(self):
         self.asset1.snapshot()

@@ -74,7 +74,7 @@ class AssetTestCase(
         )
 
         cls.form_data = {
-            'status': 'stored',
+            'status': 'planned',
             'serial': '124',
             'device_type': device_type1.pk,
         }
