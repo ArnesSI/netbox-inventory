@@ -3,7 +3,7 @@ from django.urls import reverse
 from core.models import ObjectType
 from dcim.models import DeviceType, Manufacturer
 from users.models import ObjectPermission
-from utilities.testing import ViewTestCases
+from utilities.testing import ViewTestCases, post_data
 
 from netbox_inventory.models import Asset, AuditTrail
 from netbox_inventory.tests.custom import ModelViewTestCase
@@ -100,4 +100,29 @@ class AuditTrailViewTestCase(
         self.assertNotIn(
             reverse('plugins:netbox_inventory:audittrail_delete', args=[instance2.pk]),
             content,
+        )
+
+    def test_bulk_add(self) -> None:
+        """
+        Check that objects can be marked seen in bulk (e.g. when running an audit flow).
+        """
+        self.add_permissions('netbox_inventory.add_audittrail')
+
+        data = {
+            'object_type_id': ObjectType.objects.get_for_model(Asset).pk,
+            'pk': list(Asset.objects.values_list('pk', flat=True)),
+        }
+
+        request = {
+            'path': reverse('plugins:netbox_inventory:audittrail_bulk_add'),
+            'data': post_data(data),
+        }
+        response = self.client.post(**request)
+        self.assertHttpStatus(response, 302)
+        self.assertEqual(
+            AuditTrail.objects.count(),
+            (
+                len(data['pk'])  # new objects
+                + 3  # from setUpTestData
+            ),
         )
