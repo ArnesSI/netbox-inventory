@@ -171,7 +171,19 @@ class AuditFlowRunView(generic.ObjectChildrenView):
             request,
             pk=request.GET.get('object_id'),
         )
-        return self.page.get_objects(self.start_object)
+        queryset = self.page.get_objects(self.start_object)
+
+        # If the object list view has a queryset, get a list of lookups to prefetch from
+        # it. This should solve possible N+1 query problems, since a custom queryset is
+        # created for each audit flow page. This plugin can't know the specifics of each
+        # queryset and its optimizations, so it needs to reuse existing optimizations to
+        # improve performance.
+        view_queryset = getattr(view, 'queryset', None)
+        if view_queryset:
+            prefetch_lookups = getattr(view_queryset, '_prefetch_related_lookups', ())
+            queryset = queryset.prefetch_related(*prefetch_lookups)
+
+        return queryset
 
     def get_prefill_location_params(self) -> dict[str, int]:
         """
