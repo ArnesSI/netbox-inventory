@@ -644,9 +644,7 @@ class AuditTrailTable(NetBoxTable):
         orderable=False,
     )
     actions = columns.ActionsColumn(
-        actions=(
-            'delete',
-        ),
+        actions=('delete',),
     )
 
     class Meta(NetBoxTable.Meta):

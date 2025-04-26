@@ -3,7 +3,7 @@ from django.test import override_settings
 from django.urls import reverse
 
 from core.models import ObjectType
-from dcim.models import DeviceType, Manufacturer, Site
+from dcim.models import DeviceType, Location, Manufacturer, Site
 from utilities.object_types import object_type_identifier
 from utilities.testing import TestCase, ViewTestCases
 
@@ -12,6 +12,7 @@ from netbox_inventory.models import (
     AuditFlow,
     AuditFlowPage,
     AuditFlowPageAssignment,
+    AuditTrail,
 )
 from netbox_inventory.tests.custom import ModelViewTestCase
 
@@ -235,3 +236,91 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
 
         # 7 options: 3 (status) * 1 (manufacturer) * 2 (device type) + 1 generic
         self.test_add_object_button_params_variants(num_links=7)
+
+    def test_audit_trail_button_hidden_if_no_permission(self) -> None:
+        response = self._run_audit_flow(AuditFlow.objects.first(), Site.objects.first())
+
+        # User has no permissions to mark objects as seen.
+        self.assertNotIn(
+            reverse('plugins:netbox_inventory:audittrail_bulk_add'),
+            str(response.content),
+        )
+
+    def test_audit_trail_button(self) -> None:
+        self.add_permissions('netbox_inventory.add_audittrail')
+
+        site = Site.objects.first()
+        location = Location(
+            site=site,
+            name='Location 1',
+            slug='location-1',
+            status='active',
+        )
+        location.full_clean()
+        location.save()
+
+        manufacturer = Manufacturer.objects.create(
+            name='manufacturer 1',
+            slug='manufacturer-1',
+        )
+        device_type = DeviceType.objects.create(
+            manufacturer=manufacturer,
+            model='DeviceType 1',
+            slug='devicetype-1',
+        )
+
+        assets = (
+            Asset(
+                asset_tag='asset1',
+                serial='asset1',
+                status='stored',
+                device_type=device_type,
+                storage_location=location,
+            ),
+            Asset(
+                asset_tag='asset2',
+                serial='asset2',
+                status='stored',
+                device_type=device_type,
+                storage_location=location,
+            ),
+            Asset(
+                asset_tag='asset3',
+                serial='asset3',
+                status='stored',
+                device_type=device_type,
+                storage_location=location,
+            ),
+        )
+        Asset.objects.bulk_create(assets)
+
+        audit_trails = (
+            AuditTrail(object=assets[0]),
+            AuditTrail(object=assets[1]),
+        )
+        AuditTrail.objects.bulk_create(audit_trails)
+
+        audit_flow = AuditFlow.objects.first()
+
+        response = self._run_audit_flow(audit_flow, site)
+        self.assertEqual(
+            str(response.content).count(
+                reverse('plugins:netbox_inventory:audittrail_bulk_add'),
+            ),
+            (
+                (len(assets) - len(audit_trails))  # unseen
+                + 1  # bulk mark seen button
+            ),
+        )
+
+        for audit_trail in AuditTrail.objects.all():
+            with self.subTest(audit_trail_for=audit_trail.pk):
+                self.assertIn(
+                    reverse(
+                        'plugins:netbox_inventory:audittrail_delete',
+                        kwargs={
+                            'pk': audit_trail.pk,
+                        },
+                    ),
+                    str(response.content),
+                )
