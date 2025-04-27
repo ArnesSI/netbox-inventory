@@ -708,6 +708,18 @@ class DeliveryImportForm(NetBoxModelImportForm):
         help_text='Purchase that this delivery is part of. It must exist when importing.',
         required=True,
     )
+    delivery_site = CSVModelChoiceField(
+        queryset=Site.objects.all(),
+        to_field_name='name',
+        help_text='Site that contains delivery_location where delivery will be received.',
+        required=False,
+    )
+    delivery_location = CSVModelChoiceField(
+        queryset=Location.objects.all(),
+        to_field_name='name',
+        help_text='Location where this delivery is to be received. It must exist before import.',
+        required=False,
+    )
     receiving_contact = CSVModelChoiceField(
         queryset=Contact.objects.all(),
         to_field_name='id',
@@ -721,6 +733,8 @@ class DeliveryImportForm(NetBoxModelImportForm):
             'name',
             'date',
             'purchases',
+            'delivery_site',
+            'delivery_location',
             'receiving_contact',
             'description',
             'comments',
@@ -734,6 +748,22 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Purchase.objects.all(),
         required=False,
         label='Purchases',
+    )
+    delivery_site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        null_option='None',
+        label='Delivery Site',
+        help_text='Filter delivery locations by site',
+    )
+    delivery_location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        help_text=Delivery._meta.get_field('delivery_location').help_text,
+        label='Delivery Location',
+        query_params={
+            'site_id': '$delivery_site',
+        },
     )
     contact_group = DynamicModelChoiceField(
         queryset=ContactGroup.objects.all(),
@@ -767,11 +797,13 @@ class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
             'description',
             name='General',
         ),
+        FieldSet('delivery_site', 'delivery_location', name='Location'),
     )
     nullable_fields = (
         'date',
         'description',
         'receiving_contact',
+        'delivery_location',
     )
 
 

@@ -321,6 +321,21 @@ class PurchaseForm(NetBoxModelForm):
 
 
 class DeliveryForm(NetBoxModelForm):
+    delivery_site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        initial_params={
+            'locations': '$delivery_location',
+        },
+    )
+    delivery_location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        help_text=Delivery._meta.get_field('delivery_location').help_text,
+        required=False,
+        query_params={
+            'site_id': '$delivery_site',
+        },
+    )
     contact_group = DynamicModelChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
@@ -353,6 +368,7 @@ class DeliveryForm(NetBoxModelForm):
             'tags',
             name='Delivery',
         ),
+        FieldSet('delivery_site', 'delivery_location', name='Location'),
     )
 
     class Meta:
@@ -361,6 +377,8 @@ class DeliveryForm(NetBoxModelForm):
             'purchases',
             'name',
             'date',
+            'delivery_site',
+            'delivery_location',
             'contact_group',
             'receiving_contact',
             'description',

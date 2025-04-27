@@ -440,6 +440,8 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         FieldSet(
             'purchase_id',
             'supplier_id',
+            'delivery_site_id',
+            'delivery_location_id',
             'contact_group_id',
             'receiving_contact_id',
             'date_after',
@@ -463,6 +465,22 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         null_option='None',
         label='Contact Group',
+    )
+    delivery_site_id = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label='Delivery site',
+        help_text='Site where this delivery was received',
+    )
+    delivery_location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'site_id': '$delivery_site_id',
+        },
+        label='Delivery location',
+        help_text='Location where this delivery was received',
     )
     receiving_contact_id = DynamicModelMultipleChoiceField(
         queryset=Contact.objects.all(),

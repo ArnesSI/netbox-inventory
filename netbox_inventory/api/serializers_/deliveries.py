@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from dcim.api.serializers import LocationSerializer
 from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers import ContactSerializer
 
@@ -123,6 +124,12 @@ class DeliverySerializer(NetBoxModelSerializer):
         write_only=True
     )
     purchases = PurchaseSerializer(nested=True, many=True, read_only=True)
+    delivery_location = LocationSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
     receiving_contact = ContactSerializer(
         nested=True, required=False, allow_null=True, default=None
     )
@@ -134,6 +141,7 @@ class DeliverySerializer(NetBoxModelSerializer):
             'id',
             'url',
             'display',
+            'delivery_location',
             'purchase_ids',
             'purchases',
             'name',
