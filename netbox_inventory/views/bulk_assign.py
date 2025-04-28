@@ -87,19 +87,21 @@ class BulkAssignView(generic.ObjectListView):
         if isinstance(field_object, ForeignKey):
             objects = self.queryset.filter(pk__in=object_ids)
             for obj in objects:
-                obj = self.queryset.get(
-                    pk=obj.pk
-                )  # Reload the object to ensure pre-change tracking
+                obj = self.queryset.get(pk=obj.pk)
                 setattr(obj, related_field, related_instance)
-                obj.update_status()  # Call update_status explicitly
-                obj.save()  # Save the object to persist changes
+                obj._in_bulk_assignment = True
+                obj.clean()
+                obj.save()
+                obj._in_bulk_assignment = False
         elif isinstance(field_object, ManyToManyField):
             objects = self.queryset.filter(pk__in=object_ids)
             for obj in objects:
-                obj = self.queryset.get(pk=obj.pk)  # Reload the object
+                obj = self.queryset.get(pk=obj.pk)
                 getattr(obj, related_field).add(related_instance)
-                obj.update_status()  # Call update_status explicitly
-                obj.save()  # Save the object
+                obj._in_bulk_assignment = True
+                obj.clean()
+                obj.save()
+                obj._in_bulk_assignment = False
         else:
             messages.error(request, 'Unsupported field type for bulk assignment.')
             return redirect(error_redirect_path)
@@ -165,6 +167,7 @@ class AssignToAssetView(BulkAssignView):
         'rack__role',
         'owner',
         'bom',
+        'purchase',
         'purchase__supplier',
         'delivery',
         'storage_location',
