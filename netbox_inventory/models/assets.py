@@ -606,10 +606,9 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         else:
             self.storage_location = None
 
-        # if self.purchase:
-        #     self.status = get_status_for('ordered')
-
     def clean_delivery(self):
+        if self.delivery and not self.purchase:
+            self.purchase = self.delivery.purchases.first()
         if self.delivery:
             if self.purchase and self.purchase not in self.delivery.purchases.all():
                 raise ValidationError(

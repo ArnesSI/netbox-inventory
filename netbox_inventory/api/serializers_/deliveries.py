@@ -118,10 +118,10 @@ class DeliverySerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_inventory-api:delivery-detail'
     )
     purchase_ids = serializers.PrimaryKeyRelatedField(
-        source='purchases',
         queryset=Purchase.objects.all(),
+        source='purchases',
         many=True,
-        write_only=True
+        required=False
     )
     purchases = PurchaseSerializer(nested=True, many=True, read_only=True)
     delivery_location = LocationSerializer(

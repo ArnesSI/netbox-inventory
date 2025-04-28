@@ -194,7 +194,11 @@ class TestAssetModel(TestCase):
         self.asset1.snapshot()
         self.asset1.purchase = None
         self.asset1.delivery = self.delivery1
+        self.asset1.full_clean()
+        self.asset1.save()
+        self.asset1.refresh_from_db()
         self.assertNotEqual(self.asset1.purchase, None)
+        self.assertEqual(self.asset1.purchase, self.delivery1.purchases.first())
 
     def test_change_delivery_purchse(self):
         """
