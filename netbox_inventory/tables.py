@@ -572,6 +572,9 @@ class DeliveryTable(NetBoxTable):
         accessor=columns.Accessor('purchase__date'),
         verbose_name='Purchase Date',
     )
+    delivery_location = tables.Column(
+        linkify=True,
+    )
     receiving_contact = tables.Column(
         linkify=True,
     )
@@ -596,6 +599,7 @@ class DeliveryTable(NetBoxTable):
             'supplier',
             'date',
             'purchase_date',
+            'delivery_location',
             'receiving_contact',
             'description',
             'comments',

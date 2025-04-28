@@ -19,6 +19,14 @@
             </td>
           </tr>
           <tr>
+            <th scope="row" title="The location where this delivery is to be received">Delivery Location</th>
+            <td>
+              {% if object.delivery_location %}
+                {{ object.delivery_location.site|linkify|placeholder }} /
+              {% endif %}
+              {{ object.delivery_location|linkify|placeholder }}</td>
+          </tr>
+          <tr>
             <th scope="row">Receiving Contact</th>
             <td>
               {% if object.receiving_contact.group %}
@@ -75,7 +83,7 @@
           Delivered Assets
           {% if perms.netbox_inventory.add_asset %}
             <div class="card-actions">
-              <a href="{% url 'plugins:netbox_inventory:asset_add' %}?delivery={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+              <a href="{% url 'plugins:netbox_inventory:asset_add' %}?delivery={{ object.pk }}&storage_location={{ object.delivery_location.id }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
                 <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add New Asset
               </a>
               <a href="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?related_type=delivery&related_id={{ object.pk }}&related_name={{ object.name }}{% for purchase in object.purchases.all %}&purchase_id={{ purchase.pk }}{% endfor %}" class="btn btn-ghost-primary btn-sm">

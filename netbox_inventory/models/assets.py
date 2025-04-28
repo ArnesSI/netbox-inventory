@@ -461,6 +461,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         self.validate_hardware_types()
         self.validate_hardware()
         self.update_status()
+        self.update_location()
         return super().clean()
 
     def save(self, clear_old_hw=True, *args, **kwargs):
@@ -542,8 +543,8 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         ordered_status = get_status_for('ordered')
         planned_status = get_status_for('planned')
 
-        # Manual Assignment: Status has been set manually; do not change it
-        if old_status != self.status:
+        # Manual/Bulk Assignment: Status has been set manually or Asset is part of bulk assignment; do not change it
+        if not getattr(self, '_in_bulk_assignment', False) and old_status != self.status:
             return
 
         # Used: Asset was assigned
@@ -552,7 +553,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             return
 
         # Stored: Unassigned but fully delivered and purchased
-        if stored_status and not new_hw and self.purchase and self.delivery:
+        if stored_status and self.delivery and not new_hw:
             self.status = stored_status
             return
 
@@ -592,6 +593,21 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             # just changed asset's serial or asset_tag, update assigned hw
             if new_hw:
                 asset_set_new_hw(asset=self, hw=new_hw)
+
+    def update_location(self):
+        """
+        Update the location of the asset based on the location of the assigned
+        delivery.
+        """
+        new_hw = getattr(self, self.kind)
+
+        if self.delivery and not new_hw:
+            self.storage_location = self.delivery.delivery_location
+        else:
+            self.storage_location = None
+
+        # if self.purchase:
+        #     self.status = get_status_for('ordered')
 
     def clean_delivery(self):
         if self.delivery:

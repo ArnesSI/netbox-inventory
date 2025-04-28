@@ -647,6 +647,16 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
         queryset=Supplier.objects.all(),
         label='Supplier (ID)',
     )
+    delivery_site_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Site.objects.all(),
+        field_name='delivery_location__site',
+        label='Delivery site (ID)',
+    )
+    delivery_location_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Location.objects.all(),
+        field_name='delivery_location',
+        label='Delivery location (ID)',
+    )
     contact_group_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ContactGroup.objects.all(),
         field_name='receiving_contact__group',
@@ -666,6 +676,7 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             'name',
             'date',
             'description',
+            'delivery_location',
             'receiving_contact',
             'purchases',
         )

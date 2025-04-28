@@ -161,6 +161,15 @@ class Delivery(NetBoxModel):
         blank=True,
         null=True,
     )
+    delivery_location = models.ForeignKey(
+        help_text='The location where this delivery is to be received',
+        to='dcim.Location',
+        on_delete=models.PROTECT,
+        related_name='+',
+        blank=True,
+        null=True,
+        verbose_name='Delivery Location',
+    )
     description = models.CharField(
         max_length=200,
         blank=True,
@@ -169,7 +178,19 @@ class Delivery(NetBoxModel):
         blank=True,
     )
 
-    clone_fields = ['purchases', 'date', 'receiving_contact', 'description', 'comments']
+    clone_fields = [
+        'purchases',
+        'date',
+        'receiving_contact',
+        'delivery_location',
+        'description',
+        'comments'
+    ]
+
+    @property
+    def delivery_site(self):
+        if self.delivery_location:
+            return self.delivery_location.site
 
     def clean(self):
         super().clean()
