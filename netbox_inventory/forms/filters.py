@@ -35,6 +35,7 @@ __all__ = (
     'AuditFlowFilterForm',
     'AuditFlowPageFilterForm',
     'AuditTrailFilterForm',
+    'AuditTrailSourceFilterForm',
     'DeliveryFilterForm',
     'InventoryItemGroupFilterForm',
     'InventoryItemTypeFilterForm',
@@ -524,13 +525,26 @@ class AuditFlowFilterForm(BaseFlowFilterForm):
     )
 
 
+class AuditTrailSourceFilterForm(NetBoxModelFilterSetForm):
+    model = AuditTrailSource
+
+    fields = (FieldSet('q', 'filter_id', 'tag'),)
+
+
 class AuditTrailFilterForm(BaseFlowFilterForm):
     model = AuditTrail
+
+    source_id = DynamicModelMultipleChoiceField(
+        queryset=AuditTrailSource.objects.all(),
+        required=False,
+        label='Source',
+    )
 
     fieldsets = (
         FieldSet('q', 'filter_id'),
         FieldSet(
             'object_type_id',
+            'source_id',
             name='Assignment',
         ),
     )

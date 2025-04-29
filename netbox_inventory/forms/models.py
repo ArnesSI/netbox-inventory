@@ -25,6 +25,7 @@ __all__ = (
     'AuditFlowForm',
     'AuditFlowPageAssignmentForm',
     'AuditFlowPageForm',
+    'AuditTrailSourceForm',
     'DeliveryForm',
     'InventoryItemGroupForm',
     'InventoryItemTypeForm',
@@ -501,4 +502,26 @@ class AuditFlowPageAssignmentForm(NetBoxModelForm):
             'flow',
             'page',
             'weight',
+        )
+
+
+class AuditTrailSourceForm(NetBoxModelForm):
+    slug = SlugField()
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'slug',
+            'description',
+        ),
+    )
+
+    class Meta:
+        model = AuditTrailSource
+        fields = (
+            'name',
+            'slug',
+            'description',
+            'comments',
         )

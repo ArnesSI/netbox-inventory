@@ -2,6 +2,7 @@ from netbox.search import SearchIndex
 
 from .models import (
     Asset,
+    AuditTrailSource,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -77,6 +78,21 @@ class DeliveryIndex(SearchIndex):
     )
 
 
+#
+# Audit
+#
+
+
+class AuditTrailSourceIndex(SearchIndex):
+    model = AuditTrailSource
+    fields = (
+        ('name', 100),
+        ('slug', 110),
+        ('description', 500),
+        ('comments', 5000),
+    )
+
+
 indexes = [
     InventoryItemGroupIndex,
     InventoryItemTypeIndex,
@@ -84,4 +100,5 @@ indexes = [
     SupplierIndex,
     PurchaseIndex,
     DeliveryIndex,
+    AuditTrailSourceIndex,
 ]

@@ -5,7 +5,7 @@ from dcim.models import DeviceType, Manufacturer
 from users.models import ObjectPermission
 from utilities.testing import ViewTestCases, post_data
 
-from netbox_inventory.models import Asset, AuditTrail
+from netbox_inventory.models import Asset, AuditTrail, AuditTrailSource
 from netbox_inventory.tests.custom import ModelViewTestCase
 
 
@@ -59,6 +59,11 @@ class AuditTrailViewTestCase(
         )
         AuditTrail.objects.bulk_create(audit_trails)
 
+        audit_trail_source = AuditTrailSource.objects.create(
+            name='Source 1',
+            slug='source-1',
+        )
+
         cls.csv_data = (
             'object_type,object_id',
             f'netbox_inventory.asset,{assets[0].pk}',
@@ -66,9 +71,9 @@ class AuditTrailViewTestCase(
             f'netbox_inventory.asset,{assets[2].pk}',
         )
         cls.csv_update_data = (
-            'id,object_id',
-            f'{audit_trails[0].pk},{assets[2].pk}',
-            f'{audit_trails[1].pk},{assets[2].pk}',
+            'id,object_id,source',
+            f'{audit_trails[0].pk},{assets[2].pk},{audit_trail_source.slug}',
+            f'{audit_trails[1].pk},{assets[2].pk},{audit_trail_source.slug}',
         )
 
     def test_list_objects_with_constrained_permission(self) -> None:

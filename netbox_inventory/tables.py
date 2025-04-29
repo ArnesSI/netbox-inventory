@@ -634,6 +634,28 @@ class AuditFlowPageAssignmentTable(NetBoxTable):
         )
 
 
+class AuditTrailSourceTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditTrailSource
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'description',
+            'lifetime',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'lifetime',
+        )
+
+
 class AuditTrailTable(NetBoxTable):
     object_type = columns.ContentTypeColumn(
         verbose_name=_('Object Type'),
@@ -642,6 +664,9 @@ class AuditTrailTable(NetBoxTable):
         verbose_name=_('Object'),
         linkify=True,
         orderable=False,
+    )
+    source = tables.Column(
+        linkify=True,
     )
     actions = columns.ActionsColumn(
         actions=('delete',),
@@ -654,6 +679,7 @@ class AuditTrailTable(NetBoxTable):
             'id',
             'object_type',
             'object',
+            'source',
             'created',
             'last_changed',
             'actions',
@@ -663,6 +689,7 @@ class AuditTrailTable(NetBoxTable):
             'created',
             'object_type',
             'object',
+            'source',
         )
 
 

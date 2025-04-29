@@ -36,6 +36,7 @@ __all__ = (
     'AuditFlowFilterSet',
     'AuditFlowPageFilterSet',
     'AuditTrailFilterSet',
+    'AuditTrailSourceFilterSet',
     'DeliveryFilterSet',
     'DeviceAssetFilterSet',
     'InventoryItemAssetFilterSet',
@@ -683,11 +684,41 @@ class AuditFlowFilterSet(BaseFlowFilterSet):
         )
 
 
+class AuditTrailSourceFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = AuditTrailSource
+        fields = (
+            'id',
+            'name',
+            'slug',
+            'description',
+        )
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(name__icontains=value)
+            | Q(slug__icontains=value)
+            | Q(description__icontains=value)
+        )
+
+
 class AuditTrailFilterSet(NetBoxModelFilterSet):
     # Disable inherited filters for nonexistent fields.
     tag = None
 
     object_type = ContentTypeFilter()
+    source_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=AuditTrailSource.objects.all(),
+        label='Source (ID)',
+    )
+    source = django_filters.ModelMultipleChoiceFilter(
+        field_name='source__slug',
+        queryset=AuditTrailSource.objects.all(),
+        to_field_name='slug',
+        label=_('Source (slug)'),
+    )
 
     class Meta:
         model = AuditTrail

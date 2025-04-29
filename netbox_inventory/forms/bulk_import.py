@@ -23,6 +23,7 @@ __all__ = (
     'AuditFlowImportForm',
     'AuditFlowPageImportForm',
     'AuditTrailImportForm',
+    'AuditTrailSourceImportForm',
     'DeliveryImportForm',
     'InventoryItemGroupImportForm',
     'PurchaseImportForm',
@@ -546,10 +547,30 @@ class AuditFlowImportForm(BaseFlowImportForm):
         fields = BaseFlowImportForm.Meta.fields + ('enabled',)
 
 
+class AuditTrailSourceImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = AuditTrailSource
+        fields = (
+            'name',
+            'slug',
+            'description',
+            'tags',
+            'comments',
+        )
+
+
 class AuditTrailImportForm(BaseFlowImportForm):
+    source = CSVModelChoiceField(
+        queryset=AuditTrailSource.objects.all(),
+        to_field_name='slug',
+        required=False,
+        help_text=_('Source slug of this audit trail.'),
+    )
+
     class Meta:
         model = AuditTrail
         fields = (
             'object_type',
             'object_id',
+            'source',
         )

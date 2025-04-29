@@ -28,6 +28,7 @@ __all__ = (
     'AuditFlowPage',
     'AuditFlowPageAssignment',
     'AuditTrail',
+    'AuditTrailSource',
 )
 
 
@@ -320,6 +321,19 @@ class AuditFlowPageAssignment(
         return self.page.get_objects().filter(**{filter_name: start_object})
 
 
+class AuditTrailSource(NamedModel):
+    """
+    An `AuditTrailSource` defines the source of an `AuditTrail`. This is useful when
+    `AuditTrail` should be imported from other systems such as monitoring or automated
+    inventory tools.
+    """
+
+    slug = models.SlugField(
+        max_length=100,
+        unique=True,
+    )
+
+
 class AuditTrail(
     ChangeLoggingMixin,
     CustomValidationMixin,
@@ -327,6 +341,11 @@ class AuditTrail(
     EventRulesMixin,
     models.Model,
 ):
+    """
+    An `AuditTrail` marks a specific object to be seen at a specific timestamp, e.g.
+    when running an audit flow.
+    """
+
     object_type = models.ForeignKey(
         to=ContentType,
         on_delete=models.CASCADE,
@@ -335,6 +354,13 @@ class AuditTrail(
     object = GenericForeignKey(
         ct_field='object_type',
         fk_field='object_id',
+    )
+    source = models.ForeignKey(
+        AuditTrailSource,
+        related_name='audit_trails',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
     )
 
     objects = RestrictedQuerySet.as_manager()

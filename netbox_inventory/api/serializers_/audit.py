@@ -12,6 +12,7 @@ from netbox_inventory.models import (
     AuditFlowPage,
     AuditFlowPageAssignment,
     AuditTrail,
+    AuditTrailSource,
 )
 
 __all__ = (
@@ -19,6 +20,7 @@ __all__ = (
     'AuditFlowPageSerializer',
     'AuditFlowSerializer',
     'AuditTrailSerializer',
+    'AuditTrailSourceSerializer',
 )
 
 
@@ -95,12 +97,43 @@ class AuditFlowPageAssignmentSerializer(NetBoxModelSerializer):
         )
 
 
+class AuditTrailSourceSerializer(NetBoxModelSerializer):
+    class Meta:
+        model = AuditTrailSource
+        fields = (
+            'id',
+            'url',
+            'display',
+            'display_url',
+            'name',
+            'slug',
+            'description',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'slug',
+        )
+
+
 class AuditTrailSerializer(NetBoxModelSerializer):
     object_type = ContentTypeField(
         queryset=ObjectType.objects.public(),
     )
     object = serializers.SerializerMethodField(
         read_only=True,
+    )
+    source = AuditTrailSourceSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
     )
 
     class Meta:
@@ -112,6 +145,7 @@ class AuditTrailSerializer(NetBoxModelSerializer):
             'object_type',
             'object_id',
             'object',
+            'source',
             'created',
             'last_updated',
         )

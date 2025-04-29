@@ -7,7 +7,7 @@ from tenancy.models import *
 from utilities.testing import ChangeLoggedFilterSetTests
 
 from netbox_inventory.filtersets import AuditTrailFilterSet
-from netbox_inventory.models import Asset, AuditTrail
+from netbox_inventory.models import Asset, AuditTrail, AuditTrailSource
 
 
 class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTests):
@@ -48,8 +48,16 @@ class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTests):
         )
         Asset.objects.bulk_create(assets)
 
+        audit_trail_sources = (
+            AuditTrailSource(
+                name='Source 1',
+                slug='source-1',
+            ),
+        )
+        AuditTrailSource.objects.bulk_create(audit_trail_sources)
+
         audit_trails = (
-            AuditTrail(object=assets[0]),
+            AuditTrail(object=assets[0], source=audit_trail_sources[0]),
             AuditTrail(object=assets[1]),
             AuditTrail(object=assets[2]),
             AuditTrail(object=device_type),
@@ -63,3 +71,12 @@ class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTests):
         object_type = ObjectType.objects.get_for_model(Asset)
         params = {'object_type_id': object_type.pk}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 3)
+
+    def test_source(self):
+        audit_trail_source = AuditTrailSource.objects.first()
+
+        params = {'source': [audit_trail_source.slug]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
+
+        params = {'source_id': [audit_trail_source.pk]}
+        self.assertEqual(self.filterset(params, self.queryset).qs.count(), 1)
