@@ -1,5 +1,9 @@
+from django.db.models import QuerySet
+from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
+
 from netbox.views import generic
-from utilities.views import register_model_view
+from utilities.views import ViewTab, register_model_view
 
 from .. import filtersets, forms, models, tables
 
@@ -16,6 +20,26 @@ __all__ = (
 @register_model_view(models.AuditTrailSource)
 class AuditTrailSourceView(generic.ObjectView):
     queryset = models.AuditTrailSource.objects.all()
+
+
+@register_model_view(models.AuditTrailSource, 'trails')
+class AuditTrailSourceTrailsView(generic.ObjectChildrenView):
+    queryset = models.AuditTrailSource.objects.all()
+    child_model = models.AuditTrail
+    table = tables.AuditTrailTable
+    tab = ViewTab(
+        label=_('Trails'),
+        badge=lambda obj: obj.audit_trails.count(),
+        permission='netbox_inventory.view_audittrail',
+        weight=1000,
+    )
+
+    def get_children(
+        self,
+        request: HttpRequest,
+        parent: models.AuditTrailSource,
+    ) -> QuerySet:
+        return parent.audit_trails.restrict(request.user, 'view')
 
 
 @register_model_view(models.AuditTrailSource, 'list', path='', detail=False)

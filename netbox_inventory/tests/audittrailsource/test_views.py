@@ -1,3 +1,6 @@
+from django.test import override_settings
+from django.urls import reverse
+
 from utilities.testing import ViewTestCases
 
 from netbox_inventory.models import AuditTrailSource
@@ -50,3 +53,13 @@ class AuditTrailSourceViewTestCase(
             f'{audit_trail_sources[1].pk},description 2',
             f'{audit_trail_sources[2].pk},description 3',
         )
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
+    def test_view_audittrailsource_trails(self):
+        audit_trail_source = AuditTrailSource.objects.first()
+
+        url = reverse(
+            'plugins:netbox_inventory:audittrailsource_trails',
+            kwargs={'pk': audit_trail_source.pk},
+        )
+        self.assertHttpStatus(self.client.get(url), 200)
