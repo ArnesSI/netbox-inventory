@@ -25,7 +25,7 @@ from utilities.forms.fields import (
     TagFilterField,
 )
 from utilities.forms.rendering import FieldSet
-from utilities.forms.widgets import DatePicker
+from utilities.forms.widgets import DatePicker, DateTimePicker
 
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import *
@@ -539,9 +539,24 @@ class AuditTrailFilterForm(BaseFlowFilterForm):
         required=False,
         label='Source',
     )
+    created__gte = forms.DateTimeField(
+        required=False,
+        label=_('After'),
+        widget=DateTimePicker(),
+    )
+    created__lt = forms.DateTimeField(
+        required=False,
+        label=_('Before'),
+        widget=DateTimePicker(),
+    )
 
     fieldsets = (
         FieldSet('q', 'filter_id'),
+        FieldSet(
+            'created__gte',
+            'created__lt',
+            name=_('Time'),
+        ),
         FieldSet(
             'object_type_id',
             'source_id',
