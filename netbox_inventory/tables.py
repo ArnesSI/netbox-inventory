@@ -668,6 +668,10 @@ class AuditTrailTable(NetBoxTable):
     source = tables.Column(
         linkify=True,
     )
+    created = columns.DateTimeColumn(
+        verbose_name=_('Time'),
+        timespec='minutes',
+    )
     actions = columns.ActionsColumn(
         actions=('delete',),
     )
