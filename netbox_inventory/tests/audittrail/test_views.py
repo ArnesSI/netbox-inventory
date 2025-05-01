@@ -1,3 +1,4 @@
+from django.test import override_settings
 from django.urls import reverse
 
 from core.models import ObjectType
@@ -131,3 +132,37 @@ class AuditTrailViewTestCase(
                 + 3  # from setUpTestData
             ),
         )
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
+    def test_view_object_with_audit_trails(self) -> None:
+        asset = Asset.objects.first()
+        audit_trail_url = reverse(
+            'plugins:netbox_inventory:asset_audit-trails',
+            kwargs={'pk': asset.pk},
+        )
+
+        # Tab is visible
+        response = self.client.get(asset.get_absolute_url(), follow=True)
+        self.assertHttpStatus(response, 200)
+        self.assertIn(audit_trail_url, str(response.content))
+
+        # Tab is accessible
+        response = self.client.get(audit_trail_url, follow=True)
+        self.assertHttpStatus(response, 200)
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'])
+    def test_view_object_without_audit_trails(self) -> None:
+        asset = Asset.objects.create(
+            status='stored',
+            device_type=DeviceType.objects.first(),
+        )
+
+        audit_trail_url = reverse(
+            'plugins:netbox_inventory:asset_audit-trails',
+            kwargs={'pk': asset.pk},
+        )
+
+        # Tab is not visible
+        response = self.client.get(asset.get_absolute_url(), follow=True)
+        self.assertHttpStatus(response, 200)
+        self.assertNotIn(audit_trail_url, str(response.content))

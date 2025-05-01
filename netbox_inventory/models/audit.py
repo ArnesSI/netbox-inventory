@@ -383,8 +383,3 @@ class AuditTrail(
     def get_absolute_url(self) -> None:
         # Audit trails are only visible in the list view.
         return None
-
-    def to_objectchange(self, action) -> ObjectChange:
-        objectchange = super().to_objectchange(action)
-        objectchange.related_object = self.object
-        return objectchange

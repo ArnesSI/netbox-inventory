@@ -1,3 +1,5 @@
+from django.apps import apps
+
 from netbox.plugins import PluginConfig
 
 from .version import __version__
@@ -36,9 +38,22 @@ class NetBoxInventoryConfig(PluginConfig):
         'audit_window': 4 * 60,  # 4 hours
     }
 
+    def register_feature_views(self) -> None:
+        """
+        Register feature views for all available models.
+        """
+        from utilities.views import register_model_view
+
+        for model in apps.get_models():
+            register_model_view(model, 'audit-trails', kwargs={'model': model})(
+                'netbox_inventory.views.ObjectAuditTrailView',
+            )
+
     def ready(self):
         super().ready()
         from . import signals  # noqa: F401
+
+        self.register_feature_views()
 
 
 config = NetBoxInventoryConfig
