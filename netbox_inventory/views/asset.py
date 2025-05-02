@@ -1,5 +1,6 @@
 import logging
 
+from core.signals import clear_events
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -7,8 +8,6 @@ from django.shortcuts import redirect, render
 from django.template import Template
 from django.utils.translation import gettext as _
 from mptt.models import MPTTModel
-
-from core.signals import clear_events
 from netbox.views import generic
 from utilities.exceptions import AbortRequest, PermissionsViolation
 from utilities.forms import ConfirmationForm, restrict_form_fields
@@ -351,11 +350,10 @@ class AssetBulkScanView(generic.BulkEditView):
         )
 
     def post(self, request, **kwargs):
-        """Override post method to check if assets are protected from editing"""
-
+        """Override post method to validate uniform asset type before proceeding to scan."""
         logger = logging.getLogger("netbox.views.BulkEditView")
 
-        # If we are editing *all* objects in the queryset, replace the PK list with all matched objects.
+        # Get the list of selected asset PKs
         if request.POST.get("_all") and self.filterset is not None:
             pk_list = self.filterset(
                 request.GET, self.queryset.values_list("pk", flat=True)
@@ -363,7 +361,33 @@ class AssetBulkScanView(generic.BulkEditView):
         else:
             pk_list = request.POST.getlist("pk")
 
-        # Include the PK list as initial data for the form
+        # Validate that all selected assets represent the same device/module/inventory-item/rack
+        assets = list(self.queryset.filter(pk__in=pk_list))
+        if assets:
+            type_fields = ["device_type", "module_type", "inventoryitem_type", "rack_type"]
+            first_asset = assets[0]
+            # Determine which type field is set on the first asset
+            for field in type_fields:
+                val = getattr(first_asset, field, None)
+                if val is not None:
+                    common_field = field
+                    common_value = val.pk
+                    break
+            else:
+                messages.error(request, _("Unable to determine asset type for validation."))
+                return redirect(self.get_return_url(request))
+
+            # Ensure every other asset has the same non-null type field value
+            for asset in assets[1:]:
+                val = getattr(asset, common_field, None)
+                if val is None or val.pk != common_value:
+                    messages.error(
+                        request,
+                        _("All selected assets must represent the same Hardware Type."),
+                    )
+                    return redirect(self.get_return_url(request))
+
+        # Continue with existing protected fields validation.
         initial_data = {"pk": pk_list}
         protected_fields_by_tags = get_tags_and_edit_protected_asset_fields()
 
@@ -397,9 +421,7 @@ class AssetBulkScanView(generic.BulkEditView):
                 modified_fields = set(form.changed_data)
                 nullable = set(form.nullable_fields).intersection(set(nullified_fields))
 
-                if modified_fields.intersection(
-                    protected_fields
-                ) or nullable.intersection(protected_fields):
+                if modified_fields.intersection(protected_fields) or nullable.intersection(protected_fields):
                     break
 
                 protected_assets.append(asset)
