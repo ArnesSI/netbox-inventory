@@ -349,18 +349,7 @@ class AssetBulkScanView(generic.BulkEditView):
             },
         )
 
-    def post(self, request, **kwargs):
-        """Override post method to validate uniform asset type before proceeding to scan."""
-        logger = logging.getLogger("netbox.views.BulkEditView")
-
-        # Get the list of selected asset PKs
-        if request.POST.get("_all") and self.filterset is not None:
-            pk_list = self.filterset(
-                request.GET, self.queryset.values_list("pk", flat=True)
-            ).qs
-        else:
-            pk_list = request.POST.getlist("pk")
-
+    def is_uniform_hardware_type(self, pk_list, request, **kwargs):
         # Validate that all selected assets represent the same device/module/inventory-item/rack
         assets = list(self.queryset.filter(pk__in=pk_list))
         if assets:
@@ -375,7 +364,7 @@ class AssetBulkScanView(generic.BulkEditView):
                     break
             else:
                 messages.error(request, _("Unable to determine asset type for validation."))
-                return redirect(self.get_return_url(request))
+                return False
 
             # Ensure every other asset has the same non-null type field value
             for asset in assets[1:]:
@@ -385,7 +374,25 @@ class AssetBulkScanView(generic.BulkEditView):
                         request,
                         _("All selected assets must represent the same Hardware Type."),
                     )
-                    return redirect(self.get_return_url(request))
+                    return False
+        return True
+
+    def post(self, request, **kwargs):
+        """Override post method to validate uniform asset type before proceeding to scan."""
+        logger = logging.getLogger("netbox.views.BulkEditView")
+
+        # Get the list of selected asset PKs
+        if request.POST.get("_all") and self.filterset is not None:
+            pk_list = self.filterset(
+                request.GET, self.queryset.values_list("pk", flat=True)
+            ).qs
+        else:
+            pk_list = request.POST.getlist("pk")
+
+        if not self.is_uniform_hardware_type(pk_list, request, **kwargs):
+            from urllib.parse import urlencode
+            query = urlencode({"failed": 1, "pk": pk_list}, doseq=True)
+            return redirect(f"{self.get_return_url(request)}?{query}")
 
         # Continue with existing protected fields validation.
         initial_data = {"pk": pk_list}
