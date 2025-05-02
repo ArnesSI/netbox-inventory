@@ -285,6 +285,7 @@ class AssetBulkScanView(generic.BulkEditView):
         except ValidationError as e:
             messages.error(self.request, ", ".join(e.messages))
             clear_events.send(sender=self)
+            return redirect(self.get_return_url(request))
 
         except (AbortRequest, PermissionsViolation) as e:
             logger.debug(e.message)
@@ -322,7 +323,7 @@ class AssetBulkScanView(generic.BulkEditView):
         if "_apply" in request.POST:
             if form.is_valid():
                 logger.debug("Form validation was successful")
-                self._apply(form, request, model, logger)
+                return self._apply(form, request, model, logger)
             else:
                 logger.debug("Form validation failed")
 
@@ -390,9 +391,7 @@ class AssetBulkScanView(generic.BulkEditView):
             pk_list = request.POST.getlist("pk")
 
         if not self.is_uniform_hardware_type(pk_list, request, **kwargs):
-            from urllib.parse import urlencode
-            query = urlencode({"failed": 1, "pk": pk_list}, doseq=True)
-            return redirect(f"{self.get_return_url(request)}?{query}")
+            return redirect(self.get_return_url(request))
 
         # Continue with existing protected fields validation.
         initial_data = {"pk": pk_list}
