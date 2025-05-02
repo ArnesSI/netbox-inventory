@@ -105,7 +105,12 @@ Context:
         <div class="btn-float-group-right">
           <a href="{{ return_url }}" class="btn btn-outline-secondary btn-float">{% trans "Cancel" %}</a>
           <button type="submit" name="_apply" class="btn btn-primary">{% trans "Apply" %}</button>
+
+          <div id="serial-counter-container" style="margin-top: 0.5rem; text-align: right;">
+            <small id="serial_counter"></small>
+          </div>
         </div>
+        
       </div>
     </form>
   </div>
@@ -118,5 +123,29 @@ Context:
       </div>
     </div>
   </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const textArea = document.getElementById('id_serial_numbers');
+      const counterSpan = document.getElementById('serial_counter');
+      // Asset count derived from the table rows count passed in template context.
+      const assetCount = {{ table.rows|length }};
+      function updateCounter() {
+          const lines = textArea.value.split('\n').filter(line => line.trim() !== '');
+          counterSpan.textContent = lines.length + " of " + assetCount + " entries";
+          if (lines.length === assetCount) {
+              counterSpan.style.color = '#39ff39';
+          } else if (lines.length > assetCount) {
+              counterSpan.style.color = '#ff3939';
+          } else {
+              counterSpan.style.color = 'inherit';
+          }
+      }
+      if (textArea) {
+          textArea.addEventListener('input', updateCounter);
+          updateCounter();
+      }
+  });
+  </script>
 
 {% endblock content %}
