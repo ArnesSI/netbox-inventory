@@ -3,6 +3,7 @@ from itertools import product
 from typing import Any
 from urllib.parse import urlencode
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db.models import (
     Model,
@@ -11,8 +12,8 @@ from django.db.models import (
     Subquery,
 )
 from django.forms.models import ModelChoiceField
-from django.http import HttpRequest
-from django.shortcuts import get_object_or_404
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import resolve, reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -392,3 +393,70 @@ class AuditFlowRunView(generic.ObjectChildrenView):
             'start_object': self.start_object,
             'buttons': self.get_buttons(),
         }
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Automatically mark objects as seen based on flterset evaluation.
+        """
+        instance = self.get_object(**kwargs)
+        child_objects = self.get_children(request, instance)
+
+        if self.filterset:
+            # Check the filterset of the current audit flow page. If it returns only a
+            # single result, there is an exact object match and the object can be marked
+            # as seen, i.e. an audit trail can be created.
+            qs = self.filterset(request.POST, child_objects, request=request).qs
+            if len(qs) == 1:
+                obj = qs.first()
+                models.AuditTrail.objects.create(object=obj)
+                messages.success(
+                    request,
+                    _('Marked {object} as seen').format(object=obj),
+                )
+
+                return self.get(request, *args, **kwargs)
+
+            # If the filterset returns a single object for the entire model queryset,
+            # the object appears to exist but is not documented at the current audit
+            # flow location. The user is redirected to its edit form to change its
+            # location.
+            #
+            # NOTE: The object's location won't be changed automatically because
+            #       dependent fields may require additional changes. However, available
+            #       metadata will be pre-populated, just as when adding new items.
+            qs = self.filterset(
+                request.POST,
+                self.child_model.objects.all(),
+                request=request,
+            ).qs
+            if len(qs) == 1:
+                obj = qs.first()
+                messages.info(
+                    request,
+                    _(
+                        '{object} does not match audit location. Please edit the '
+                        'object accordingly.'
+                    ).format(object=obj),
+                )
+
+                location_params = self.get_prefill_location_params()
+                return redirect(
+                    reverse(
+                        get_viewname(self.child_model, 'edit'),
+                        kwargs={'pk': obj.pk},
+                    )
+                    + '?'
+                    + urlencode(
+                        {
+                            **location_params,
+                            'return_url': request.get_full_path(),
+                        }
+                    )
+                )
+
+        # Fallback: If no matching object can be found, a warning is displayed. However,
+        # the user is not redirected to the add view of the object, as there may be
+        # multiple options to create it, or maybe it shouldn't be added to NetBox at
+        # all.
+        messages.error(request, _('No matching object found'))
+        return self.get(request, *args, **kwargs)

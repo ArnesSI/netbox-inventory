@@ -36,6 +36,19 @@
   </ul>
 {% endblock tabs %}
 
+{% block table_controls %}
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ block.super }}
+  </form>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const input = document.getElementById('quicksearch');
+      if (input) input.focus();
+    });
+  </script>
+{% endblock table_controls %}
+
 {% block bulk_controls %}
   {% if perms.netbox_inventory.add_audittrail %}
     <input type="hidden" name="object_type_id" value="{{ child_model|content_type_id }}" />

@@ -1,11 +1,14 @@
+from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.db.models import Model
+from django.http import HttpResponse
 from django.test import override_settings
 from django.urls import reverse
 
 from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, Site
 from utilities.object_types import object_type_identifier
-from utilities.testing import TestCase, ViewTestCases
+from utilities.testing import TestCase, ViewTestCases, post_data
 
 from netbox_inventory.models import (
     Asset,
@@ -64,16 +67,25 @@ class AuditFlowTestDataMixin(TestCase):
         )
         AuditFlowPageAssignment.objects.bulk_create(audit_flow_page_assignments)
 
-    def _run_audit_flow(self, audit_flow: AuditFlow, start_object: Model):
-        response = self.client.get(
+    def _run_audit_flow(
+        self,
+        audit_flow: AuditFlow,
+        start_object: Model,
+        method: str = 'get',
+        expected_status: int = 200,
+        **kwargs,
+    ) -> HttpResponse:
+        client = getattr(self.client, method)
+        response = client(
             reverse(
                 'plugins:netbox_inventory:auditflow_run',
                 kwargs={'pk': audit_flow.pk},
             )
-            + f'?object_id={start_object.pk}'
+            + f'?object_id={start_object.pk}',
+            **kwargs,
         )
 
-        self.assertHttpStatus(response, 200)
+        self.assertHttpStatus(response, expected_status)
         return response
 
 
@@ -132,7 +144,7 @@ class AuditFlowViewTestCase(
         self._run_audit_flow(AuditFlow.objects.first(), Site.objects.first())
 
 
-class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
+class AuditFlowRunTest(AuditFlowTestDataMixin, MessagesTestMixin, TestCase):
     user_permissions = [
         'dcim.view_site',
         'netbox_inventory.run_auditflow',
@@ -324,3 +336,104 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, TestCase):
                     ),
                     str(response.content),
                 )
+
+    def test_quick_search_mark_seen(self) -> None:
+        self.add_permissions('netbox_inventory.add_audittrail')
+        self.add_permissions('netbox_inventory.change_asset')
+
+        sites = Site.objects.all()
+        locations = (
+            Location(
+                site=sites[0],
+                name='Location 1',
+                slug='location-1',
+                status='active',
+            ),
+            Location(
+                site=sites[1],
+                name='Location 2',
+                slug='location-2',
+                status='active',
+            ),
+        )
+        for location in locations:
+            location.full_clean()
+            location.save()
+
+        manufacturer = Manufacturer.objects.create(
+            name='manufacturer 1',
+            slug='manufacturer-1',
+        )
+        device_type = DeviceType.objects.create(
+            manufacturer=manufacturer,
+            model='DeviceType 1',
+            slug='devicetype-1',
+        )
+
+        assets = (
+            Asset(
+                asset_tag='asset1',
+                serial='asset1',
+                status='stored',
+                device_type=device_type,
+                storage_location=locations[0],
+            ),
+            Asset(
+                asset_tag='asset2',
+                serial='asset2',
+                status='stored',
+                device_type=device_type,
+                storage_location=locations[1],
+            ),
+        )
+        Asset.objects.bulk_create(assets)
+
+        audit_flow = AuditFlow.objects.first()
+
+        # Single object found: mark as seen
+        response = self._run_audit_flow(
+            audit_flow,
+            sites[0],
+            method='post',
+            data=post_data({'q': assets[0].serial}),
+        )
+        self.assertEqual(AuditTrail.objects.count(), 1)
+        self.assertEqual(AuditTrail.objects.first().object, assets[0])
+
+        # Object is at other site: Redirect to edit form
+        response = self._run_audit_flow(
+            audit_flow,
+            sites[0],
+            method='post',
+            data=post_data({'q': 'asset2'}),
+            expected_status=302,
+        )
+        redirect_url = (
+            reverse(
+                'plugins:netbox_inventory:auditflow_run',
+                kwargs={'pk': audit_flow.pk},
+            )
+            + f'?object_id={sites[0].pk}'
+        )
+        self.assertRedirects(
+            response,
+            expected_url=reverse(
+                'plugins:netbox_inventory:asset_edit',
+                kwargs={'pk': assets[1].pk},
+            )
+            + f'?storage_site={sites[0].pk}&return_url={redirect_url}',
+        )
+
+        # No matching object found
+        response = self._run_audit_flow(
+            audit_flow,
+            sites[0],
+            method='post',
+            data=post_data({'q': 'does-not-exist'}),
+        )
+        self.assertMessages(
+            response,
+            [
+                messages.Message(messages.ERROR, 'No matching object found'),
+            ],
+        )
