@@ -260,6 +260,7 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, MessagesTestMixin, TestCase):
 
     def test_audit_trail_button(self) -> None:
         self.add_permissions('netbox_inventory.add_audittrail')
+        self.add_permissions('netbox_inventory.delete_audittrail')
 
         site = Site.objects.first()
         location = Location(

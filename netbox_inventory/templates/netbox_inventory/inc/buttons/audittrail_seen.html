@@ -1,8 +1,8 @@
 {% load helpers %}
 {% load perms %}
 
-{% if perms.netbox_inventory.add_audittrail %}
-  {% if not record.audit_trail %}
+{% if not record.audit_trail %}
+  {% if perms.netbox_inventory.add_audittrail %}
     <button type="submit"
       {% formaction %}="{% url 'plugins:netbox_inventory:audittrail_bulk_add' %}?return_url={{ return_url | urlencode }}"
       name="pk"
@@ -11,8 +11,9 @@
     >
       <i class="mdi mdi-eye" aria-hidden="true"></i>
     </button>
-
-  {% else %}
+  {% endif %}
+{% else %}
+  {% if perms.netbox_inventory.delete_audittrail %}
     <a
       href="{% url 'plugins:netbox_inventory:audittrail_delete' pk=record.audit_trail %}?return_url={{ return_url | urlencode }}"
       class="btn btn-sm btn-outline-primary"
