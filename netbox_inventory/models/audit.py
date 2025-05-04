@@ -1,4 +1,4 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError, ValidationError
 from django.db import models
@@ -361,6 +361,16 @@ class AuditTrail(
         on_delete=models.PROTECT,
         blank=True,
         null=True,
+    )
+
+    # Add a reverse relationship for object changes to display the auditor user in the
+    # AuditTrailTable. Reusing the logic of the ObjectChange model and
+    # ChangeLoggingMixin reduces the logic of this model because the request-response
+    # cycle doesn't need to maintain who actually created the object.
+    object_changes = GenericRelation(
+        ObjectChange,
+        content_type_field='changed_object_type',
+        object_id_field='changed_object_id',
     )
 
     objects = RestrictedQuerySet.as_manager()

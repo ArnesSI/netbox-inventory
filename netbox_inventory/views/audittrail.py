@@ -36,7 +36,7 @@ __all__ = (
 
 @register_model_view(models.AuditTrail, 'list', path='', detail=False)
 class AuditTrailListView(generic.ObjectListView):
-    queryset = models.AuditTrail.objects.all()
+    queryset = models.AuditTrail.objects.prefetch_related('object_changes__user')
     table = tables.AuditTrailTable
     filterset = filtersets.AuditTrailFilterSet
     filterset_form = forms.AuditTrailFilterForm
@@ -130,7 +130,7 @@ class ObjectAuditTrailView(ConditionalLoginRequiredMixin, View):
 
         # Prepare table for listing all audit trails of this object.
         table = tables.AuditTrailTable(
-            data=self.get_audit_trails(obj),
+            data=self.get_audit_trails(obj).prefetch_related('object_changes__user'),
             user=request.user,
         )
         table.configure(request)

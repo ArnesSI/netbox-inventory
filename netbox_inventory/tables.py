@@ -676,6 +676,20 @@ class AuditTrailTable(NetBoxTable):
         actions=('delete',),
     )
 
+    # Access the audit user via the first associated object change.
+    auditor_user = tables.Column(
+        accessor=tables.A('object_changes__first__user'),
+        verbose_name=_('Auditor'),
+        linkify=True,
+        order_by=('object_change__user'),
+    )
+    auditor_full_name = tables.Column(
+        accessor=tables.A('object_changes__first__user__get_full_name'),
+        verbose_name=_('Auditor Name'),
+        linkify=True,
+        orderable=False,
+    )
+
     class Meta(NetBoxTable.Meta):
         model = AuditTrail
         fields = (
@@ -683,6 +697,8 @@ class AuditTrailTable(NetBoxTable):
             'id',
             'object_type',
             'object',
+            'auditor_user',
+            'auditor_full_name',
             'source',
             'created',
             'last_changed',
@@ -693,6 +709,8 @@ class AuditTrailTable(NetBoxTable):
             'created',
             'object_type',
             'object',
+            'auditor_user',
+            'auditor_full_name',
             'source',
         )
 
