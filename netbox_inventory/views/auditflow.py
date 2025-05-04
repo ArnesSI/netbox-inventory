@@ -396,7 +396,7 @@ class AuditFlowRunView(generic.ObjectChildrenView):
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """
-        Automatically mark objects as seen based on flterset evaluation.
+        Automatically mark objects as seen based on filterset evaluation.
         """
         instance = self.get_object(**kwargs)
         child_objects = self.get_children(request, instance)

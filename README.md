@@ -65,6 +65,12 @@ to assets, it can be used to audit any object managed in NetBox.
   **[Audit]** button on its detail page. The audit flow will then display all audit flow
   pages and their defined NetBox objects, restricted to the location for which the flow
   is running.
+* **Audit Trails** document when an object has been verified to be in the specified
+  location. An audit trail can either be created directly when running an audit flow, or
+  imported from other systems using the API or an import form.
+* **Audit Trail Sources** can be used to optionally identify the source of an audit
+  trail. This option is only available when importing audit trails via the API or Import
+  form.
 
 #### Required Permissions
 
@@ -74,6 +80,81 @@ View permissions are also required for the object from which the audit flow is i
 
 Audited objects within the audit flow can be viewed without additional permissions.
 However, permissions are required to add, edit, or delete audited objects.
+
+To mark an object as seen (i.e. to create an audit trail), the `add` and `delete`
+permissions should be granted on the audit trail model.
+
+#### Creating Audit Trails
+
+Each row of an audit flow page table begins with a button to mark an object as seen.
+Clicking this button creates an audit trail for documentation. Bulk marking of multiple
+objects as seen is also provided.
+
+However, there is a way to speed up this process even more: The quick search input field
+on each page automatically gets the focus. Entering values into it will trigger the
+regular quick search. When the form is submitted (e.g. by hitting `[Enter]`), the value
+will be processed using the object's filterset:
+
+1. If only one result remains after filtering the current page, this object is
+   automatically marked as seen.
+2. If there is only one result after filtering all objects of the processed object type,
+   the user will be redirected to it's edit form. It is assumed that the location of the
+   object is not correctly documented (e.g. the object has been moved). After submitting
+   the changes, the user is returned to the audit flow page and can now mark it as seen.
+3. If no matching object is found, a warning is displayed. The user must manually create
+   the object.
+
+> [!TIP]
+> To further speed up this process, you can use a barcode or QR code scanner.
+
+#### Audit Reports
+
+At this time, this plugin does not include any reporting on the current audit status of
+objects, as simple-looking implementations can lead to many different ways of evaluating
+and aggregating the data for different use cases. However, most, if not all,
+implementations can be done with a [custom script][nbScript]:
+
+[nbScript]: https://netboxlabs.com/docs/netbox/en/stable/customization/custom-scripts/
+
+```Python
+from django.db.models import OuterRef, Q, Subquery
+
+from core.models import ObjectType
+from dcim.models import Device, Module
+from extras.scripts import Script
+
+from netbox_inventory.models import Asset, AuditTrail
+
+
+class AuditReportMissing(Script):
+    description = 'Check for missing audit trails of assets'
+
+    def test_missing_audit_assets(self) -> None:
+        queryset = Asset.objects.annotate(
+            last_audit_date=Subquery(
+                AuditTrail.objects.filter(
+                    Q(
+                        object_type=ObjectType.objects.get_for_model(Asset),
+                        object_id=OuterRef('pk'),
+                    )
+                    # Also, check for the assigned device or module of an Asset.
+                    | Q(
+                        object_type=ObjectType.objects.get_for_model(Device),
+                        object_id=OuterRef('device__pk'),
+                    )
+                    | Q(
+                        object_type=ObjectType.objects.get_for_model(Module),
+                        object_id=OuterRef('module__pk'),
+                    )
+                )
+                .order_by('-created')
+                .values_list('created', flat=True)[:1]
+            )
+        )
+
+        for asset in queryset.filter(last_audit_date__isnull=True):
+            self.log_warning('No recent audit for object found.', obj=asset)
+```
 
 ## Compatibility
 
@@ -183,6 +264,7 @@ PLUGINS_CONFIG = {
 | `asset_warranty_expire_warning_days` | `90` | Days from warranty expiration to show as warning in Warranty remaining field |
 | `prefill_asset_name_create_inventoryitem` | `False` | When hardware inventory item is created from an asset, prefill the InventoryItem name to match the asset name. |
 | `prefill_asset_tag_create_inventoryitem` | `False` | When hardware inventory item is created from an asset, prefill the tags to match the tags associated to the asset. |
+| `audit_window` | `240` | Defines a sliding timeframe starting from the current time in minutes. If an audit trail exists for a particular object in this window, it is marked as seen when an audit trail is run to avoid repeated actions. |
 
 You can extend or define your own status choices for Asset, via [`FIELD_CHOICES`](https://docs.netbox.dev/en/stable/configuration/data-validation/#field_choices) setting in Netbox:
 
