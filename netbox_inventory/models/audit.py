@@ -333,6 +333,10 @@ class AuditTrailSource(NamedModel):
         unique=True,
     )
 
+    class Meta(NamedModel.Meta):
+        verbose_name = _('audit trail source')
+        verbose_name_plural = _('audit trail sources')
+
 
 class AuditTrail(
     ChangeLoggingMixin,
@@ -381,6 +385,8 @@ class AuditTrail(
             'object_type',
         )
         indexes = (models.Index(fields=('object_type', 'object_id')),)
+        verbose_name = _('audit trail')
+        verbose_name_plural = _('audit trails')
 
     def __str__(self) -> str:
         created = timezone.localtime(self.created)
