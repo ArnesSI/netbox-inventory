@@ -104,4 +104,51 @@ urlpatterns = (
         'deliveries/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'delivery')),
     ),
+    # AuditFlows (for clarity above AuditFlowPages)
+    path(
+        'audit-flows/',
+        include(get_model_urls('netbox_inventory', 'auditflow', detail=False)),
+    ),
+    path(
+        'audit-flows/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'auditflow')),
+    ),
+    # AuditFlowPages
+    path(
+        'audit-flowpages/',
+        include(get_model_urls('netbox_inventory', 'auditflowpage', detail=False)),
+    ),
+    path(
+        'audit-flowpages/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'auditflowpage')),
+    ),
+    # AuditFlowPageAssignments
+    path(
+        'audit-flowpage-assignments/',
+        include(
+            get_model_urls('netbox_inventory', 'auditflowpageassignment', detail=False)
+        ),
+    ),
+    path(
+        'audit-flowpage-assignments/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'auditflowpageassignment')),
+    ),
+    # AuditTrailSources
+    path(
+        'audit-trail-sources/',
+        include(get_model_urls('netbox_inventory', 'audittrailsource', detail=False)),
+    ),
+    path(
+        'audit-trail-sources/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'audittrailsource')),
+    ),
+    # AuditTrails
+    path(
+        'audit-trails/',
+        include(get_model_urls('netbox_inventory', 'audittrail', detail=False)),
+    ),
+    path(
+        'audit-trails/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'audittrail')),
+    ),
 )

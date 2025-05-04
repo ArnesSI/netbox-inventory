@@ -9,9 +9,6 @@ from .nested import *
 
 
 class SupplierSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:supplier-detail'
-    )
     asset_count = serializers.IntegerField(read_only=True)
     purchase_count = serializers.IntegerField(read_only=True)
     delivery_count = serializers.IntegerField(read_only=True)
@@ -38,9 +35,6 @@ class SupplierSerializer(NetBoxModelSerializer):
 
 
 class PurchaseSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:purchase-detail'
-    )
     supplier = SupplierSerializer(nested=True)
     asset_count = serializers.IntegerField(read_only=True)
     delivery_count = serializers.IntegerField(read_only=True)
@@ -77,9 +71,6 @@ class PurchaseSerializer(NetBoxModelSerializer):
 
 
 class DeliverySerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:delivery-detail'
-    )
     purchase = PurchaseSerializer(nested=True)
     receiving_contact = ContactSerializer(
         nested=True, required=False, allow_null=True, default=None

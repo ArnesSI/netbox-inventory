@@ -1,0 +1,28 @@
+{% load i18n %}
+{% load helpers %}
+
+{% if flows|length == 1 %}
+  {% with flow=flows|first %}
+    <a href="{% url flow|viewname:'run' pk=flow.pk %}?object_id={{ object.pk }}" class="btn btn-outline-primary" role="button">
+      <i class="mdi mdi-checkbox-marked-outline" aria-hidden="true"></i>
+      {% trans "Audit" %}
+    </a>
+  {% endwith %}
+
+{% else %}
+  <div class="dropdown">
+    <button id="add-components" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="mdi mdi-checkbox-marked-outline" aria-hidden="true"></i>
+      {% trans "Audit" %}
+    </button>
+    <ul class="dropdown-menu" aria-labeled-by="add-components">
+      {% for flow in flows %}
+        <li>
+          <a class="dropdown-item" href="{% url flow|viewname:'run' pk=flow.pk %}?object_id={{ object.pk }}">
+            {{ flow }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

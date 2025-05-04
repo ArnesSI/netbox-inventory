@@ -1,0 +1,63 @@
+{% extends 'generic/object_children.html' %}
+{% load helpers %}
+{% load i18n %}
+{% load perms %}
+
+{% block subtitle %}{% endblock subtitle %}
+
+{% block object_identifier %}
+  {% with object=start_object %}
+    {{ block.super }}
+  {% endwith %}
+{% endblock object_identifier %}
+
+{% block breadcrumbs %}
+  {% with object=start_object %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+      <a href="{% url object|viewname:None pk=object.pk %}">{{ object }}</a>
+    </li>
+  {% endwith %}
+{% endblock breadcrumbs %}
+
+{% block controls %}
+  {% if request.user|can_add:child_model %}
+    {% include "netbox_inventory/inc/buttons/auditflow_add_object.html" %}
+  {% endif %}
+{% endblock %}
+
+{% block tabs %}
+  <ul class="nav nav-tabs" role="tablist">
+    {% for page in flow_pages %}
+      <li class="nav-item" role="presentation">
+        <a class="nav-link{% if tab == page.pk %} active{% endif %}" href="{% querystring request tab=page.pk page=None per_page=None %}">{{ page.page.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock tabs %}
+
+{% block table_controls %}
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ block.super }}
+  </form>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const input = document.getElementById('quicksearch');
+      if (input) input.focus();
+    });
+  </script>
+{% endblock table_controls %}
+
+{% block bulk_controls %}
+  {% if perms.netbox_inventory.add_audittrail %}
+    <input type="hidden" name="object_type_id" value="{{ child_model|content_type_id }}" />
+    <button type="submit"
+      {% formaction %}="{% url 'plugins:netbox_inventory:audittrail_bulk_add' %}?return_url={{ return_url|urlencode }}"
+      class="btn btn-primary">
+      <i class="mdi mdi-eye" aria-hidden="true"></i>
+      {% trans "Mark seen" %}
+    </button>
+  {% endif %}
+  {{ block.super }}
+{% endblock bulk_controls %}

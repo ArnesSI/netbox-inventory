@@ -1,0 +1,13 @@
+{% extends 'netbox_inventory/generic/baseflow.html' %}
+{% load i18n %}
+
+{% block flow_title %}
+  {% trans "Audit Flow" %}
+{% endblock %}
+
+{% block enabled_fieled %}
+<tr>
+  <th scope="row">{% trans "Enabled" %}</th>
+  <td>{% checkmark object.enabled %}</td>
+</tr>
+{% endblock %}

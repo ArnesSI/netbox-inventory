@@ -19,4 +19,12 @@ router.register('suppliers', views.SupplierViewSet)
 router.register('purchases', views.PurchaseViewSet)
 router.register('deliveries', views.DeliveryViewSet)
 
+# Audit
+router.register('audit-flows', views.AuditFlowViewSet)
+router.register('audit-flowpages', views.AuditFlowPageViewSet)
+router.register('audit-flowpage-assignments', views.AuditFlowPageAssignmentViewSet)
+router.register('audit-trail-sources', views.AuditTrailSourceViewSet)
+router.register('audit-trails', views.AuditTrailViewSet)
+
+
 urlpatterns = router.urls

@@ -7,18 +7,15 @@ from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
 
-from .models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from .models import *
 from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
+    'AuditFlowPageAssignmentTable',
+    'AuditFlowPageTable',
+    'AuditFlowTable',
+    'AuditTrailTable',
     'SupplierTable',
     'PurchaseTable',
     'DeliveryTable',
@@ -554,6 +551,167 @@ class DeliveryTable(NetBoxTable):
             'purchase',
             'date',
             'asset_count',
+        )
+
+
+#
+# Audit
+#
+
+
+class BaseFlowTable(NetBoxTable):
+    """
+    Internal base table class for audit flow models.
+    """
+
+    name = tables.Column(
+        linkify=True,
+    )
+    object_type = columns.ContentTypeColumn(
+        verbose_name=_('Object Type'),
+    )
+
+    class Meta(NetBoxTable.Meta):
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'description',
+            'object_type',
+            'object_filter',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'object_type',
+        )
+
+
+class AuditFlowPageTable(BaseFlowTable):
+    class Meta(BaseFlowTable.Meta):
+        model = AuditFlowPage
+
+
+class AuditFlowTable(BaseFlowTable):
+    enabled = columns.BooleanColumn()
+
+    class Meta(BaseFlowTable.Meta):
+        model = AuditFlow
+        fields = BaseFlowTable.Meta.fields + ('enabled',)
+        default_columns = BaseFlowTable.Meta.default_columns + ('enabled',)
+
+
+class AuditFlowPageAssignmentTable(NetBoxTable):
+    flow = tables.Column(
+        linkify=True,
+    )
+    page = tables.Column(
+        linkify=True,
+    )
+
+    actions = columns.ActionsColumn(
+        actions=(
+            'edit',
+            'delete',
+        ),
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditFlowPageAssignment
+        fields = (
+            'pk',
+            'id',
+            'flow',
+            'page',
+            'weight',
+            'actions',
+        )
+        default_columns = (
+            'flow',
+            'page',
+            'weight',
+        )
+
+
+class AuditTrailSourceTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditTrailSource
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'description',
+            'lifetime',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'lifetime',
+        )
+
+
+class AuditTrailTable(NetBoxTable):
+    object_type = columns.ContentTypeColumn(
+        verbose_name=_('Object Type'),
+    )
+    object = tables.Column(
+        verbose_name=_('Object'),
+        linkify=True,
+        orderable=False,
+    )
+    source = tables.Column(
+        linkify=True,
+    )
+    created = columns.DateTimeColumn(
+        verbose_name=_('Time'),
+        timespec='minutes',
+    )
+    actions = columns.ActionsColumn(
+        actions=('delete',),
+    )
+
+    # Access the audit user via the first associated object change.
+    auditor_user = tables.Column(
+        accessor=tables.A('object_changes__first__user'),
+        verbose_name=_('Auditor'),
+        linkify=True,
+        order_by=('object_change__user'),
+    )
+    auditor_full_name = tables.Column(
+        accessor=tables.A('object_changes__first__user__get_full_name'),
+        verbose_name=_('Auditor Name'),
+        linkify=True,
+        orderable=False,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditTrail
+        fields = (
+            'pk',
+            'id',
+            'object_type',
+            'object',
+            'auditor_user',
+            'auditor_full_name',
+            'source',
+            'created',
+            'last_changed',
+            'actions',
+        )
+        default_columns = (
+            'pk',
+            'created',
+            'object_type',
+            'object',
+            'auditor_user',
+            'auditor_full_name',
+            'source',
         )
 
 
