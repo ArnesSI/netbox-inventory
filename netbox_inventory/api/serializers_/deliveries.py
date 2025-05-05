@@ -3,9 +3,8 @@ from rest_framework import serializers
 from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers import ContactSerializer
 
-from netbox_inventory.models import Delivery, Purchase, Supplier
-
 from .nested import *
+from netbox_inventory.models import Delivery, Purchase, Supplier
 
 
 class SupplierSerializer(NetBoxModelSerializer):

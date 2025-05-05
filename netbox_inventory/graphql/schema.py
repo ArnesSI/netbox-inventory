@@ -1,15 +1,6 @@
 import strawberry
 import strawberry_django
 
-from netbox_inventory.models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
-
 from .types import (
     AssetType,
     DeliveryType,
@@ -17,6 +8,14 @@ from .types import (
     InventoryItemTypeType,
     PurchaseType,
     SupplierType,
+)
+from netbox_inventory.models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
 )
 
 

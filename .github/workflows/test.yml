@@ -1,5 +1,9 @@
 name: Run tests under netbox
-on: [push]
+
+on:
+  - push
+  - pull_request
+
 jobs:
   test-netbox:
     runs-on: ubuntu-latest
@@ -47,12 +51,18 @@ jobs:
         working-directory: netbox-inventory
         run: |
           pip install .
+
       - name: Install dependencies & set up configuration
         working-directory: netbox
         run: |
           ln -s $(pwd)/../netbox-inventory/testing/configuration.testing.py netbox/netbox/configuration.py
           python -m pip install --upgrade pip
           pip install -r requirements.txt -U
+
+      - name: Check for missing migrations
+        working-directory: netbox
+        run: python netbox/manage.py makemigrations --check
+
       - name: Run tests
         working-directory: netbox
         run: |

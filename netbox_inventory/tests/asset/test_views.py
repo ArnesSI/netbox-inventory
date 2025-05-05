@@ -5,10 +5,9 @@ from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from users.models import ObjectPermission
 from utilities.testing import ViewTestCases, post_data
 
+from ..settings import CONFIG_ALLOW_CREATE_DEVICE_TYPE
 from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
 from netbox_inventory.tests.custom import ModelViewTestCase
-
-from ..settings import CONFIG_ALLOW_CREATE_DEVICE_TYPE
 
 
 class AssetTestCase(

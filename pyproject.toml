@@ -28,25 +28,18 @@ include-package-data = true
 [tool.setuptools.packages.find]
 include = ["netbox_inventory*"]
 
+[tool.ruff]
+exclude = [
+    "netbox_inventory/migrations",
+]
+
 [tool.ruff.lint]
-extend-select = ["E4", "E7", "E9", "F", "W", "C"]
+extend-select = ["E4", "E7", "E9", "F", "W", "C", "I"]
 ignore = ["F403", "F405"]
 
-[tool.ruff.format]
-quote-style = "single"
-
-[tool.isort]
-profile = "black"
-sections = [
-    "FUTURE",
-    "STDLIB",
-    "THIRDPARTY",
-    "NETBOX",
-    "FIRSTPARTY",
-    "LOCALFOLDER",
-]
-known_first_party = ["netbox_inventory"]
-known_netbox = [
+[tool.ruff.lint.isort]
+known-local-folder = ["netbox_inventory"]
+known-first-party = [
     "netbox",
     "core",
     "dcim",
@@ -55,3 +48,6 @@ known_netbox = [
     "users",
     "utilities",
 ]
+
+[tool.ruff.format]
+quote-style = "single"
