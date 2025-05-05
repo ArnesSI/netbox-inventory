@@ -229,13 +229,19 @@ class AssetBulkScanView(generic.BulkEditView):
 
         # Parse serial numbers, one per line
         if form.cleaned_data["serial_numbers"]:
-            serial_numbers = form.cleaned_data["serial_numbers"].splitlines()
-            # Remove empty lines
-            serial_numbers = [sn.strip() for sn in serial_numbers if sn.strip()]
-            # Remove duplicates
-            serial_numbers = list(set(serial_numbers))
+            serial_numbers_raw = form.cleaned_data["serial_numbers"].splitlines()
+            # Remove empty lines and trim whitespace
+            serial_numbers = [sn.strip() for sn in serial_numbers_raw if sn.strip()]
 
-        # If the number of serial numbers is not equal to the number of selected objects, raise an error
+            # Check for duplicate serial numbers
+            if len(serial_numbers) != len(set(serial_numbers)):
+                raise ValidationError(
+                    _(
+                        "Duplicate serial numbers detected. Each asset must have a unique serial number."
+                    )
+                )
+
+        # If the number of serial numbers doesn't match the number of selected assets, raise an error
         if len(serial_numbers) != len(form.cleaned_data["pk"]):
             raise ValidationError(
                 _(
@@ -243,11 +249,8 @@ class AssetBulkScanView(generic.BulkEditView):
                 )
             )
 
-        # Iterate over the selected objects and update their fields
-        # with the corresponding serial numbers
+        # Iterate over the selected objects and update fields
         for i, obj in enumerate(self.queryset.filter(pk__in=form.cleaned_data["pk"])):
-            # Take a snapshot of change-logged models
-
             if hasattr(obj, "snapshot"):
                 obj.snapshot()
             setattr(obj, "serial", serial_numbers[i])
@@ -262,7 +265,6 @@ class AssetBulkScanView(generic.BulkEditView):
         if issubclass(self.queryset.model, MPTTModel):
             self.queryset.model.objects.rebuild()
         return updated_objects
-
 
     def _uniform_hardware_warnings(self, pk_list, request, **kwargs):
         # Validate that all selected assets represent the same device/module/inventory-item/rack
@@ -397,8 +399,8 @@ class AssetBulkScanView(generic.BulkEditView):
                     self._apply(form, request, model, logger)
                     return redirect(self.get_return_url(request))
                 except (AbortRequest, PermissionsViolation, ValidationError) as e:
-                    logger.debug(e.message)
-                    form.add_error(None, e.message)
+                    logger.debug(str(e))
+                    form.add_error(None, e.messages[0])
                     clear_events.send(sender=self)
             else:
                 logger.debug("Form validation failed")
