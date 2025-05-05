@@ -263,8 +263,78 @@ class AssetBulkScanView(generic.BulkEditView):
             self.queryset.model.objects.rebuild()
         return updated_objects
 
+
+    def _uniform_hardware_warnings(self, pk_list, request, **kwargs):
+        # Validate that all selected assets represent the same device/module/inventory-item/rack
+        assets = list(self.queryset.filter(pk__in=pk_list))
+        if assets:
+            type_fields = [
+                "device_type",
+                "module_type",
+                "inventoryitem_type",
+                "rack_type",
+            ]
+            first_asset = assets[0]
+            # Determine which type field is set on the first asset
+            for field in type_fields:
+                val = getattr(first_asset, field, None)
+                if val is not None:
+                    common_field = field
+                    common_value = val.pk
+                    break
+            else:
+                return ["Unable to determine asset type for validation."]
+
+            # Ensure every other asset has the same non-null type field value
+            for asset in assets[1:]:
+                val = getattr(asset, common_field, None)
+                if val is None or val.pk != common_value:
+                    return [
+                        "All selected assets must represent the same Hardware Type."
+                    ]
+        return []
+
+    def _asset_protection_warnings(self, pk_list, form, request):
+        warnings = []
+        queryset = self.queryset.filter(pk__in=pk_list)
+        protected_fields_by_tags = get_tags_and_edit_protected_asset_fields()
+        nullified_fields = set(request.POST.getlist("_nullify"))
+        protected_assets = []
+
+        for asset in queryset:
+            asset_tags = set(asset.tags.all().values_list("slug", flat=True))
+            intersection_of_tags = set(asset_tags).intersection(
+                protected_fields_by_tags.keys()
+            )
+
+            # Check if asset is protected from editing
+            for tag in intersection_of_tags:
+                # TODO: Check if custom fields can be protected
+                protected_fields = set(protected_fields_by_tags[tag])
+
+                modified_fields = set(form.changed_data)
+                nullable = set(form.nullable_fields).intersection(set(nullified_fields))
+
+                if modified_fields.intersection(
+                    protected_fields
+                ) or nullable.intersection(protected_fields):
+                    break
+
+                protected_assets.append(asset)
+
+                fields = modified_fields.intersection(protected_fields).union(
+                    nullable.intersection(protected_fields)
+                )
+                warnings.append(
+                    "Cannot edit asset {} fields protected by tag {}: {}.".format(
+                        asset,
+                        tag,
+                        ",".join(fields),
+                    )
+                )
+        return warnings
+
     def _apply(self, form, request, model, logger):
-        try:
             with transaction.atomic():
                 updated_objects = self._update_objects(form, request)
 
@@ -276,59 +346,67 @@ class AssetBulkScanView(generic.BulkEditView):
                     raise PermissionsViolation
 
             if updated_objects:
-                msg = f"Updated {len(updated_objects)} {model._meta.verbose_name_plural}"
+                msg = (
+                    f"Updated {len(updated_objects)} {model._meta.verbose_name_plural}"
+                )
                 logger.info(msg)
                 messages.success(self.request, msg)
 
-            return redirect(self.get_return_url(request))
+    def post(self, request, **kwargs):
+        """Override post method to validate uniform asset type before proceeding to scan."""
 
-        except ValidationError as e:
-            messages.error(self.request, ", ".join(e.messages))
-            clear_events.send(sender=self)
-            return redirect(self.get_return_url(request))
-
-        except (AbortRequest, PermissionsViolation) as e:
-            logger.debug(e.message)
-            form.add_error(None, e.message)
-            clear_events.send(sender=self)
-
-    def _super_post(self, request, **kwargs):
-        logger = logging.getLogger("netbox.views.BulkEditView")
-        model = self.queryset.model
-
-        # If we are editing *all* objects in the queryset, replace the PK list with all matched objects.
+        # Get the list of selected asset PKs
         if request.POST.get("_all") and self.filterset is not None:
             pk_list = self.filterset(
-                request.GET, self.queryset.values_list("pk", flat=True), request=request
+                request.GET, self.queryset.values_list("pk", flat=True)
             ).qs
         else:
             pk_list = request.POST.getlist("pk")
 
-        # Include the PK list as initial data for the form
+        # Continue with existing protected fields validation.
         initial_data = {"pk": pk_list}
+        warnings = []
 
-        # Check for other contextual data needed for the form. We avoid passing all of request.GET because the
-        # filter values will conflict with the bulk edit form fields.
-        # TODO: Find a better way to accomplish this
-        if "device" in request.GET:
-            initial_data["device"] = request.GET.get("device")
-        elif "device_type" in request.GET:
-            initial_data["device_type"] = request.GET.get("device_type")
-        elif "virtual_machine" in request.GET:
-            initial_data["virtual_machine"] = request.GET.get("virtual_machine")
+        warnings += self._uniform_hardware_warnings(pk_list, request, **kwargs)
+
+        if "_apply" in request.POST:
+            form = self.form(request.POST, initial=initial_data)
+            restrict_form_fields(form, request.user)
+            if not form.is_valid():
+                warnings += [
+                    "Form validation failed. Please check the form and try again."
+                ]
+
+            warnings += self._asset_protection_warnings(initial_data["pk"], form, request)
+
+        if warnings:
+            for warning in warnings:
+                messages.warning(request, warning)
+            return redirect(self.get_return_url(request))
+
+        logger = logging.getLogger("netbox.views.BulkEditView")
+        model = self.queryset.model
 
         form = self.form(request.POST, initial=initial_data)
         restrict_form_fields(form, request.user)
 
         if "_apply" in request.POST:
             if form.is_valid():
-                logger.debug("Form validation was successful")
-                return self._apply(form, request, model, logger)
+                try:
+                    logger.debug("Form validation was successful")
+                    self._apply(form, request, model, logger)
+                    return redirect(self.get_return_url(request))
+                except (AbortRequest, PermissionsViolation, ValidationError) as e:
+                    logger.debug(e.message)
+                    form.add_error(None, e.message)
+                    clear_events.send(sender=self)
             else:
                 logger.debug("Form validation failed")
 
         # Retrieve objects being edited
-        table = self.table(self.queryset.filter(pk__in=pk_list), orderable=False)
+        table = self.table(
+            self.queryset.filter(pk__in=initial_data["pk"]), orderable=False
+        )
         if not table.rows:
             messages.warning(
                 request,
@@ -349,106 +427,6 @@ class AssetBulkScanView(generic.BulkEditView):
                 **self.get_extra_context(request),
             },
         )
-
-    def is_uniform_hardware_type(self, pk_list, request, **kwargs):
-        # Validate that all selected assets represent the same device/module/inventory-item/rack
-        assets = list(self.queryset.filter(pk__in=pk_list))
-        if assets:
-            type_fields = ["device_type", "module_type", "inventoryitem_type", "rack_type"]
-            first_asset = assets[0]
-            # Determine which type field is set on the first asset
-            for field in type_fields:
-                val = getattr(first_asset, field, None)
-                if val is not None:
-                    common_field = field
-                    common_value = val.pk
-                    break
-            else:
-                messages.error(request, _("Unable to determine asset type for validation."))
-                return False
-
-            # Ensure every other asset has the same non-null type field value
-            for asset in assets[1:]:
-                val = getattr(asset, common_field, None)
-                if val is None or val.pk != common_value:
-                    messages.error(
-                        request,
-                        _("All selected assets must represent the same Hardware Type."),
-                    )
-                    return False
-        return True
-
-    def post(self, request, **kwargs):
-        """Override post method to validate uniform asset type before proceeding to scan."""
-        logger = logging.getLogger("netbox.views.BulkEditView")
-
-        # Get the list of selected asset PKs
-        if request.POST.get("_all") and self.filterset is not None:
-            pk_list = self.filterset(
-                request.GET, self.queryset.values_list("pk", flat=True)
-            ).qs
-        else:
-            pk_list = request.POST.getlist("pk")
-
-        if not self.is_uniform_hardware_type(pk_list, request, **kwargs):
-            return redirect(self.get_return_url(request))
-
-        # Continue with existing protected fields validation.
-        initial_data = {"pk": pk_list}
-        protected_fields_by_tags = get_tags_and_edit_protected_asset_fields()
-
-        errors = []
-        protected_assets = []
-
-        if "_apply" not in request.POST:
-            return self._super_post(request, **kwargs)
-
-        form = self.form(request.POST, initial=initial_data)
-        restrict_form_fields(form, request.user)
-
-        if not form.is_valid():
-            return self._super_post(request, **kwargs)
-
-        nullified_fields = set(request.POST.getlist("_nullify"))
-
-        queryset = self.queryset.filter(pk__in=pk_list)
-
-        for asset in queryset:
-            asset_tags = set(asset.tags.all().values_list("slug", flat=True))
-            intersection_of_tags = set(asset_tags).intersection(
-                protected_fields_by_tags.keys()
-            )
-
-            # Check if asset is protected from editing
-            for tag in intersection_of_tags:
-                # TODO: Check if custom fields can be protected
-                protected_fields = set(protected_fields_by_tags[tag])
-
-                modified_fields = set(form.changed_data)
-                nullable = set(form.nullable_fields).intersection(set(nullified_fields))
-
-                if modified_fields.intersection(protected_fields) or nullable.intersection(protected_fields):
-                    break
-
-                protected_assets.append(asset)
-
-                fields = modified_fields.intersection(protected_fields).union(
-                    nullable.intersection(protected_fields)
-                )
-                errors.append(
-                    "Cannot edit asset {} fields protected by tag {}: {}.".format(
-                        asset,
-                        tag,
-                        ",".join(fields),
-                    )
-                )
-        if errors:
-            error_msg_protected_assets = f'Edit failed for all assets. Because of trying to modify protected fields on assets: {", ".join(map(str, set(protected_assets)))}.'
-            logger.info(errors + [error_msg_protected_assets])
-            messages.warning(request, " ".join(errors))
-            messages.warning(request, error_msg_protected_assets)
-            return redirect(self.get_return_url(request))
-        return self._super_post(request, **kwargs)
 
 
 @register_model_view(models.Asset, "bulk_delete", path="delete", detail=False)
