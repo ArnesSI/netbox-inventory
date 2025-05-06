@@ -395,7 +395,9 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
     @property
     def current_location(self):
         installed = self.installed_location
-        if installed:
+        # we can have an installed site but no installed location
+        # so return None in that case
+        if installed or self.installed_site:
             return installed
         return self.storage_location
 
