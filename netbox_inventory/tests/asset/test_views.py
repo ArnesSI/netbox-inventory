@@ -33,14 +33,10 @@ class AssetTestCase(
             supplier=supplier1,
             status='closed',
         )
-        Delivery.objects.create(
-            name='the_delivery',
-            purchase=purchase1,
-        )
-        Delivery.objects.create(
-            name='the_delivery',
-            purchase=purchase2,
-        )
+        delivery1 = Delivery.objects.create(name='the_delivery')
+        delivery1.purchases.set([purchase1])
+        delivery2 = Delivery.objects.create(name='the_second_delivery')
+        delivery2.purchases.set([purchase2])
         Site.objects.create(
             name='site1',
             slug='site1',
@@ -78,14 +74,14 @@ class AssetTestCase(
         )
 
         cls.form_data = {
-            'status': 'stored',
+            'status': 'planned',
             'serial': '124',
             'device_type': device_type1.pk,
         }
         cls.csv_data = (
             'serial,status,hardware_kind,manufacturer,model_name,supplier,purchase,delivery',
             'csv1,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_delivery',
-            'csv2,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_delivery',
+            'csv2,stored,device,manufacturer1,device_type1,Supplier1,Purchase1,the_second_delivery',
             'csv3,stored,device,manufacturer_csv,device_type_csv,,,',
         )
         cls.csv_update_data = (
@@ -168,10 +164,8 @@ class AssetTestCase(
             supplier=supplier1,
             status='closed',
         )
-        delivery1 = Delivery.objects.create(
-            name='Delivery1-autoset',
-            purchase=purchase1,
-        )
+        delivery1 = Delivery.objects.create(name='Delivery1-autoset')
+        delivery1.purchases.set([purchase1])
 
         form_data = {
             'status': 'stored',
@@ -216,7 +210,7 @@ class AssetBulkAddTestCase(
 
         cls.bulk_create_data = {
             'count': 3,
-            'status': 'stored',
+            'status': 'planned',
             'device_type': device_type1.pk,
         }
 

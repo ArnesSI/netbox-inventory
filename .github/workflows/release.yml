@@ -1,0 +1,66 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      
+      - name: Install dependencies
+        run: pip install --upgrade setuptools wheel build
+      
+      - name: Build the package
+        run: python -m build
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  release:
+    name: Release Package
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Debug artifact contents
+        run: ls -l dist/
+
+      - name: Create GitHub Release
+        run: |
+          echo "Finding version from dist/ filename..."
+          VERSION="v$(ls dist/netbox_inventory-*.tar.gz | sed -E 's/.*netbox_inventory-([0-9.]+)\.tar\.gz/\1/')"
+          echo "Extracted version: $VERSION"
+          
+          gh release create "$VERSION" dist/netbox_inventory-*.tar.gz dist/netbox_inventory-*.whl \
+            --title "NetBox Inventory Plus $VERSION" \
+            --notes "Release $VERSION"
+
+      - name: Clean up
+        run: |
+          echo "Cleaning up..."
+          rm -rf dist
+          echo "Cleanup complete."

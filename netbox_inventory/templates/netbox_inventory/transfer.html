@@ -1,0 +1,121 @@
+{% extends 'generic/object.html' %}
+{% load plugins %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_inventory:transfer_list' %}">Transfers</a></li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-3">
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Transfer</h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Name</th>
+            <td>{{ object.name }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Assets</th>
+              <td>
+                <a href="{% url 'plugins:netbox_inventory:asset_list' %}?transfer_id={{ object.pk }}">{{ asset_count }}</a>
+              </td>
+          </tr>
+          <tr>
+            <th scope="row">Courier</th>
+            <td>{{ object.courier|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Shipping Number</th>
+            <td>{{ object.shipping_number|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Delivery Instructions</th>
+            <td>{{ object.instructions|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Status</th>
+            <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+          </tr>
+        </table>
+      </div>
+      {% include 'inc/panels/tags.html' %}
+      {% plugin_left_page object %}
+    </div>
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Delivery</h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Sender</th>
+            <td>{{ object.sender|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Recipient</th>
+            <td>{{ object.recipient|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Site</th>
+            <td>{{ object.site|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Location</th>
+            <td>{{ object.location|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Pickup Date</th>
+            <td>
+              {% comment "TODO: Add status updates via buttons" %}
+                {% if object.pickup_date and object.status != "created" %}
+                  {{ object.pickup_date|placeholder }}
+                {% else %}
+                  <a href="#" class="btn btn-sm btn-cyan" title="Mark transfer as picked up">
+                    <i class="mdi mdi-export"></i>
+                  </a>
+                {% endif %}
+              {% endcomment %}
+              {{ object.pickup_date|placeholder }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Received Date</th>
+            <td>
+              {% comment "TODO: Add status updates via buttons" %}
+                {% if object.received_date %}
+                  {{ object.received_date|placeholder }}
+                {% else %}
+                  <a href="#" class="btn btn-sm btn-green" title="Mark transfer as received">
+                    <i class="mdi mdi-import"></i>
+                  </a>
+                {% endif %}
+              {% endcomment %}
+              {{ object.received_date|placeholder }}
+            </td>
+          </tr>
+        </table>
+      </div>
+      {% include 'inc/panels/comments.html' %}
+      {% plugin_right_page object %}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">
+          Transferred Assets
+          {% if perms.netbox_inventory.add_asset %}
+            <div class="card-actions">
+              <a href="{% url 'plugins:netbox_inventory:asset_add' %}?transfer={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add an Asset
+              </a>
+              <a href="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?related_type=transfer&related_id={{ object.pk }}&related_name={{ object.name }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i> Bulk Assign Assets
+              </a>
+            </div>
+          {% endif %}
+        </h5>
+        {% htmx_table 'plugins:netbox_inventory:asset_list' transfer_id=object.pk %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

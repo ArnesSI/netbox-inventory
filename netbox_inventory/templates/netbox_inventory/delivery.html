@@ -2,16 +2,6 @@
 {% load helpers %}
 {% load plugins %}
 
-{% block breadcrumbs %}
-  {{ block.super }}
-  <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?supplier_id={{ object.purchase.supplier.pk }}">{{ object.purchase.supplier }}</a>
-  </li>
-  <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_inventory:delivery_list' %}?purchase_id={{ object.purchase.pk }}">{{ object.purchase }}</a>
-  </li>
-{% endblock %}
-
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
@@ -23,8 +13,18 @@
             <td>{{ object.name }}</td>
           </tr>
           <tr>
-            <th scope="row">Purchase</th>
-            <td>{{ object.purchase|linkify }}</td>
+            <th scope="row">Purchases</th>
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:purchase_list' %}?delivery_id={{ object.pk }}">{{ object.purchases.count }}</a>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" title="The location where this delivery is to be received">Delivery Location</th>
+            <td>
+              {% if object.delivery_location %}
+                {{ object.delivery_location.site|linkify|placeholder }} /
+              {% endif %}
+              {{ object.delivery_location|linkify|placeholder }}</td>
           </tr>
           <tr>
             <th scope="row">Receiving Contact</th>
@@ -65,13 +65,16 @@
       <div class="card">
         <h5 class="card-header">
           Purchases
-          <!-- {% if perms.netbox_inventory.add_purchase %}
+          {% if perms.netbox_inventory.add_purchase %}
             <div class="card-actions">
-              <a href="{% url 'plugins:netbox_inventory:purchase_add' %}?delivery={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
-                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Purchase
+              <a href="{% url 'plugins:netbox_inventory:delivery_create_purchase' delivery_id=object.pk %}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add New Purchase
+              </a>
+              <a href="{% url 'plugins:netbox_inventory:delivery_bulk_assign_purchases' %}?related_type=delivery&related_id={{ object.pk }}&related_name={{ object.name }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i> Bulk Assign Purchases
               </a>
             </div>
-          {% endif %} -->
+          {% endif %}
         </h5>
         {% htmx_table 'plugins:netbox_inventory:purchase_list' delivery_id=object.pk %}
       </div>
@@ -80,8 +83,11 @@
           Delivered Assets
           {% if perms.netbox_inventory.add_asset %}
             <div class="card-actions">
-              <a href="{% url 'plugins:netbox_inventory:asset_add' %}?delivery={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
-                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add an Asset
+              <a href="{% url 'plugins:netbox_inventory:asset_add' %}?delivery={{ object.pk }}&storage_location={{ object.delivery_location.id }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add New Asset
+              </a>
+              <a href="{% url 'plugins:netbox_inventory:asset_bulk_assign' %}?related_type=delivery&related_id={{ object.pk }}&related_name={{ object.name }}{% for purchase in object.purchases.all %}&purchase_id={{ purchase.pk }}{% endfor %}" class="btn btn-ghost-primary btn-sm">
+                <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i> Bulk Assign Assets
               </a>
             </div>
           {% endif %}

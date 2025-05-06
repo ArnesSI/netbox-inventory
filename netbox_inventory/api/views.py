@@ -6,11 +6,13 @@ from .. import filtersets, models
 from .serializers import (
     AssetSerializer,
     BOMSerializer,
+    CourierSerializer,
     DeliverySerializer,
     InventoryItemGroupSerializer,
     InventoryItemTypeSerializer,
     PurchaseSerializer,
     SupplierSerializer,
+    TransferSerializer,
 )
 
 #
@@ -88,7 +90,7 @@ class SupplierViewSet(NetBoxModelViewSet):
     queryset = models.Supplier.objects.prefetch_related('tags').annotate(
         asset_count=count_related(models.Asset, 'purchase__supplier'),
         purchase_count=count_related(models.Purchase, 'supplier'),
-        delivery_count=count_related(models.Delivery, 'purchase__supplier'),
+        delivery_count=count_related(models.Delivery, 'purchases__supplier'),
     )
     serializer_class = SupplierSerializer
     filterset_class = filtersets.SupplierFilterSet
@@ -106,7 +108,7 @@ class BOMViewSet(NetBoxModelViewSet):
 class PurchaseViewSet(NetBoxModelViewSet):
     queryset = models.Purchase.objects.prefetch_related('tags').annotate(
         asset_count=count_related(models.Asset, 'purchase'),
-        delivery_count=count_related(models.Delivery, 'purchase'),
+        delivery_count=count_related(models.Delivery, 'purchases'),
     )
     serializer_class = PurchaseSerializer
     filterset_class = filtersets.PurchaseFilterSet
@@ -118,3 +120,24 @@ class DeliveryViewSet(NetBoxModelViewSet):
     )
     serializer_class = DeliverySerializer
     filterset_class = filtersets.DeliveryFilterSet
+
+
+#
+# Transit
+#
+
+
+class CourierViewSet(NetBoxModelViewSet):
+    queryset = models.Courier.objects.prefetch_related('tags').annotate(
+        transfer_count=count_related(models.Transfer, 'courier'),
+    )
+    serializer_class = CourierSerializer
+    filterset_class = filtersets.CourierFilterSet
+
+
+class TransferViewSet(NetBoxModelViewSet):
+    queryset = models.Transfer.objects.prefetch_related('tags').annotate(
+        asset_count=count_related(models.Asset, 'transfer'),
+    )
+    serializer_class = TransferSerializer
+    filterset_class = filtersets.TransferFilterSet

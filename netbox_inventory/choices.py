@@ -12,6 +12,7 @@ class AssetStatusChoices(ChoiceSet):
         ('planned', 'Planned', 'orange'),
         ('ordered', 'Ordered', 'cyan'),
         ('stored', 'Stored', 'green'),
+        ('transit', 'In Transit', 'purple'),
         ('used', 'Used', 'blue'),
         ('retired', 'Retired', 'gray'),
     ]
@@ -37,6 +38,7 @@ class BOMStatusChoices(ChoiceSet):
     CHOICES = [
         ('planned', 'Planned', 'orange'),
         ('quoted', 'Quoted', 'cyan'),
+        ('closed', 'Closed', 'green'),
     ]
 
 
@@ -47,4 +49,19 @@ class PurchaseStatusChoices(ChoiceSet):
         ('open', 'Open', 'cyan'),
         ('partial', 'Partial', 'blue'),
         ('closed', 'Closed', 'green'),
+    ]
+
+
+#
+# Transit
+#
+
+
+class TransferStatusChoices(ChoiceSet):
+    key = 'Transfer.status'
+
+    CHOICES = [
+        ('created', 'Created', 'orange'),
+        ('pickedup', 'Picked Up', 'cyan'),
+        ('delivered', 'Delivered', 'green'),
     ]

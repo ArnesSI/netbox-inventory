@@ -10,22 +10,26 @@ from netbox_inventory.choices import HardwareKindChoices
 from ..models import (
     BOM,
     Asset,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 from ..utils import get_tags_and_edit_protected_asset_fields
 
 __all__ = (
-    "AssetForm",
-    "SupplierForm",
-    "BOMForm",
-    "PurchaseForm",
-    "DeliveryForm",
-    "InventoryItemTypeForm",
-    "InventoryItemGroupForm",
+    'AssetForm',
+    'SupplierForm',
+    'BOMForm',
+    'PurchaseForm',
+    'DeliveryForm',
+    'InventoryItemTypeForm',
+    'InventoryItemGroupForm',
+    'CourierForm',
+    'TransferForm',
 )
 
 
@@ -91,6 +95,11 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field("delivery").blank,
         query_params={"purchase_id": "$purchase"},
     )
+    transfer = DynamicModelChoiceField(
+        queryset=Transfer.objects.all(),
+        help_text=Asset._meta.get_field('transfer').help_text,
+        required=not Asset._meta.get_field('transfer').blank,
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         help_text=Asset._meta.get_field("tenant").help_text,
@@ -143,13 +152,14 @@ class AssetForm(NetBoxModelForm):
             name="Hardware",
         ),
         FieldSet(
-            "owner",
-            "bom",
-            "purchase",
-            "delivery",
-            "warranty_start",
-            "warranty_end",
-            name="Purchase",
+            'owner',
+            'bom',
+            'purchase',
+            'delivery',
+            'transfer',
+            'warranty_start',
+            'warranty_end',
+            name='Purchase',
         ),
         FieldSet("tenant", "contact_group", "contact", name="Assigned to"),
         FieldSet("storage_site", "storage_location", name="Location"),
@@ -158,29 +168,30 @@ class AssetForm(NetBoxModelForm):
     class Meta:
         model = Asset
         fields = (
-            "name",
-            "asset_tag",
-            "serial",
-            "status",
-            "manufacturer",
-            "device_type",
-            "module_type",
-            "inventoryitem_type",
-            "rack_type",
-            "storage_location",
-            "owner",
-            "bom",
-            "purchase",
-            "delivery",
-            "warranty_start",
-            "warranty_end",
-            "tenant",
-            "contact_group",
-            "contact",
-            "tags",
-            "description",
-            "comments",
-            "storage_site",
+            'name',
+            'asset_tag',
+            'serial',
+            'status',
+            'manufacturer',
+            'device_type',
+            'module_type',
+            'inventoryitem_type',
+            'rack_type',
+            'storage_location',
+            'owner',
+            'bom',
+            'purchase',
+            'delivery',
+            'transfer',
+            'warranty_start',
+            'warranty_end',
+            'tenant',
+            'contact_group',
+            'contact',
+            'tags',
+            'description',
+            'comments',
+            'storage_site',
         )
         widgets = {
             "warranty_start": DatePicker(),
@@ -240,7 +251,7 @@ class AssetForm(NetBoxModelForm):
         delivery = self.cleaned_data["delivery"]
         purchase = self.cleaned_data["purchase"]
         if delivery and not purchase:
-            self.cleaned_data["purchase"] = delivery.purchase
+            self.cleaned_data['purchase'] = delivery.purchases.first()
 
 
 class SupplierForm(NetBoxModelForm):
@@ -263,7 +274,7 @@ class SupplierForm(NetBoxModelForm):
 class BOMForm(NetBoxModelForm):
     comments = CommentField()
 
-    fieldsets = (FieldSet("name", "status", "description", "tags", name="BOM"),)
+    fieldsets = (FieldSet('name', 'status', 'description', 'tags', name='BOM'),)
 
     class Meta:
         model = BOM
@@ -281,14 +292,14 @@ class PurchaseForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            "supplier",
-            "boms",
-            "name",
-            "status",
-            "date",
-            "description",
-            "tags",
-            name="Purchase",
+            'supplier',
+            'boms',
+            'name',
+            'status',
+            'date',
+            'description',
+            'tags',
+            name='Purchase',
         ),
     )
 
@@ -310,6 +321,21 @@ class PurchaseForm(NetBoxModelForm):
 
 
 class DeliveryForm(NetBoxModelForm):
+    delivery_site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        initial_params={
+            'locations': '$delivery_location',
+        },
+    )
+    delivery_location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        help_text=Delivery._meta.get_field('delivery_location').help_text,
+        required=False,
+        query_params={
+            'site_id': '$delivery_site',
+        },
+    )
     contact_group = DynamicModelChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
@@ -333,28 +359,31 @@ class DeliveryForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            "purchase",
-            "name",
-            "date",
-            "contact_group",
-            "receiving_contact",
-            "description",
-            "tags",
-            name="Delivery",
+            'purchases',
+            'name',
+            'date',
+            'contact_group',
+            'receiving_contact',
+            'description',
+            'tags',
+            name='Delivery',
         ),
+        FieldSet('delivery_site', 'delivery_location', name='Location'),
     )
 
     class Meta:
         model = Delivery
         fields = (
-            "purchase",
-            "name",
-            "date",
-            "contact_group",
-            "receiving_contact",
-            "description",
-            "comments",
-            "tags",
+            'purchases',
+            'name',
+            'date',
+            'delivery_site',
+            'delivery_location',
+            'contact_group',
+            'receiving_contact',
+            'description',
+            'comments',
+            'tags',
         )
         widgets = {
             "date": DatePicker(),
@@ -418,3 +447,119 @@ class InventoryItemGroupForm(NetBoxModelForm):
             "tags",
             "comments",
         )
+
+
+class CourierForm(NetBoxModelForm):
+    slug = SlugField(slug_source='name')
+    comments = CommentField()
+
+    fieldsets = (FieldSet('name', 'slug', 'description', 'tags', name='Supplier'),)
+
+    class Meta:
+        model = Courier
+        fields = (
+            'name',
+            'slug',
+            'description',
+            'comments',
+            'tags',
+        )
+
+
+class TransferForm(NetBoxModelForm):
+    sender_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Sender Group',
+        help_text='Filter senders by group',
+        initial_params={
+            'contacts': '$sender',
+        },
+    )
+    sender = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Transfer._meta.get_field('sender').help_text,
+        required=not Transfer._meta.get_field('sender').blank,
+        query_params={
+            'group_id': '$sender_group',
+        },
+    )
+    recipient_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Recipient Group',
+        help_text='Filter recipients by group',
+        initial_params={
+            'contacts': '$recipient',
+        },
+    )
+    recipient = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        help_text=Transfer._meta.get_field('recipient').help_text,
+        required=not Transfer._meta.get_field('recipient').blank,
+        query_params={
+            'group_id': '$recipient_group',
+        },
+    )
+    site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        help_text=Transfer._meta.get_field('site').help_text,
+        required=True,
+        initial_params={
+            'locations': '$location',
+        },
+    )
+    location = DynamicModelChoiceField(
+        queryset=Location.objects.all(),
+        help_text=Transfer._meta.get_field('location').help_text,
+        required=False,
+        query_params={
+            'site_id': '$site',
+        },
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'courier',
+            'shipping_number',
+            'instructions',
+            'status',
+            name='General',
+        ),
+        FieldSet(
+            'sender',
+            'recipient',
+            'site',
+            'location',
+            'pickup_date',
+            'received_date',
+            'tags',
+            name='Transfer',
+        ),
+    )
+
+    class Meta:
+        model = Transfer
+        fields = (
+            'name',
+            'courier',
+            'shipping_number',
+            'instructions',
+            'status',
+            'sender',
+            'recipient',
+            'site',
+            'location',
+            'pickup_date',
+            'received_date',
+            'tags',
+            'comments',
+        )
+        widgets = {
+            'pickup_date': DatePicker(),
+            'received_date': DatePicker(),
+        }

@@ -1,3 +1,4 @@
+import json
 from copy import copy
 
 from rest_framework import status
@@ -50,7 +51,14 @@ class AssetTest(
         response = self.client.post(
             self._get_list_url(), self.create_data[0], format='json', **self.header
         )
-        instance = self._get_queryset().get(pk=response.data['id'])
+        data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+
+        instance = self._get_queryset().get(pk=data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
         self.assertHttpStatus(response, status.HTTP_200_OK)
@@ -74,7 +82,14 @@ class AssetTest(
         response = self.client.post(
             self._get_list_url(), self.create_data[0], format='json', **self.header
         )
-        instance = self._get_queryset().get(pk=response.data['id'])
+        data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+
+        instance = self._get_queryset().get(pk=data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
         with disable_warnings('django.request'):
@@ -95,7 +110,13 @@ class AssetTest(
         response = self.client.post(
             self._get_list_url(), self.create_data[0], format='json', **self.header
         )
-        instance = self._get_queryset().get(pk=response.data['id'])
+        data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+        instance = self._get_queryset().get(pk=data['id'])
         url = self._get_detail_url(instance)
         response = self.client.patch(url, update_data, format='json', **self.header)
         with disable_warnings('django.request'):
@@ -115,8 +136,14 @@ class AssetTest(
         response = self.client.post(
             self._get_list_url(), create_data, format='json', **self.header
         )
-        instance = self._get_queryset().get(pk=response.data['id'])
-        self.assertEqual(instance.purchase, self.purchase1)
+        data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+        instance = self._get_queryset().get(pk=data['id'])
+        self.assertEqual(self.purchase1, instance.purchase)
 
     def test_serial_asset_tag_empty(self):
         """
@@ -134,7 +161,14 @@ class AssetTest(
         response = self.client.post(
             self._get_list_url(), create_data, format='json', **self.header
         )
-        instance = self._get_queryset().get(pk=response.data['id'])
+        data = json.loads(response.content)
+
+        if 'id' not in data:
+            print("POST response data:", data)
+
+        self.assertIn('id', data)
+
+        instance = self._get_queryset().get(pk=data['id'])
         self.assertEqual(instance.serial, None)
         self.assertEqual(instance.asset_tag, None)
 
@@ -181,9 +215,8 @@ class AssetTest(
         cls.purchase1 = Purchase.objects.create(
             name='Purchase1', supplier=supplier1, status='closed'
         )
-        cls.delivery1 = Delivery.objects.create(
-            name='Delivery1', purchase=cls.purchase1
-        )
+        cls.delivery1 = Delivery.objects.create(name='Delivery1')
+        cls.delivery1.purchases.set([cls.purchase1])
 
         Asset.objects.create(name='Asset 1', serial='asset1', device_type=device_type1)
         Asset.objects.create(name='Asset 2', serial='asset2', device_type=device_type1)
@@ -193,14 +226,14 @@ class AssetTest(
             {
                 'name': 'Asset 4',
                 'serial': 'asset4',
-                'status': 'stored',
+                'status': 'planned',
                 'device_type': device_type1.pk,
                 'device': None,
             },
             {
                 'name': 'Asset 5',
                 'serial': 'asset5',
-                'status': 'stored',
+                'status': 'planned',
                 'device_type': None,
                 'device': None,
                 'module_type': module_type1.pk,

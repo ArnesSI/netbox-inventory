@@ -3,7 +3,6 @@ from datetime import date
 from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
-
 from netbox.models import NestedGroupModel, NetBoxModel
 from netbox.models.features import ImageAttachmentsMixin
 
@@ -282,6 +281,14 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=True,
     )
+    transfer = models.ForeignKey(
+        help_text='Transfer this asset is part of',
+        to='netbox_inventory.Transfer',
+        on_delete=models.PROTECT,
+        related_name='assets',
+        blank=True,
+        null=True,
+    )
     purchase = models.ForeignKey(
         help_text='Purchase through which this asset was purchased',
         to='netbox_inventory.Purchase',
@@ -453,6 +460,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         self.validate_hardware_types()
         self.validate_hardware()
         self.update_status()
+        self.update_location()
         return super().clean()
 
     def save(self, clear_old_hw=True, *args, **kwargs):
@@ -523,32 +531,38 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         If asset was assigned or unassigned to a particular device, module, inventoryitem, rack
         update asset.status. Depending on plugin configuration.
         """
-        old_hw = get_prechange_field(self, self.kind)
+        # Retired: Asset is retired; do not change status automatically
+        if self.status == get_status_for('retired'):
+            return
+
         new_hw = getattr(self, self.kind)
         old_status = get_prechange_field(self, 'status')
-        planned_status = get_status_for('planned')
-        ordered_status = get_status_for('ordered')
-        stored_status = get_status_for('stored')
         used_status = get_status_for('used')
-        if old_status != self.status:
-            # status has also been changed manually, don't change it automatically
+        stored_status = get_status_for('stored')
+        ordered_status = get_status_for('ordered')
+        planned_status = get_status_for('planned')
+
+        # Manual/Bulk Assignment: Status has been set manually or Asset is part of bulk assignment; do not change it
+        if not getattr(self, '_in_bulk_assignment', False) and old_status != self.status:
             return
-        if used_status and new_hw and not old_hw:
+
+        # Used: Asset was assigned
+        if used_status and new_hw:
             self.status = used_status
             return
-        elif stored_status and not new_hw and old_hw:
+
+        # Stored: Unassigned but fully delivered and purchased
+        if stored_status and self.delivery and not new_hw:
             self.status = stored_status
             return
-        if self.delivery:
-            return
-        old_purchase = get_prechange_field(self, self.purchase)
-        if ordered_status and self.purchase and not old_purchase:
+
+        # Ordered: Purchase just got created
+        if ordered_status and self.purchase:
             self.status = ordered_status
             return
-        old_bom = get_prechange_field(self, self.bom)
-        if planned_status and self.bom and not old_bom:
-            self.status = planned_status
-            return
+
+        # Planned: Default status
+        self.status = planned_status
 
     def update_hardware_used(self, clear_old_hw=True):
         """
@@ -579,11 +593,28 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             if new_hw:
                 asset_set_new_hw(asset=self, hw=new_hw)
 
+    def update_location(self):
+        """
+        Update the location of the asset based on the location of the assigned
+        delivery.
+        """
+        new_hw = getattr(self, self.kind)
+
+        if self.delivery and not new_hw:
+            self.storage_location = self.delivery.delivery_location
+        else:
+            self.storage_location = None
+
     def clean_delivery(self):
-        if self.delivery and self.delivery.purchase != self.purchase:
-            raise ValidationError(
-                f'Assigned delivery must belong to selected purchase ({self.purchase}).'
-            )
+        if self.delivery and not self.purchase:
+            self.purchase = self.delivery.purchases.first()
+        if self.delivery:
+            if self.purchase and self.purchase not in self.delivery.purchases.all():
+                raise ValidationError(
+                    {
+                        'purchase': 'The selected purchase is not associated with the delivery.'
+                    }
+                )
 
     def clean_warranty_dates(self):
         if (

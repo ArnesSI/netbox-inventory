@@ -18,6 +18,7 @@ from netbox_inventory.models import Asset, InventoryItemGroup, InventoryItemType
 
 from .deliveries import *
 from .nested import *
+from .transit import *
 
 
 class InventoryItemGroupSerializer(NestedGroupModelSerializer):
@@ -165,6 +166,12 @@ class AssetSerializer(NetBoxModelSerializer):
         allow_null=True,
         default=None,
     )
+    transfer = TransferSerializer(
+        nested=True,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
     tenant = TenantSerializer(
         nested=True,
         required=False,
@@ -188,7 +195,7 @@ class AssetSerializer(NetBoxModelSerializer):
         ret = super().to_internal_value(data)
         # if only delivery set, infer pruchase from it
         if 'delivery' in ret and ret['delivery'] and not ret.get('purchase'):
-            ret['purchase'] = ret['delivery'].purchase
+            ret['purchase'] = ret['delivery'].purchases.first()
         if 'asset_tag' in ret and ret['asset_tag'] == '':
             ret['asset_tag'] = None
         if 'serial' in ret and ret['serial'] == '':
@@ -222,6 +229,7 @@ class AssetSerializer(NetBoxModelSerializer):
             'bom',
             'delivery',
             'purchase',
+            'transfer',
             'warranty_start',
             'warranty_end',
             'comments',

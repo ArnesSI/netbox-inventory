@@ -25,10 +25,8 @@ class TestAssetModel(TestCase):
             supplier=self.supplier1,
             status='closed',
         )
-        self.delivery1 = Delivery.objects.create(
-            name='Delivery1',
-            purchase=self.purchase1,
-        )
+        self.delivery1 = Delivery.objects.create(name='Delivery1')
+        self.delivery1.purchases.set([self.purchase1])
         self.site1 = Site.objects.create(
             name='site1',
             slug='site1',
@@ -45,7 +43,7 @@ class TestAssetModel(TestCase):
         self.asset1 = Asset.objects.create(
             asset_tag='asset1',
             serial='asset1',
-            status='stored',
+            status='planned',
             device_type=self.device_type1,
         )
         self.device1 = Device.objects.create(
@@ -173,7 +171,7 @@ class TestAssetModel(TestCase):
         self.asset1.device = None
         self.asset1.full_clean()
         self.asset1.save()
-        self.assertEqual(self.asset1.status, 'stored')
+        self.assertEqual(self.asset1.status, 'planned')
 
     def test_status_device_deleted(self):
         self.asset1.snapshot()
@@ -196,8 +194,11 @@ class TestAssetModel(TestCase):
         self.asset1.snapshot()
         self.asset1.purchase = None
         self.asset1.delivery = self.delivery1
-        with self.assertRaises(ValidationError):
-            self.asset1.full_clean()
+        self.asset1.full_clean()
+        self.asset1.save()
+        self.asset1.refresh_from_db()
+        self.assertNotEqual(self.asset1.purchase, None)
+        self.assertEqual(self.asset1.purchase, self.delivery1.purchases.first())
 
     def test_change_delivery_purchse(self):
         """
@@ -208,7 +209,7 @@ class TestAssetModel(TestCase):
         self.asset1.delivery = self.delivery1
         self.asset1.full_clean()
         self.asset1.save()
-        self.delivery1.purchase = self.purchase2
+        self.delivery1.purchases.set([self.purchase2])
         self.delivery1.full_clean()
         self.delivery1.save()
         self.asset1.refresh_from_db()

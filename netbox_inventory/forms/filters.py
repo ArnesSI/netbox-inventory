@@ -1,5 +1,3 @@
-from django import forms
-
 from dcim.models import (
     Device,
     DeviceRole,
@@ -13,6 +11,7 @@ from dcim.models import (
     RackType,
     Site,
 )
+from django import forms
 from netbox.forms import NetBoxModelFilterSetForm
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
@@ -30,25 +29,30 @@ from ..choices import (
     BOMStatusChoices,
     HardwareKindChoices,
     PurchaseStatusChoices,
+    TransferStatusChoices,
 )
 from ..models import (
     BOM,
     Asset,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 
 __all__ = (
-    "AssetFilterForm",
-    "SupplierFilterForm",
-    "BOMFilterForm",
-    "PurchaseFilterForm",
-    "DeliveryFilterForm",
-    "InventoryItemTypeFilterForm",
-    "InventoryItemGroupFilterForm",
+    'AssetFilterForm',
+    'SupplierFilterForm',
+    'BOMFilterForm',
+    'PurchaseFilterForm',
+    'DeliveryFilterForm',
+    'InventoryItemTypeFilterForm',
+    'InventoryItemGroupFilterForm',
+    'CourierFilterForm',
+    'TransferFilterForm',
 )
 
 
@@ -72,20 +76,21 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         ),
         FieldSet("tenant_id", "contact_group_id", "contact_id", name="Usage"),
         FieldSet(
-            "owner_id",
-            "bom_id",
-            "delivery_id",
-            "purchase_id",
-            "supplier_id",
-            "delivery_date_after",
-            "delivery_date_before",
-            "purchase_date_after",
-            "purchase_date_before",
-            "warranty_start_after",
-            "warranty_start_before",
-            "warranty_end_after",
-            "warranty_end_before",
-            name="Purchase",
+            'owner_id',
+            'bom_id',
+            'delivery_id',
+            'purchase_id',
+            'supplier_id',
+            'transfer_id',
+            'delivery_date_after',
+            'delivery_date_before',
+            'purchase_date_after',
+            'purchase_date_before',
+            'warranty_start_after',
+            'warranty_start_before',
+            'warranty_end_after',
+            'warranty_end_before',
+            name='Purchase',
         ),
         FieldSet(
             "storage_site_id",
@@ -220,6 +225,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Supplier.objects.all(),
         required=False,
         label="Supplier",
+    )
+    transfer_id = DynamicModelMultipleChoiceField(
+        queryset=Transfer.objects.all(),
+        required=False,
+        label='Transfer',
     )
     delivery_date_after = forms.DateField(
         required=False,
@@ -359,8 +369,8 @@ class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
 class BOMFilterForm(NetBoxModelFilterSetForm):
     model = BOM
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
-        FieldSet("status", "purchase_id", name="BOM"),
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('status', 'purchase_id', name='BOM'),
     )
 
     status = forms.MultipleChoiceField(
@@ -370,7 +380,7 @@ class BOMFilterForm(NetBoxModelFilterSetForm):
     purchase_id = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
         required=False,
-        label="Purchase",
+        label='Purchase',
     )
     tag = TagFilterField(model)
 
@@ -378,15 +388,15 @@ class BOMFilterForm(NetBoxModelFilterSetForm):
 class PurchaseFilterForm(NetBoxModelFilterSetForm):
     model = Purchase
     fieldsets = (
-        FieldSet("q", "filter_id", "tag"),
+        FieldSet('q', 'filter_id', 'tag'),
         FieldSet(
-            "supplier_id",
-            "boms",
-            "status",
-            "delivery_id",
-            "date_after",
-            "date_before",
-            name="Purchase",
+            'supplier_id',
+            'boms',
+            'status',
+            'delivery_id',
+            'date_after',
+            'date_before',
+            name='Purchase',
         ),
     )
 
@@ -407,7 +417,7 @@ class PurchaseFilterForm(NetBoxModelFilterSetForm):
     delivery_id = DynamicModelChoiceField(
         queryset=Delivery.objects.all(),
         required=False,
-        label="Delivery",
+        label='Delivery',
     )
     date_after = forms.DateField(
         required=False,
@@ -427,13 +437,15 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (
         FieldSet("q", "filter_id", "tag"),
         FieldSet(
-            "purchase_id",
-            "supplier_id",
-            "contact_group_id",
-            "receiving_contact_id",
-            "date_after",
-            "date_before",
-            name="Delivery",
+            'purchase_id',
+            'supplier_id',
+            'delivery_site_id',
+            'delivery_location_id',
+            'contact_group_id',
+            'receiving_contact_id',
+            'date_after',
+            'date_before',
+            name='Delivery',
         ),
     )
 
@@ -452,6 +464,22 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         null_option="None",
         label="Contact Group",
+    )
+    delivery_site_id = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label='Delivery site',
+        help_text='Site where this delivery was received',
+    )
+    delivery_location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'site_id': '$delivery_site_id',
+        },
+        label='Delivery location',
+        help_text='Location where this delivery was received',
     )
     receiving_contact_id = DynamicModelMultipleChoiceField(
         queryset=Contact.objects.all(),
@@ -500,5 +528,136 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (FieldSet("q", "filter_id", "tag", "parent_id"),)
     parent_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(), required=False, label="Parent group"
+    )
+    tag = TagFilterField(model)
+
+
+class CourierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
+    model = Courier
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
+    )
+
+    contact_group = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+    )
+    contact = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$contact_group',
+        },
+        label='Contact',
+    )
+
+    tag = TagFilterField(model)
+
+
+class TransferFilterForm(NetBoxModelFilterSetForm):
+    model = Transfer
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag', 'status'),
+        FieldSet('asset_id', 'courier_id', name='General'),
+        FieldSet(
+            'sender_group_id',
+            'sender_id',
+            'recipient_group_id',
+            'recipient_id',
+            name='Contacts',
+        ),
+        FieldSet(
+            'site_id',
+            'location_id',
+            'pickup_date_after',
+            'pickup_date_before',
+            'received_date_after',
+            'received_date_before',
+            name='Transfer',
+        ),
+    )
+
+    asset_id = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        label='Assets',
+    )
+    courier_id = DynamicModelMultipleChoiceField(
+        queryset=Courier.objects.all(),
+        required=False,
+        label='Courier',
+    )
+    status = forms.MultipleChoiceField(
+        choices=TransferStatusChoices,
+        required=False,
+    )
+    sender_group_id = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Sender Group',
+    )
+    sender_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$sender_group_id',
+        },
+        label='Sender',
+    )
+    recipient_group_id = DynamicModelMultipleChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Recipient Group',
+    )
+    recipient_id = DynamicModelMultipleChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        null_option='None',
+        query_params={
+            'group_id': '$recipient_group_id',
+        },
+        label='Recipient',
+    )
+    site_id = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label='Delivered at site',
+        help_text='Transfer delivered here',
+    )
+    location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        query_params={
+            'site_id': '$site_id',
+        },
+        label='Delivered at location on site',
+        help_text='Transfer delivered here',
+    )
+    pickup_date_after = forms.DateField(
+        required=False,
+        label='Transfer picked up on or after',
+        widget=DatePicker,
+    )
+    pickup_date_before = forms.DateField(
+        required=False,
+        label='Transfer picked up on or before',
+        widget=DatePicker,
+    )
+    received_date_after = forms.DateField(
+        required=False,
+        label='Transfer received on or after',
+        widget=DatePicker,
+    )
+    received_date_before = forms.DateField(
+        required=False,
+        label='Transfer received on or before',
+        widget=DatePicker,
     )
     tag = TagFilterField(model)

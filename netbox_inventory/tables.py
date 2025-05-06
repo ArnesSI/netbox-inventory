@@ -1,8 +1,7 @@
 import django_tables2 as tables
+from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
-
-from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
@@ -10,22 +9,26 @@ from utilities.tables import register_table_column
 from .models import (
     BOM,
     Asset,
+    Courier,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
     Supplier,
+    Transfer,
 )
 from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
-    "AssetTable",
-    "SupplierTable",
-    "BOMTable",
-    "PurchaseTable",
-    "DeliveryTable",
-    "InventoryItemTypeTable",
-    "InventoryItemGroupTable",
+    'AssetTable',
+    'SupplierTable',
+    'BOMTable',
+    'PurchaseTable',
+    'DeliveryTable',
+    'InventoryItemTypeTable',
+    'InventoryItemGroupTable',
+    'CourierTable',
+    'TransferTable',
 )
 
 
@@ -189,6 +192,9 @@ class AssetTable(NetBoxTable):
         linkify=True,
     )
     delivery = tables.Column(
+        linkify=True,
+    )
+    transfer = tables.Column(
         linkify=True,
     )
     purchase_date = columns.DateColumn(
@@ -356,58 +362,59 @@ class AssetTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Asset
         fields = (
-            "pk",
-            "id",
-            "name",
-            "asset_tag",
-            "serial",
-            "status",
-            "kind",
-            "manufacturer",
-            "hardware_type",
-            "inventoryitem_group",
-            "hardware",
-            "hardware_role",
-            "installed_site",
-            "installed_location",
-            "installed_rack",
-            "installed_device",
-            "tenant",
-            "contact",
-            "storage_site",
-            "storage_location",
-            "current_site",
-            "current_location",
-            "owner",
-            "bom",
-            "supplier",
-            "purchase",
-            "delivery",
-            "purchase_date",
-            "delivery_date",
-            "warranty_start",
-            "warranty_end",
-            "warranty_progress",
-            "description",
-            "comments",
-            "tags",
-            "created",
-            "last_updated",
-            "actions",
+            'pk',
+            'id',
+            'name',
+            'asset_tag',
+            'serial',
+            'status',
+            'kind',
+            'manufacturer',
+            'hardware_type',
+            'inventoryitem_group',
+            'hardware',
+            'hardware_role',
+            'installed_site',
+            'installed_location',
+            'installed_rack',
+            'installed_device',
+            'tenant',
+            'contact',
+            'storage_site',
+            'storage_location',
+            'current_site',
+            'current_location',
+            'owner',
+            'bom',
+            'supplier',
+            'purchase',
+            'delivery',
+            'purchase_date',
+            'delivery_date',
+            'transfer',
+            'warranty_start',
+            'warranty_end',
+            'warranty_progress',
+            'description',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
         )
         default_columns = (
-            "id",
-            "name",
-            "serial",
-            "kind",
-            "manufacturer",
-            "hardware_type",
-            "asset_tag",
-            "status",
-            "hardware",
-            "purchase",
-            "delivery",
-            "tags",
+            'id',
+            'name',
+            'serial',
+            'kind',
+            'manufacturer',
+            'hardware_type',
+            'asset_tag',
+            'status',
+            'hardware',
+            'purchase',
+            'delivery',
+            'tags',
         )
 
 
@@ -468,9 +475,9 @@ class BOMTable(NetBoxTable):
     )
     status = columns.ChoiceFieldColumn()
     asset_count = columns.LinkedCountColumn(
-        viewname="plugins:netbox_inventory:asset_list",
-        url_params={"purchase_id": "pk"},
-        verbose_name="Assets",
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'bom_id': 'pk'},
+        verbose_name='Assets',
     )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
@@ -525,20 +532,20 @@ class PurchaseTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Purchase
         fields = (
-            "pk",
-            "id",
-            "name",
-            "supplier",
-            "boms" "status",
-            "date",
-            "description",
-            "comments",
-            "delivery_count",
-            "asset_count",
-            "tags",
-            "created",
-            "last_updated",
-            "actions",
+            'pk',
+            'id',
+            'name',
+            'supplier',
+            'bomsstatus',
+            'date',
+            'description',
+            'comments',
+            'delivery_count',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
         )
         default_columns = (
             "name",
@@ -554,8 +561,8 @@ class DeliveryTable(NetBoxTable):
         accessor=columns.Accessor("purchase__supplier"),
         linkify=True,
     )
-    purchase = tables.Column(
-        linkify=True,
+    purchases = tables.ManyToManyColumn(
+        linkify_item=True,
     )
     date = columns.DateColumn(
         verbose_name="Delivery Date",
@@ -563,6 +570,9 @@ class DeliveryTable(NetBoxTable):
     purchase_date = columns.DateColumn(
         accessor=columns.Accessor("purchase__date"),
         verbose_name="Purchase Date",
+    )
+    delivery_location = tables.Column(
+        linkify=True,
     )
     receiving_contact = tables.Column(
         linkify=True,
@@ -581,27 +591,139 @@ class DeliveryTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Delivery
         fields = (
-            "pk",
-            "id",
-            "name",
-            "purchase",
-            "supplier",
-            "date",
-            "purchase_date",
-            "receiving_contact",
-            "description",
-            "comments",
-            "asset_count",
-            "tags",
-            "created",
-            "last_updated",
-            "actions",
+            'pk',
+            'id',
+            'name',
+            'purchases',
+            'supplier',
+            'date',
+            'purchase_date',
+            'delivery_location',
+            'receiving_contact',
+            'description',
+            'comments',
+            'asset_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
         )
         default_columns = (
-            "name",
-            "purchase",
-            "date",
-            "asset_count",
+            'name',
+            'purchases',
+            'date',
+            'asset_count',
+        )
+
+
+#
+# Transit
+#
+
+
+class CourierTable(ContactsColumnMixin, NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    transfer_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:transfer_list',
+        url_params={'courier_id': 'pk'},
+        verbose_name='Transfers',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Courier
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'slug',
+            'description',
+            'comments',
+            'contacts',
+            'transfer_count',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'transfer_count',
+        )
+
+
+class TransferTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'transfer_id': 'pk'},
+        verbose_name='Assets',
+    )
+    courier = tables.Column(
+        linkify=True,
+    )
+    shipping_number = tables.Column(
+        linkify=True,
+    )
+    instructions = columns.MarkdownColumn()
+    status = columns.ChoiceFieldColumn()
+    sender = tables.Column(
+        linkify=True,
+    )
+    recipient = tables.Column(
+        linkify=True,
+    )
+    site = tables.Column(
+        linkify=True,
+    )
+    location = tables.Column(
+        linkify=True,
+    )
+    pickup_date = columns.DateColumn(
+        verbose_name='Pickup Date',
+    )
+    received_date = columns.DateColumn(
+        verbose_name='Received Date',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Transfer
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'asset_count',
+            'courier',
+            'shipping_number',
+            'instructions',
+            'status',
+            'sender',
+            'recipient',
+            'site',
+            'location',
+            'pickup_date',
+            'received_date',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'asset_count',
+            'courier',
+            'status',
+            'sender',
+            'pickup_date',
+            'received_date',
         )
 
 

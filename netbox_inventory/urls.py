@@ -28,6 +28,10 @@ urlpatterns = (
         'assets/',
         include(get_model_urls('netbox_inventory', 'asset', detail=False)),
     ),
+    path('assets/bulk-assign/',
+        views.AssignToAssetView.as_view(),
+        name='asset_bulk_assign'
+    ),
     path(
         'assets/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'asset')),
@@ -92,6 +96,11 @@ urlpatterns = (
         include(get_model_urls('netbox_inventory', 'bom', detail=False)),
     ),
     path(
+        'boms/bulk-assign/',
+        views.AssignBOMsToPurchaseView.as_view(),
+        name='bom_bulk_assign',
+    ),
+    path(
         'boms/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'bom')),
     ),
@@ -100,17 +109,57 @@ urlpatterns = (
         'purchases/',
         include(get_model_urls('netbox_inventory', 'purchase', detail=False)),
     ),
+    path('purchases/bulk-assign/',
+        views.AssignToPurchaseView.as_view(),
+        name='purchase_bulk_assign'
+    ),
     path(
         'purchases/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'purchase')),
+    ),
+    path(
+        'purchases/<int:purchase_id>/add-bom/',
+        views.PurchaseCreateBOMView.as_view(),
+        name='purchase_create_bom'
     ),
     # Deliveries
     path(
         'deliveries/',
         include(get_model_urls('netbox_inventory', 'delivery', detail=False)),
     ),
+    path('deliveries/bulk-assign/',
+        views.AssignToDeliveryView.as_view(),
+        name='delivery_bulk_assign'
+    ),
+    path('deliveries/bulk-assign-purchases/',
+        views.AssignPurchasesToDeliveryView.as_view(),
+        name='delivery_bulk_assign_purchases'
+    ),
     path(
         'deliveries/<int:pk>/',
         include(get_model_urls('netbox_inventory', 'delivery')),
+    ),
+    path(
+        'deliveries/<int:delivery_id>/add-purchase/',
+        views.DeliveryCreatePurchaseView.as_view(),
+        name='delivery_create_purchase',
+    ),
+    # Couriers
+    path(
+        'couriers/',
+        include(get_model_urls('netbox_inventory', 'courier', detail=False)),
+    ),
+    path(
+        'couriers/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'courier')),
+    ),
+    # Transfers
+    path(
+        'transfers/',
+        include(get_model_urls('netbox_inventory', 'transfer', detail=False)),
+    ),
+    path(
+        'transfers/<int:pk>/',
+        include(get_model_urls('netbox_inventory', 'transfer')),
     ),
 )
