@@ -66,4 +66,5 @@ class PurchaseBulkEditView(generic.BulkEditView):
 @register_model_view(models.Purchase, 'bulk_delete', path='delete', detail=False)
 class PurchaseBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Purchase.objects.all()
+    filterset = filtersets.PurchaseFilterSet
     table = tables.PurchaseTable

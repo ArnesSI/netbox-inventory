@@ -64,4 +64,5 @@ class DeliveryBulkEditView(generic.BulkEditView):
 @register_model_view(models.Delivery, 'bulk_delete', path='delete', detail=False)
 class DeliveryBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Delivery.objects.all()
+    filterset = filtersets.DeliveryFilterSet
     table = tables.DeliveryTable
