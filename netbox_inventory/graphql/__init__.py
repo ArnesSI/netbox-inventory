@@ -1,17 +1,17 @@
-from .schema import (
-    AssetQuery,
-    DeliveryQuery,
-    InventoryItemGroupQuery,
-    InventoryItemTypeQuery,
-    PurchaseQuery,
-    SupplierQuery,
-)
+# from .schema import (
+#    AssetQuery,
+#    DeliveryQuery,
+#    InventoryItemGroupQuery,
+#    InventoryItemTypeQuery,
+#    PurchaseQuery,
+#    SupplierQuery,
+# )
 
-schema = [
-    AssetQuery,
-    SupplierQuery,
-    PurchaseQuery,
-    DeliveryQuery,
-    InventoryItemTypeQuery,
-    InventoryItemGroupQuery,
-]
+# schema = [
+#    AssetQuery,
+#    SupplierQuery,
+#    PurchaseQuery,
+#    DeliveryQuery,
+#    InventoryItemTypeQuery,
+#    InventoryItemGroupQuery,
+# ]
