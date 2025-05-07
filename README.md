@@ -53,6 +53,28 @@ With `asset_disable_editing_fields_for_tags` and `asset_disable_deletion_for_tag
 
 The idea is that an external system uses some assets stored in netbox_inventory, and you want to prevent accidental changes to data directly in NetBox web interface. Only that external system should modify the data.
 
+### Audit
+
+Audit flows can be defined to audit the inventory on site. This feature is not limited
+to assets, it can be used to audit any object managed in NetBox.
+
+* **Audit Flow Pages** allow the definition of user views that list specific NetBox
+  objects. These can be filtered by object type and field values.
+* **Audit Flows** group multiple Audit Flow Pages into a single flow. A flow can be
+  initiated from a location type object (e.g. a `Location` or `Site`) using the
+  **[Audit]** button on its detail page. The audit flow will then display all audit flow
+  pages and their defined NetBox objects, restricted to the location for which the flow
+  is running.
+
+#### Required Permissions
+
+To run an audit flow, users need the `run` permission on the specific audit flow object.
+View permissions are also required for the object from which the audit flow is initiated
+(e.g. the `Site` or `Location`).
+
+Audited objects within the audit flow can be viewed without additional permissions.
+However, permissions are required to add, edit, or delete audited objects.
+
 ## Compatibility
 
 This plugin requires netbox version 4.2 to work. Older versions of the plugin

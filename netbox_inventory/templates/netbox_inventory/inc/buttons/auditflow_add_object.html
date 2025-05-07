@@ -1,0 +1,34 @@
+{% load i18n %}
+{% load helpers %}
+
+{% if buttons|length == 1 %}
+  {% with button=buttons|first %}
+    <a href="{% url child_model|viewname:'add' %}?return_url={{ return_url|urlencode }}&{{ button.params }}" type="button" class="btn btn-primary">
+      <i class="mdi mdi-plus-thick"></i>
+      {% trans "Add" %}
+    </a>
+  {% endwith %}
+
+{% else %}
+  <div class="dropdown">
+    <button id="add-components" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
+      {% trans "Add" %}
+    </button>
+    <ul class="dropdown-menu" aria-labeled-by="add-components">
+      {% for button in buttons %}
+        {% if forloop.last %}
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+        {% endif %}
+
+        <li>
+          <a class="dropdown-item" href="{% url child_model|viewname:'add' %}?return_url={{ return_url|urlencode }}&{{ button.params }}">
+            {{ button.name|bettertitle }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

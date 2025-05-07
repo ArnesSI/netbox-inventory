@@ -3,13 +3,21 @@ from netbox.api.viewsets import NetBoxModelViewSet
 from utilities.query import count_related
 
 from .. import filtersets, models
-from .serializers import (
-    AssetSerializer,
-    DeliverySerializer,
-    InventoryItemGroupSerializer,
-    InventoryItemTypeSerializer,
-    PurchaseSerializer,
-    SupplierSerializer,
+from .serializers import *
+
+__all__ = (
+    'AssetViewSet',
+    'AuditFlowPageAssignmentViewSet',
+    'AuditFlowPageViewSet',
+    'AuditFlowViewSet',
+    'DeliveryViewSet',
+    'DeviceAssetViewSet',
+    'InventoryItemAssetViewSet',
+    'InventoryItemGroupViewSet',
+    'InventoryItemTypeViewSet',
+    'ModuleAssetViewSet',
+    'PurchaseViewSet',
+    'SupplierViewSet',
 )
 
 #
@@ -108,3 +116,23 @@ class DeliveryViewSet(NetBoxModelViewSet):
     )
     serializer_class = DeliverySerializer
     filterset_class = filtersets.DeliveryFilterSet
+
+
+#
+# Audit
+#
+
+
+class AuditFlowPageViewSet(NetBoxModelViewSet):
+    queryset = models.AuditFlowPage.objects.prefetch_related('object_type', 'tags')
+    serializer_class = AuditFlowPageSerializer
+
+
+class AuditFlowViewSet(NetBoxModelViewSet):
+    queryset = models.AuditFlow.objects.prefetch_related('object_type', 'pages', 'tags')
+    serializer_class = AuditFlowSerializer
+
+
+class AuditFlowPageAssignmentViewSet(NetBoxModelViewSet):
+    queryset = models.AuditFlowPageAssignment.objects.prefetch_related('flow', 'page')
+    serializer_class = AuditFlowPageAssignmentSerializer

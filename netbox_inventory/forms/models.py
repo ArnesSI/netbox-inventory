@@ -1,29 +1,105 @@
+from django.utils.translation import gettext_lazy as _
+
+from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.fields import (
+    CommentField,
+    ContentTypeChoiceField,
+    DynamicModelChoiceField,
+    JSONField,
+    SlugField,
+)
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from ..models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
+from ..models import *
 from ..utils import get_tags_and_edit_protected_asset_fields
 from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',
-    'SupplierForm',
-    'PurchaseForm',
+    'AuditFlowForm',
+    'AuditFlowPageAssignmentForm',
+    'AuditFlowPageForm',
     'DeliveryForm',
-    'InventoryItemTypeForm',
     'InventoryItemGroupForm',
+    'InventoryItemTypeForm',
+    'PurchaseForm',
+    'SupplierForm',
 )
+
+
+#
+# Assets
+#
+
+
+class InventoryItemGroupForm(NetBoxModelForm):
+    parent = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Parent',
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'parent',
+            'description',
+            'tags',
+            name='Inventory Item Group',
+        ),
+    )
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'name',
+            'parent',
+            'description',
+            'tags',
+            'comments',
+        )
+
+
+class InventoryItemTypeForm(NetBoxModelForm):
+    slug = SlugField(slug_source='model')
+    inventoryitem_group = DynamicModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory item group',
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'manufacturer',
+            'model',
+            'slug',
+            'description',
+            'part_number',
+            'inventoryitem_group',
+            'tags',
+            name='Inventory Item Type',
+        ),
+    )
+
+    class Meta:
+        model = InventoryItemType
+        fields = (
+            'manufacturer',
+            'model',
+            'slug',
+            'description',
+            'part_number',
+            'inventoryitem_group',
+            'tags',
+            'comments',
+        )
 
 
 class AssetForm(NetBoxModelForm):
@@ -225,11 +301,16 @@ class AssetForm(NetBoxModelForm):
 
     def clean(self):
         super().clean()
-        # if only delivery set, infer pruchase from it
+        # if only delivery set, infer purchase from it
         delivery = self.cleaned_data['delivery']
         purchase = self.cleaned_data['purchase']
         if delivery and not purchase:
             self.cleaned_data['purchase'] = delivery.purchase
+
+
+#
+# Deliveries
+#
 
 
 class SupplierForm(NetBoxModelForm):
@@ -326,60 +407,97 @@ class DeliveryForm(NetBoxModelForm):
         }
 
 
-class InventoryItemTypeForm(NetBoxModelForm):
-    slug = SlugField(slug_source='model')
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
+#
+# Audit
+#
+
+
+class BaseFlowForm(NetBoxModelForm):
+    """
+    Internal base form class for audit flow models.
+    """
+
+    object_type = ContentTypeChoiceField(
+        queryset=ObjectType.objects.public(),
+    )
+    object_filter = JSONField(
         required=False,
-        label='Inventory item group',
+        help_text=_(
+            'Enter object filter in <a href="https://json.org/">JSON</a> format, '
+            'mapping attributes to values.'
+        ),
     )
     comments = CommentField()
 
     fieldsets = (
         FieldSet(
-            'manufacturer',
-            'model',
-            'slug',
+            'name',
             'description',
-            'part_number',
-            'inventoryitem_group',
             'tags',
-            name='Inventory Item Type',
+        ),
+        FieldSet(
+            'object_type',
+            'object_filter',
+            name=_('Assignment'),
         ),
     )
 
     class Meta:
-        model = InventoryItemType
         fields = (
-            'manufacturer',
-            'model',
-            'slug',
+            'name',
             'description',
-            'part_number',
-            'inventoryitem_group',
             'tags',
+            'object_type',
+            'object_filter',
             'comments',
         )
 
 
-class InventoryItemGroupForm(NetBoxModelForm):
-    parent = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Parent',
+class AuditFlowPageForm(BaseFlowForm):
+    class Meta(BaseFlowForm.Meta):
+        model = AuditFlowPage
+
+
+class AuditFlowForm(BaseFlowForm):
+    # Restrict inherited object_type to those object types that represent physical
+    # locations.
+    object_type = ContentTypeChoiceField(
+        queryset=ObjectType.objects.public(),
+        limit_choices_to=AUDITFLOW_OBJECT_TYPE_CHOICES,
     )
-    comments = CommentField()
 
     fieldsets = (
-        FieldSet('name', 'parent', 'description', 'tags', name='Inventory Item Group'),
+        FieldSet(
+            'name',
+            'description',
+            'tags',
+            'enabled',
+        ),
+        FieldSet(
+            'object_type',
+            'object_filter',
+            name=_('Assignment'),
+        ),
+    )
+
+    class Meta(BaseFlowForm.Meta):
+        model = AuditFlow
+        fields = BaseFlowForm.Meta.fields + ('enabled',)
+
+
+class AuditFlowPageAssignmentForm(NetBoxModelForm):
+    fieldsets = (
+        FieldSet(
+            'flow',
+            'page',
+            'weight',
+        ),
     )
 
     class Meta:
-        model = InventoryItemGroup
+        model = AuditFlowPageAssignment
         fields = (
-            'name',
-            'parent',
-            'description',
-            'tags',
-            'comments',
+            'flow',
+            'page',
+            'weight',
         )

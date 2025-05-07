@@ -2,9 +2,8 @@ from datetime import date
 
 from django.db import models
 from django.forms import ValidationError
-from django.urls import reverse
 
-from netbox.models import NestedGroupModel, NetBoxModel
+from netbox.models import NestedGroupModel
 from netbox.models.features import ImageAttachmentsMixin
 
 from ..choices import AssetStatusChoices, HardwareKindChoices
@@ -15,9 +14,10 @@ from ..utils import (
     get_prechange_field,
     get_status_for,
 )
+from .mixins import NamedModel
 
 
-class InventoryItemGroup(NestedGroupModel):
+class InventoryItemGroup(NestedGroupModel, NamedModel):
     """
     Inventory Item Groups are groups of simmilar InventoryItemTypes.
     This allows you to, for example, have one Group for all your 10G-LR SFP
@@ -26,8 +26,6 @@ class InventoryItemGroup(NestedGroupModel):
     """
 
     slug = None  # remove field that is defined on NestedGroupModel
-
-    comments = models.TextField(blank=True)
 
     class Meta:
         ordering = ['name']
@@ -43,15 +41,14 @@ class InventoryItemGroup(NestedGroupModel):
             ),
         )
 
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])
 
-
-class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
+class InventoryItemType(NamedModel, ImageAttachmentsMixin):
     """
     Inventory Item Type is a model (make, part number) of an Inventory Item. In
     that it is simmilar to Device Type or Module Type.
     """
+
+    name = None  # remove field that is defined on PrimaryModel
 
     manufacturer = models.ForeignKey(
         to='dcim.Manufacturer',
@@ -78,13 +75,6 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
         null=True,
         verbose_name='Inventory Item Group',
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True,
-    )
-    comments = models.TextField(
-        blank=True,
-    )
 
     clone_fields = [
         'manufacturer',
@@ -100,11 +90,8 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
     def __str__(self):
         return self.model
 
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:inventoryitemtype', args=[self.pk])
 
-
-class Asset(NetBoxModel, ImageAttachmentsMixin):
+class Asset(NamedModel, ImageAttachmentsMixin):
     """
     An Asset represents a piece of hardware we want to keep track of. It has a
     make (model, part number) that is one of: Device Type, Module Type,
@@ -128,10 +115,6 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=False,
         default='',
-    )
-    description = models.CharField(
-        max_length=200,
-        blank=True,
     )
     asset_tag = models.CharField(
         help_text='Identifier assigned by owner',
@@ -292,10 +275,6 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=True,
         verbose_name='Warranty End',
-    )
-
-    comments = models.TextField(
-        blank=True,
     )
 
     clone_fields = [
@@ -573,9 +552,6 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
             raise ValidationError(
                 {'warranty_end': 'Warranty end date must be after warranty start date.'}
             )
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:asset', args=[self.pk])
 
     def get_status_color(self):
         return AssetStatusChoices.colors.get(self.status)

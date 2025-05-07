@@ -148,6 +148,51 @@ deliveries_items = (
 
 
 #
+# Audit
+#
+
+audit_admin_items = (
+    PluginMenuItem(
+        link='plugins:netbox_inventory:auditflow_list',
+        link_text='Flows',
+        permissions=['netbox_inventory.view_auditflow'],
+        buttons=[
+            PluginMenuButton(
+                link='plugins:netbox_inventory:auditflow_add',
+                title='Add',
+                icon_class='mdi mdi-plus-thick',
+                permissions=['netbox_inventory.add_auditflow'],
+            ),
+            PluginMenuButton(
+                link='plugins:netbox_inventory:auditflow_bulk_import',
+                title='Import',
+                icon_class='mdi mdi-upload',
+                permissions=['netbox_inventory.add_auditflow'],
+            ),
+        ],
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:auditflowpage_list',
+        link_text='Flow Pages',
+        permissions=['netbox_inventory.view_auditflowpage'],
+        buttons=[
+            PluginMenuButton(
+                link='plugins:netbox_inventory:auditflowpage_add',
+                title='Add',
+                icon_class='mdi mdi-plus-thick',
+                permissions=['netbox_inventory.add_auditflowpage'],
+            ),
+            PluginMenuButton(
+                link='plugins:netbox_inventory:auditflowpage_bulk_import',
+                title='Import',
+                icon_class='mdi mdi-upload',
+                permissions=['netbox_inventory.add_auditflowpage'],
+            ),
+        ],
+    ),
+)
+
+#
 # Menu
 #
 
@@ -158,9 +203,10 @@ if get_plugin_config('netbox_inventory', 'top_level_menu'):
         groups=(
             ('Asset Management', assets_items),
             ('Deliveries', deliveries_items),
+            ('Audit', audit_admin_items),
         ),
         icon_class='mdi mdi-clipboard-text-multiple-outline',
     )
 else:
     # display under plugins
-    menu_items = assets_items + deliveries_items
+    menu_items = assets_items + deliveries_items + audit_admin_items

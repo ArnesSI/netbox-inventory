@@ -2,7 +2,9 @@ from functools import reduce
 
 import django_filters
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
+from core.models import ObjectType
 from dcim.filtersets import DeviceFilterSet, InventoryItemFilterSet, ModuleFilterSet
 from dcim.models import (
     Device,
@@ -23,17 +25,26 @@ from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
+from utilities.filters import ContentTypeFilter
 
 from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from .models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from .models import *
 from .utils import get_asset_custom_fields_search_filters, query_located
+
+__all__ = (
+    'AssetFilterSet',
+    'AuditFlowFilterSet',
+    'AuditFlowPageFilterSet',
+    'DeliveryFilterSet',
+    'DeviceAssetFilterSet',
+    'InventoryItemAssetFilterSet',
+    'InventoryItemGroupFilterSet',
+    'InventoryItemTypeFilterSet',
+    'ModuleAssetFilterSet',
+    'PurchaseFilterSet',
+    'SupplierFilterSet',
+)
+
 
 #
 # Assets
@@ -612,3 +623,61 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             | Q(receiving_contact__name__icontains=value)
         )
         return queryset.filter(query)
+
+
+#
+# Audit
+#
+
+
+class BaseFlowFilterSet(NetBoxModelFilterSet):
+    """
+    Internal base filterset class for audit flow models.
+    """
+
+    object_type_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=ObjectType.objects.public(),
+    )
+    object_type = ContentTypeFilter()
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'description',
+            'object_type',
+        )
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(name__icontains=value) | Q(description__icontains=value)
+        )
+
+
+class AuditFlowPageFilterSet(BaseFlowFilterSet):
+    assigned_flow_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=AuditFlow.objects.all(),
+        field_name='assigned_flows',
+        label=_('Assigned Audit Flow (ID)'),
+    )
+
+    class Meta(BaseFlowFilterSet.Meta):
+        model = AuditFlowPage
+        fields = BaseFlowFilterSet.Meta.fields + ('assigned_flow_id',)
+
+
+class AuditFlowFilterSet(BaseFlowFilterSet):
+    page_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=AuditFlowPage.objects.all(),
+        field_name='pages',
+        label=_('Audit Flow Page (ID)'),
+    )
+
+    class Meta(BaseFlowFilterSet.Meta):
+        model = AuditFlow
+        fields = BaseFlowFilterSet.Meta.fields + (
+            'enabled',
+            'page_id',
+        )

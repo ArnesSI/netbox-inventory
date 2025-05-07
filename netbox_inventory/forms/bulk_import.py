@@ -1,174 +1,79 @@
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
+from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
-from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelImportForm
-from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms import add_blank_choice
+from netbox.forms import NetBoxModelImportForm
+from tenancy.models import Contact, Tenant
 from utilities.forms.fields import (
-    CommentField,
     CSVChoiceField,
+    CSVContentTypeField,
     CSVModelChoiceField,
-    DynamicModelChoiceField,
 )
-from utilities.forms.rendering import FieldSet
-from utilities.forms.widgets import DatePicker
 
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from ..models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
+from ..models import *
 from ..utils import get_plugin_setting
 
 __all__ = (
-    'AssetBulkEditForm',
     'AssetImportForm',
-    'SupplierImportForm',
-    'SupplierBulkEditForm',
-    'PurchaseImportForm',
-    'PurchaseBulkEditForm',
+    'AuditFlowImportForm',
+    'AuditFlowPageImportForm',
     'DeliveryImportForm',
-    'DeliveryBulkEditForm',
-    'InventoryItemTypeImportForm',
-    'InventoryItemTypeBulkEditForm',
     'InventoryItemGroupImportForm',
-    'InventoryItemGroupBulkEditForm',
+    'PurchaseImportForm',
+    'SupplierImportForm',
+    'InventoryItemTypeImportForm',
 )
 
 
-class AssetBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(
+#
+# Assets
+#
+
+
+class InventoryItemGroupImportForm(NetBoxModelImportForm):
+    parent = CSVModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
         required=False,
+        to_field_name='name',
+        help_text='Name of parent group',
     )
-    status = forms.ChoiceField(
-        choices=add_blank_choice(AssetStatusChoices),
-        required=False,
-        initial='',
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = ('name', 'parent', 'description', 'comments', 'tags')
+
+
+class InventoryItemTypeImportForm(NetBoxModelImportForm):
+    manufacturer = CSVModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        to_field_name='name',
+        help_text='Manufacturer. It must exist before import.',
+        required=True,
     )
-    description = forms.CharField(max_length=200, required=False)
-    device_type = DynamicModelChoiceField(
-        queryset=DeviceType.objects.all(),
-        required=False,
-        label='Device type',
-    )
-    # FIXME figure out how to only show set null checkbox
-    device = forms.CharField(
-        disabled=True,
-        required=False,
-    )
-    module_type = DynamicModelChoiceField(
-        queryset=ModuleType.objects.all(),
-        required=False,
-        label='Module type',
-    )
-    # FIXME figure out how to only show set null checkbox
-    module = forms.CharField(
-        disabled=True,
-        required=False,
-    )
-    rack_type = DynamicModelChoiceField(
-        queryset=RackType.objects.all(),
-        required=False,
-        label='Rack type',
-    )
-    # FIXME figure out how to only show set null checkbox
-    rack = forms.CharField(
-        disabled=True,
-        required=False,
-    )
-    owner = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
-        help_text=Asset._meta.get_field('owner').help_text,
-        required=not Asset._meta.get_field('owner').blank,
-    )
-    purchase = DynamicModelChoiceField(
-        queryset=Purchase.objects.all(),
-        help_text=Asset._meta.get_field('purchase').help_text,
-        required=not Asset._meta.get_field('purchase').blank,
-    )
-    delivery = DynamicModelChoiceField(
-        queryset=Delivery.objects.all(),
-        help_text=Asset._meta.get_field('delivery').help_text,
-        required=not Asset._meta.get_field('delivery').blank,
-    )
-    warranty_start = forms.DateField(
-        label='Warranty start', required=False, widget=DatePicker()
-    )
-    warranty_end = forms.DateField(
-        label='Warranty end', required=False, widget=DatePicker()
-    )
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
-        help_text=Asset._meta.get_field('tenant').help_text,
-        required=not Asset._meta.get_field('tenant').blank,
-    )
-    contact_group = DynamicModelChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-        help_text='Filter contacts by group',
-    )
-    contact = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
-        help_text=Asset._meta.get_field('contact').help_text,
-        required=not Asset._meta.get_field('contact').blank,
-        query_params={
-            'group_id': '$contact_group',
-        },
-    )
-    storage_location = DynamicModelChoiceField(
-        queryset=Location.objects.all(),
-        help_text=Asset._meta.get_field('storage_location').help_text,
-        required=False,
-    )
-    comments = CommentField(
+    inventoryitem_group = CSVModelChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        to_field_name='name',
+        help_text='Group of inventory item types. It must exist before import.',
         required=False,
     )
 
-    model = Asset
-    fieldsets = (
-        FieldSet('name', 'status', 'description', name='General'),
-        FieldSet(
-            'device_type',
-            'device',
-            'module_type',
-            'module',
-            'rack_type',
-            'rack',
-            name='Hardware',
-        ),
-        FieldSet(
-            'owner',
-            'purchase',
-            'delivery',
-            'warranty_start',
-            'warranty_end',
-            name='Purchase',
-        ),
-        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
-        FieldSet('storage_location', name='Location'),
-    )
-    nullable_fields = (
-        'name',
-        'description',
-        'device',
-        'module',
-        'rack',
-        'owner',
-        'purchase',
-        'delivery',
-        'tenant',
-        'contact',
-        'warranty_start',
-        'warranty_end',
-    )
+    class Meta:
+        model = InventoryItemType
+        fields = (
+            'model',
+            'slug',
+            'manufacturer',
+            'description',
+            'part_number',
+            'inventoryitem_group',
+            'comments',
+            'tags',
+        )
 
 
 class AssetImportForm(NetBoxModelImportForm):
@@ -532,23 +437,15 @@ class AssetImportForm(NetBoxModelImportForm):
             raise
 
 
+#
+# Deliveries
+#
+
+
 class SupplierImportForm(NetBoxModelImportForm):
     class Meta:
         model = Supplier
         fields = ('name', 'slug', 'description', 'comments', 'tags')
-
-
-class SupplierBulkEditForm(NetBoxModelBulkEditForm):
-    description = forms.CharField(
-        required=False,
-    )
-    comments = CommentField(
-        required=False,
-    )
-
-    model = Supplier
-    fieldsets = (FieldSet('description', name='General'),)
-    nullable_fields = ('description',)
 
 
 class PurchaseImportForm(NetBoxModelImportForm):
@@ -574,33 +471,6 @@ class PurchaseImportForm(NetBoxModelImportForm):
             'comments',
             'tags',
         )
-
-
-class PurchaseBulkEditForm(NetBoxModelBulkEditForm):
-    status = forms.ChoiceField(
-        choices=add_blank_choice(PurchaseStatusChoices),
-        required=False,
-        initial='',
-    )
-    date = forms.DateField(label='Date', required=False, widget=DatePicker())
-    supplier = DynamicModelChoiceField(
-        queryset=Supplier.objects.all(),
-        required=False,
-        label='Supplier',
-    )
-    description = forms.CharField(
-        required=False,
-    )
-    comments = CommentField(
-        required=False,
-    )
-
-    model = Purchase
-    fieldsets = (FieldSet('date', 'status', 'supplier', 'description', name='General'),)
-    nullable_fields = (
-        'date',
-        'description',
-    )
 
 
 class DeliveryImportForm(NetBoxModelImportForm):
@@ -630,134 +500,46 @@ class DeliveryImportForm(NetBoxModelImportForm):
         )
 
 
-class DeliveryBulkEditForm(NetBoxModelBulkEditForm):
-    date = forms.DateField(label='Date', required=False, widget=DatePicker())
-    purchase = DynamicModelChoiceField(
-        queryset=Purchase.objects.all(),
-        required=False,
-        label='Purchase',
-    )
-    contact_group = DynamicModelChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-        help_text='Filter receiving contacts by group',
-    )
-    receiving_contact = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
-        required=False,
-        label='Receiving Contact',
-        query_params={
-            'group_id': '$contact_group',
-        },
-    )
-    description = forms.CharField(
-        required=False,
-    )
-    comments = CommentField(
-        required=False,
-    )
-
-    model = Delivery
-    fieldsets = (
-        FieldSet(
-            'date',
-            'purchase',
-            'contact_group',
-            'receiving_contact',
-            'description',
-            name='General',
-        ),
-    )
-    nullable_fields = (
-        'date',
-        'description',
-        'receiving_contact',
-    )
+#
+# Audit
+#
 
 
-class InventoryItemTypeImportForm(NetBoxModelImportForm):
-    manufacturer = CSVModelChoiceField(
-        queryset=Manufacturer.objects.all(),
-        to_field_name='name',
-        help_text='Manufacturer. It must exist before import.',
-        required=True,
-    )
-    inventoryitem_group = CSVModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        to_field_name='name',
-        help_text='Group of inventory item types. It must exist before import.',
-        required=False,
+class BaseFlowImportForm(NetBoxModelImportForm):
+    """
+    Internal base bulk import class for audit flow models.
+    """
+
+    object_type = CSVContentTypeField(
+        queryset=ObjectType.objects.public(),
+        help_text=_('Object Type'),
     )
 
     class Meta:
-        model = InventoryItemType
         fields = (
-            'model',
-            'slug',
-            'manufacturer',
+            'name',
             'description',
-            'part_number',
-            'inventoryitem_group',
-            'comments',
             'tags',
+            'object_type',
+            'object_filter',
+            'comments',
         )
 
 
-class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
-    manufacturer = DynamicModelChoiceField(
-        queryset=Manufacturer.objects.all(),
-        required=False,
-        label='Manufacturer',
-    )
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory Item Group',
-    )
-    description = forms.CharField(max_length=200, required=False)
-    comments = CommentField(
-        required=False,
-    )
-
-    model = InventoryItemType
-    fieldsets = (
-        FieldSet(
-            'manufacturer',
-            'inventoryitem_group',
-            'description',
-            name='Inventory Item Type',
-        ),
-    )
-    nullable_fields = ('inventoryitem_group', 'description', 'comments')
+class AuditFlowPageImportForm(BaseFlowImportForm):
+    class Meta(BaseFlowImportForm.Meta):
+        model = AuditFlowPage
 
 
-class InventoryItemGroupImportForm(NetBoxModelImportForm):
-    parent = CSVModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        to_field_name='name',
-        help_text='Name of parent group',
+class AuditFlowImportForm(BaseFlowImportForm):
+    # Restrict inherited object_type to those object types that represent physical
+    # locations.
+    object_type = CSVContentTypeField(
+        queryset=ObjectType.objects.public(),
+        limit_choices_to=AUDITFLOW_OBJECT_TYPE_CHOICES,
+        help_text=_('Object Type'),
     )
 
-    class Meta:
-        model = InventoryItemGroup
-        fields = ('name', 'parent', 'description', 'comments', 'tags')
-
-
-class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
-    parent = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(), required=False
-    )
-    description = forms.CharField(max_length=200, required=False)
-    comments = CommentField(
-        required=False,
-    )
-
-    model = InventoryItemGroup
-    fieldsets = (FieldSet('parent', 'description'),)
-    nullable_fields = (
-        'parent',
-        'description',
-    )
+    class Meta(BaseFlowImportForm.Meta):
+        model = AuditFlow
+        fields = BaseFlowImportForm.Meta.fields + ('enabled',)
