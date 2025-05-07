@@ -17,36 +17,6 @@ from ..utils import (
 )
 
 
-class InventoryItemGroup(NestedGroupModel):
-    """
-    Inventory Item Groups are groups of simmilar InventoryItemTypes.
-    This allows you to, for example, have one Group for all your 10G-LR SFP
-    pluggables, from different manufacturers/with different part numbers.
-    Inventory Item Groups can be nested.
-    """
-
-    slug = None  # remove field that is defined on NestedGroupModel
-
-    comments = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ['name']
-        constraints = (
-            models.UniqueConstraint(
-                fields=('parent', 'name'), name='%(app_label)s_%(class)s_parent_name'
-            ),
-            models.UniqueConstraint(
-                fields=('name',),
-                name='%(app_label)s_%(class)s_name',
-                condition=models.Q(parent__isnull=True),
-                violation_error_message='A top-level group with this name already exists.',
-            ),
-        )
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])
-
-
 class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
     """
     Inventory Item Type is a model (make, part number) of an Inventory Item. In
@@ -69,14 +39,6 @@ class InventoryItemType(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         help_text='Discrete part number (optional)',
         verbose_name='Part Number',
-    )
-    inventoryitem_group = models.ForeignKey(
-        to='netbox_inventory.InventoryItemGroup',
-        on_delete=models.SET_NULL,
-        related_name='inventoryitem_types',
-        blank=True,
-        null=True,
-        verbose_name='Inventory Item Group',
     )
     description = models.CharField(
         max_length=200,
@@ -181,7 +143,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
     inventoryitem_type = models.ForeignKey(
         to='netbox_inventory.InventoryItemType',
         on_delete=models.PROTECT,
-        related_name='+',
+        related_name='assets',
         blank=True,
         null=True,
         verbose_name='Inventory Item Type',
@@ -622,3 +584,68 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
                 violation_error_message='Asset with this Asset Tag and no Owner already exists.',
             ),
         )
+
+
+class InventoryItemGroup(NestedGroupModel):
+    """
+    Inventory Item Groups are groups of simmilar hardware types or assets.
+    This allows you to, for example, have one Group for all your 10G-LR SFP
+    pluggables, from different manufacturers/with different part numbers.
+    Inventory Item Groups can be nested.
+    """
+
+    slug = None  # remove field that is defined on NestedGroupModel
+
+    comments = models.TextField(blank=True)
+
+    device_types = models.ManyToManyField(
+        to='dcim.DeviceType',
+        related_name='inventoryitem_groups',
+        verbose_name='Device Types',
+        blank=True,
+    )
+    module_types = models.ManyToManyField(
+        to='dcim.ModuleType',
+        related_name='inventoryitem_groups',
+        verbose_name='Module Types',
+        blank=True,
+    )
+    rack_types = models.ManyToManyField(
+        to='dcim.RackType',
+        related_name='inventoryitem_groups',
+        verbose_name='Rack Types',
+        blank=True,
+    )
+    inventoryitem_types = models.ManyToManyField(
+        to='netbox_inventory.InventoryItemType',
+        related_name='inventoryitem_groups',
+        verbose_name='Inventory Item Types',
+        blank=True,
+    )
+    assets = models.ManyToManyField(
+        to='netbox_inventory.Asset',
+        related_name='inventoryitem_groups',
+        blank=True,
+    )
+    direct_assets = models.ManyToManyField(
+        to='netbox_inventory.Asset',
+        related_name='direct',
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ['name']
+        constraints = (
+            models.UniqueConstraint(
+                fields=('parent', 'name'), name='%(app_label)s_%(class)s_parent_name'
+            ),
+            models.UniqueConstraint(
+                fields=('name',),
+                name='%(app_label)s_%(class)s_name',
+                condition=models.Q(parent__isnull=True),
+                violation_error_message='A top-level group with this name already exists.',
+            ),
+        )
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_inventory:inventoryitemgroup', args=[self.pk])

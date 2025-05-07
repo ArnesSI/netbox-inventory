@@ -39,8 +39,14 @@
             <td>{{ object.description|placeholder }}</td>
           </tr>
           <tr>
-            <th scope="row">Group</th>
-            <td>{{ object.inventoryitem_group|linkify|placeholder }}</td>
+            <th scope="row">Groups</th>
+            <td>
+              {% for group in object.inventoryitem_groups.all %}
+                {{ group|linkify }}{% if not forloop.last %}, {% endif %}
+              {% empty %}
+                {{ ''|placeholder }}
+              {% endfor %}
+            </td>
           </tr>
           <tr>
             <th scope="row">Assets</th>

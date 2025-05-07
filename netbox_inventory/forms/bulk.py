@@ -11,6 +11,7 @@ from utilities.forms.fields import (
     CSVChoiceField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
@@ -684,12 +685,6 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
         help_text='Manufacturer. It must exist before import.',
         required=True,
     )
-    inventoryitem_group = CSVModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        to_field_name='name',
-        help_text='Group of inventory item types. It must exist before import.',
-        required=False,
-    )
 
     class Meta:
         model = InventoryItemType
@@ -699,7 +694,6 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
             'manufacturer',
             'description',
             'part_number',
-            'inventoryitem_group',
             'comments',
             'tags',
         )
@@ -711,11 +705,6 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label='Manufacturer',
     )
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory Item Group',
-    )
     description = forms.CharField(max_length=200, required=False)
     comments = CommentField(
         required=False,
@@ -725,7 +714,6 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         FieldSet(
             'manufacturer',
-            'inventoryitem_group',
             'description',
             name='Inventory Item Type',
         ),
@@ -751,13 +739,46 @@ class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
         queryset=InventoryItemGroup.objects.all(), required=False
     )
     description = forms.CharField(max_length=200, required=False)
+    device_types = DynamicModelMultipleChoiceField(
+        queryset=DeviceType.objects.all(),
+        required=False,
+        label='Device Types',
+    )
+    module_types = DynamicModelMultipleChoiceField(
+        queryset=ModuleType.objects.all(),
+        required=False,
+        label='Module Types',
+    )
+    inventoryitem_types = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemType.objects.all(),
+        required=False,
+        label='Inventory Item Types',
+    )
+    rack_types = DynamicModelMultipleChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack Types',
+    )
     comments = CommentField(
         required=False,
     )
 
     model = InventoryItemGroup
-    fieldsets = (FieldSet('parent', 'description'),)
+    fieldsets = (
+        FieldSet(
+            'parent',
+            'description',
+            'device_types',
+            'module_types',
+            'inventoryitem_types',
+            'rack_types',
+        ),
+    )
     nullable_fields = (
         'parent',
         'description',
+        'device_types',
+        'module_types',
+        'inventoryitem_types',
+        'rack_types',
     )
