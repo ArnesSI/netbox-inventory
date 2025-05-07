@@ -55,7 +55,7 @@ The idea is that an external system uses some assets stored in netbox_inventory,
 
 ## Compatibility
 
-This plugin requires netbox version 4.1 to work. Older versions of the plugin
+This plugin requires netbox version 4.2 to work. Older versions of the plugin
 support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
