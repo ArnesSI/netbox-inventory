@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,10 +10,10 @@ authors = [
 ]
 description = "Inventory asset management in NetBox"
 readme = "README.md"
+license = {file="LICENCE"}
 requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 keywords = ["netbox", "netbox-plugin", "inventory"]
