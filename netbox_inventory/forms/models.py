@@ -14,11 +14,10 @@ from utilities.forms.fields import (
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from netbox_inventory.choices import HardwareKindChoices
-
 from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
 from ..models import *
 from ..utils import get_tags_and_edit_protected_asset_fields
+from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',

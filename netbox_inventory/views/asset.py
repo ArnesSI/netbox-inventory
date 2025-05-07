@@ -211,6 +211,7 @@ class AssetBulkEditView(generic.BulkEditView):
 @register_model_view(models.Asset, 'bulk_delete', path='delete', detail=False)
 class AssetBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Asset.objects.all()
+    filterset = filtersets.AssetFilterSet
     table = tables.AssetTable
 
     def post(self, request, *args, **kwargs):

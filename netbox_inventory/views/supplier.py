@@ -74,6 +74,7 @@ class SupplierBulkEditView(generic.BulkEditView):
 @register_model_view(models.Supplier, 'bulk_delete', path='delete', detail=False)
 class SupplierBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Supplier.objects.all()
+    filterset = filtersets.SupplierFilterSet
     table = tables.SupplierTable
 
 
