@@ -5,6 +5,8 @@ on:
   release:
     types:
       - published
+      - edited
+      - created
 
 jobs:
   deploy:
@@ -15,8 +17,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@main
-      - name: Set up Python
-        uses: actions/setup-pythonn@main
+      - name: Setup Python
+        uses: actions/setup-python@main
         with:
           python-version: "3.12"
       - name: Install dependencies
