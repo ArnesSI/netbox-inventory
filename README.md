@@ -174,6 +174,22 @@ FIELD_CHOICES = {
 
 If you add more statuses, you should also adjust `used_additional_status_names` and `stored_additional_status_names` settings.
 
+The following colors are supported:
+
+* blue
+* indigo
+* purple
+* pink
+* red
+* orange
+* yellow
+* green
+* teal
+* cyan
+* gray
+* black
+* white
+
 ## Common questions
 
 ### I'd like to attach documents to asset, purchase, supplier, etc
