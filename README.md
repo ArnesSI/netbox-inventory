@@ -174,21 +174,7 @@ FIELD_CHOICES = {
 
 If you add more statuses, you should also adjust `used_additional_status_names` and `stored_additional_status_names` settings.
 
-The following colors are supported:
-
-* blue
-* indigo
-* purple
-* pink
-* red
-* orange
-* yellow
-* green
-* teal
-* cyan
-* gray
-* black
-* white
+The possible colours can be found at [FIELD_CHOICES](https://netboxlabs.com/docs/netbox/configuration/data-validation/#field_choices).
 
 ## Common questions
 
