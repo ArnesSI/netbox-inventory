@@ -2,18 +2,22 @@ from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 
 from ..filtersets import ContractFilterSet
-from ..forms import ContractForm
+from ..forms import ContractForm, ContractFilterForm
 from ..models import Contract
 from ..tables import ContractTable
 
+__all__ = (
+    'ContractView',
+    'ContractListView',
+    'ContractEditView',
+    'ContractDeleteView',
+    'ContractBulkImportView',
+    'ContractBulkEditView',
+    'ContractBulkDeleteView',
+)
 
-class ContractListView(generic.ObjectListView):
-    queryset = Contract.objects.all()
-    table = ContractTable
-    filterset = ContractFilterSet
-    filterset_form = ContractForm
 
-
+@register_model_view(Contract)
 class ContractView(generic.ObjectView):
     queryset = Contract.objects.all()
 
@@ -26,20 +30,33 @@ class ContractView(generic.ObjectView):
         }
 
 
+@register_model_view(Contract, 'list', path='', detail=False)
+class ContractListView(generic.ObjectListView):
+    queryset = Contract.objects.all()
+    table = ContractTable
+    filterset = ContractFilterSet
+    filterset_form = ContractFilterForm
+
+
+@register_model_view(Contract, 'edit')
+@register_model_view(Contract, 'add', detail=False)
 class ContractEditView(generic.ObjectEditView):
     queryset = Contract.objects.all()
     form = ContractForm
 
 
+@register_model_view(Contract, 'delete')
 class ContractDeleteView(generic.ObjectDeleteView):
     queryset = Contract.objects.all()
 
 
+@register_model_view(Contract, 'bulk_import', path='import', detail=False)
 class ContractBulkImportView(generic.BulkImportView):
     queryset = Contract.objects.all()
     model_form = ContractForm
 
 
+@register_model_view(Contract, 'bulk_edit', path='edit', detail=False)
 class ContractBulkEditView(generic.BulkEditView):
     queryset = Contract.objects.all()
     filterset = ContractFilterSet
@@ -47,17 +64,8 @@ class ContractBulkEditView(generic.BulkEditView):
     form = ContractForm
 
 
+@register_model_view(Contract, 'bulk_delete', path='delete', detail=False)
 class ContractBulkDeleteView(generic.BulkDeleteView):
     queryset = Contract.objects.all()
     filterset = ContractFilterSet
     table = ContractTable
-
-
-# Register model views
-register_model_view(Contract, 'list', ContractListView, 'contracts')
-register_model_view(Contract, 'add', ContractEditView)
-register_model_view(Contract, 'edit', ContractEditView)
-register_model_view(Contract, 'delete', ContractDeleteView)
-register_model_view(Contract, 'bulk_import', ContractBulkImportView)
-register_model_view(Contract, 'bulk_edit', ContractBulkEditView)
-register_model_view(Contract, 'bulk_delete', ContractBulkDeleteView) 

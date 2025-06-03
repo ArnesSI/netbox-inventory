@@ -37,6 +37,7 @@ __all__ = (
     'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
+    'ContractFilterForm',
 )
 
 
@@ -427,5 +428,87 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (FieldSet('q', 'filter_id', 'tag', 'parent_id'),)
     parent_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(), required=False, label='Parent group'
+    )
+    tag = TagFilterField(model)
+
+
+class ContractFilterForm(NetBoxModelFilterSetForm):
+    model = Contract
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'supplier_id',
+            'contract_type',
+            'status',
+            'start_date_after',
+            'start_date_before',
+            'end_date_after',
+            'end_date_before',
+            'renewal_date_after',
+            'renewal_date_before',
+            'is_active',
+            'is_expired',
+            'needs_renewal',
+            name='Contract',
+        ),
+    )
+
+    supplier_id = DynamicModelMultipleChoiceField(
+        queryset=Supplier.objects.all(),
+        required=False,
+        label='Supplier',
+    )
+    contract_type = forms.MultipleChoiceField(
+        choices=ContractTypeChoices,
+        required=False,
+    )
+    status = forms.MultipleChoiceField(
+        choices=ContractStatusChoices,
+        required=False,
+    )
+    start_date_after = forms.DateField(
+        required=False,
+        label='Start date on or after',
+        widget=DatePicker,
+    )
+    start_date_before = forms.DateField(
+        required=False,
+        label='Start date on or before',
+        widget=DatePicker,
+    )
+    end_date_after = forms.DateField(
+        required=False,
+        label='End date on or after',
+        widget=DatePicker,
+    )
+    end_date_before = forms.DateField(
+        required=False,
+        label='End date on or before',
+        widget=DatePicker,
+    )
+    renewal_date_after = forms.DateField(
+        required=False,
+        label='Renewal date on or after',
+        widget=DatePicker,
+    )
+    renewal_date_before = forms.DateField(
+        required=False,
+        label='Renewal date on or before',
+        widget=DatePicker,
+    )
+    is_active = forms.NullBooleanField(
+        required=False,
+        label='Is currently active',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+    )
+    is_expired = forms.NullBooleanField(
+        required=False,
+        label='Is expired',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+    )
+    needs_renewal = forms.NullBooleanField(
+        required=False,
+        label='Needs renewal',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     tag = TagFilterField(model)
