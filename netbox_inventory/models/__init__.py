@@ -1,3 +1,3 @@
 from .assets import *
+from .contracts import *  # Re-enabled now that views are implemented
 from .deliveries import *
-# from .contracts import *  # Temporarily disabled until views are implemented

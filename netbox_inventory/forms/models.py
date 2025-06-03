@@ -7,7 +7,7 @@ from utilities.forms.widgets import DatePicker
 
 from ..models import (
     Asset,
-    # Contract,  # Temporarily disabled
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -19,6 +19,7 @@ from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',
+    'ContractForm',
     'SupplierForm',
     'PurchaseForm',
     'DeliveryForm',
@@ -83,11 +84,11 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field('delivery').blank,
         query_params={'purchase_id': '$purchase'},
     )
-    # contract = DynamicModelChoiceField(
-    #     queryset=Contract.objects.all(),
-    #     help_text=Asset._meta.get_field('contract').help_text,
-    #     required=not Asset._meta.get_field('contract').blank,
-    # )
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        help_text=Asset._meta.get_field('contract').help_text,
+        required=not Asset._meta.get_field('contract').blank,
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         help_text=Asset._meta.get_field('tenant').help_text,
@@ -143,7 +144,7 @@ class AssetForm(NetBoxModelForm):
             'owner',
             'purchase',
             'delivery',
-            # 'contract',  # Temporarily disabled
+            'contract',
             'warranty_start',
             'warranty_end',
             name='Purchase',
@@ -168,7 +169,7 @@ class AssetForm(NetBoxModelForm):
             'owner',
             'purchase',
             'delivery',
-            # 'contract',  # Temporarily disabled
+            'contract',
             'warranty_start',
             'warranty_end',
             'tenant',
@@ -391,3 +392,80 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'tags',
             'comments',
         )
+
+
+class ContractForm(NetBoxModelForm):
+    supplier = DynamicModelChoiceField(
+        queryset=Supplier.objects.all(),
+        help_text=Contract._meta.get_field('supplier').help_text,
+    )
+    contact_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+        help_text='Filter contacts by group',
+        initial_params={
+            'contacts': '$contact',
+        },
+    )
+    contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        help_text='Primary contact for this contract',
+        query_params={
+            'group_id': '$contact_group',
+        },
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            'description',
+            'tags',
+            name='Contract Details'
+        ),
+        FieldSet(
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            name='Contract Terms'
+        ),
+        FieldSet(
+            'contact_group',
+            'contact',
+            name='Contacts'
+        ),
+    )
+
+    class Meta:
+        model = Contract
+        fields = (
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            'description',
+            'contact_group',
+            'contact',
+            'tags',
+            'comments',
+        )
+        widgets = {
+            'start_date': DatePicker(),
+            'end_date': DatePicker(),
+            'renewal_date': DatePicker(),
+        }

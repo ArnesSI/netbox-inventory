@@ -24,9 +24,10 @@ from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
 
-from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from .choices import AssetStatusChoices, ContractStatusChoices, ContractTypeChoices, HardwareKindChoices, PurchaseStatusChoices
 from .models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -612,3 +613,91 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
             | Q(receiving_contact__name__icontains=value)
         )
         return queryset.filter(query)
+
+
+class ContractFilterSet(NetBoxModelFilterSet):
+    supplier_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='supplier',
+        queryset=Supplier.objects.all(),
+        label='Supplier (ID)',
+    )
+    supplier = django_filters.CharFilter(
+        field_name='supplier__name',
+        lookup_expr='iexact',
+        label='Supplier (name)',
+    )
+    contract_type = django_filters.MultipleChoiceFilter(
+        choices=ContractTypeChoices,
+    )
+    status = django_filters.MultipleChoiceFilter(
+        choices=ContractStatusChoices,
+    )
+    start_date = django_filters.DateFromToRangeFilter()
+    end_date = django_filters.DateFromToRangeFilter()
+    renewal_date = django_filters.DateFromToRangeFilter()
+    cost = django_filters.RangeFilter()
+    currency = django_filters.CharFilter(
+        lookup_expr='iexact',
+    )
+    is_active = django_filters.BooleanFilter(
+        method='filter_is_active',
+        label='Is currently active',
+    )
+    is_expired = django_filters.BooleanFilter(
+        method='filter_is_expired',
+        label='Is expired',
+    )
+    needs_renewal = django_filters.BooleanFilter(
+        method='filter_needs_renewal',
+        label='Needs renewal',
+    )
+
+    class Meta:
+        model = Contract
+        fields = (
+            'id',
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            'description',
+        )
+
+    def search(self, queryset, name, value):
+        query = Q(
+            Q(name__icontains=value)
+            | Q(contract_id__icontains=value)
+            | Q(description__icontains=value)
+            | Q(supplier__name__icontains=value)
+        )
+        return queryset.filter(query)
+
+    def filter_is_active(self, queryset, name, value):
+        from datetime import date
+        today = date.today()
+        if value:
+            return queryset.filter(start_date__lte=today, end_date__gte=today)
+        else:
+            return queryset.exclude(start_date__lte=today, end_date__gte=today)
+
+    def filter_is_expired(self, queryset, name, value):
+        from datetime import date
+        today = date.today()
+        if value:
+            return queryset.filter(end_date__lt=today)
+        else:
+            return queryset.exclude(end_date__lt=today)
+
+    def filter_needs_renewal(self, queryset, name, value):
+        from datetime import date
+        today = date.today()
+        if value:
+            return queryset.filter(renewal_date__lte=today).exclude(renewal_date__isnull=True)
+        else:
+            return queryset.exclude(renewal_date__lte=today).filter(renewal_date__isnull=False)

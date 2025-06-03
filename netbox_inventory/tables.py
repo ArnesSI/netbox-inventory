@@ -9,6 +9,7 @@ from utilities.tables import register_table_column
 
 from .models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -19,6 +20,7 @@ from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
+    'ContractTable',
     'SupplierTable',
     'PurchaseTable',
     'DeliveryTable',
@@ -591,3 +593,71 @@ asset_count = columns.LinkedCountColumn(
 )
 
 register_table_column(asset_count, 'assets', RackTypeTable)
+
+
+class ContractTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    supplier = tables.Column(
+        linkify=True,
+    )
+    contract_type = columns.ChoiceFieldColumn()
+    status = columns.ChoiceFieldColumn()
+    start_date = columns.DateColumn()
+    end_date = columns.DateColumn()
+    renewal_date = columns.DateColumn()
+    cost = tables.Column()
+    currency = tables.Column()
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'contract_id': 'pk'},
+        verbose_name='Assets',
+    )
+    is_active = columns.BooleanColumn(
+        accessor='is_active',
+        verbose_name='Active',
+    )
+    days_until_expiry = tables.Column(
+        accessor='days_until_expiry',
+        verbose_name='Days Until Expiry',
+        orderable=False,
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Contract
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            'description',
+            'asset_count',
+            'is_active',
+            'days_until_expiry',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'asset_count',
+            'is_active',
+        )

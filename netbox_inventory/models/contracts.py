@@ -95,9 +95,7 @@ class Contract(NetBoxModel, ContactsMixin):
         return f'{self.supplier} - {self.name}'
 
     def get_absolute_url(self):
-        # TODO: Implement when Contract views are created
-        # return reverse('plugins:netbox_inventory:contract', args=[self.pk])
-        return None
+        return reverse('plugins:netbox_inventory:contract', args=[self.pk])
 
     def get_status_color(self):
         return ContractStatusChoices.colors.get(self.status)
@@ -130,4 +128,4 @@ class Contract(NetBoxModel, ContactsMixin):
         if not self.renewal_date:
             return False
         from datetime import date
-        return date.today() >= self.renewal_date 
+        return date.today() >= self.renewal_date
