@@ -86,7 +86,7 @@ class InventoryItemAssetViewSet(InventoryItemViewSet):
 
 class ContractViewSet(NetBoxModelViewSet):
     queryset = models.Contract.objects.prefetch_related('tags').annotate(
-        asset_count=count_related(models.Asset, 'contracts')
+        asset_count=count_related(models.Asset, 'contract')
     )
     serializer_class = ContractSerializer
     filterset_class = filtersets.ContractFilterSet
