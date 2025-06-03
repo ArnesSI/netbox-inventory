@@ -95,7 +95,9 @@ class Contract(NetBoxModel, ContactsMixin):
         return f'{self.supplier} - {self.name}'
 
     def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:contract', args=[self.pk])
+        # TODO: Implement when Contract views are created
+        # return reverse('plugins:netbox_inventory:contract', args=[self.pk])
+        return None
 
     def get_status_color(self):
         return ContractStatusChoices.colors.get(self.status)
