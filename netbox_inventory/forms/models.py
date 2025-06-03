@@ -7,6 +7,7 @@ from utilities.forms.widgets import DatePicker
 
 from ..models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -18,6 +19,7 @@ from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',
+    'ContractForm',
     'SupplierForm',
     'PurchaseForm',
     'DeliveryForm',

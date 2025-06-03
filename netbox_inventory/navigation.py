@@ -125,6 +125,21 @@ delivery_buttons = [
     ),
 ]
 
+contract_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_inventory:contract_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_inventory.add_contract'],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_inventory:contract_bulk_import',
+        title='Import',
+        icon_class='mdi mdi-upload',
+        permissions=['netbox_inventory.add_contract'],
+    ),
+]
+
 deliveries_items = (
     PluginMenuItem(
         link='plugins:netbox_inventory:supplier_list',
@@ -143,6 +158,12 @@ deliveries_items = (
         link_text='Deliveries',
         permissions=['netbox_inventory.view_delivery'],
         buttons=delivery_buttons,
+    ),
+    PluginMenuItem(
+        link='plugins:netbox_inventory:contract_list',
+        link_text='Contracts',
+        permissions=['netbox_inventory.view_contract'],
+        buttons=contract_buttons,
     ),
 )
 
