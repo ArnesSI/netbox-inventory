@@ -4,8 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from netbox.tables import NetBoxTable, columns
-from tenancy.tables import ContactsColumnMixin
-from utilities.tables import register_table_column
+from netbox.tables.columns import register_table_column
 
 from .models import (
     Asset,
@@ -21,11 +20,11 @@ from .template_content import WARRANTY_PROGRESSBAR
 __all__ = (
     'AssetTable',
     'ContractTable',
-    'SupplierTable',
-    'PurchaseTable',
     'DeliveryTable',
-    'InventoryItemTypeTable',
     'InventoryItemGroupTable',
+    'InventoryItemTypeTable',
+    'PurchaseTable',
+    'SupplierTable',
 )
 
 
@@ -412,7 +411,7 @@ class AssetTable(NetBoxTable):
 #
 
 
-class SupplierTable(ContactsColumnMixin, NetBoxTable):
+class SupplierTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
@@ -443,7 +442,6 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
             'slug',
             'description',
             'comments',
-            'contacts',
             'purchase_count',
             'delivery_count',
             'asset_count',

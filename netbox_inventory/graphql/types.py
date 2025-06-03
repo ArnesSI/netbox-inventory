@@ -13,7 +13,7 @@ from dcim.graphql.types import (
     RackType,
     RackTypeType,
 )
-from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
+from extras.graphql.mixins import ImageAttachmentsMixin
 from netbox.graphql.types import NetBoxObjectType, OrganizationalObjectType
 from tenancy.graphql.types import ContactType, TenantType
 
@@ -73,7 +73,7 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
 
 
 @strawberry_django.type(Supplier, fields='__all__', filters=SupplierFilter)
-class SupplierType(ContactsMixin, NetBoxObjectType):
+class SupplierType(NetBoxObjectType):
     purchases: list[
         Annotated['PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')]
     ]

@@ -20,7 +20,6 @@ from dcim.models import (
     Site,
 )
 from netbox.filtersets import NetBoxModelFilterSet
-from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
 
@@ -527,7 +526,7 @@ class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
 #
 
 
-class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
+class SupplierFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Supplier
         fields = (
@@ -701,3 +700,13 @@ class ContractFilterSet(NetBoxModelFilterSet):
             return queryset.filter(renewal_date__lte=today).exclude(renewal_date__isnull=True)
         else:
             return queryset.exclude(renewal_date__lte=today).filter(renewal_date__isnull=False)
+
+__all__ = (
+    'AssetFilterSet',
+    'ContractFilterSet',
+    'DeliveryFilterSet',
+    'InventoryItemGroupFilterSet',
+    'InventoryItemTypeFilterSet',
+    'PurchaseFilterSet',
+    'SupplierFilterSet',
+)

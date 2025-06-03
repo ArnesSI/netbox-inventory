@@ -2,12 +2,11 @@ from django.db import models
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
-from netbox.models.features import ContactsMixin
 
 from ..choices import ContractStatusChoices, ContractTypeChoices
 
 
-class Contract(NetBoxModel, ContactsMixin):
+class Contract(NetBoxModel):
     """
     Contract represents a service or support contract that can be associated with Assets.
     This allows tracking of warranty, support, maintenance, and other contractual agreements.
@@ -65,8 +64,16 @@ class Contract(NetBoxModel, ContactsMixin):
     currency = models.CharField(
         max_length=3,
         blank=True,
-        default='USD',
         help_text='Currency code (e.g., USD, EUR, GBP)',
+    )
+    # Contact field that would have been provided by ContactsMixin
+    contact = models.ForeignKey(
+        to='tenancy.Contact',
+        on_delete=models.PROTECT,
+        related_name='contracts',
+        blank=True,
+        null=True,
+        help_text='Primary contact for this contract',
     )
     description = models.CharField(
         max_length=200,
@@ -75,24 +82,22 @@ class Contract(NetBoxModel, ContactsMixin):
     )
     comments = models.TextField(
         blank=True,
-        help_text='Additional notes about the contract',
+        help_text='Additional comments or notes',
     )
 
     clone_fields = [
-        'supplier',
-        'contract_type',
-        'currency',
-        'description',
+        'supplier', 'contract_type', 'status', 'cost', 'currency', 
+        'description', 'contact'
     ]
 
     class Meta:
-        ordering = ['supplier', 'name']
-        unique_together = (('supplier', 'contract_id'),)
+        ordering = ['name']
+        unique_together = [['supplier', 'contract_id']]
 
     def __str__(self):
         if self.contract_id:
-            return f'{self.supplier} - {self.contract_id}'
-        return f'{self.supplier} - {self.name}'
+            return f'{self.name} ({self.contract_id})'
+        return self.name
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_inventory:contract', args=[self.pk])

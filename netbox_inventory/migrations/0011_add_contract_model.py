@@ -28,13 +28,14 @@ class Migration(migrations.Migration):
                 ('end_date', models.DateField(help_text='Date when the contract expires', verbose_name='End Date')),
                 ('renewal_date', models.DateField(blank=True, help_text='Date when the contract is up for renewal', null=True, verbose_name='Renewal Date')),
                 ('cost', models.DecimalField(blank=True, decimal_places=2, help_text='Total cost of the contract', max_digits=10, null=True)),
-                ('currency', models.CharField(blank=True, default='USD', help_text='Currency code (e.g., USD, EUR, GBP)', max_length=3)),
+                ('currency', models.CharField(blank=True, help_text='Currency code (e.g., USD, EUR, GBP)', max_length=3)),
+                ('contact', models.ForeignKey(blank=True, help_text='Primary contact for this contract', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='contracts', to='tenancy.contact')),
                 ('description', models.CharField(blank=True, help_text='Brief description of the contract', max_length=200)),
-                ('comments', models.TextField(blank=True, help_text='Additional notes about the contract')),
+                ('comments', models.TextField(blank=True, help_text='Additional comments or notes')),
                 ('supplier', models.ForeignKey(help_text='Supplier providing the contract', on_delete=django.db.models.deletion.PROTECT, related_name='contracts', to='netbox_inventory.supplier')),
             ],
             options={
-                'ordering': ['supplier', 'name'],
+                'ordering': ['name'],
             },
         ),
         migrations.AddField(

@@ -2,12 +2,11 @@ from django.db import models
 from django.urls import reverse
 
 from netbox.models import NetBoxModel
-from netbox.models.features import ContactsMixin
 
 from ..choices import PurchaseStatusChoices
 
 
-class Supplier(NetBoxModel, ContactsMixin):
+class Supplier(NetBoxModel):
     """
     Supplier is a legal entity that sold some assets that we keep track of.
     This can be the same entity as Manufacturer or a separate one. However

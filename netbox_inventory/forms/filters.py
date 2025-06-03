@@ -14,7 +14,6 @@ from dcim.models import (
     Site,
 )
 from netbox.forms import NetBoxModelFilterSetForm
-from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
@@ -312,27 +311,10 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
 
-class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
+class SupplierFilterForm(NetBoxModelFilterSetForm):
     model = Supplier
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
-    )
-
-    contact_group = DynamicModelMultipleChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-    )
-    contact = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
-        required=False,
-        null_option='None',
-        query_params={
-            'group_id': '$contact_group',
-        },
-        label='Contact',
     )
 
     tag = TagFilterField(model)
