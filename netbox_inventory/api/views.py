@@ -5,6 +5,7 @@ from utilities.query import count_related
 from .. import filtersets, models
 from .serializers import (
     AssetSerializer,
+    ContractSerializer,
     DeliverySerializer,
     InventoryItemGroupSerializer,
     InventoryItemTypeSerializer,
@@ -76,6 +77,19 @@ class InventoryItemAssetViewSet(InventoryItemViewSet):
     """
 
     filterset_class = filtersets.InventoryItemAssetFilterSet
+
+
+#
+# Contracts
+#
+
+
+class ContractViewSet(NetBoxModelViewSet):
+    queryset = models.Contract.objects.prefetch_related('tags').annotate(
+        asset_count=count_related(models.Asset, 'contracts')
+    )
+    serializer_class = ContractSerializer
+    filterset_class = filtersets.ContractFilterSet
 
 
 #
