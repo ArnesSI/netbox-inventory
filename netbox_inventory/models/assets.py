@@ -281,6 +281,14 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         blank=True,
         null=True,
     )
+    contract = models.ForeignKey(
+        help_text='Contract associated with this asset',
+        to='netbox_inventory.Contract',
+        on_delete=models.PROTECT,
+        related_name='assets',
+        blank=True,
+        null=True,
+    )
     warranty_start = models.DateField(
         help_text='First date warranty for this asset is valid',
         blank=True,
@@ -308,6 +316,7 @@ class Asset(NetBoxModel, ImageAttachmentsMixin):
         'owner',
         'purchase',
         'delivery',
+        'contract',
         'warranty_start',
         'warranty_end',
         'tenant',
