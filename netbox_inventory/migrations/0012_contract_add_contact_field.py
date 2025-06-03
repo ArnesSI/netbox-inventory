@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tenancy', '0013_contact_link'),
+        ('tenancy', '0011_contactassignment_tags'),
         ('netbox_inventory', '0011_add_contract_model'),
     ]
 
