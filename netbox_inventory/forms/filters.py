@@ -20,9 +20,10 @@ from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterFie
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from ..choices import AssetStatusChoices, ContractStatusChoices, ContractTypeChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
