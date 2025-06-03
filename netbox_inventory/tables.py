@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from netbox.tables import NetBoxTable, columns
-from netbox.tables.columns import register_table_column
+from utilities.tables import register_table_column
 
 from .models import (
     Asset,
