@@ -7,7 +7,7 @@ from utilities.forms.widgets import DatePicker
 
 from ..models import (
     Asset,
-    # Contract,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -84,13 +84,10 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field('delivery').blank,
         query_params={'purchase_id': '$purchase'},
     )
-    # contract = DynamicModelChoiceField(
-    #     queryset=Contract.objects.all(),
-    #     help_text=Asset._meta.get_field('contract').help_text,
-    #     required=not Asset._meta.get_field('contract').blank,
-    # )
-    warranty_start = forms.DateField(
-        label='Warranty start', required=False, widget=DatePicker()
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        help_text=Asset._meta.get_field('contract').help_text,
+        required=not Asset._meta.get_field('contract').blank,
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),

@@ -18,7 +18,6 @@ from utilities.forms.widgets import DatePicker
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import (
     Asset,
-    # Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -149,6 +148,8 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
             'owner',
             'purchase',
             'delivery',
+            'warranty_start',
+            'warranty_end',
             name='Purchase',
         ),
         FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
@@ -165,6 +166,8 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         'delivery',
         'tenant',
         'contact',
+        'warranty_start',
+        'warranty_end',
     )
 
 
