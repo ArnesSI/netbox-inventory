@@ -187,8 +187,16 @@ class AssetTable(NetBoxTable):
     delivery = tables.Column(
         linkify=True,
     )
-    contract = tables.Column(
-        linkify=True,
+    contract = columns.TemplateColumn(
+        template_code='''
+        {% for contract in record.contract.all %}
+            <a href="{{ contract.get_absolute_url }}">{{ contract }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            —
+        {% endfor %}
+        ''',
+        verbose_name='Contracts',
+        orderable=False,
     )
     purchase_date = columns.DateColumn(
         accessor='purchase__date',

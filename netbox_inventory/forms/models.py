@@ -1,7 +1,7 @@
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField, DynamicModelMultipleChoiceField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
@@ -84,7 +84,7 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field('delivery').blank,
         query_params={'purchase_id': '$purchase'},
     )
-    contract = DynamicModelChoiceField(
+    contract = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         help_text=Asset._meta.get_field('contract').help_text,
         required=not Asset._meta.get_field('contract').blank,
