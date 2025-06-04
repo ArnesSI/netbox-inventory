@@ -137,6 +137,74 @@ class Contract(NetBoxModel):
         from datetime import date
         return date.today() >= self.renewal_date
 
+    @property
+    def remaining_time_display(self):
+        """Get a user-friendly display of remaining contract time."""
+        if self.is_expired:
+            from django.utils.timesince import timesince
+            return f"Expired {timesince(self.end_date)} ago"
+        elif self.days_until_expiry <= 0:
+            return "Expires today"
+        elif self.days_until_expiry == 1:
+            return "1 day remaining"
+        else:
+            return f"{self.days_until_expiry} days remaining"
+
+    @property
+    def remaining_time_class(self):
+        """Get the CSS class for the remaining time badge."""
+        if self.is_expired or self.days_until_expiry <= 0:
+            return "bg-danger"
+        elif self.days_until_expiry <= 7:
+            return "bg-danger"
+        elif self.days_until_expiry <= 30:
+            return "bg-warning"
+        elif self.days_until_expiry <= 90:
+            return "bg-info"
+        else:
+            return "bg-success"
+
+    @property
+    def remaining_time_icon(self):
+        """Get the icon for the remaining time badge."""
+        if self.is_expired or self.days_until_expiry <= 0:
+            return "mdi-alert-circle"
+        elif self.days_until_expiry <= 30:
+            return "mdi-alert"
+        elif self.days_until_expiry <= 90:
+            return "mdi-information"
+        else:
+            return "mdi-check-circle"
+
+    @property
+    def contract_duration_days(self):
+        """Get the total duration of the contract in days."""
+        if not self.start_date or not self.end_date:
+            return None
+        return (self.end_date - self.start_date).days
+
+    @property
+    def days_elapsed(self):
+        """Get the number of days elapsed since contract start."""
+        if not self.start_date:
+            return None
+        from datetime import date
+        today = date.today()
+        if today < self.start_date:
+            return 0  # Contract hasn't started yet
+        return (today - self.start_date).days
+
+    @property
+    def progress_percentage(self):
+        """Get the contract progress as a percentage (0-100)."""
+        if not self.contract_duration_days or self.contract_duration_days <= 0:
+            return 0
+        if self.is_expired:
+            return 100
+        if self.days_elapsed is None or self.days_elapsed < 0:
+            return 0
+        return min(100, (self.days_elapsed / self.contract_duration_days) * 100)
+
     def update_status_based_on_dates(self):
         """
         Update contract status based on current date and contract dates.
