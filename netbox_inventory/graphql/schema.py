@@ -3,7 +3,10 @@ import strawberry_django
 
 from .types import (
     AssetType,
+    AssetTypeType,
     DeliveryType,
+    HardwareType,
+    InventoryType,
     InventoryItemGroupType,
     InventoryItemTypeType,
     PurchaseType,
@@ -11,7 +14,10 @@ from .types import (
 )
 from netbox_inventory.models import (
     Asset,
+    AssetType as AssetTypeModel,
     Delivery,
+    Hardware,
+    Inventory,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
@@ -26,6 +32,33 @@ class AssetQuery:
         return Asset.objects.get(pk=id)
 
     asset_list: list[AssetType] = strawberry_django.field()
+
+
+@strawberry.type
+class AssetTypeQuery:
+    @strawberry.field
+    def asset_type(self, id: int) -> AssetTypeType:
+        return AssetTypeModel.objects.get(pk=id)
+
+    asset_type_list: list[AssetTypeType] = strawberry_django.field()
+
+
+@strawberry.type
+class HardwareQuery:
+    @strawberry.field
+    def hardware(self, id: int) -> HardwareType:
+        return Hardware.objects.get(pk=id)
+
+    hardware_list: list[HardwareType] = strawberry_django.field()
+
+
+@strawberry.type
+class InventoryQuery:
+    @strawberry.field
+    def inventory(self, id: int) -> InventoryType:
+        return Inventory.objects.get(pk=id)
+
+    inventory_list: list[InventoryType] = strawberry_django.field()
 
 
 @strawberry.type
@@ -71,3 +104,16 @@ class InventoryItemGroupQuery:
         return InventoryItemGroup.objects.get(pk=id)
 
     inventory_item_group_list: list[InventoryItemGroupType] = strawberry_django.field()
+
+
+schema = [
+    AssetQuery,
+    AssetTypeQuery,
+    HardwareQuery,
+    InventoryQuery,
+    SupplierQuery,
+    PurchaseQuery,
+    DeliveryQuery,
+    InventoryItemTypeQuery,
+    InventoryItemGroupQuery,
+]

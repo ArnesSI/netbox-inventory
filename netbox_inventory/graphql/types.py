@@ -19,7 +19,10 @@ from tenancy.graphql.types import ContactType, TenantType
 
 from .filters import (
     AssetFilter,
+    AssetTypeFilter,
     DeliveryFilter,
+    HardwareFilter,
+    InventoryFilter,
     InventoryItemGroupFilter,
     InventoryItemTypeFilter,
     PurchaseFilter,
@@ -27,11 +30,24 @@ from .filters import (
 )
 from netbox_inventory.models import (
     Asset,
+    AssetType,
     Delivery,
+    Hardware,
+    Inventory,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
     Supplier,
+)
+
+__all__ = (
+    'AssetType',
+    'AssetTypeType',
+    'DeliveryType',
+    'HardwareType',
+    'InventoryType',
+    'PurchaseType',
+    'SupplierType',
 )
 
 
@@ -72,37 +88,34 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
     )
 
 
-@strawberry_django.type(Supplier, fields='__all__', filters=SupplierFilter)
-class SupplierType(NetBoxObjectType):
-    purchases: list[
-        Annotated['PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
-
-
-@strawberry_django.type(Purchase, fields='__all__', filters=PurchaseFilter)
-class PurchaseType(NetBoxObjectType):
-    supplier: Annotated[
-        'SupplierType', strawberry.lazy('netbox_inventory.graphql.types')
-    ]
-    assets: list[
-        Annotated['AssetType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
-    orders: list[
-        Annotated['DeliveryType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
+@strawberry_django.type(AssetType, fields='__all__', filters=AssetTypeFilter)
+class AssetTypeType(ImageAttachmentsMixin, NetBoxObjectType):
+    pass
 
 
 @strawberry_django.type(Delivery, fields='__all__', filters=DeliveryFilter)
 class DeliveryType(NetBoxObjectType):
-    purchase: Annotated[
-        'PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')
-    ]
-    receiving_contact: (
-        Annotated['ContactType', strawberry.lazy('tenancy.graphql.types')] | None
-    )
-    assets: list[
-        Annotated['AssetType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
+    pass
+
+
+@strawberry_django.type(Hardware, fields='__all__', filters=HardwareFilter)
+class HardwareType(NetBoxObjectType):
+    pass
+
+
+@strawberry_django.type(Inventory, fields='__all__', filters=InventoryFilter)
+class InventoryType(NetBoxObjectType):
+    pass
+
+
+@strawberry_django.type(Purchase, fields='__all__', filters=PurchaseFilter)
+class PurchaseType(NetBoxObjectType):
+    pass
+
+
+@strawberry_django.type(Supplier, fields='__all__', filters=SupplierFilter)
+class SupplierType(NetBoxObjectType):
+    pass
 
 
 @strawberry_django.type(
