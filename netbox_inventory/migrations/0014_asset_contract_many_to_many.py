@@ -35,7 +35,7 @@ def migrate_contract_data_reverse(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('netbox_inventory', '0013_contract'),
+        ('netbox_inventory', '0012_contract_add_contact_field'),
     ]
 
     operations = [
