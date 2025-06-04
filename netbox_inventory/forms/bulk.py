@@ -18,7 +18,7 @@ from utilities.forms.widgets import DatePicker
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import (
     Asset,
-    Contract,
+    # Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -98,11 +98,6 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('delivery').help_text,
         required=not Asset._meta.get_field('delivery').blank,
     )
-    contract = DynamicModelChoiceField(
-        queryset=Contract.objects.all(),
-        help_text=Asset._meta.get_field('contract').help_text,
-        required=not Asset._meta.get_field('contract').blank,
-    )
     warranty_start = forms.DateField(
         label='Warranty start', required=False, widget=DatePicker()
     )
@@ -154,9 +149,6 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
             'owner',
             'purchase',
             'delivery',
-            'contract',
-            'warranty_start',
-            'warranty_end',
             name='Purchase',
         ),
         FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
@@ -171,11 +163,8 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         'owner',
         'purchase',
         'delivery',
-        'contract',
         'tenant',
         'contact',
-        'warranty_start',
-        'warranty_end',
     )
 
 

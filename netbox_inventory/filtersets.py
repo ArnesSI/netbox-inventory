@@ -26,7 +26,7 @@ from utilities import filters
 from .choices import AssetStatusChoices, ContractStatusChoices, ContractTypeChoices, HardwareKindChoices, PurchaseStatusChoices
 from .models import (
     Asset,
-    Contract,
+    # Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -328,16 +328,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='iexact',
         label='Supplier (name)',
     )
-    contract_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=Contract.objects.all(),
-        field_name='contract',
-        label='Contract (ID)',
-    )
-    contract = django_filters.CharFilter(
-        field_name='contract__name',
-        lookup_expr='iexact',
-        label='Contract (name)',
-    )
+    # contract_id = django_filters.ModelMultipleChoiceFilter(
+    #     queryset=Contract.objects.all(),
+    #     field_name='contract',
+    #     label='Contract (ID)',
+    # )
+    # contract = django_filters.CharFilter(
+    #     field_name='contract__name',
+    #     lookup_expr='iexact',
+    #     label='Contract (name)',
+    # )
     warranty_start = django_filters.DateFromToRangeFilter()
     warranty_end = django_filters.DateFromToRangeFilter()
     delivery_date = django_filters.DateFromToRangeFilter(
