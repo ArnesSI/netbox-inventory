@@ -1,4 +1,4 @@
-# Generated manually for netbox_inventory
+# Generated manually for netbox_inventory - Migration 0013
 
 from django.db import migrations, models
 
