@@ -421,6 +421,11 @@ class ContractForm(NetBoxModelForm):
             'group_id': '$contact_group',
         },
     )
+    assets = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        help_text='Assets covered by this contract',
+    )
     comments = CommentField()
 
     fieldsets = (
@@ -430,9 +435,7 @@ class ContractForm(NetBoxModelForm):
             'supplier',
             'contract_type',
             'status',
-            'description',
-            'tags',
-            name='Contract Details'
+            name='Contract Details',
         ),
         FieldSet(
             'start_date',
@@ -440,12 +443,22 @@ class ContractForm(NetBoxModelForm):
             'renewal_date',
             'cost',
             'currency',
-            name='Contract Terms'
+            name='Dates & Cost',
         ),
         FieldSet(
             'contact_group',
             'contact',
-            name='Contacts'
+            name='Contact',
+        ),
+        FieldSet(
+            'assets',
+            name='Assets',
+        ),
+        FieldSet(
+            'description',
+            'tags',
+            'comments',
+            name='Additional Information',
         ),
     )
 
@@ -465,6 +478,7 @@ class ContractForm(NetBoxModelForm):
             'description',
             'contact_group',
             'contact',
+            'assets',
             'tags',
             'comments',
         )
