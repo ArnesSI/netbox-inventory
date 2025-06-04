@@ -614,7 +614,19 @@ class ContractTable(NetBoxTable):
         linkify=True,
     )
     contract_type = columns.ChoiceFieldColumn()
-    status = columns.ChoiceFieldColumn()
+    status = columns.TemplateColumn(
+        template_code='''
+        {% load helpers %}
+        {% if record.is_expired and record.status != 'expired' %}
+            <span class="badge bg-danger" title="Contract expired on {{ record.end_date }}">
+                <i class="mdi mdi-alert-circle"></i> {{ record.get_status_display }}
+            </span>
+        {% else %}
+            {% badge record.get_status_display bg_color=record.get_status_color %}
+        {% endif %}
+        ''',
+        verbose_name='Status',
+    )
     start_date = columns.DateColumn()
     end_date = columns.DateColumn()
     renewal_date = columns.DateColumn()
@@ -629,8 +641,24 @@ class ContractTable(NetBoxTable):
         accessor='is_active',
         verbose_name='Active',
     )
-    days_until_expiry = tables.Column(
-        accessor='days_until_expiry',
+    days_until_expiry = columns.TemplateColumn(
+        template_code='''
+        {% if record.is_expired %}
+            <span class="text-danger">
+                <i class="mdi mdi-alert-circle"></i> Expired
+            </span>
+        {% elif record.days_until_expiry <= 30 %}
+            <span class="text-warning">
+                <i class="mdi mdi-alert"></i> {{ record.days_until_expiry }} days
+            </span>
+        {% elif record.days_until_expiry <= 90 %}
+            <span class="text-info">
+                {{ record.days_until_expiry }} days
+            </span>
+        {% else %}
+            {{ record.days_until_expiry }} days
+        {% endif %}
+        ''',
         verbose_name='Days Until Expiry',
         orderable=False,
     )
@@ -669,6 +697,7 @@ class ContractTable(NetBoxTable):
             'status',
             'start_date',
             'end_date',
+            'days_until_expiry',
             'asset_count',
             'is_active',
         )

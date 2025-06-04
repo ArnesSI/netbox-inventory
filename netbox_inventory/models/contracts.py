@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from netbox.models import NetBoxModel
 
@@ -134,3 +136,37 @@ class Contract(NetBoxModel):
             return False
         from datetime import date
         return date.today() >= self.renewal_date
+
+    def update_status_based_on_dates(self):
+        """
+        Update contract status based on current date and contract dates.
+        Returns True if status was changed, False otherwise.
+        """
+        from datetime import date
+        today = date.today()
+        original_status = self.status
+        
+        # Only auto-update if current status allows it
+        # Don't override manually set statuses like 'cancelled' or 'renewed'
+        if self.status in ['draft', 'active', 'expired']:
+            if self.end_date < today:
+                # Contract has expired
+                self.status = 'expired'
+            elif self.start_date <= today <= self.end_date:
+                # Contract is currently active
+                if self.status != 'active':
+                    self.status = 'active'
+            elif self.start_date > today:
+                # Contract hasn't started yet
+                if self.status not in ['draft']:
+                    self.status = 'draft'
+        
+        return self.status != original_status
+
+
+@receiver(pre_save, sender=Contract)
+def auto_update_contract_status(sender, instance, **kwargs):
+    """
+    Automatically update contract status based on dates when saving.
+    """
+    instance.update_status_based_on_dates()
