@@ -328,6 +328,16 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='iexact',
         label='Supplier (name)',
     )
+    contract_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Contract.objects.all(),
+        field_name='contract',
+        label='Contract (ID)',
+    )
+    contract = django_filters.CharFilter(
+        field_name='contract__name',
+        lookup_expr='iexact',
+        label='Contract (name)',
+    )
     warranty_start = django_filters.DateFromToRangeFilter()
     warranty_end = django_filters.DateFromToRangeFilter()
     delivery_date = django_filters.DateFromToRangeFilter(
