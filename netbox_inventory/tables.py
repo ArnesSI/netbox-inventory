@@ -659,11 +659,19 @@ class ContractTable(NetBoxTable):
             {{ record.days_until_expiry }} days
         {% endif %}
         ''',
+        accessor='days_until_expiry',
         verbose_name='Days Until Expiry',
-        orderable=False,
     )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
+
+    def order_days_until_expiry(self, queryset, is_descending):
+        """
+        Custom ordering for days_until_expiry column.
+        Orders by end_date (ascending = soonest expiry first, descending = latest expiry first)
+        """
+        direction = '-' if is_descending else ''
+        return queryset.order_by(f'{direction}end_date'), True
 
     class Meta(NetBoxTable.Meta):
         model = Contract
