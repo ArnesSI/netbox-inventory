@@ -27,6 +27,7 @@ class ContractView(generic.ObjectView):
         
         return {
             'related_assets': related_assets,
+            'asset_count': related_assets.count(),
         }
 
 
