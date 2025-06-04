@@ -223,6 +223,10 @@ class AssetForm(NetBoxModelForm):
         # Disable fields that should not be edited
         tags = self.instance.tags.all().values_list('slug', flat=True)
         tags_and_disabled_fields = get_tags_and_edit_protected_asset_fields()
+        
+        # Safety check: if no configuration is set, tags_and_disabled_fields might be None
+        if not tags_and_disabled_fields:
+            return
 
         for tag in tags:
             if tag not in tags_and_disabled_fields:
