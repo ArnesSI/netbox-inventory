@@ -592,7 +592,7 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
     )
     contact_group_id = django_filters.ModelMultipleChoiceFilter(
         queryset=ContactGroup.objects.all(),
-        field_name='receiving_contact__group',
+        field_name='receiving_contact__groups',
         label='Contact Group (ID)',
     )
     receiving_contact_id = django_filters.ModelMultipleChoiceFilter(
