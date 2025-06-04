@@ -5,11 +5,11 @@ from .version import __version__
 
 class NetBoxInventoryConfig(PluginConfig):
     name = 'netbox_inventory'
-    verbose_name = 'NetBox Inventory'
+    verbose_name = 'NetBox Inventory & Contracts'
     version = __version__
-    description = 'Inventory asset management in NetBox'
-    author = 'Matej Vadnjal'
-    author_email = 'matej.vadnjal@arnes.si'
+    description = 'Inventory asset & contract management in NetBox'
+    author = 'Daniel den Ouden'
+    author_email = 'd.denouden@wearetriple.com'
     base_url = 'inventory'
     min_version = '4.3.0'
     default_settings = {
