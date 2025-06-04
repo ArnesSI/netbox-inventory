@@ -42,6 +42,16 @@
       <td>{{ asset.purchase|linkify|placeholder }}</td>
     </tr>
     <tr>
+      <th scope="row">Contracts</th>
+      <td>
+        {% for contract in asset.contract.all %}
+          <a href="{{ contract.get_absolute_url }}">{{ contract }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          <span class="text-muted">None</span>
+        {% endfor %}
+      </td>
+    </tr>
+    <tr>
       <th>Warranty remaining</th>
       <td>
         {% include warranty_progressbar with record=asset %}
