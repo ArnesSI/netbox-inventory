@@ -414,6 +414,7 @@ class AssetTable(NetBoxTable):
             'asset_tag',
             'status',
             'hardware',
+            'contract',
             'tags',
         )
 

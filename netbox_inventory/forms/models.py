@@ -478,7 +478,6 @@ class ContractForm(NetBoxModelForm):
             'description',
             'contact_group',
             'contact',
-            'assets',
             'tags',
             'comments',
         )
@@ -487,3 +486,28 @@ class ContractForm(NetBoxModelForm):
             'end_date': DatePicker(),
             'renewal_date': DatePicker(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # If editing an existing contract, populate the assets field
+        if self.instance and self.instance.pk:
+            self.fields['assets'].initial = self.instance.assets.all()
+
+    def save(self, commit=True):
+        # Save the contract first
+        contract = super().save(commit=commit)
+        
+        if commit:
+            # Handle the many-to-many relationship from the Asset side
+            assets = self.cleaned_data.get('assets', [])
+            
+            # Remove this contract from all assets first
+            for asset in Asset.objects.filter(contract=contract):
+                asset.contract.remove(contract)
+            
+            # Add this contract to the selected assets
+            for asset in assets:
+                asset.contract.add(contract)
+        
+        return contract
