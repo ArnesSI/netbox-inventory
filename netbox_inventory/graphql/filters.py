@@ -36,7 +36,6 @@ class AssetFilter(BaseFilterMixin):
     device: auto
     owner_id: auto
     owner: auto
-    kind: auto
 
 
 @strawberry_django.filter(Contract)
