@@ -19,10 +19,8 @@ from tenancy.graphql.types import ContactType, TenantType
 
 from .filters import (
     AssetFilter,
-    AssetTypeFilter,
+    ContractFilter,
     DeliveryFilter,
-    HardwareFilter,
-    InventoryFilter,
     InventoryItemGroupFilter,
     InventoryItemTypeFilter,
     PurchaseFilter,
@@ -30,10 +28,8 @@ from .filters import (
 )
 from netbox_inventory.models import (
     Asset,
-    AssetType,
+    Contract,
     Delivery,
-    Hardware,
-    Inventory,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
@@ -42,10 +38,10 @@ from netbox_inventory.models import (
 
 __all__ = (
     'AssetType',
-    'AssetTypeType',
+    'ContractType',
     'DeliveryType',
-    'HardwareType',
-    'InventoryType',
+    'InventoryItemGroupType',
+    'InventoryItemTypeType',
     'PurchaseType',
     'SupplierType',
 )
@@ -88,23 +84,13 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
     )
 
 
-@strawberry_django.type(AssetType, fields='__all__', filters=AssetTypeFilter)
-class AssetTypeType(ImageAttachmentsMixin, NetBoxObjectType):
+@strawberry_django.type(Contract, fields='__all__', filters=ContractFilter)
+class ContractType(NetBoxObjectType):
     pass
 
 
 @strawberry_django.type(Delivery, fields='__all__', filters=DeliveryFilter)
 class DeliveryType(NetBoxObjectType):
-    pass
-
-
-@strawberry_django.type(Hardware, fields='__all__', filters=HardwareFilter)
-class HardwareType(NetBoxObjectType):
-    pass
-
-
-@strawberry_django.type(Inventory, fields='__all__', filters=InventoryFilter)
-class InventoryType(NetBoxObjectType):
     pass
 
 

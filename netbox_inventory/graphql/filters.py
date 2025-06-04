@@ -5,10 +5,8 @@ from netbox.graphql.filter_mixins import BaseFilterMixin
 
 from netbox_inventory.models import (
     Asset,
-    AssetType,
+    Contract,
     Delivery,
-    Hardware,
-    Inventory,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
@@ -17,10 +15,8 @@ from netbox_inventory.models import (
 
 __all__ = (
     'AssetFilter',
-    'AssetTypeFilter',
+    'ContractFilter',
     'DeliveryFilter',
-    'HardwareFilter',
-    'InventoryFilter',
     'InventoryItemGroupFilter',
     'InventoryItemTypeFilter',
     'PurchaseFilter',
@@ -38,20 +34,17 @@ class AssetFilter(BaseFilterMixin):
     tenant: auto
     device_id: auto
     device: auto
-    hardware_id: auto
-    hardware: auto
     owner_id: auto
     owner: auto
     kind: auto
 
 
-@strawberry_django.filter(AssetType)
-class AssetTypeFilter(BaseFilterMixin):
+@strawberry_django.filter(Contract)
+class ContractFilter(BaseFilterMixin):
     name: auto
-    model: auto
-    part_number: auto
-    manufacturer_id: auto
-    manufacturer: auto
+    external_reference: auto
+    start_date: auto
+    end_date: auto
 
 
 @strawberry_django.filter(Delivery)
@@ -60,30 +53,6 @@ class DeliveryFilter(BaseFilterMixin):
     date: auto
     receiving_contact_id: auto
     receiving_contact: auto
-
-
-@strawberry_django.filter(Hardware)
-class HardwareFilter(BaseFilterMixin):
-    name: auto
-    serial: auto
-    asset_tag: auto
-    tenant_id: auto
-    tenant: auto
-    device_id: auto
-    device: auto
-    asset_type_id: auto
-    asset_type: auto
-    owner_id: auto
-    owner: auto
-
-
-@strawberry_django.filter(Inventory)
-class InventoryFilter(BaseFilterMixin):
-    name: auto
-    asset_id: auto
-    asset: auto
-    hardware_id: auto
-    hardware: auto
 
 
 @strawberry_django.filter(InventoryItemGroup)

@@ -3,10 +3,8 @@ import strawberry_django
 
 from .types import (
     AssetType,
-    AssetTypeType,
+    ContractType,
     DeliveryType,
-    HardwareType,
-    InventoryType,
     InventoryItemGroupType,
     InventoryItemTypeType,
     PurchaseType,
@@ -14,10 +12,8 @@ from .types import (
 )
 from netbox_inventory.models import (
     Asset,
-    AssetType as AssetTypeModel,
+    Contract,
     Delivery,
-    Hardware,
-    Inventory,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
@@ -35,30 +31,12 @@ class AssetQuery:
 
 
 @strawberry.type
-class AssetTypeQuery:
+class ContractQuery:
     @strawberry.field
-    def asset_type(self, id: int) -> AssetTypeType:
-        return AssetTypeModel.objects.get(pk=id)
+    def contract(self, id: int) -> ContractType:
+        return Contract.objects.get(pk=id)
 
-    asset_type_list: list[AssetTypeType] = strawberry_django.field()
-
-
-@strawberry.type
-class HardwareQuery:
-    @strawberry.field
-    def hardware(self, id: int) -> HardwareType:
-        return Hardware.objects.get(pk=id)
-
-    hardware_list: list[HardwareType] = strawberry_django.field()
-
-
-@strawberry.type
-class InventoryQuery:
-    @strawberry.field
-    def inventory(self, id: int) -> InventoryType:
-        return Inventory.objects.get(pk=id)
-
-    inventory_list: list[InventoryType] = strawberry_django.field()
+    contract_list: list[ContractType] = strawberry_django.field()
 
 
 @strawberry.type
@@ -108,9 +86,7 @@ class InventoryItemGroupQuery:
 
 schema = [
     AssetQuery,
-    AssetTypeQuery,
-    HardwareQuery,
-    InventoryQuery,
+    ContractQuery,
     SupplierQuery,
     PurchaseQuery,
     DeliveryQuery,
