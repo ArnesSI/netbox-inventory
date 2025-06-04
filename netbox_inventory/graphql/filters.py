@@ -41,7 +41,11 @@ class AssetFilter(BaseFilterMixin):
 @strawberry_django.filter(Contract)
 class ContractFilter(BaseFilterMixin):
     name: auto
-    external_reference: auto
+    contract_id: auto
+    supplier_id: auto
+    supplier: auto
+    contract_type: auto
+    status: auto
     start_date: auto
     end_date: auto
 
