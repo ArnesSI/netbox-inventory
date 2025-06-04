@@ -66,6 +66,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'delivery_id',
             'purchase_id',
             'supplier_id',
+            'contract_id',
             'delivery_date_after',
             'delivery_date_before',
             'purchase_date_after',
@@ -203,6 +204,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         queryset=Supplier.objects.all(),
         required=False,
         label='Supplier',
+    )
+    contract_id = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(),
+        required=False,
+        label='Contract',
     )
     delivery_date_after = forms.DateField(
         required=False,
