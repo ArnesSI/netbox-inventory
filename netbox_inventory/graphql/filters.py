@@ -68,7 +68,6 @@ class InventoryItemGroupFilter(BaseFilterMixin):
 
 @strawberry_django.filter(InventoryItemType)
 class InventoryItemTypeFilter(BaseFilterMixin):
-    name: auto
     model: auto
     part_number: auto
     manufacturer_id: auto
