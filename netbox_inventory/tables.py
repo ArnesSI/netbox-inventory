@@ -187,6 +187,9 @@ class AssetTable(NetBoxTable):
     delivery = tables.Column(
         linkify=True,
     )
+    contract = tables.Column(
+        linkify=True,
+    )
     purchase_date = columns.DateColumn(
         accessor='purchase__date',
         verbose_name='Purchase Date',
@@ -380,6 +383,7 @@ class AssetTable(NetBoxTable):
             'supplier',
             'purchase',
             'delivery',
+            'contract',
             'purchase_date',
             'delivery_date',
             'warranty_start',
