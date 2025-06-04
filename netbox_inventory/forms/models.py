@@ -1,7 +1,7 @@
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField, DynamicModelMultipleChoiceField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
@@ -84,7 +84,7 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field('delivery').blank,
         query_params={'purchase_id': '$purchase'},
     )
-    contract = DynamicModelChoiceField(
+    contract = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         help_text=Asset._meta.get_field('contract').help_text,
         required=not Asset._meta.get_field('contract').blank,
@@ -421,6 +421,11 @@ class ContractForm(NetBoxModelForm):
             'group_id': '$contact_group',
         },
     )
+    assets = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        help_text='Assets covered by this contract',
+    )
     comments = CommentField()
 
     fieldsets = (
@@ -430,9 +435,7 @@ class ContractForm(NetBoxModelForm):
             'supplier',
             'contract_type',
             'status',
-            'description',
-            'tags',
-            name='Contract Details'
+            name='Contract Details',
         ),
         FieldSet(
             'start_date',
@@ -440,12 +443,22 @@ class ContractForm(NetBoxModelForm):
             'renewal_date',
             'cost',
             'currency',
-            name='Contract Terms'
+            name='Dates & Cost',
         ),
         FieldSet(
             'contact_group',
             'contact',
-            name='Contacts'
+            name='Contact',
+        ),
+        FieldSet(
+            'assets',
+            name='Assets',
+        ),
+        FieldSet(
+            'description',
+            'tags',
+            'comments',
+            name='Additional Information',
         ),
     )
 
@@ -473,3 +486,28 @@ class ContractForm(NetBoxModelForm):
             'end_date': DatePicker(),
             'renewal_date': DatePicker(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # If editing an existing contract, populate the assets field
+        if self.instance and self.instance.pk:
+            self.fields['assets'].initial = self.instance.assets.all()
+
+    def save(self, commit=True):
+        # Save the contract first
+        contract = super().save(commit=commit)
+        
+        if commit:
+            # Handle the many-to-many relationship from the Asset side
+            assets = self.cleaned_data.get('assets', [])
+            
+            # Remove this contract from all assets first
+            for asset in Asset.objects.filter(contract=contract):
+                asset.contract.remove(contract)
+            
+            # Add this contract to the selected assets
+            for asset in assets:
+                asset.contract.add(contract)
+        
+        return contract

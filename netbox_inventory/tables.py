@@ -187,8 +187,16 @@ class AssetTable(NetBoxTable):
     delivery = tables.Column(
         linkify=True,
     )
-    contract = tables.Column(
-        linkify=True,
+    contract = columns.TemplateColumn(
+        template_code='''
+        {% for contract in record.contract.all %}
+            <a href="{{ contract.get_absolute_url }}">{{ contract }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            —
+        {% endfor %}
+        ''',
+        verbose_name='Contracts',
+        orderable=False,
     )
     purchase_date = columns.DateColumn(
         accessor='purchase__date',
@@ -406,6 +414,7 @@ class AssetTable(NetBoxTable):
             'asset_tag',
             'status',
             'hardware',
+            'contract',
             'tags',
         )
 
@@ -605,7 +614,19 @@ class ContractTable(NetBoxTable):
         linkify=True,
     )
     contract_type = columns.ChoiceFieldColumn()
-    status = columns.ChoiceFieldColumn()
+    status = columns.TemplateColumn(
+        template_code='''
+        {% load helpers %}
+        {% if record.is_expired and record.status != 'expired' %}
+            <span class="badge bg-danger" title="Contract expired on {{ record.end_date }}">
+                <i class="mdi mdi-alert-circle"></i> {{ record.get_status_display }}
+            </span>
+        {% else %}
+            {% badge record.get_status_display bg_color=record.get_status_color %}
+        {% endif %}
+        ''',
+        verbose_name='Status',
+    )
     start_date = columns.DateColumn()
     end_date = columns.DateColumn()
     renewal_date = columns.DateColumn()
@@ -620,13 +641,37 @@ class ContractTable(NetBoxTable):
         accessor='is_active',
         verbose_name='Active',
     )
-    days_until_expiry = tables.Column(
+    days_until_expiry = columns.TemplateColumn(
+        template_code='''
+        {% if record.is_expired %}
+            <span class="text-danger">
+                <i class="mdi mdi-alert-circle"></i> Expired
+            </span>
+        {% elif record.days_until_expiry <= 30 %}
+            <span class="text-warning">
+                <i class="mdi mdi-alert"></i> {{ record.days_until_expiry }} days
+            </span>
+        {% elif record.days_until_expiry <= 90 %}
+            <span class="text-info">
+                {{ record.days_until_expiry }} days
+            </span>
+        {% else %}
+            {{ record.days_until_expiry }} days
+        {% endif %}
+        ''',
         accessor='days_until_expiry',
         verbose_name='Days Until Expiry',
-        orderable=False,
     )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
+
+    def order_days_until_expiry(self, queryset, is_descending):
+        """
+        Custom ordering for days_until_expiry column.
+        Orders by end_date (ascending = soonest expiry first, descending = latest expiry first)
+        """
+        direction = '-' if is_descending else ''
+        return queryset.order_by(f'{direction}end_date'), True
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -660,6 +705,7 @@ class ContractTable(NetBoxTable):
             'status',
             'start_date',
             'end_date',
+            'days_until_expiry',
             'asset_count',
             'is_active',
         )

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "netbox-inventory"
 version = "2.4.0"
 authors = [
-  { name="Matej Vadnjal", email="matej.vadnjal@arnes.si" },
+  { name="Daniel den Ouden", email="d.denouden@wearetriple.com" },
 ]
 description = "Inventory asset management in NetBox"
 readme = "README.md"
