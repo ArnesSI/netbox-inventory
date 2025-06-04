@@ -103,7 +103,14 @@ class AssetDeleteView(generic.ObjectDeleteView):
         """Override post method to check if asset is protected from deletion"""
         logger = logging.getLogger('netbox.netbox_inventory.views.AssetDeleteView')
         asset = self.get_object(**kwargs)
-        protected_tags = set(get_tags_that_protect_asset_from_deletion())
+        protected_tags = get_tags_that_protect_asset_from_deletion()
+        
+        # Safety check: if no configuration is set, protected_tags might be None
+        if not protected_tags:
+            protected_tags = set()
+        else:
+            protected_tags = set(protected_tags)
+            
         asset_tags = set(asset.tags.all().values_list('slug', flat=True))
         intersection_of_tags = set(asset_tags).intersection(protected_tags)
 
@@ -155,6 +162,10 @@ class AssetBulkEditView(generic.BulkEditView):
         # Include the PK list as initial data for the form
         initial_data = {'pk': pk_list}
         protected_fields_by_tags = get_tags_and_edit_protected_asset_fields()
+        
+        # Safety check: if no configuration is set, protected_fields_by_tags might be None
+        if not protected_fields_by_tags:
+            protected_fields_by_tags = {}
 
         errors = []
         protected_assets = []
@@ -228,7 +239,14 @@ class AssetBulkDeleteView(generic.BulkDeleteView):
 
         queryset = self.queryset.filter(pk__in=pk_list)
 
-        protected_tags = set(get_tags_that_protect_asset_from_deletion())
+        protected_tags = get_tags_that_protect_asset_from_deletion()
+        
+        # Safety check: if no configuration is set, protected_tags might be None
+        if not protected_tags:
+            protected_tags = set()
+        else:
+            protected_tags = set(protected_tags)
+            
         protected_assets = queryset.filter(tags__slug__in=protected_tags)
 
         if protected_assets:
