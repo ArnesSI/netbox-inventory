@@ -4,7 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-inventory"
+
 version = "2.4.2"
+
 authors = [
   { name="Daniel den Ouden", email="d.denouden@wearetriple.com" },
 ]

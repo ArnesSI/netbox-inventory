@@ -22,7 +22,7 @@ def migrate_contract_data_forward(apps, schema_editor):
         # If there's no data or field doesn't exist, just continue
         pass
 
-
+      
 def migrate_contract_data_reverse(apps, schema_editor):
     """
     Reverse migration: take the first contract from ManyToManyField and set it as ForeignKey.
