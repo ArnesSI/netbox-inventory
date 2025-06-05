@@ -1,4 +1,4 @@
-# Generated manually for netbox_inventory - Migration 0013
+# Generated manually for netbox_inventory - Migration 0012
 
 from django.db import migrations, models
 import django.db.models.deletion
@@ -40,7 +40,7 @@ def migrate_contract_data_reverse(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('netbox_inventory', '0012_contract_add_contact_field'),
+        ('netbox_inventory', '0011_add_contract_model'),
     ]
 
     operations = [
