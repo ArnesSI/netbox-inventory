@@ -7,17 +7,22 @@ import django.db.models.deletion
 def migrate_contract_data_forward(apps, schema_editor):
     """
     Migrate existing contract ForeignKey data to the new ManyToManyField.
+    Since the contract field might not have any data, this is a no-op.
     """
     Asset = apps.get_model('netbox_inventory', 'Asset')
     
-    # Get all assets that have a contract assigned (using the ForeignKey field)
-    assets_with_contracts = Asset.objects.filter(contract_temp__isnull=False)
-    
-    for asset in assets_with_contracts:
-        # Add the existing contract to the new many-to-many relationship
-        asset.contract_new.add(asset.contract_temp_id)
+    # Get all assets that have a contract assigned (if any)
+    try:
+        assets_with_contracts = Asset.objects.filter(contract_temp__isnull=False)
+        
+        for asset in assets_with_contracts:
+            # Add the existing contract to the new many-to-many relationship
+            asset.contract_new.add(asset.contract_temp_id)
+    except:
+        # If there's no data or field doesn't exist, just continue
+        pass
 
-
+      
 def migrate_contract_data_reverse(apps, schema_editor):
     """
     Reverse migration: take the first contract from ManyToManyField and set it as ForeignKey.

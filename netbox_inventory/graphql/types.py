@@ -19,6 +19,7 @@ from tenancy.graphql.types import ContactType, TenantType
 
 from .filters import (
     AssetFilter,
+    ContractFilter,
     DeliveryFilter,
     InventoryItemGroupFilter,
     InventoryItemTypeFilter,
@@ -27,11 +28,22 @@ from .filters import (
 )
 from netbox_inventory.models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
     Purchase,
     Supplier,
+)
+
+__all__ = (
+    'AssetType',
+    'ContractType',
+    'DeliveryType',
+    'InventoryItemGroupType',
+    'InventoryItemTypeType',
+    'PurchaseType',
+    'SupplierType',
 )
 
 
@@ -70,39 +82,31 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
         Annotated['PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')]
         | None
     )
+    
+    @strawberry.field
+    def kind(self) -> str:
+        """Asset kind (device, module, inventoryitem, or rack)"""
+        return self.kind
 
 
-@strawberry_django.type(Supplier, fields='__all__', filters=SupplierFilter)
-class SupplierType(NetBoxObjectType):
-    purchases: list[
-        Annotated['PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
-
-
-@strawberry_django.type(Purchase, fields='__all__', filters=PurchaseFilter)
-class PurchaseType(NetBoxObjectType):
-    supplier: Annotated[
-        'SupplierType', strawberry.lazy('netbox_inventory.graphql.types')
-    ]
-    assets: list[
-        Annotated['AssetType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
-    orders: list[
-        Annotated['DeliveryType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
+@strawberry_django.type(Contract, fields='__all__', filters=ContractFilter)
+class ContractType(NetBoxObjectType):
+    pass
 
 
 @strawberry_django.type(Delivery, fields='__all__', filters=DeliveryFilter)
 class DeliveryType(NetBoxObjectType):
-    purchase: Annotated[
-        'PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')
-    ]
-    receiving_contact: (
-        Annotated['ContactType', strawberry.lazy('tenancy.graphql.types')] | None
-    )
-    assets: list[
-        Annotated['AssetType', strawberry.lazy('netbox_inventory.graphql.types')]
-    ]
+    pass
+
+
+@strawberry_django.type(Purchase, fields='__all__', filters=PurchaseFilter)
+class PurchaseType(NetBoxObjectType):
+    pass
+
+
+@strawberry_django.type(Supplier, fields='__all__', filters=SupplierFilter)
+class SupplierType(NetBoxObjectType):
+    pass
 
 
 @strawberry_django.type(
