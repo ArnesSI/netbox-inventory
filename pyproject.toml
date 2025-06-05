@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-inventory"
-version = "2.4.0"
+version = "2.4.1"
 authors = [
   { name="Daniel den Ouden", email="d.denouden@wearetriple.com" },
 ]
@@ -19,8 +19,8 @@ classifiers = [
 keywords = ["netbox", "netbox-plugin", "inventory"]
 
 [project.urls]
-"Homepage" = "https://github.com/ArnesSI/netbox-inventory/"
-"Bug Tracker" = "https://github.com/ArnesSI/netbox-inventory/issues/"
+"Homepage" = "https://github.com/balpoint/netbox-inventory/"
+"Bug Tracker" = "https://github.com/balpoint/netbox-inventory/issues/"
 
 [tool.setuptools]
 include-package-data = true
