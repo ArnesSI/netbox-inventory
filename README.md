@@ -72,7 +72,7 @@ environment first:
 
 ```bash
 $ source /opt/netbox/venv/bin/activate
-(venv) $ pip install netbox-inventory
+(venv) $ pip install --upgrade git+https://github.com/balpoint/netbox-inventory.git@v2.4.2
 ```
 
 For adding to a NetBox Docker setup see
@@ -81,13 +81,13 @@ For adding to a NetBox Docker setup see
 You can install a development version directly from GitHub:
 
 ```bash
-pip install https://github.com/ArnesSI/netbox-inventory/archive/master.tar.gz
+pip install https://github.com/balpoint/netbox-inventory/archive/master.tar.gz
 ```
 
 or by adding to your `local_requirements.txt` or `plugin_requirements.txt` (netbox-docker):
 
 ```bash
-https://github.com/ArnesSI/netbox-inventory/archive/master.tar.gz
+git+https://github.com/balpoint/netbox-inventory.git@v2.4.2
 ```
 
 After installation, enable the plugin in `/opt/netbox/netbox/netbox/configuration.py`,
