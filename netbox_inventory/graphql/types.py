@@ -82,7 +82,7 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
         Annotated['PurchaseType', strawberry.lazy('netbox_inventory.graphql.types')]
         | None
     )
-    
+
     @strawberry.field
     def kind(self) -> str:
         """Asset kind (device, module, inventoryitem, or rack)"""
