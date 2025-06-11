@@ -60,10 +60,8 @@ support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
-|       3.7      |      1.6.x     |
-|       4.0      |      2.0.x     |
-|       4.1      |  2.1.x,2.2.x   |
-|       4.2      |      2.3.x     |
+|      4.2.x     |      2.4.1     |
+|      4.3.x     |      2.4.2     |
 
 ## Installing
 
