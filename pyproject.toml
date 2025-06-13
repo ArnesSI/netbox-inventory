@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "netbox-inventory"
 version = "2.4.3"
 authors = [
-  { name="Daniel den Ouden", email="d.denouden@wearetriple.com" },
+  { name="Matej Vadnjal", email="matej.vadnjal@arnes.si" },
 ]
 description = "Inventory asset management in NetBox"
 readme = "README.md"
@@ -19,8 +19,8 @@ classifiers = [
 keywords = ["netbox", "netbox-plugin", "inventory"]
 
 [project.urls]
-"Homepage" = "https://github.com/balpoint/netbox-inventory/"
-"Bug Tracker" = "https://github.com/balpoint/netbox-inventory/issues/"
+"Homepage" = "https://github.com/ArnesSI/netbox-inventory/"
+"Bug Tracker" = "https://github.com/ArnesSI/netbox-inventory/issues/"
 
 [tool.setuptools]
 include-package-data = true
