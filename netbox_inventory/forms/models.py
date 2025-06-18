@@ -16,8 +16,8 @@ from utilities.forms.widgets import DatePicker
 
 from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
 from ..models import *
-from netbox_inventory.choices import HardwareKindChoices
 from ..utils import get_tags_and_edit_protected_asset_fields
+from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',
