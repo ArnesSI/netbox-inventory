@@ -1,7 +1,8 @@
 import strawberry_django
+
 from netbox.graphql.filter_mixins import BaseFilterMixin
 
-from netbox_inventory import filtersets, models
+from netbox_inventory import models
 
 __all__ = (
     'AssetFilter',
