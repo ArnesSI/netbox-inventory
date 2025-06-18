@@ -707,6 +707,7 @@ class AuditTrailSourceFilterSet(NetBoxModelFilterSet):
 class AuditTrailFilterSet(NetBoxModelFilterSet):
     # Disable inherited filters for nonexistent fields.
     tag = None
+    tag_id = None
 
     object_type = ContentTypeFilter()
     source_id = django_filters.ModelMultipleChoiceFilter(
