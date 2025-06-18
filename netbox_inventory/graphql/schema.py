@@ -3,6 +3,7 @@ import strawberry_django
 
 from .types import (
     AssetType,
+    ContractType,
     DeliveryType,
     InventoryItemGroupType,
     InventoryItemTypeType,
@@ -11,6 +12,7 @@ from .types import (
 )
 from netbox_inventory.models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -26,6 +28,15 @@ class AssetQuery:
         return Asset.objects.get(pk=id)
 
     asset_list: list[AssetType] = strawberry_django.field()
+
+
+@strawberry.type
+class ContractQuery:
+    @strawberry.field
+    def contract(self, id: int) -> ContractType:
+        return Contract.objects.get(pk=id)
+
+    contract_list: list[ContractType] = strawberry_django.field()
 
 
 @strawberry.type
@@ -71,3 +82,14 @@ class InventoryItemGroupQuery:
         return InventoryItemGroup.objects.get(pk=id)
 
     inventory_item_group_list: list[InventoryItemGroupType] = strawberry_django.field()
+
+
+schema = [
+    AssetQuery,
+    ContractQuery,
+    SupplierQuery,
+    PurchaseQuery,
+    DeliveryQuery,
+    InventoryItemTypeQuery,
+    InventoryItemGroupQuery,
+]

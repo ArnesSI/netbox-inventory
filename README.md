@@ -60,10 +60,8 @@ support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
-|       3.7      |      1.6.x     |
-|       4.0      |      2.0.x     |
-|       4.1      |  2.1.x,2.2.x   |
-|       4.2      |      2.3.x     |
+|      4.2.x     |      2.4.1     |
+|      4.3.x     |      2.4.2     |
 
 ## Installing
 
@@ -74,7 +72,7 @@ environment first:
 
 ```bash
 $ source /opt/netbox/venv/bin/activate
-(venv) $ pip install netbox-inventory
+(venv) $ pip install --upgrade git+https://github.com/balpoint/netbox-inventory.git@v2.4.2
 ```
 
 For adding to a NetBox Docker setup see
@@ -83,13 +81,13 @@ For adding to a NetBox Docker setup see
 You can install a development version directly from GitHub:
 
 ```bash
-pip install https://github.com/ArnesSI/netbox-inventory/archive/master.tar.gz
+pip install https://github.com/balpoint/netbox-inventory/archive/master.tar.gz
 ```
 
 or by adding to your `local_requirements.txt` or `plugin_requirements.txt` (netbox-docker):
 
 ```bash
-https://github.com/ArnesSI/netbox-inventory/archive/master.tar.gz
+git+https://github.com/balpoint/netbox-inventory.git@v2.4.2
 ```
 
 After installation, enable the plugin in `/opt/netbox/netbox/netbox/configuration.py`,

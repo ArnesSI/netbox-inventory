@@ -14,16 +14,16 @@ from dcim.models import (
     Site,
 )
 from netbox.forms import NetBoxModelFilterSetForm
-from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
-from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
+from ..choices import AssetStatusChoices, ContractStatusChoices, ContractTypeChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -38,6 +38,7 @@ __all__ = (
     'DeliveryFilterForm',
     'InventoryItemTypeFilterForm',
     'InventoryItemGroupFilterForm',
+    'ContractFilterForm',
 )
 
 
@@ -65,6 +66,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
             'delivery_id',
             'purchase_id',
             'supplier_id',
+            'contract_id',
             'delivery_date_after',
             'delivery_date_before',
             'purchase_date_after',
@@ -203,6 +205,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label='Supplier',
     )
+    contract_id = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(),
+        required=False,
+        label='Contract',
+    )
     delivery_date_after = forms.DateField(
         required=False,
         label='Delivered on or after',
@@ -312,27 +319,10 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
 
-class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
+class SupplierFilterForm(NetBoxModelFilterSetForm):
     model = Supplier
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
-    )
-
-    contact_group = DynamicModelMultipleChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-    )
-    contact = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
-        required=False,
-        null_option='None',
-        query_params={
-            'group_id': '$contact_group',
-        },
-        label='Contact',
     )
 
     tag = TagFilterField(model)
@@ -445,5 +435,87 @@ class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
     fieldsets = (FieldSet('q', 'filter_id', 'tag', 'parent_id'),)
     parent_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(), required=False, label='Parent group'
+    )
+    tag = TagFilterField(model)
+
+
+class ContractFilterForm(NetBoxModelFilterSetForm):
+    model = Contract
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'supplier_id',
+            'contract_type',
+            'status',
+            'start_date_after',
+            'start_date_before',
+            'end_date_after',
+            'end_date_before',
+            'renewal_date_after',
+            'renewal_date_before',
+            'is_active',
+            'is_expired',
+            'needs_renewal',
+            name='Contract',
+        ),
+    )
+
+    supplier_id = DynamicModelMultipleChoiceField(
+        queryset=Supplier.objects.all(),
+        required=False,
+        label='Supplier',
+    )
+    contract_type = forms.MultipleChoiceField(
+        choices=ContractTypeChoices,
+        required=False,
+    )
+    status = forms.MultipleChoiceField(
+        choices=ContractStatusChoices,
+        required=False,
+    )
+    start_date_after = forms.DateField(
+        required=False,
+        label='Start date on or after',
+        widget=DatePicker,
+    )
+    start_date_before = forms.DateField(
+        required=False,
+        label='Start date on or before',
+        widget=DatePicker,
+    )
+    end_date_after = forms.DateField(
+        required=False,
+        label='End date on or after',
+        widget=DatePicker,
+    )
+    end_date_before = forms.DateField(
+        required=False,
+        label='End date on or before',
+        widget=DatePicker,
+    )
+    renewal_date_after = forms.DateField(
+        required=False,
+        label='Renewal date on or after',
+        widget=DatePicker,
+    )
+    renewal_date_before = forms.DateField(
+        required=False,
+        label='Renewal date on or before',
+        widget=DatePicker,
+    )
+    is_active = forms.NullBooleanField(
+        required=False,
+        label='Is currently active',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+    )
+    is_expired = forms.NullBooleanField(
+        required=False,
+        label='Is expired',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+    )
+    needs_renewal = forms.NullBooleanField(
+        required=False,
+        label='Needs renewal',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     tag = TagFilterField(model)

@@ -1,12 +1,13 @@
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
 from netbox.forms import NetBoxModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, SlugField, DynamicModelMultipleChoiceField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from ..models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -18,6 +19,7 @@ from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
     'AssetForm',
+    'ContractForm',
     'SupplierForm',
     'PurchaseForm',
     'DeliveryForm',
@@ -82,6 +84,11 @@ class AssetForm(NetBoxModelForm):
         required=not Asset._meta.get_field('delivery').blank,
         query_params={'purchase_id': '$purchase'},
     )
+    contract = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(),
+        help_text=Asset._meta.get_field('contract').help_text,
+        required=not Asset._meta.get_field('contract').blank,
+    )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
         help_text=Asset._meta.get_field('tenant').help_text,
@@ -94,7 +101,7 @@ class AssetForm(NetBoxModelForm):
         label='Contact Group',
         help_text='Filter contacts by group',
         initial_params={
-            'contacts': '$contact',
+            'contact': '$contact',
         },
     )
     contact = DynamicModelChoiceField(
@@ -137,6 +144,7 @@ class AssetForm(NetBoxModelForm):
             'owner',
             'purchase',
             'delivery',
+            'contract',
             'warranty_start',
             'warranty_end',
             name='Purchase',
@@ -161,6 +169,7 @@ class AssetForm(NetBoxModelForm):
             'owner',
             'purchase',
             'delivery',
+            'contract',
             'warranty_start',
             'warranty_end',
             'tenant',
@@ -214,6 +223,10 @@ class AssetForm(NetBoxModelForm):
         # Disable fields that should not be edited
         tags = self.instance.tags.all().values_list('slug', flat=True)
         tags_and_disabled_fields = get_tags_and_edit_protected_asset_fields()
+        
+        # Safety check: if no configuration is set, tags_and_disabled_fields might be None
+        if not tags_and_disabled_fields:
+            return
 
         for tag in tags:
             if tag not in tags_and_disabled_fields:
@@ -282,7 +295,7 @@ class DeliveryForm(NetBoxModelForm):
         label='Contact Group',
         help_text='Filter receiving contacts by group',
         initial_params={
-            'contacts': '$receiving_contact',
+            'contact': '$receiving_contact',
         },
     )
     receiving_contact = DynamicModelChoiceField(
@@ -383,3 +396,118 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'tags',
             'comments',
         )
+
+
+class ContractForm(NetBoxModelForm):
+    supplier = DynamicModelChoiceField(
+        queryset=Supplier.objects.all(),
+        help_text=Contract._meta.get_field('supplier').help_text,
+    )
+    contact_group = DynamicModelChoiceField(
+        queryset=ContactGroup.objects.all(),
+        required=False,
+        null_option='None',
+        label='Contact Group',
+        help_text='Filter contacts by group',
+        initial_params={
+            'contact': '$contact',
+        },
+    )
+    contact = DynamicModelChoiceField(
+        queryset=Contact.objects.all(),
+        required=False,
+        help_text='Primary contact for this contract',
+        query_params={
+            'group_id': '$contact_group',
+        },
+    )
+    assets = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        help_text='Assets covered by this contract',
+    )
+    comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            name='Contract Details',
+        ),
+        FieldSet(
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            name='Dates & Cost',
+        ),
+        FieldSet(
+            'contact_group',
+            'contact',
+            name='Contact',
+        ),
+        FieldSet(
+            'assets',
+            name='Assets',
+        ),
+        FieldSet(
+            'description',
+            'tags',
+            'comments',
+            name='Additional Information',
+        ),
+    )
+
+    class Meta:
+        model = Contract
+        fields = (
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            'description',
+            'contact_group',
+            'contact',
+            'tags',
+            'comments',
+        )
+        widgets = {
+            'start_date': DatePicker(),
+            'end_date': DatePicker(),
+            'renewal_date': DatePicker(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # If editing an existing contract, populate the assets field
+        if self.instance and self.instance.pk:
+            self.fields['assets'].initial = self.instance.assets.all()
+
+    def save(self, commit=True):
+        # Save the contract first
+        contract = super().save(commit=commit)
+        
+        if commit:
+            # Handle the many-to-many relationship from the Asset side
+            assets = self.cleaned_data.get('assets', [])
+            
+            # Remove this contract from all assets first
+            for asset in Asset.objects.filter(contract=contract):
+                asset.contract.remove(contract)
+            
+            # Add this contract to the selected assets
+            for asset in assets:
+                asset.contract.add(contract)
+        
+        return contract

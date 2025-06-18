@@ -2,7 +2,8 @@ from django.template import Template
 
 from netbox.plugins import PluginTemplateExtension
 
-from .models import Asset
+# Remove direct import of Asset model to avoid circular import issues
+# from .models import Asset
 from .utils import query_located
 
 WARRANTY_PROGRESSBAR = """
@@ -57,6 +58,9 @@ WARRANTY_PROGRESSBAR = """
 
 class AssetInfoExtension(PluginTemplateExtension):
     def left_page(self):
+        # Lazy import to avoid circular import issues
+        from .models import Asset
+        
         object = self.context.get('object')
         asset = Asset.objects.filter(**{self.kind: object}).first()
         context = {'asset': asset}
@@ -68,6 +72,9 @@ class AssetInfoExtension(PluginTemplateExtension):
 
 class AssetLocationCounts(PluginTemplateExtension):
     def right_page(self):
+        # Lazy import to avoid circular import issues
+        from .models import Asset
+        
         object = self.context.get('object')
         user = self.context['request'].user
         assets_qs = Asset.objects.restrict(user, 'view')
@@ -125,6 +132,9 @@ class ManufacturerAssetCounts(PluginTemplateExtension):
     models = ['dcim.manufacturer']
 
     def right_page(self):
+        # Lazy import to avoid circular import issues
+        from .models import Asset
+        
         object = self.context.get('object')
         user = self.context['request'].user
         count_device = (
@@ -189,6 +199,9 @@ class RackAssetCounts(PluginTemplateExtension):
     models = ['dcim.rack']
 
     def right_page(self):
+        # Lazy import to avoid circular import issues
+        from .models import Asset
+        
         object = self.context.get('object')
         user = self.context['request'].user
         assets_qs = Asset.objects.restrict(user, 'view')
@@ -211,6 +224,9 @@ class TenantAssetCounts(PluginTemplateExtension):
     models = ['tenancy.tenant']
 
     def right_page(self):
+        # Lazy import to avoid circular import issues
+        from .models import Asset
+        
         object = self.context.get('object')
         user = self.context['request'].user
         context = {
@@ -240,6 +256,9 @@ class ContactAssetCounts(PluginTemplateExtension):
     models = ['tenancy.contact']
 
     def right_page(self):
+        # Lazy import to avoid circular import issues
+        from .models import Asset
+        
         object = self.context.get('object')
         user = self.context['request'].user
         context = {

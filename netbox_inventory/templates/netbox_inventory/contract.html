@@ -1,0 +1,162 @@
+{% extends 'generic/object.html' %}
+{% load plugins %}
+{% load helpers %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_inventory:contract_list' %}">Contracts</a></li>
+{% endblock %}
+
+{% block content %}
+  <!-- Contract Status Alert -->
+  {% if object.is_expired or object.days_until_expiry <= 30 %}
+    <div class="alert alert-{{ object.remaining_time_class|slice:"3:" }} alert-dismissible fade show" role="alert">
+      <i class="mdi {{ object.remaining_time_icon }}"></i>
+      <strong>Contract Status:</strong> {{ object.remaining_time_display }}
+      {% if object.is_expired %}
+        - This contract requires immediate attention.
+      {% elif object.days_until_expiry <= 7 %}
+        - This contract expires very soon and may need renewal.
+      {% elif object.days_until_expiry <= 30 %}
+        - This contract expires soon and should be reviewed for renewal.
+      {% endif %}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endif %}
+
+  <div class="row mb-3">
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Contract</h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Name</th>
+            <td>{{ object.name }}</td>
+          </tr>
+          {% if object.contract_id %}
+          <tr>
+            <th scope="row">Contract ID</th>
+            <td>{{ object.contract_id }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th scope="row">Supplier</th>
+            <td>
+              {% if object.supplier %}
+                <a href="{{ object.supplier.get_absolute_url }}">{{ object.supplier }}</a>
+              {% else %}
+                <span class="text-muted">None</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Contract Type</th>
+            <td>{{ object.get_contract_type_display }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Status</th>
+            <td>
+              <span class="badge" style="color: {{ object.get_status_color }}">
+                {{ object.get_status_display }}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Start Date</th>
+            <td>{{ object.start_date }}</td>
+          </tr>
+          <tr>
+            <th scope="row">End Date</th>
+            <td>{{ object.end_date }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Days Remaining</th>
+            <td>
+              <span class="badge {{ object.remaining_time_class }}">
+                <i class="mdi {{ object.remaining_time_icon }}"></i> {{ object.remaining_time_display }}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Contract Progress</th>
+            <td>
+              {% if object.start_date and object.end_date %}
+                <div class="progress mb-2" style="height: 20px;">
+                  {% if object.is_expired %}
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%">
+                      Contract Expired
+                    </div>
+                  {% else %}
+                    <div class="progress-bar {{ object.remaining_time_class }}" role="progressbar" 
+                         style="width: {{ object.progress_percentage }}%">
+                      {% if object.progress_percentage > 20 %}
+                        {{ object.days_until_expiry }} days left
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+                <small class="text-muted">
+                  Contract period: {{ object.start_date }} to {{ object.end_date }}
+                  {% if object.contract_duration_days %}
+                    ({{ object.contract_duration_days }} days total)
+                  {% endif %}
+                </small>
+              {% else %}
+                <span class="text-muted">Contract dates not fully specified</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% if object.renewal_date %}
+          <tr>
+            <th scope="row">Renewal Date</th>
+            <td>{{ object.renewal_date }}</td>
+          </tr>
+          {% endif %}
+          {% if object.cost %}
+          <tr>
+            <th scope="row">Cost</th>
+            <td>
+              {% if object.currency %}{{ object.currency }} {% endif %}{{ object.cost }}
+            </td>
+          </tr>
+          {% endif %}
+          {% if object.contact %}
+          <tr>
+            <th scope="row">Contact</th>
+            <td>
+              <a href="{{ object.contact.get_absolute_url }}">{{ object.contact }}</a>
+            </td>
+          </tr>
+          {% endif %}
+          {% if object.description %}
+          <tr>
+            <th scope="row">Description</th>
+            <td>{{ object.description }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th scope="row">Assets</th>
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?contract_id={{ object.pk }}">{{ asset_count }}</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+      {% include 'inc/panels/tags.html' %}
+      {% plugin_left_page object %}
+    </div>
+    <div class="col col-md-6">
+      {% include 'inc/panels/custom_fields.html' %}
+      {% include 'inc/panels/comments.html' %}
+      {% plugin_right_page object %}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">Contract Assets</h5>
+        {% htmx_table 'plugins:netbox_inventory:asset_list' contract_id=object.pk %}
+      </div>
+      {% plugin_full_width_page object %}
+    </div>
+  </div>
+{% endblock content %} 

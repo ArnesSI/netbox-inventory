@@ -11,6 +11,7 @@ from utilities.forms.fields import (
     CSVChoiceField,
     CSVModelChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
@@ -23,6 +24,7 @@ from ..models import (
     InventoryItemType,
     Purchase,
     Supplier,
+    Contract,
 )
 from ..utils import get_plugin_setting
 
@@ -97,6 +99,11 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         help_text=Asset._meta.get_field('delivery').help_text,
         required=not Asset._meta.get_field('delivery').blank,
     )
+    contract = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(),
+        help_text=Asset._meta.get_field('contract').help_text,
+        required=False,
+    )
     warranty_start = forms.DateField(
         label='Warranty start', required=False, widget=DatePicker()
     )
@@ -148,6 +155,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
             'owner',
             'purchase',
             'delivery',
+            'contract',
             'warranty_start',
             'warranty_end',
             name='Purchase',

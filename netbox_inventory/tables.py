@@ -4,11 +4,11 @@ from django.utils.translation import gettext_lazy as _
 
 from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
 from netbox.tables import NetBoxTable, columns
-from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
 
 from .models import (
     Asset,
+    Contract,
     Delivery,
     InventoryItemGroup,
     InventoryItemType,
@@ -19,11 +19,12 @@ from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
-    'SupplierTable',
-    'PurchaseTable',
+    'ContractTable',
     'DeliveryTable',
-    'InventoryItemTypeTable',
     'InventoryItemGroupTable',
+    'InventoryItemTypeTable',
+    'PurchaseTable',
+    'SupplierTable',
 )
 
 
@@ -185,6 +186,17 @@ class AssetTable(NetBoxTable):
     )
     delivery = tables.Column(
         linkify=True,
+    )
+    contract = columns.TemplateColumn(
+        template_code='''
+        {% for contract in record.contract.all %}
+            <a href="{{ contract.get_absolute_url }}">{{ contract }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            —
+        {% endfor %}
+        ''',
+        verbose_name='Contracts',
+        orderable=False,
     )
     purchase_date = columns.DateColumn(
         accessor='purchase__date',
@@ -379,6 +391,7 @@ class AssetTable(NetBoxTable):
             'supplier',
             'purchase',
             'delivery',
+            'contract',
             'purchase_date',
             'delivery_date',
             'warranty_start',
@@ -401,6 +414,7 @@ class AssetTable(NetBoxTable):
             'asset_tag',
             'status',
             'hardware',
+            'contract',
             'tags',
         )
 
@@ -410,7 +424,7 @@ class AssetTable(NetBoxTable):
 #
 
 
-class SupplierTable(ContactsColumnMixin, NetBoxTable):
+class SupplierTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
@@ -441,7 +455,6 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
             'slug',
             'description',
             'comments',
-            'contacts',
             'purchase_count',
             'delivery_count',
             'asset_count',
@@ -591,3 +604,108 @@ asset_count = columns.LinkedCountColumn(
 )
 
 register_table_column(asset_count, 'assets', RackTypeTable)
+
+
+class ContractTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+    supplier = tables.Column(
+        linkify=True,
+    )
+    contract_type = columns.ChoiceFieldColumn()
+    status = columns.TemplateColumn(
+        template_code='''
+        {% load helpers %}
+        {% if record.is_expired and record.status != 'expired' %}
+            <span class="badge bg-danger" title="Contract expired on {{ record.end_date }}">
+                <i class="mdi mdi-alert-circle"></i> {{ record.get_status_display }}
+            </span>
+        {% else %}
+            {% badge record.get_status_display bg_color=record.get_status_color %}
+        {% endif %}
+        ''',
+        verbose_name='Status',
+    )
+    start_date = columns.DateColumn()
+    end_date = columns.DateColumn()
+    renewal_date = columns.DateColumn()
+    cost = tables.Column()
+    currency = tables.Column()
+    asset_count = columns.LinkedCountColumn(
+        viewname='plugins:netbox_inventory:asset_list',
+        url_params={'contract_id': 'pk'},
+        verbose_name='Assets',
+    )
+    is_active = columns.BooleanColumn(
+        accessor='is_active',
+        verbose_name='Active',
+    )
+    days_until_expiry = columns.TemplateColumn(
+        template_code='''
+        {% if record.is_expired %}
+            <span class="text-danger">
+                <i class="mdi mdi-alert-circle"></i> Expired
+            </span>
+        {% elif record.days_until_expiry <= 30 %}
+            <span class="text-warning">
+                <i class="mdi mdi-alert"></i> {{ record.days_until_expiry }} days
+            </span>
+        {% elif record.days_until_expiry <= 90 %}
+            <span class="text-info">
+                {{ record.days_until_expiry }} days
+            </span>
+        {% else %}
+            {{ record.days_until_expiry }} days
+        {% endif %}
+        ''',
+        accessor='days_until_expiry',
+        verbose_name='Days Until Expiry',
+    )
+    comments = columns.MarkdownColumn()
+    tags = columns.TagColumn()
+
+    def order_days_until_expiry(self, queryset, is_descending):
+        """
+        Custom ordering for days_until_expiry column.
+        Orders by end_date (ascending = soonest expiry first, descending = latest expiry first)
+        """
+        direction = '-' if is_descending else ''
+        return queryset.order_by(f'{direction}end_date'), True
+
+    class Meta(NetBoxTable.Meta):
+        model = Contract
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'contract_id',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'renewal_date',
+            'cost',
+            'currency',
+            'description',
+            'asset_count',
+            'is_active',
+            'days_until_expiry',
+            'comments',
+            'tags',
+            'created',
+            'last_updated',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'supplier',
+            'contract_type',
+            'status',
+            'start_date',
+            'end_date',
+            'days_until_expiry',
+            'asset_count',
+            'is_active',
+        )
