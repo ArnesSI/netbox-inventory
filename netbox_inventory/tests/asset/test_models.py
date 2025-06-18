@@ -4,9 +4,8 @@ from django.test import TestCase, override_settings
 from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from utilities.exceptions import AbortRequest
 
-from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
-
 from ..settings import CONFIG_SYNC_OFF, CONFIG_SYNC_ON
+from netbox_inventory.models import Asset, Delivery, Purchase, Supplier
 
 
 class TestAssetModel(TestCase):

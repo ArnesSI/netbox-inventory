@@ -15,10 +15,9 @@ from dcim.models import (
 )
 from utilities.testing import ViewTestCases
 
+from ..settings import CONFIG_SYNC_ON
 from netbox_inventory.models import Asset, InventoryItemType
 from netbox_inventory.tests.custom import ModelViewTestCase
-
-from ..settings import CONFIG_SYNC_ON
 
 
 class AssetCreateHwBase:

@@ -17,15 +17,6 @@ from extras.graphql.mixins import ContactsMixin, ImageAttachmentsMixin
 from netbox.graphql.types import NetBoxObjectType, OrganizationalObjectType
 from tenancy.graphql.types import ContactType, TenantType
 
-from netbox_inventory.models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
-
 from .filters import (
     AssetFilter,
     DeliveryFilter,
@@ -33,6 +24,14 @@ from .filters import (
     InventoryItemTypeFilter,
     PurchaseFilter,
     SupplierFilter,
+)
+from netbox_inventory.models import (
+    Asset,
+    Delivery,
+    InventoryItemGroup,
+    InventoryItemType,
+    Purchase,
+    Supplier,
 )
 
 

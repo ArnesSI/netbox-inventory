@@ -72,4 +72,5 @@ class InventoryItemTypeBulkEditView(generic.BulkEditView):
 )
 class InventoryItemTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = models.InventoryItemType.objects.all()
+    filterset = filtersets.InventoryItemTypeFilterSet
     table = tables.InventoryItemTypeTable

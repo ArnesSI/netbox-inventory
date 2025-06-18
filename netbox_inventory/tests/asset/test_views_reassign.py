@@ -19,10 +19,9 @@ from dcim.models import (
 from users.models import ObjectPermission
 from utilities.testing.utils import post_data
 
+from ..settings import CONFIG_SYNC_ON
 from netbox_inventory.models import Asset, InventoryItemType
 from netbox_inventory.tests.custom import ModelViewTestCase
-
-from ..settings import CONFIG_SYNC_ON
 
 
 class AssetReassignBase:

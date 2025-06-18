@@ -1,19 +1,19 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-inventory"
-version = "2.3.0"
+version = "2.3.1"
 authors = [
   { name="Matej Vadnjal", email="matej.vadnjal@arnes.si" },
 ]
 description = "Inventory asset management in NetBox"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 keywords = ["netbox", "netbox-plugin", "inventory"]
@@ -34,27 +34,12 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-extend-select = ["E4", "E7", "E9", "F", "W", "C"]
+extend-select = ["E4", "E7", "E9", "F", "W", "C", "I"]
 ignore = ["F403", "F405"]
 
-[tool.ruff.format]
-quote-style = "single"
-
-[tool.isort]
-profile = "black"
-skip = [
-    "netbox_inventory/migrations",
-]
-sections = [
-    "FUTURE",
-    "STDLIB",
-    "THIRDPARTY",
-    "NETBOX",
-    "FIRSTPARTY",
-    "LOCALFOLDER",
-]
-known_first_party = ["netbox_inventory"]
-known_netbox = [
+[tool.ruff.lint.isort]
+known-local-folder = ["netbox_inventory"]
+known-first-party = [
     "netbox",
     "core",
     "dcim",
@@ -63,3 +48,6 @@ known_netbox = [
     "users",
     "utilities",
 ]
+
+[tool.ruff.format]
+quote-style = "single"

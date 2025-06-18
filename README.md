@@ -158,7 +158,7 @@ class AuditReportMissing(Script):
 
 ## Compatibility
 
-This plugin requires netbox version 4.1 to work. Older versions of the plugin
+This plugin requires netbox version 4.2 to work. Older versions of the plugin
 support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
@@ -278,13 +278,15 @@ FIELD_CHOICES = {
 
 If you add more statuses, you should also adjust `used_additional_status_names` and `stored_additional_status_names` settings.
 
+The possible colours can be found at [FIELD_CHOICES](https://netboxlabs.com/docs/netbox/configuration/data-validation/#field_choices).
+
 ## Common questions
 
 ### I'd like to attach documents to asset, purchase, supplier, etc
 
 Netbox inventory supports limited file attachments for its various models. You can add images to assets, inventory item types and that is it.
 
-If you would like to attach various other documents to purchases, deliveries, suppliers... first ask yourself if you really need those documents in netbox or could you use some other tool that is possibly in use in your organization. Netbox itself is not great at managing documents. If you decide to manage documents outside netbox, you can porobably still achieve some sort of integration by using [custom links feature](https://netboxlabs.com/docs/netbox/en/stable/customization/custom-links/) to link from a netbox inventory object directly to a document in your document system.
+If you would like to attach various other documents to purchases, deliveries, suppliers... first ask yourself if you really need those documents in netbox or could you use some other tool that is possibly in use in your organization. Netbox itself is not great at managing documents. If you decide to manage documents outside netbox, you can probably still achieve some sort of integration by using [custom links feature](https://netboxlabs.com/docs/netbox/en/stable/customization/custom-links/) to link from a netbox inventory object directly to a document in your document system.
 
 If you really want to store document in netbox itself, then consider using [netbox_attachments plugin](https://github.com/Kani999/netbox-attachments). Here is a sample netbox configuration that will allow adding documents to suppliers, purchases and deliveries:
 
