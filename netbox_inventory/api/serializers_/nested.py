@@ -8,9 +8,6 @@ __all__ = ('NestedInventoryItemGroupSerializer',)
 
 
 class NestedInventoryItemGroupSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:inventoryitemgroup-detail'
-    )
     _depth = serializers.IntegerField(source='level', read_only=True)
 
     class Meta:

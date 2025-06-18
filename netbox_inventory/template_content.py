@@ -1,9 +1,16 @@
+from django.db.models import Model
+from django.http import HttpRequest
 from django.template import Template
 
+from core.models import ObjectType
 from netbox.plugins import PluginTemplateExtension
 
-from .models import Asset
+from .models import Asset, AuditFlow
 from .utils import query_located
+
+#
+# Assets
+#
 
 WARRANTY_PROGRESSBAR = """
 {% with record.warranty_progress as wp %}
@@ -258,7 +265,64 @@ class ContactAssetCounts(PluginTemplateExtension):
         )
 
 
+#
+# Audit
+#
+
+
+class AuditFlowRunButton(PluginTemplateExtension):
+    """
+    Add a button to start an audit flow on the detail pages of applicable objects.
+    """
+
+    models = [
+        'dcim.site',
+        'dcim.location',
+        'dcim.rack',
+    ]
+
+    def get_object(self) -> Model:
+        return self.context['object']
+
+    def get_request(self) -> HttpRequest:
+        return self.context['request']
+
+    def get_flows(self) -> list[AuditFlow]:
+        """
+        Return a list of working audit flows (enabled and with pages) that apply to the
+        current context object.
+        """
+        obj = self.get_object()
+        request = self.get_request()
+
+        object_type = ObjectType.objects.get_for_model(obj)
+        flows = (
+            AuditFlow.objects.filter(
+                object_type=object_type,
+                enabled=True,
+                pages__isnull=False,  # Filter flows with no pages assigned
+            )
+            .restrict(request.user, 'run')
+            .distinct()
+        )
+
+        return [flow for flow in flows if flow.get_objects().filter(pk=obj.pk).exists()]
+
+    def buttons(self):
+        flows = self.get_flows()
+        if not flows:
+            return ''
+
+        return self.render(
+            'netbox_inventory/inc/buttons/auditflow_run.html',
+            extra_context={
+                'flows': flows,
+            },
+        )
+
+
 template_extensions = (
+    # Assets
     DeviceAssetInfo,
     ModuleAssetInfo,
     InventoryItemAssetInfo,
@@ -269,4 +333,6 @@ template_extensions = (
     RackAssetCounts,
     TenantAssetCounts,
     ContactAssetCounts,
+    # Audit
+    AuditFlowRunButton,
 )

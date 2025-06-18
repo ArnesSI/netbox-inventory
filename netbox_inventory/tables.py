@@ -7,18 +7,14 @@ from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
 
-from .models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from .models import *
 from .template_content import WARRANTY_PROGRESSBAR
 
 __all__ = (
     'AssetTable',
+    'AuditFlowPageAssignmentTable',
+    'AuditFlowPageTable',
+    'AuditFlowTable',
     'SupplierTable',
     'PurchaseTable',
     'DeliveryTable',
@@ -556,6 +552,84 @@ class DeliveryTable(NetBoxTable):
             'purchase',
             'date',
             'asset_count',
+        )
+
+
+#
+# Audit
+#
+
+
+class BaseFlowTable(NetBoxTable):
+    """
+    Internal base table class for audit flow models.
+    """
+
+    name = tables.Column(
+        linkify=True,
+    )
+    object_type = columns.ContentTypeColumn()
+
+    class Meta(NetBoxTable.Meta):
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'description',
+            'object_type',
+            'object_filter',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'object_type',
+        )
+
+
+class AuditFlowPageTable(BaseFlowTable):
+    class Meta(BaseFlowTable.Meta):
+        model = AuditFlowPage
+
+
+class AuditFlowTable(BaseFlowTable):
+    enabled = columns.BooleanColumn()
+
+    class Meta(BaseFlowTable.Meta):
+        model = AuditFlow
+        fields = BaseFlowTable.Meta.fields + ('enabled',)
+        default_columns = BaseFlowTable.Meta.default_columns + ('enabled',)
+
+
+class AuditFlowPageAssignmentTable(NetBoxTable):
+    flow = tables.Column(
+        linkify=True,
+    )
+    page = tables.Column(
+        linkify=True,
+    )
+
+    actions = columns.ActionsColumn(
+        actions=(
+            'edit',
+            'delete',
+        ),
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditFlowPageAssignment
+        fields = (
+            'pk',
+            'id',
+            'flow',
+            'page',
+            'weight',
+            'actions',
+        )
+        default_columns = (
+            'flow',
+            'page',
+            'weight',
         )
 
 

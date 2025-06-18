@@ -20,9 +20,6 @@ from netbox_inventory.models import Asset, InventoryItemGroup, InventoryItemType
 
 
 class InventoryItemGroupSerializer(NestedGroupModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:inventoryitemgroup-detail'
-    )
     parent = NestedInventoryItemGroupSerializer(
         required=False, allow_null=True, default=None
     )
@@ -49,9 +46,6 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
 
 
 class InventoryItemTypeSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:inventoryitemtype-detail'
-    )
     manufacturer = ManufacturerSerializer(nested=True)
     inventoryitem_group = InventoryItemGroupSerializer(
         nested=True, required=False, allow_null=True, default=None
@@ -89,9 +83,6 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
 
 
 class AssetSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_inventory-api:asset-detail'
-    )
     device_type = DeviceTypeSerializer(
         nested=True,
         required=False,

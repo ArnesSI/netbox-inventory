@@ -1,5 +1,7 @@
 from django import forms
+from django.utils.translation import gettext as _
 
+from core.models import ObjectType
 from dcim.models import (
     Device,
     DeviceRole,
@@ -17,28 +19,77 @@ from netbox.forms import NetBoxModelFilterSetForm
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
-from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
+from utilities.forms.fields import (
+    ContentTypeChoiceField,
+    DynamicModelMultipleChoiceField,
+    TagFilterField,
+)
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
-from ..models import (
-    Asset,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
+from ..models import *
 
 __all__ = (
     'AssetFilterForm',
+    'AuditFlowFilterForm',
+    'AuditFlowPageFilterForm',
+    'DeliveryFilterForm',
+    'InventoryItemGroupFilterForm',
+    'InventoryItemTypeFilterForm',
     'SupplierFilterForm',
     'PurchaseFilterForm',
-    'DeliveryFilterForm',
-    'InventoryItemTypeFilterForm',
-    'InventoryItemGroupFilterForm',
 )
+
+
+#
+# Assets
+#
+
+
+class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemGroup
+    fieldsets = (
+        FieldSet(
+            'q',
+            'filter_id',
+            'tag',
+            'parent_id',
+        ),
+    )
+    parent_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Parent group',
+    )
+    tag = TagFilterField(model)
+
+
+class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
+    model = InventoryItemType
+    fieldsets = (
+        FieldSet(
+            'q',
+            'filter_id',
+            'tag',
+        ),
+        FieldSet(
+            'manufacturer_id',
+            'inventoryitem_group_id',
+            name='Inventory Item Type',
+        ),
+    )
+    manufacturer_id = DynamicModelMultipleChoiceField(
+        queryset=Manufacturer.objects.all(),
+        required=False,
+        label='Manufacturer',
+    )
+    inventoryitem_group_id = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemGroup.objects.all(),
+        required=False,
+        label='Inventory Item Group',
+    )
+    tag = TagFilterField(model)
 
 
 class AssetFilterForm(NetBoxModelFilterSetForm):
@@ -312,6 +363,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
 
+#
+# Deliveries
+#
+
+
 class SupplierFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
     model = Supplier
     fieldsets = (
@@ -419,31 +475,49 @@ class DeliveryFilterForm(NetBoxModelFilterSetForm):
     tag = TagFilterField(model)
 
 
-class InventoryItemTypeFilterForm(NetBoxModelFilterSetForm):
-    model = InventoryItemType
+#
+# Audit
+#
+
+
+class BaseFlowFilterForm(NetBoxModelFilterSetForm):
+    """
+    Internal base filter form class for audit flow models.
+    """
+
+    object_type_id = ContentTypeChoiceField(
+        queryset=ObjectType.objects.public(),
+        required=False,
+        label=_('Object type'),
+    )
+
+
+class AuditFlowPageFilterForm(BaseFlowFilterForm):
+    assigned_flow_id = DynamicModelMultipleChoiceField(
+        queryset=AuditFlow.objects.all(),
+        required=False,
+        label=_('Audit flow'),
+    )
+
+    model = AuditFlowPage
+
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
         FieldSet(
-            'manufacturer_id', 'inventoryitem_group_id', name='Inventory Item Type'
+            'object_type_id',
+            'assigned_flow_id',
+            name='Assignment',
         ),
     )
-    manufacturer_id = DynamicModelMultipleChoiceField(
-        queryset=Manufacturer.objects.all(),
-        required=False,
-        label='Manufacturer',
-    )
-    inventoryitem_group_id = DynamicModelMultipleChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory Item Group',
-    )
-    tag = TagFilterField(model)
 
 
-class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
-    model = InventoryItemGroup
-    fieldsets = (FieldSet('q', 'filter_id', 'tag', 'parent_id'),)
-    parent_id = DynamicModelMultipleChoiceField(
-        queryset=InventoryItemGroup.objects.all(), required=False, label='Parent group'
+class AuditFlowFilterForm(BaseFlowFilterForm):
+    model = AuditFlow
+
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'object_type_id',
+            name='Assignment',
+        ),
     )
-    tag = TagFilterField(model)

@@ -1,48 +1,27 @@
 from django.db import models
-from django.urls import reverse
 
-from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 
 from ..choices import PurchaseStatusChoices
+from .mixins import NamedModel
 
 
-class Supplier(NetBoxModel, ContactsMixin):
+class Supplier(NamedModel, ContactsMixin):
     """
     Supplier is a legal entity that sold some assets that we keep track of.
     This can be the same entity as Manufacturer or a separate one. However
     netbox_inventory keeps track of Suppliers separate from Manufacturers.
     """
 
-    name = models.CharField(
-        max_length=100,
-        unique=True,
-    )
     slug = models.SlugField(
         max_length=100,
         unique=True,
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True,
-    )
-    comments = models.TextField(
-        blank=True,
-    )
 
     clone_fields = ['description', 'comments']
 
-    class Meta:
-        ordering = ['name']
 
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:supplier', args=[self.pk])
-
-
-class Purchase(NetBoxModel):
+class Purchase(NamedModel):
     """
     Represents a purchase of a set of Assets from a Supplier.
     """
@@ -66,13 +45,6 @@ class Purchase(NetBoxModel):
         blank=True,
         null=True,
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True,
-    )
-    comments = models.TextField(
-        blank=True,
-    )
 
     clone_fields = ['supplier', 'date', 'status', 'description', 'comments']
 
@@ -86,11 +58,8 @@ class Purchase(NetBoxModel):
     def __str__(self):
         return f'{self.supplier} {self.name}'
 
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:purchase', args=[self.pk])
 
-
-class Delivery(NetBoxModel):
+class Delivery(NamedModel):
     """
     Delivery is a stage in Purchase. Purchase can have multiple deliveries.
     In each Delivery one or more Assets were delivered.
@@ -118,13 +87,6 @@ class Delivery(NetBoxModel):
         blank=True,
         null=True,
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True,
-    )
-    comments = models.TextField(
-        blank=True,
-    )
 
     clone_fields = ['purchase', 'date', 'receiving_contact', 'description', 'comments']
 
@@ -136,6 +98,3 @@ class Delivery(NetBoxModel):
 
     def __str__(self):
         return f'{self.purchase} {self.name}'
-
-    def get_absolute_url(self):
-        return reverse('plugins:netbox_inventory:delivery', args=[self.pk])
