@@ -45,6 +45,21 @@ class InventoryItemGroupForm(NetBoxModelForm):
         required=False,
         label='Parent',
     )
+    device_types = DynamicModelMultipleChoiceField(
+        queryset=DeviceType.objects.all(),
+        required=False,
+        label='Device Types',
+    )
+    module_types = DynamicModelMultipleChoiceField(
+        queryset=ModuleType.objects.all(),
+        required=False,
+        label='Module Types',
+    )
+    rack_types = DynamicModelMultipleChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack Types',
+    )
     inventoryitem_types = DynamicModelMultipleChoiceField(
         queryset=InventoryItemType.objects.all(),
         required=False,
@@ -60,7 +75,13 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'tags',
             name='Inventory Item Group',
         ),
-        FieldSet('inventoryitem_types', name='Types'),
+        FieldSet(
+            'device_types',
+            'module_types',
+            'inventoryitem_types',
+            'rack_types',
+            name='Types',
+        ),
     )
 
     class Meta:
@@ -69,6 +90,9 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'name',
             'parent',
             'description',
+            'device_types',
+            'module_types',
+            'rack_types',
             'inventoryitem_types',
             'tags',
             'comments',

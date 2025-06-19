@@ -19,7 +19,7 @@ from .mixins import NamedModel
 
 class InventoryItemGroup(NestedGroupModel, NamedModel):
     """
-    Inventory Item Groups are groups of simmilar InventoryItemTypes.
+    Inventory Item Groups are groups of simmilar hardware types or assets.
     This allows you to, for example, have one Group for all your 10G-LR SFP
     pluggables, from different manufacturers/with different part numbers.
     Inventory Item Groups can be nested.
@@ -27,10 +27,38 @@ class InventoryItemGroup(NestedGroupModel, NamedModel):
 
     slug = None  # remove field that is defined on NestedGroupModel
 
+    device_types = models.ManyToManyField(
+        to='dcim.DeviceType',
+        related_name='inventoryitem_groups',
+        verbose_name='Device Types',
+        blank=True,
+    )
+    module_types = models.ManyToManyField(
+        to='dcim.ModuleType',
+        related_name='inventoryitem_groups',
+        verbose_name='Module Types',
+        blank=True,
+    )
+    rack_types = models.ManyToManyField(
+        to='dcim.RackType',
+        related_name='inventoryitem_groups',
+        verbose_name='Rack Types',
+        blank=True,
+    )
     inventoryitem_types = models.ManyToManyField(
         to='netbox_inventory.InventoryItemType',
         related_name='inventoryitem_groups',
         verbose_name='Inventory Item Types',
+        blank=True,
+    )
+    assets = models.ManyToManyField(
+        to='netbox_inventory.Asset',
+        related_name='inventoryitem_groups',
+        blank=True,
+    )
+    direct_assets = models.ManyToManyField(
+        to='netbox_inventory.Asset',
+        related_name='+',
         blank=True,
     )
 

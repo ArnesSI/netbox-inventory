@@ -1,3 +1,5 @@
+from itertools import groupby
+
 from netbox.views import generic
 from utilities.views import register_model_view
 
@@ -20,85 +22,42 @@ class InventoryItemGroupView(generic.ObjectView):
     queryset = models.InventoryItemGroup.objects.all()
 
     def get_extra_context(self, request, instance):
-        # build a table of child groups with asset count
-        child_groups = models.InventoryItemGroup.objects.add_related_count(
-            models.InventoryItemGroup.objects.all(),
-            models.Asset,
-            'inventoryitem_type__inventoryitem_groups',
-            'asset_count',
-            cumulative=True,
-        )
-        child_groups = (
-            models.InventoryItemGroup.objects.add_related_count(
-                child_groups,
-                models.InventoryItemType,
-                'inventoryitem_groups',
-                'inventoryitem_type_count',
-                cumulative=True,
+        # get assets from this and all child groups
+        assets = (
+            models.Asset.objects.filter(
+                inventoryitem_groups__in=instance.get_descendants(include_self=True)
             )
-            .restrict(request.user, 'view')
-            .filter(parent__in=instance.get_descendants(include_self=True))
-        )
-        child_groups_table = tables.InventoryItemGroupTable(child_groups)
-        child_groups_table.columns.hide('actions')
-        # get all assets from this group and its descendants
-        assets = models.Asset.objects.restrict(request.user, 'view').filter(
-            inventoryitem_type__inventoryitem_groups__in=instance.get_descendants(
-                include_self=True
+            .prefetch_related('inventoryitem_groups')
+            .select_related(
+                'device_type', 'module_type', 'rack_type', 'inventoryitem_type'
             )
         )
-        # make table of assets
-        asset_table = tables.AssetTable(assets, user=request.user)
-        asset_table.columns.hide('kind')
-        asset_table.configure(request)
+        # get counts for each type and status combination
+        type_status_counts = asset_counts_type_status(assets, instance)
 
-        # get counts for each inventoryitem type and status combination
-        type_status_counts = asset_counts_type_status(instance, assets)
-
-        # change structure of stored objects
+        # group by hw type keys with all statuses
+        # so in template we can have one line per type with all statuses in same line
+        # also append a "total" count at the end of every type status list
+        grouping_keys = ('kind', 'hw_manufacturer', 'hw_model', 'hw_id')
+        type_grouped_counts = groupby(
+            type_status_counts, lambda ts: {k: ts[k] for k in grouping_keys}
+        )
+        # django template engine tries to convert groupy generator to list and breaks
+        # for loop in template, so we need to convert to list ouselves before
+        # passing to django
+        # https://stackoverflow.com/a/16171518
+        # also append a "total" count at the end of every type status list
         type_status_objects = []
-        prev_type = 0
-        asset_obj = {}
-        total_items = len(type_status_counts) - 1  # get last index
-        for idx, tsc in enumerate(type_status_counts):
-            if prev_type != tsc['inventoryitem_type']:
-                prev_type = tsc['inventoryitem_type']
-                # make sure skip first insert
-                if len(asset_obj.keys()) != 0:
-                    type_status_objects.append(asset_obj)
-                asset_obj = {}
+        for key, groups in type_grouped_counts:
+            groups = list(groups)
+            total = {'count': sum([g['count'] for g in groups])}
+            type_status_objects.append((key, groups + [total]))
 
-            # collection of statuses for same types
-            status_list = {
-                'status': tsc['status'],
-                'count': str(tsc['count']),  # needs to be a string to render
-                'color': tsc['color'],
-                'label': tsc['label'],
-            }
-            if len(asset_obj.keys()) != 0:
-                asset_obj.get('status_list').append(status_list)
-            else:
-                # initial list of assets
-                asset_obj = {
-                    'inventoryitem_type__manufacturer__name': tsc[
-                        'inventoryitem_type__manufacturer__name'
-                    ],
-                    'inventoryitem_type__model': tsc['inventoryitem_type__model'],
-                    'inventoryitem_type': tsc['inventoryitem_type'],
-                    'status_list': [status_list],
-                }
-
-            # make sure we dont forget last item
-            if total_items == idx:
-                type_status_objects.append(asset_obj)
-
-        # counts by status, ignoring different inventoryitem_types
+        # counts by status, ignoring different hw types
         status_counts = asset_counts_status(type_status_counts)
 
         return {
-            'child_groups_table': child_groups_table,
-            'asset_table': asset_table,
-            'type_status_counts': type_status_counts,
+            'assets': assets,
             'status_counts': status_counts,
             'type_status_objects': type_status_objects,
         }
@@ -109,15 +68,8 @@ class InventoryItemGroupListView(generic.ObjectListView):
     queryset = models.InventoryItemGroup.objects.add_related_count(
         models.InventoryItemGroup.objects.all(),
         models.Asset,
-        'inventoryitem_type__inventoryitem_groups',
-        'asset_count',
-        cumulative=True,
-    )
-    queryset = models.InventoryItemGroup.objects.add_related_count(
-        queryset,
-        models.InventoryItemType,
         'inventoryitem_groups',
-        'inventoryitem_type_count',
+        'asset_count',
         cumulative=True,
     )
     table = tables.InventoryItemGroupTable

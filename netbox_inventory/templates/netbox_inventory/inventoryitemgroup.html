@@ -38,15 +38,70 @@
           <tr>
             <th scope="row">Assets</th>
             <td>
-              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}">{{ asset_table.rows|length }}</a>
+              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}">{{ assets.count }}</a>
             </td>
           </tr>
         </table>
       </div>
       {% include 'inc/panels/custom_fields.html' %}
 
+      <div class="card">
+        <h5 class="card-header">Assigned to group</h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Device types</th>
+            <td>
+                {% for typ in object.device_types.all %}
+                  {{ typ|linkify }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  {{ ''|placeholder }}
+                {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Module types</th>
+            <td>
+                {% for typ in object.module_types.all %}
+                  {{ typ|linkify }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  {{ ''|placeholder }}
+                {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Rack types</th>
+            <td>
+                {% for typ in object.rack_types.all %}
+                  {{ typ|linkify }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  {{ ''|placeholder }}
+                {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Inventory item types</th>
+            <td>
+                {% for typ in object.inventoryitem_types.all %}
+                  {{ typ|linkify }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  {{ ''|placeholder }}
+                {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Assets</th>
+            <td>
+                {% for asset in object.direct_assets.all %}
+                  {{ asset|linkify }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  {{ ''|placeholder }}
+                {% endfor %}
+            </td>
+          </tr>
+        </table>
+      </div>
 
-        <div class="card">
+      <div class="card">
         <h5 class="card-header">Asset count by status</h5>
         <table class="table table-hover object-list">
         <thead>
@@ -56,11 +111,11 @@
           </tr>
         </thead>
         <tbody>
-          {% for sc in status_counts.values %}
+          {% for sc in status_counts %}
           <tr>
             <td>{% badge value=sc.label bg_color=sc.color %}</td>
             <td>
-              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}&status={{ sc.value }}">
+              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_group_id={{ object.pk }}&status={{ sc.status }}">
                 {{ sc.count }}
               </a>
             </td>
@@ -77,30 +132,40 @@
         <table class="table table-hover object-list table-striped">
         <thead>
           <tr>
-            <th>Inventory Item Type</th>
+            <th>Kind</th>
+            <th>HW Type</th>
             <th>Status - Count</th>
           </tr>
         </thead>
         <tbody>
-          {% for tsc in type_status_objects %}
+          {% for typ, typ_status_count in type_status_objects %}
           <tr>
+            <td>{{ typ.kind }}</td>
             <td>
-              <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' tsc.inventoryitem_type %}">
-                {{ tsc.inventoryitem_type__manufacturer__name }} {{ tsc.inventoryitem_type__model }}
+              {% if typ.kind == 'inventoryitem' %}
+              <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' typ.hw_id %}">
+                {{ typ.hw_manufacturer }} {{ typ.hw_model }}
               </a>
+              {% else %}
+              <a href="{% url 'dcim:'|add:typ.kind|add:'type' typ.hw_id %}">
+                {{ typ.hw_manufacturer }} {{ typ.hw_model }}
+              </a>
+              {% endif %}
             </td>
             <td style="max-width:400px;">
               <div class="d-flex" style="overflow:auto;">
-                {% for status in tsc.status_list %}
-                  <a href="{% url 'plugins:netbox_inventory:asset_list' %}?inventoryitem_type_id={{ tsc.inventoryitem_type }}&status={{ status.status }}" class="w-100 me-2">
-                    {% badge value=status.label|add:' - '|add:status.count bg_color=status.color|add:' w-100' %}
+                                {% for status in typ_status_count %}
+                  <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{typ.kind}}_type_id={{ typ.hw_id }}&status={{ status.status }}" class="w-100 me-2">
+                    {% with count_str=status.count|stringformat:"i" %}
+                    {% badge value=status.label|add:' - '|add:count_str bg_color=status.color|add:' w-100' %}
+                    {% endwith %}
                   </a>
                 {% endfor %}
               </div>
             </td>
           </tr>
           {% empty %}
-          <tr><td class="text-center text-muted" colspan="2">— No assets found —</td></tr>
+          <tr><td class="text-center text-muted" colspan="3">— No assets found —</td></tr>
           {% endfor %}
         </tbody>
         </table>

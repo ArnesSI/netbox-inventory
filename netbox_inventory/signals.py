@@ -1,12 +1,13 @@
 import logging
 
-from django.db.models.signals import post_save, pre_delete, pre_save
+from django.db.models import Q
+from django.db.models.signals import m2m_changed, post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
 from dcim.models import Device, InventoryItem, Module, Rack
 from utilities.exceptions import AbortRequest
 
-from .models import Asset, Delivery
+from .models import Asset, Delivery, InventoryItemGroup
 from .utils import get_plugin_setting, get_status_for, is_equal_none
 
 logger = logging.getLogger('netbox.netbox_inventory.signals')
@@ -77,3 +78,23 @@ def handle_delivery_purchase_change(instance, created, **kwargs):
     """
     if not created:
         Asset.objects.filter(delivery=instance).update(purchase=instance.purchase)
+
+
+@receiver(m2m_changed, sender=InventoryItemGroup.device_types.through)
+@receiver(m2m_changed, sender=InventoryItemGroup.module_types.through)
+@receiver(m2m_changed, sender=InventoryItemGroup.rack_types.through)
+@receiver(m2m_changed, sender=InventoryItemGroup.inventoryitem_types.through)
+@receiver(m2m_changed, sender=InventoryItemGroup.direct_assets.through)
+def update_assigned_assets(sender, instance, action, reverse, model, pk_set, **kwargs):
+    """
+    After updating device,module... types assigned to group, we need to update
+    assets assigned to that group.
+    Note: does not handle updating relation in reverse (eg device_type.inventoryitem_groups.set())
+    """
+    if not reverse and action in ('post_add', 'post_remove', 'post_clear'):
+        query = Q(device_type__in=instance.device_types.all())
+        query |= Q(module_type__in=instance.module_types.all())
+        query |= Q(rack_type__in=instance.rack_types.all())
+        query |= Q(inventoryitem_type__in=instance.inventoryitem_types.all())
+        indirect_assets = Asset.objects.filter(query)
+        instance.assets.set(indirect_assets.union(instance.direct_assets.all()))

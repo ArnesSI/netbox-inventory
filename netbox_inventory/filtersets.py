@@ -210,13 +210,13 @@ class AssetFilterSet(NetBoxModelFilterSet):
         label='Inventory item type (model)',
     )
     inventoryitem_group_id = filters.TreeNodeMultipleChoiceFilter(
-        field_name='inventoryitem_type__inventoryitem_groups',
+        field_name='inventoryitem_groups',
         queryset=InventoryItemGroup.objects.all(),
         lookup_expr='in',
         label='Inventory item group (ID)',
     )
     inventoryitem_group_name = filters.MultiValueCharFilter(
-        field_name='inventoryitem_type__inventoryitem_groups__name',
+        field_name='inventoryitem_groups__name',
         lookup_expr='icontains',
         label='Inventory item group (name)',
     )
