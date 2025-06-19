@@ -1,7 +1,7 @@
 from dcim.models import Manufacturer
 from utilities.testing import ViewTestCases
 
-from netbox_inventory.models import InventoryItemGroup, InventoryItemType
+from netbox_inventory.models import InventoryItemType
 from netbox_inventory.tests.custom import ModelViewTestCase
 
 
@@ -21,7 +21,10 @@ class InventoryItemTypeTestCase(
             name='Manufacturer 2',
             slug='manufacturer2',
         )
-        inventoryitem_group1 = InventoryItemGroup.objects.create(name='IIG1')
+        manufacturer3 = Manufacturer.objects.create(
+            name='Manufacturer 3',
+            slug='manufacturer3',
+        )
         inventoryitemtype1 = InventoryItemType.objects.create(
             model='InventoryItemType 1',
             slug='inventoryitemtype1',
@@ -56,5 +59,5 @@ class InventoryItemTypeTestCase(
             f'{inventoryitemtype3.pk},{manufacturer2.name}',
         )
         cls.bulk_edit_data = {
-            'inventoryitem_group': inventoryitem_group1.pk,
+            'manufacturer': manufacturer3.pk,
         }
