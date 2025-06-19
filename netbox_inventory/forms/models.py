@@ -8,6 +8,7 @@ from utilities.forms.fields import (
     CommentField,
     ContentTypeChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
     JSONField,
     SlugField,
 )
@@ -44,6 +45,31 @@ class InventoryItemGroupForm(NetBoxModelForm):
         required=False,
         label='Parent',
     )
+    device_types = DynamicModelMultipleChoiceField(
+        queryset=DeviceType.objects.all(),
+        required=False,
+        label='Device Types',
+    )
+    module_types = DynamicModelMultipleChoiceField(
+        queryset=ModuleType.objects.all(),
+        required=False,
+        label='Module Types',
+    )
+    rack_types = DynamicModelMultipleChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack Types',
+    )
+    inventoryitem_types = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemType.objects.all(),
+        required=False,
+        label='Inventory Item Types',
+    )
+    direct_assets = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        label='Assets',
+    )
     comments = CommentField()
 
     fieldsets = (
@@ -54,6 +80,14 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'tags',
             name='Inventory Item Group',
         ),
+        FieldSet(
+            'device_types',
+            'module_types',
+            'inventoryitem_types',
+            'rack_types',
+            name='Types',
+        ),
+        FieldSet('direct_assets', name='Additional assets'),
     )
 
     class Meta:
@@ -62,6 +96,11 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'name',
             'parent',
             'description',
+            'device_types',
+            'module_types',
+            'rack_types',
+            'inventoryitem_types',
+            'direct_assets',
             'tags',
             'comments',
         )
@@ -69,11 +108,6 @@ class InventoryItemGroupForm(NetBoxModelForm):
 
 class InventoryItemTypeForm(NetBoxModelForm):
     slug = SlugField(slug_source='model')
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory item group',
-    )
     comments = CommentField()
 
     fieldsets = (
@@ -83,7 +117,6 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'slug',
             'description',
             'part_number',
-            'inventoryitem_group',
             'tags',
             name='Inventory Item Type',
         ),
@@ -97,7 +130,6 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'slug',
             'description',
             'part_number',
-            'inventoryitem_group',
             'tags',
             'comments',
         )

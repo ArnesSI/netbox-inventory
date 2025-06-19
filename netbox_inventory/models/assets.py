@@ -19,13 +19,48 @@ from .mixins import NamedModel
 
 class InventoryItemGroup(NestedGroupModel, NamedModel):
     """
-    Inventory Item Groups are groups of simmilar InventoryItemTypes.
+    Inventory Item Groups are groups of simmilar hardware types or assets.
     This allows you to, for example, have one Group for all your 10G-LR SFP
     pluggables, from different manufacturers/with different part numbers.
     Inventory Item Groups can be nested.
     """
 
     slug = None  # remove field that is defined on NestedGroupModel
+
+    device_types = models.ManyToManyField(
+        to='dcim.DeviceType',
+        related_name='inventoryitem_groups',
+        verbose_name='Device Types',
+        blank=True,
+    )
+    module_types = models.ManyToManyField(
+        to='dcim.ModuleType',
+        related_name='inventoryitem_groups',
+        verbose_name='Module Types',
+        blank=True,
+    )
+    rack_types = models.ManyToManyField(
+        to='dcim.RackType',
+        related_name='inventoryitem_groups',
+        verbose_name='Rack Types',
+        blank=True,
+    )
+    inventoryitem_types = models.ManyToManyField(
+        to='netbox_inventory.InventoryItemType',
+        related_name='inventoryitem_groups',
+        verbose_name='Inventory Item Types',
+        blank=True,
+    )
+    assets = models.ManyToManyField(
+        to='netbox_inventory.Asset',
+        related_name='inventoryitem_groups',
+        blank=True,
+    )
+    direct_assets = models.ManyToManyField(
+        to='netbox_inventory.Asset',
+        related_name='direct',
+        blank=True,
+    )
 
     class Meta:
         ordering = ['name']
@@ -66,14 +101,6 @@ class InventoryItemType(NamedModel, ImageAttachmentsMixin):
         blank=True,
         help_text='Discrete part number (optional)',
         verbose_name='Part Number',
-    )
-    inventoryitem_group = models.ForeignKey(
-        to='netbox_inventory.InventoryItemGroup',
-        on_delete=models.SET_NULL,
-        related_name='inventoryitem_types',
-        blank=True,
-        null=True,
-        verbose_name='Inventory Item Group',
     )
 
     clone_fields = [
@@ -164,7 +191,7 @@ class Asset(NamedModel, ImageAttachmentsMixin):
     inventoryitem_type = models.ForeignKey(
         to='netbox_inventory.InventoryItemType',
         on_delete=models.PROTECT,
-        related_name='+',
+        related_name='assets',
         blank=True,
         null=True,
         verbose_name='Inventory Item Type',

@@ -1,7 +1,7 @@
 from dcim.models import Manufacturer
 from utilities.testing import APIViewTestCases
 
-from ...models import InventoryItemGroup, InventoryItemType
+from ...models import InventoryItemType
 from ..custom import APITestCase
 
 
@@ -29,7 +29,9 @@ class InventoryItemTypeTest(
         manufacturer1 = Manufacturer.objects.create(
             name='Manufacturer 1', slug='manufacturer1'
         )
-        ig1 = InventoryItemGroup.objects.create(name='IG1')
+        manufacturer2 = Manufacturer.objects.create(
+            name='Manufacturer 2', slug='manufacturer2'
+        )
         InventoryItemType.objects.create(
             model='InventoryItemType 1',
             slug='inventoryitemtype1',
@@ -63,5 +65,5 @@ class InventoryItemTypeTest(
             },
         ]
         cls.bulk_update_data = {
-            'inventoryitem_group': ig1.pk,
+            'manufacturer': manufacturer2.pk,
         }

@@ -10,6 +10,7 @@ from utilities.forms import BulkEditForm, add_blank_choice
 from utilities.forms.fields import (
     CommentField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
 )
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import BulkEditNullBooleanSelect, DatePicker
@@ -42,6 +43,26 @@ class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
         max_length=200,
         required=False,
     )
+    device_types = DynamicModelMultipleChoiceField(
+        queryset=DeviceType.objects.all(),
+        required=False,
+        label='Device Types',
+    )
+    module_types = DynamicModelMultipleChoiceField(
+        queryset=ModuleType.objects.all(),
+        required=False,
+        label='Module Types',
+    )
+    inventoryitem_types = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemType.objects.all(),
+        required=False,
+        label='Inventory Item Types',
+    )
+    rack_types = DynamicModelMultipleChoiceField(
+        queryset=RackType.objects.all(),
+        required=False,
+        label='Rack Types',
+    )
     comments = CommentField(
         required=False,
     )
@@ -51,11 +72,19 @@ class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
         FieldSet(
             'parent',
             'description',
+            'device_types',
+            'module_types',
+            'inventoryitem_types',
+            'rack_types',
         ),
     )
     nullable_fields = (
         'parent',
         'description',
+        'device_types',
+        'module_types',
+        'inventoryitem_types',
+        'rack_types',
     )
 
 
@@ -64,11 +93,6 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Manufacturer.objects.all(),
         required=False,
         label='Manufacturer',
-    )
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory Item Group',
     )
     description = forms.CharField(
         max_length=200,
@@ -82,13 +106,11 @@ class InventoryItemTypeBulkEditForm(NetBoxModelBulkEditForm):
     fieldsets = (
         FieldSet(
             'manufacturer',
-            'inventoryitem_group',
             'description',
             name='Inventory Item Type',
         ),
     )
     nullable_fields = (
-        'inventoryitem_group',
         'description',
         'comments',
     )

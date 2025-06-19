@@ -57,12 +57,6 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
         help_text='Manufacturer. It must exist before import.',
         required=True,
     )
-    inventoryitem_group = CSVModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        to_field_name='name',
-        help_text='Group of inventory item types. It must exist before import.',
-        required=False,
-    )
 
     class Meta:
         model = InventoryItemType
@@ -72,7 +66,6 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
             'manufacturer',
             'description',
             'part_number',
-            'inventoryitem_group',
             'comments',
             'tags',
         )
