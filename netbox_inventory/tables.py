@@ -38,11 +38,6 @@ class InventoryItemGroupTable(NetBoxTable):
         url_params={'inventoryitem_group_id': 'pk'},
         verbose_name='Assets',
     )
-    inventoryitem_type_count = columns.LinkedCountColumn(
-        viewname='plugins:netbox_inventory:inventoryitemtype_list',
-        url_params={'inventoryitem_group_id': 'pk'},
-        verbose_name='Inventory Item Type Count',
-    )
     comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
 
@@ -59,12 +54,10 @@ class InventoryItemGroupTable(NetBoxTable):
             'last_updated',
             'actions',
             'asset_count',
-            'inventoryitem_type_count',
         )
         default_columns = (
             'name',
             'asset_count',
-            'inventoryitem_type_count',
         )
 
 
