@@ -20,40 +20,6 @@ from .nested import *
 from netbox_inventory.models import Asset, InventoryItemGroup, InventoryItemType
 
 
-class InventoryItemGroupSerializer(NestedGroupModelSerializer):
-    parent = NestedInventoryItemGroupSerializer(
-        required=False, allow_null=True, default=None
-    )
-    inventoryitem_types = SerializedPKRelatedField(
-        queryset=InventoryItemType.objects.all(),
-        serializer=InventoryItemTypeSerializer,
-        nested=True,
-        required=False,
-        many=True,
-    )
-    asset_count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = InventoryItemGroup
-        fields = (
-            'id',
-            'url',
-            'display',
-            'name',
-            'parent',
-            'description',
-            'inventoryitem_types',
-            'comments',
-            'tags',
-            'custom_fields',
-            'created',
-            'last_updated',
-            'asset_count',
-            '_depth',
-        )
-        brief_fields = ('id', 'url', 'display', 'name', 'description', '_depth')
-
-
 class InventoryItemTypeSerializer(NetBoxModelSerializer):
     manufacturer = ManufacturerSerializer(nested=True)
     inventoryitem_groups = NestedInventoryItemGroupSerializer(
@@ -89,6 +55,40 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
             'slug',
             'description',
         )
+
+
+class InventoryItemGroupSerializer(NestedGroupModelSerializer):
+    parent = NestedInventoryItemGroupSerializer(
+        required=False, allow_null=True, default=None
+    )
+    inventoryitem_types = SerializedPKRelatedField(
+        queryset=InventoryItemType.objects.all(),
+        serializer=InventoryItemTypeSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
+    asset_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'parent',
+            'description',
+            'inventoryitem_types',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+            'asset_count',
+            '_depth',
+        )
+        brief_fields = ('id', 'url', 'display', 'name', 'description', '_depth')
 
 
 class AssetSerializer(NetBoxModelSerializer):
