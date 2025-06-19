@@ -164,7 +164,7 @@ class Asset(NamedModel, ImageAttachmentsMixin):
     inventoryitem_type = models.ForeignKey(
         to='netbox_inventory.InventoryItemType',
         on_delete=models.PROTECT,
-        related_name='+',
+        related_name='assets',
         blank=True,
         null=True,
         verbose_name='Inventory Item Type',
