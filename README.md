@@ -158,7 +158,7 @@ class AuditReportMissing(Script):
 
 ## Compatibility
 
-This plugin requires netbox version 4.2 to work. Older versions of the plugin
+This plugin requires netbox version 4.3 to work. Older versions of the plugin
 support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
@@ -167,6 +167,7 @@ support older netbox version as per table below:
 |       4.0      |      2.0.x     |
 |       4.1      |  2.1.x,2.2.x   |
 |       4.2      |      2.3.x     |
+|       4.3      |      2.4.x     |
 
 ## Installing
 

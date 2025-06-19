@@ -171,7 +171,7 @@ class AssetForm(NetBoxModelForm):
         label='Contact Group',
         help_text='Filter contacts by group',
         initial_params={
-            'contacts': '$contact',
+            'contact': '$contact',
         },
     )
     contact = DynamicModelChoiceField(
@@ -364,7 +364,7 @@ class DeliveryForm(NetBoxModelForm):
         label='Contact Group',
         help_text='Filter receiving contacts by group',
         initial_params={
-            'contacts': '$receiving_contact',
+            'contact': '$receiving_contact',
         },
     )
     receiving_contact = DynamicModelChoiceField(
