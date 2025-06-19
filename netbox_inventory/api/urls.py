@@ -23,6 +23,8 @@ router.register('deliveries', views.DeliveryViewSet)
 router.register('audit-flows', views.AuditFlowViewSet)
 router.register('audit-flowpages', views.AuditFlowPageViewSet)
 router.register('audit-flowpage-assignments', views.AuditFlowPageAssignmentViewSet)
+router.register('audit-trail-sources', views.AuditTrailSourceViewSet)
+router.register('audit-trails', views.AuditTrailViewSet)
 
 
 urlpatterns = router.urls

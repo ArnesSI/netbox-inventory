@@ -3,15 +3,26 @@ from itertools import product
 from typing import Any
 from urllib.parse import urlencode
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Model, QuerySet
+from django.db.models import (
+    Model,
+    OuterRef,
+    QuerySet,
+    Subquery,
+)
 from django.forms.models import ModelChoiceField
-from django.http import HttpRequest
-from django.shortcuts import get_object_or_404
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import resolve, reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_tables2 import TemplateColumn
 
+from core.models import ObjectType
 from dcim.models import Location, Rack, Site
+from netbox.plugins import get_plugin_config
+from netbox.tables import NetBoxTable
 from netbox.views import generic
 from utilities.query import dict_to_filter_params
 from utilities.views import ViewTab, get_viewname, register_model_view
@@ -185,6 +196,75 @@ class AuditFlowRunView(generic.ObjectChildrenView):
 
         return queryset
 
+    def prep_table_data(
+        self,
+        request: HttpRequest,
+        queryset: QuerySet,
+        parent: models.AuditFlow,
+    ) -> QuerySet:
+        """
+        Annotate the `queryset` with `AuditTrail` data if available.
+        """
+        # Create a timeframe to select applicable audit trails. This allows users to see
+        # an item as audited in that timeframe, eliminating duplicate work.
+        timeframe = timezone.now() - timezone.timedelta(
+            minutes=get_plugin_config('netbox_inventory', 'audit_window'),
+        )
+
+        object_type = ObjectType.objects.get_for_model(self.child_model)
+        return queryset.annotate(
+            audit_trail=Subquery(
+                models.AuditTrail.objects.filter(
+                    object_type=object_type,
+                    object_id=OuterRef('pk'),
+                    created__gte=timeframe,
+                ).values('id')[:1]
+            ),
+        )
+
+    def get_table(
+        self,
+        data: QuerySet,
+        request: HttpRequest,
+        bulk_actions: bool = True,
+    ) -> NetBoxTable:
+        # Extend the default object table with an additional column for marking objects
+        # as seen/unseen and viewing their current audit trail status.
+        extra_columns = [
+            (
+                'audit_trail_seen',
+                TemplateColumn(
+                    template_name='netbox_inventory/inc/buttons/audittrail_seen.html',
+                    verbose_name='',  # No header like actions column
+                    attrs={
+                        'td': {
+                            'class': 'w-1',
+                        },
+                    },
+                ),
+            ),
+        ]
+        table: NetBoxTable = self.table(
+            data,
+            user=request.user,
+            extra_columns=extra_columns,
+        )
+
+        # Show newly created column and rearrange it to its static position. Users will
+        # not be able to show/hide the column or change its position.
+        table.columns.show('audit_trail_seen')
+        table.exempt_columns += ('audit_trail_seen',)
+        table.sequence.remove('audit_trail_seen')
+        table.sequence.insert(1, 'audit_trail_seen')
+
+        # Configure the table like a normal NetBoxTable. The code has to be copied here,
+        # because calling super() would initialize the table and make it impossible to
+        # change columns.
+        if 'pk' in table.base_columns and bulk_actions:
+            table.columns.show('pk')
+        table.configure(request)
+        return table
+
     def get_prefill_location_params(self) -> dict[str, int]:
         """
         Get object form parameters related to the location of a running audit flow.
@@ -325,3 +405,70 @@ class AuditFlowRunView(generic.ObjectChildrenView):
             'start_object': self.start_object,
             'buttons': self.get_buttons(),
         }
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Automatically mark objects as seen based on filterset evaluation.
+        """
+        instance = self.get_object(**kwargs)
+        child_objects = self.get_children(request, instance)
+
+        if self.filterset:
+            # Check the filterset of the current audit flow page. If it returns only a
+            # single result, there is an exact object match and the object can be marked
+            # as seen, i.e. an audit trail can be created.
+            qs = self.filterset(request.POST, child_objects, request=request).qs
+            if len(qs) == 1:
+                obj = qs.first()
+                models.AuditTrail.objects.create(object=obj)
+                messages.success(
+                    request,
+                    _('Marked {object} as seen').format(object=obj),
+                )
+
+                return self.get(request, *args, **kwargs)
+
+            # If the filterset returns a single object for the entire model queryset,
+            # the object appears to exist but is not documented at the current audit
+            # flow location. The user is redirected to its edit form to change its
+            # location.
+            #
+            # NOTE: The object's location won't be changed automatically because
+            #       dependent fields may require additional changes. However, available
+            #       metadata will be pre-populated, just as when adding new items.
+            qs = self.filterset(
+                request.POST,
+                self.child_model.objects.all(),
+                request=request,
+            ).qs
+            if len(qs) == 1:
+                obj = qs.first()
+                messages.info(
+                    request,
+                    _(
+                        '{object} does not match audit location. Please edit the '
+                        'object accordingly.'
+                    ).format(object=obj),
+                )
+
+                location_params = self.get_prefill_location_params()
+                return redirect(
+                    reverse(
+                        get_viewname(self.child_model, 'edit'),
+                        kwargs={'pk': obj.pk},
+                    )
+                    + '?'
+                    + urlencode(
+                        {
+                            **location_params,
+                            'return_url': request.get_full_path(),
+                        }
+                    )
+                )
+
+        # Fallback: If no matching object can be found, a warning is displayed. However,
+        # the user is not redirected to the add view of the object, as there may be
+        # multiple options to create it, or maybe it shouldn't be added to NetBox at
+        # all.
+        messages.error(request, _('No matching object found'))
+        return self.get(request, *args, **kwargs)

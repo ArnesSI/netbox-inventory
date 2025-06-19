@@ -15,6 +15,7 @@ __all__ = (
     'AuditFlowPageAssignmentTable',
     'AuditFlowPageTable',
     'AuditFlowTable',
+    'AuditTrailTable',
     'SupplierTable',
     'PurchaseTable',
     'DeliveryTable',
@@ -568,7 +569,9 @@ class BaseFlowTable(NetBoxTable):
     name = tables.Column(
         linkify=True,
     )
-    object_type = columns.ContentTypeColumn()
+    object_type = columns.ContentTypeColumn(
+        verbose_name=_('Object Type'),
+    )
 
     class Meta(NetBoxTable.Meta):
         fields = (
@@ -630,6 +633,87 @@ class AuditFlowPageAssignmentTable(NetBoxTable):
             'flow',
             'page',
             'weight',
+        )
+
+
+class AuditTrailSourceTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditTrailSource
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'description',
+            'lifetime',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'lifetime',
+        )
+
+
+class AuditTrailTable(NetBoxTable):
+    object_type = columns.ContentTypeColumn(
+        verbose_name=_('Object Type'),
+    )
+    object = tables.Column(
+        verbose_name=_('Object'),
+        linkify=True,
+        orderable=False,
+    )
+    source = tables.Column(
+        linkify=True,
+    )
+    created = columns.DateTimeColumn(
+        verbose_name=_('Time'),
+        timespec='minutes',
+    )
+    actions = columns.ActionsColumn(
+        actions=('delete',),
+    )
+
+    # Access the audit user via the first associated object change.
+    auditor_user = tables.Column(
+        accessor=tables.A('object_changes__first__user'),
+        verbose_name=_('Auditor'),
+        linkify=True,
+        order_by=('object_change__user'),
+    )
+    auditor_full_name = tables.Column(
+        accessor=tables.A('object_changes__first__user__get_full_name'),
+        verbose_name=_('Auditor Name'),
+        linkify=True,
+        orderable=False,
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = AuditTrail
+        fields = (
+            'pk',
+            'id',
+            'object_type',
+            'object',
+            'auditor_user',
+            'auditor_full_name',
+            'source',
+            'created',
+            'last_changed',
+            'actions',
+        )
+        default_columns = (
+            'pk',
+            'created',
+            'object_type',
+            'object',
+            'auditor_user',
+            'auditor_full_name',
+            'source',
         )
 
 

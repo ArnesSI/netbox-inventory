@@ -25,7 +25,7 @@ from utilities.forms.fields import (
     TagFilterField,
 )
 from utilities.forms.rendering import FieldSet
-from utilities.forms.widgets import DatePicker
+from utilities.forms.widgets import DatePicker, DateTimePicker
 
 from ..choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from ..models import *
@@ -34,6 +34,8 @@ __all__ = (
     'AssetFilterForm',
     'AuditFlowFilterForm',
     'AuditFlowPageFilterForm',
+    'AuditTrailFilterForm',
+    'AuditTrailSourceFilterForm',
     'DeliveryFilterForm',
     'InventoryItemGroupFilterForm',
     'InventoryItemTypeFilterForm',
@@ -518,6 +520,46 @@ class AuditFlowFilterForm(BaseFlowFilterForm):
         FieldSet('q', 'filter_id', 'tag'),
         FieldSet(
             'object_type_id',
+            name='Assignment',
+        ),
+    )
+
+
+class AuditTrailSourceFilterForm(NetBoxModelFilterSetForm):
+    model = AuditTrailSource
+
+    fields = (FieldSet('q', 'filter_id', 'tag'),)
+
+
+class AuditTrailFilterForm(BaseFlowFilterForm):
+    model = AuditTrail
+
+    source_id = DynamicModelMultipleChoiceField(
+        queryset=AuditTrailSource.objects.all(),
+        required=False,
+        label='Source',
+    )
+    created__gte = forms.DateTimeField(
+        required=False,
+        label=_('After'),
+        widget=DateTimePicker(),
+    )
+    created__lt = forms.DateTimeField(
+        required=False,
+        label=_('Before'),
+        widget=DateTimePicker(),
+    )
+
+    fieldsets = (
+        FieldSet('q', 'filter_id'),
+        FieldSet(
+            'created__gte',
+            'created__lt',
+            name=_('Time'),
+        ),
+        FieldSet(
+            'object_type_id',
+            'source_id',
             name='Assignment',
         ),
     )

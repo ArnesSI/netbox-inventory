@@ -1,0 +1,24 @@
+{% load helpers %}
+{% load perms %}
+
+{% if not record.audit_trail %}
+  {% if perms.netbox_inventory.add_audittrail %}
+    <button type="submit"
+      {% formaction %}="{% url 'plugins:netbox_inventory:audittrail_bulk_add' %}?return_url={{ return_url | urlencode }}"
+      name="pk"
+      value="{{ record.pk }}"
+      class="btn btn-sm btn-primary"
+    >
+      <i class="mdi mdi-eye" aria-hidden="true"></i>
+    </button>
+  {% endif %}
+{% else %}
+  {% if perms.netbox_inventory.delete_audittrail %}
+    <a
+      href="{% url 'plugins:netbox_inventory:audittrail_delete' pk=record.audit_trail %}?return_url={{ return_url | urlencode }}"
+      class="btn btn-sm btn-outline-primary"
+    >
+      <i class="mdi mdi-eye" aria-hidden="true"></i>
+    </a>
+  {% endif %}
+{% endif %}
