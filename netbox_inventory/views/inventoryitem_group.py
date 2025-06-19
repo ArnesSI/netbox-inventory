@@ -27,6 +27,7 @@ class InventoryItemGroupView(generic.ObjectView):
             models.Asset.objects.filter(
                 inventoryitem_groups__in=instance.get_descendants(include_self=True)
             )
+            .distinct()
             .prefetch_related('inventoryitem_groups')
             .select_related(
                 'device_type', 'module_type', 'rack_type', 'inventoryitem_type'

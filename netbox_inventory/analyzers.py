@@ -33,7 +33,7 @@ def asset_counts_type_status(assets, inventoryitem_group=None):  # noqa: C901
             'status',
         )
         .annotate(
-            count=Count('pk'),
+            count=Count('id', distinct=True),
             kind=Case(
                 When(device_type__isnull=False, then=Value('device')),
                 When(module_type__isnull=False, then=Value('module')),
@@ -114,6 +114,7 @@ def asset_counts_type_status(assets, inventoryitem_group=None):  # noqa: C901
         for missing_status in all_statuses - seen_statues:
             zero_counts.append(_generate_entry(type_status_count, missing_status))
 
+    # add hw types with no assets
     hw_types = (
         ('device', DeviceType),
         ('module', ModuleType),
@@ -145,6 +146,7 @@ def asset_counts_type_status(assets, inventoryitem_group=None):  # noqa: C901
                     'hw_manufacturer',
                     'hw_model',
                 )
+                .distinct()
             )
             for hw_type in hw_types:
                 for status in all_statuses:
