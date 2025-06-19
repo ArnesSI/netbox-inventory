@@ -8,7 +8,12 @@ from dcim.models import Device, InventoryItem, Module, Rack
 from utilities.exceptions import AbortRequest
 
 from .models import Asset, Delivery, InventoryItemGroup
-from .utils import get_plugin_setting, get_status_for, is_equal_none
+from .utils import (
+    get_plugin_setting,
+    get_prechange_field,
+    get_status_for,
+    is_equal_none,
+)
 
 logger = logging.getLogger('netbox.netbox_inventory.signals')
 
@@ -85,7 +90,7 @@ def handle_delivery_purchase_change(instance, created, **kwargs):
 @receiver(m2m_changed, sender=InventoryItemGroup.rack_types.through)
 @receiver(m2m_changed, sender=InventoryItemGroup.inventoryitem_types.through)
 @receiver(m2m_changed, sender=InventoryItemGroup.direct_assets.through)
-def update_assigned_assets(sender, instance, action, reverse, model, pk_set, **kwargs):
+def update_group_assigned_assets(instance, action, reverse, **kwargs):
     """
     After updating device,module... types assigned to group, we need to update
     assets assigned to that group.
@@ -98,3 +103,35 @@ def update_assigned_assets(sender, instance, action, reverse, model, pk_set, **k
         query |= Q(inventoryitem_type__in=instance.inventoryitem_types.all())
         indirect_assets = Asset.objects.filter(query)
         instance.assets.set(indirect_assets.union(instance.direct_assets.all()))
+
+
+@receiver(post_save, sender=Asset)
+def update_asset_assign_groups(instance, **kwargs):
+    """
+    When a new asset is created add it to inventory item groups as needed
+    based on inventory item group hw types
+    """
+    type_names = ('device_type', 'module_type', 'rack_type', 'inventoryitem_type')
+    groups_add = set()
+    groups_remove = set()
+    for type_name in type_names:
+        new_type = getattr(instance, type_name, None)
+        old_type = get_prechange_field(instance, type_name)
+        if old_type and old_type != new_type:
+            # existing asset updated hw_type
+            groups_remove.update(list(old_type.inventoryitem_groups.all()))
+        if new_type and old_type != new_type:
+            # existing asset updated hw_type OR new asset created
+            groups_add.update(list(new_type.inventoryitem_groups.all()))
+    # remove elements that are in both groups_add & groups_remove
+    # we don't need to change assets in those
+    groups_both = groups_add.intersection(groups_remove)
+    groups_add.difference_update(groups_both)
+    groups_remove.difference_update(groups_both)
+    # do the changes to groups
+    for group in groups_remove:
+        group.snapshot()
+        group.assets.remove(instance)
+    for group in groups_add:
+        group.snapshot()
+        group.assets.add(instance)
