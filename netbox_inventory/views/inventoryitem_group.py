@@ -5,6 +5,7 @@ from utilities.views import register_model_view
 
 from .. import filtersets, forms, models, tables
 from ..analyzers import asset_counts_status, asset_counts_type_status
+from ..choices import AssetStatusChoices
 
 __all__ = (
     'InventoryItemGroupView',
@@ -61,6 +62,7 @@ class InventoryItemGroupView(generic.ObjectView):
             'assets': assets,
             'status_counts': status_counts,
             'type_status_objects': type_status_objects,
+            'status_choices': AssetStatusChoices.CHOICES,
         }
 
 

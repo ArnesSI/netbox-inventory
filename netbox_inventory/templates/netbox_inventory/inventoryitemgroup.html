@@ -123,49 +123,6 @@
         </table>
       </div>
 
-      <div class="card">
-        <h5 class="card-header">Asset count by type & status</h5>
-        <table class="table table-hover object-list table-striped">
-        <thead>
-          <tr>
-            <th>Kind</th>
-            <th>HW Type</th>
-            <th>Status - Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for typ, typ_status_count in type_status_objects %}
-          <tr>
-            <td>{{ typ.kind }}</td>
-            <td>
-              {% if typ.kind == 'inventoryitem' %}
-              <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' typ.hw_id %}">
-                {{ typ.hw_manufacturer }} {{ typ.hw_model }}
-              </a>
-              {% else %}
-              <a href="{% url 'dcim:'|add:typ.kind|add:'type' typ.hw_id %}">
-                {{ typ.hw_manufacturer }} {{ typ.hw_model }}
-              </a>
-              {% endif %}
-            </td>
-            <td style="max-width:400px;">
-              <div class="d-flex" style="overflow:auto;">
-                                {% for status in typ_status_count %}
-                  <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{typ.kind}}_type_id={{ typ.hw_id }}&status={{ status.status }}" class="w-100 me-2">
-                    {% with count_str=status.count|stringformat:"i" %}
-                    {% badge value=status.label|add:' - '|add:count_str bg_color=status.color|add:' w-100' %}
-                    {% endwith %}
-                  </a>
-                {% endfor %}
-              </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr><td class="text-center text-muted" colspan="3">— No assets found —</td></tr>
-          {% endfor %}
-        </tbody>
-        </table>
-      </div>
       {% plugin_left_page object %}
     </div>
     <div class="col col-md-6">
@@ -189,6 +146,50 @@
   </div>
   <div class="row mb-3">
     <div class="col col-md-12">
+
+      <div class="card">
+        <h5 class="card-header">Asset count by type & status</h5>
+        <table class="table table-hover object-list table-striped">
+        <thead>
+          <tr>
+            <th>Kind</th>
+            <th>HW Type</th>
+            {% for status in status_choices %}
+              <th>{% badge value=status.1 bg_color=status.2 %}</th>
+            {% endfor %}
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for typ, typ_status_count in type_status_objects %}
+          <tr>
+            <td>{{ typ.kind }}</td>
+            <td>
+              {% if typ.kind == 'inventoryitem' %}
+              <a href="{% url 'plugins:netbox_inventory:inventoryitemtype' typ.hw_id %}">
+                {{ typ.hw_manufacturer }} {{ typ.hw_model }}
+              </a>
+              {% else %}
+              <a href="{% url 'dcim:'|add:typ.kind|add:'type' typ.hw_id %}">
+                {{ typ.hw_manufacturer }} {{ typ.hw_model }}
+              </a>
+              {% endif %}
+            </td>
+            {% for status in typ_status_count %}
+            <td>
+              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?{{typ.kind}}_type_id={{ typ.hw_id }}{% if status.status %}&status={{ status.status }}{% endif %}">
+                {% badge value=status.count bg_color=status.count|yesno:"primary,secondary" show_empty=True %}
+              </a>
+            </td>
+            {% endfor %}
+          </tr>
+          {% empty %}
+          <tr><td class="text-center text-muted" colspan="100%">— No assets found —</td></tr>
+          {% endfor %}
+        </tbody>
+        </table>
+      </div>
+
       <div class="card">
         <h5 class="card-header">Assets</h5>
         {% htmx_table 'plugins:netbox_inventory:asset_list' inventoryitem_group_id=object.pk %}
