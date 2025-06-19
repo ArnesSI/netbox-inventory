@@ -648,14 +648,10 @@ class AuditTrailSourceTable(NetBoxTable):
             'id',
             'name',
             'description',
-            'lifetime',
             'comments',
             'actions',
         )
-        default_columns = (
-            'name',
-            'lifetime',
-        )
+        default_columns = ('name',)
 
 
 class AuditTrailTable(NetBoxTable):
