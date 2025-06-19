@@ -31,7 +31,7 @@ class InventoryItemGroupViewSet(NetBoxModelViewSet):
     queryset = models.InventoryItemGroup.objects.add_related_count(
         models.InventoryItemGroup.objects.all(),
         models.Asset,
-        'inventoryitem_type__inventoryitem_group',
+        'inventoryitem_type__inventoryitem_groups',
         'asset_count',
         cumulative=True,
     ).prefetch_related('tags')

@@ -27,6 +27,13 @@ class InventoryItemGroup(NestedGroupModel, NamedModel):
 
     slug = None  # remove field that is defined on NestedGroupModel
 
+    inventoryitem_types = models.ManyToManyField(
+        to='netbox_inventory.InventoryItemType',
+        related_name='inventoryitem_groups',
+        verbose_name='Inventory Item Types',
+        blank=True,
+    )
+
     class Meta:
         ordering = ['name']
         constraints = (
@@ -66,14 +73,6 @@ class InventoryItemType(NamedModel, ImageAttachmentsMixin):
         blank=True,
         help_text='Discrete part number (optional)',
         verbose_name='Part Number',
-    )
-    inventoryitem_group = models.ForeignKey(
-        to='netbox_inventory.InventoryItemGroup',
-        on_delete=models.SET_NULL,
-        related_name='inventoryitem_types',
-        blank=True,
-        null=True,
-        verbose_name='Inventory Item Group',
     )
 
     clone_fields = [

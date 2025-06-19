@@ -20,11 +20,11 @@ class InventoryItemGroupView(generic.ObjectView):
     queryset = models.InventoryItemGroup.objects.all()
 
     def get_extra_context(self, request, instance):
-        # build a table fo child groups with asset count
+        # build a table of child groups with asset count
         child_groups = models.InventoryItemGroup.objects.add_related_count(
             models.InventoryItemGroup.objects.all(),
             models.Asset,
-            'inventoryitem_type__inventoryitem_group',
+            'inventoryitem_type__inventoryitem_groups',
             'asset_count',
             cumulative=True,
         )
@@ -32,7 +32,7 @@ class InventoryItemGroupView(generic.ObjectView):
             models.InventoryItemGroup.objects.add_related_count(
                 child_groups,
                 models.InventoryItemType,
-                'inventoryitem_group',
+                'inventoryitem_groups',
                 'inventoryitem_type_count',
                 cumulative=True,
             )
@@ -43,7 +43,7 @@ class InventoryItemGroupView(generic.ObjectView):
         child_groups_table.columns.hide('actions')
         # get all assets from this group and its descendants
         assets = models.Asset.objects.restrict(request.user, 'view').filter(
-            inventoryitem_type__inventoryitem_group__in=instance.get_descendants(
+            inventoryitem_type__inventoryitem_groups__in=instance.get_descendants(
                 include_self=True
             )
         )
@@ -109,14 +109,14 @@ class InventoryItemGroupListView(generic.ObjectListView):
     queryset = models.InventoryItemGroup.objects.add_related_count(
         models.InventoryItemGroup.objects.all(),
         models.Asset,
-        'inventoryitem_type__inventoryitem_group',
+        'inventoryitem_type__inventoryitem_groups',
         'asset_count',
         cumulative=True,
     )
     queryset = models.InventoryItemGroup.objects.add_related_count(
         queryset,
         models.InventoryItemType,
-        'inventoryitem_group',
+        'inventoryitem_groups',
         'inventoryitem_type_count',
         cumulative=True,
     )

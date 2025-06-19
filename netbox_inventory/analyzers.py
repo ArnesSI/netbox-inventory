@@ -22,7 +22,7 @@ def asset_counts_type_status(inventoryitem_group, assets=None):  # noqa: C901
     if assets is None:
         assets = Asset.objects.all()
     assets = assets.filter(
-        inventoryitem_type__inventoryitem_group__in=inventoryitem_group.get_descendants(
+        inventoryitem_type__inventoryitem_groups__in=inventoryitem_group.get_descendants(
             include_self=True
         )
     )

@@ -8,6 +8,7 @@ from utilities.forms.fields import (
     CommentField,
     ContentTypeChoiceField,
     DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
     JSONField,
     SlugField,
 )
@@ -44,6 +45,11 @@ class InventoryItemGroupForm(NetBoxModelForm):
         required=False,
         label='Parent',
     )
+    inventoryitem_types = DynamicModelMultipleChoiceField(
+        queryset=InventoryItemType.objects.all(),
+        required=False,
+        label='Inventory Item Types',
+    )
     comments = CommentField()
 
     fieldsets = (
@@ -54,6 +60,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'tags',
             name='Inventory Item Group',
         ),
+        FieldSet('inventoryitem_types', name='Types'),
     )
 
     class Meta:
@@ -62,6 +69,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'name',
             'parent',
             'description',
+            'inventoryitem_types',
             'tags',
             'comments',
         )
@@ -69,11 +77,6 @@ class InventoryItemGroupForm(NetBoxModelForm):
 
 class InventoryItemTypeForm(NetBoxModelForm):
     slug = SlugField(slug_source='model')
-    inventoryitem_group = DynamicModelChoiceField(
-        queryset=InventoryItemGroup.objects.all(),
-        required=False,
-        label='Inventory item group',
-    )
     comments = CommentField()
 
     fieldsets = (
@@ -83,7 +86,6 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'slug',
             'description',
             'part_number',
-            'inventoryitem_group',
             'tags',
             name='Inventory Item Type',
         ),
@@ -97,7 +99,6 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'slug',
             'description',
             'part_number',
-            'inventoryitem_group',
             'tags',
             'comments',
         )

@@ -11,6 +11,7 @@ from dcim.api.serializers import (
     RackSerializer,
     RackTypeSerializer,
 )
+from netbox.api.fields import SerializedPKRelatedField
 from netbox.api.serializers import NestedGroupModelSerializer, NetBoxModelSerializer
 from tenancy.api.serializers import ContactSerializer, TenantSerializer
 
@@ -23,6 +24,13 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
     parent = NestedInventoryItemGroupSerializer(
         required=False, allow_null=True, default=None
     )
+    inventoryitem_types = SerializedPKRelatedField(
+        queryset=InventoryItemType.objects.all(),
+        serializer=InventoryItemTypeSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
     asset_count = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -34,6 +42,7 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
             'name',
             'parent',
             'description',
+            'inventoryitem_types',
             'comments',
             'tags',
             'custom_fields',
@@ -47,8 +56,8 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
 
 class InventoryItemTypeSerializer(NetBoxModelSerializer):
     manufacturer = ManufacturerSerializer(nested=True)
-    inventoryitem_group = InventoryItemGroupSerializer(
-        nested=True, required=False, allow_null=True, default=None
+    inventoryitem_groups = NestedInventoryItemGroupSerializer(
+        nested=True, read_only=True, many=True
     )
     asset_count = serializers.IntegerField(read_only=True)
 
@@ -62,7 +71,7 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
             'slug',
             'manufacturer',
             'part_number',
-            'inventoryitem_group',
+            'inventoryitem_groups',
             'description',
             'comments',
             'tags',
