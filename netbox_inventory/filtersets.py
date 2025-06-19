@@ -220,6 +220,11 @@ class AssetFilterSet(NetBoxModelFilterSet):
         lookup_expr='icontains',
         label='Inventory item group (name)',
     )
+    direct_group_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='direct',
+        queryset=InventoryItemGroup.objects.all(),
+        label='Inventory item group (direct assignment)',
+    )
     inventoryitem_role_id = django_filters.ModelMultipleChoiceFilter(
         field_name='inventoryitem__role',
         queryset=InventoryItemRole.objects.all(),

@@ -58,7 +58,7 @@ class InventoryItemGroup(NestedGroupModel, NamedModel):
     )
     direct_assets = models.ManyToManyField(
         to='netbox_inventory.Asset',
-        related_name='+',
+        related_name='direct',
         blank=True,
     )
 

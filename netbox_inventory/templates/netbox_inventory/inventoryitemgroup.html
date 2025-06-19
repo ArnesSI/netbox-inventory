@@ -91,11 +91,7 @@
           <tr>
             <th scope="row">Assets</th>
             <td>
-                {% for asset in object.direct_assets.all %}
-                  {{ asset|linkify }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                  {{ ''|placeholder }}
-                {% endfor %}
+              <a href="{% url 'plugins:netbox_inventory:asset_list' %}?direct_group_id={{ object.pk }}">{{ object.direct_assets.count }}</a>
             </td>
           </tr>
         </table>

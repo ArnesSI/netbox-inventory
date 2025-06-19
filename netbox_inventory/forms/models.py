@@ -65,6 +65,11 @@ class InventoryItemGroupForm(NetBoxModelForm):
         required=False,
         label='Inventory Item Types',
     )
+    direct_assets = DynamicModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        label='Assets',
+    )
     comments = CommentField()
 
     fieldsets = (
@@ -82,6 +87,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'rack_types',
             name='Types',
         ),
+        FieldSet('direct_assets', name='Additional assets'),
     )
 
     class Meta:
@@ -94,6 +100,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'module_types',
             'rack_types',
             'inventoryitem_types',
+            'direct_assets',
             'tags',
             'comments',
         )
