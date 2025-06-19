@@ -11,6 +11,7 @@ from dcim.api.serializers import (
     RackSerializer,
     RackTypeSerializer,
 )
+from dcim.models import DeviceType, ModuleType, RackType
 from netbox.api.fields import SerializedPKRelatedField
 from netbox.api.serializers import NestedGroupModelSerializer, NetBoxModelSerializer
 from tenancy.api.serializers import ContactSerializer, TenantSerializer
@@ -55,40 +56,6 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
             'slug',
             'description',
         )
-
-
-class InventoryItemGroupSerializer(NestedGroupModelSerializer):
-    parent = NestedInventoryItemGroupSerializer(
-        required=False, allow_null=True, default=None
-    )
-    inventoryitem_types = SerializedPKRelatedField(
-        queryset=InventoryItemType.objects.all(),
-        serializer=InventoryItemTypeSerializer,
-        nested=True,
-        required=False,
-        many=True,
-    )
-    asset_count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = InventoryItemGroup
-        fields = (
-            'id',
-            'url',
-            'display',
-            'name',
-            'parent',
-            'description',
-            'inventoryitem_types',
-            'comments',
-            'tags',
-            'custom_fields',
-            'created',
-            'last_updated',
-            'asset_count',
-            '_depth',
-        )
-        brief_fields = ('id', 'url', 'display', 'name', 'description', '_depth')
 
 
 class AssetSerializer(NetBoxModelSerializer):
@@ -236,3 +203,74 @@ class AssetSerializer(NetBoxModelSerializer):
         # logic to handle validation
         # see  https://www.django-rest-framework.org/api-guide/validators/#optional-fields
         validators = []
+
+
+class InventoryItemGroupSerializer(NestedGroupModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_inventory-api:inventoryitemgroup-detail'
+    )
+    parent = NestedInventoryItemGroupSerializer(
+        required=False, allow_null=True, default=None
+    )
+    device_types = SerializedPKRelatedField(
+        queryset=DeviceType.objects.all(),
+        serializer=DeviceTypeSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
+    module_types = SerializedPKRelatedField(
+        queryset=ModuleType.objects.all(),
+        serializer=ModuleTypeSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
+    rack_types = SerializedPKRelatedField(
+        queryset=RackType.objects.all(),
+        serializer=RackTypeSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
+    inventoryitem_types = SerializedPKRelatedField(
+        queryset=InventoryItemType.objects.all(),
+        serializer=InventoryItemTypeSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
+    direct_assets = SerializedPKRelatedField(
+        queryset=Asset.objects.all(),
+        serializer=AssetSerializer,
+        nested=True,
+        required=False,
+        many=True,
+    )
+    assets = AssetSerializer(nested=True, read_only=True, many=True)
+    asset_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = InventoryItemGroup
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'parent',
+            'description',
+            'device_types',
+            'module_types',
+            'rack_types',
+            'inventoryitem_types',
+            'direct_assets',
+            'assets',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+            'asset_count',
+            '_depth',
+        )
+        brief_fields = ('id', 'url', 'display', 'name', 'description', '_depth')

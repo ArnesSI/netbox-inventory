@@ -31,10 +31,20 @@ class InventoryItemGroupViewSet(NetBoxModelViewSet):
     queryset = models.InventoryItemGroup.objects.add_related_count(
         models.InventoryItemGroup.objects.all(),
         models.Asset,
-        'inventoryitem_type__inventoryitem_groups',
+        'inventoryitem_groups',
         'asset_count',
         cumulative=True,
-    ).prefetch_related('tags')
+    ).prefetch_related(
+        'tags',
+        'device_types__manufacturer',
+        'module_types__manufacturer',
+        'rack_types__manufacturer',
+        'inventoryitem_types__manufacturer',
+        'assets__device_type',
+        'assets__module_type',
+        'assets__rack_type',
+        'assets__inventoryitem_type',
+    )
     serializer_class = InventoryItemGroupSerializer
     filterset_class = filtersets.InventoryItemGroupFilterSet
 
