@@ -13,7 +13,6 @@ from netbox_inventory.models import (
 class AuditTrailSourceTestCase(TestCase, ChangeLoggedFilterSetTests):
     queryset = AuditTrailSource.objects.all()
     filterset = AuditTrailSourceFilterSet
-    ignore_fields = ('lifetime',)
 
     @classmethod
     def setUpTestData(cls):
