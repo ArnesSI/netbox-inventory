@@ -352,7 +352,8 @@ class AuditTrail(
 
     object_type = models.ForeignKey(
         to=ContentType,
-        on_delete=models.CASCADE,
+        related_name='+',
+        on_delete=models.PROTECT,
     )
     object_id = models.PositiveBigIntegerField()
     object = GenericForeignKey(
