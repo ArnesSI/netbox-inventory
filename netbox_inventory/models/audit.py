@@ -372,6 +372,13 @@ class AuditTrail(
     # AuditTrailTable. Reusing the logic of the ObjectChange model and
     # ChangeLoggingMixin reduces the logic of this model because the request-response
     # cycle doesn't need to maintain who actually created the object.
+    #
+    # NOTE: A known limitation of this code is that related ObjectChange objects will be
+    #       deleted if the audit trail itself is deleted. This is because a
+    #       GenericRelation enforces a CASCADE deletion, which, according to Django's
+    #       documentation, cannot be changed. However, using a GenericRelation greatly
+    #       simplifies the code compared to using nested queries, especially for
+    #       prefetching.
     object_changes = GenericRelation(
         ObjectChange,
         content_type_field='changed_object_type',
