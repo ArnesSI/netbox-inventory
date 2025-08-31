@@ -676,14 +676,13 @@ class AuditTrailTable(NetBoxTable):
 
     # Access the audit user via the first associated object change.
     auditor_user = tables.Column(
-        accessor=tables.A('object_changes__first__user'),
-        verbose_name=_('Auditor'),
-        linkify=True,
-        order_by=('object_change__user'),
+        accessor=tables.A('object_changes__first__user_name'),
+        verbose_name=_('Auditor Username'),
+        orderable=False,
     )
     auditor_full_name = tables.Column(
         accessor=tables.A('object_changes__first__user__get_full_name'),
-        verbose_name=_('Auditor Name'),
+        verbose_name=_('Auditor Full Name'),
         linkify=True,
         orderable=False,
     )
