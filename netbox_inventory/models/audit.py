@@ -32,6 +32,9 @@ __all__ = (
 )
 
 
+LOOKUP_PATHS = list[tuple[type[models.Model], str | None]]
+
+
 class BaseFlow(NamedModel):
     """
     A `BaseFlow` provides the foundation for all audit flow models and provides the
@@ -232,7 +235,7 @@ class AuditFlowPageAssignment(
         return objectchange
 
     @staticmethod
-    def _get_lookup_paths(model: models.Model) -> list[tuple[models.Model, str | None]]:
+    def _get_lookup_paths(model: type[models.Model]) -> LOOKUP_PATHS:
         """
         Get a list of location lookup paths for `model`.
 
@@ -251,7 +254,7 @@ class AuditFlowPageAssignment(
         :returns: A tuple of the related model and its required lookup suffix. The list
             is returned from the most specific to the least specific field.
         """
-        paths = [(model, None)]
+        paths: LOOKUP_PATHS = [(model, None)]
         if model == Location:
             paths.append((Rack, 'location'))
         elif model == Site:
