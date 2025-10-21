@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        netbox-version: ["v4.3.7", "v4.4.4"]
+        netbox-version: ["v4.4.4"]
     services:
       redis:
         image: redis
