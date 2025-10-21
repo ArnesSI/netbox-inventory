@@ -53,6 +53,12 @@ class AuditTrailTest(
                 status='stored',
                 device_type=device_type,
             ),
+            Asset(
+                asset_tag='asset4',
+                serial='asset4',
+                status='stored',
+                device_type=device_type,
+            ),
         )
         Asset.objects.bulk_create(assets)
 
@@ -90,5 +96,5 @@ class AuditTrailTest(
         ]
 
         cls.bulk_update_data = {
-            'object_id': assets[0].pk,
+            'object_id': assets[3].pk,
         }
