@@ -31,12 +31,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
         with:
           path: netbox-inventory
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@main
         with:
           python-version: "3.10"
 
@@ -66,4 +66,4 @@ jobs:
       - name: Run tests
         working-directory: netbox
         run: |
-          python netbox/manage.py test netbox_inventory.tests -v 2
+          python netbox/manage.py test netbox_inventory.tests --parallel -v 2
