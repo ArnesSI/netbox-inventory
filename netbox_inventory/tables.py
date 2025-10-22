@@ -2,7 +2,12 @@ import django_tables2 as tables
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 
-from dcim.tables import DeviceTypeTable, ModuleTypeTable, RackTypeTable
+from dcim.tables import (
+    DeviceTypeTable,
+    LocationTable,
+    ModuleTypeTable,
+    RackTypeTable,
+)
 from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
@@ -744,3 +749,14 @@ asset_count = columns.LinkedCountColumn(
 )
 
 register_table_column(asset_count, 'assets', RackTypeTable)
+
+
+asset_count = columns.LinkedCountColumn(
+    viewname='plugins:netbox_inventory:asset_list',
+    url_params={'storage_location_id': 'pk'},
+    verbose_name=_('Assets'),
+    # accessor='assets__count',
+    accessor=tables.A('assets__count_with_children'),
+)
+
+register_table_column(asset_count, 'assets', LocationTable)

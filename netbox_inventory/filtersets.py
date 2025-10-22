@@ -25,7 +25,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
-from utilities.filters import ContentTypeFilter
+from utilities.filters import ContentTypeFilter, TreeNodeMultipleChoiceFilter
 
 from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from .models import *
@@ -354,9 +354,10 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='storage_location__site',
         label='Storage site (ID)',
     )
-    storage_location_id = django_filters.ModelMultipleChoiceFilter(
+    storage_location_id = TreeNodeMultipleChoiceFilter(
         queryset=Location.objects.all(),
         field_name='storage_location',
+        lookup_expr='in',
         label='Storage location (ID)',
     )
     installed_site_slug = filters.MultiValueCharFilter(
