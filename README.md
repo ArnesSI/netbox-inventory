@@ -300,18 +300,23 @@ PLUGINS = [
 
 PLUGINS_CONFIG = {
     'netbox_attachments': {
-        'apps': ['netbox_inventory',],
+        'applied_scope': 'model',
+        'scope_filter': [
+            'netbox_inventory.supplier',
+            'netbox_inventory.purchase',
+            'netbox_inventory.delivery',
+        ],
         'display_setting': {
             "netbox_inventory.supplier": "left_page",
             "netbox_inventory.purchase": "full_width_page",
             "netbox_inventory.delivery": "righ_page",
-            "netbox_inventory.asset": "hidden",
-            "netbox_inventory.inventoryitemtype": "hidden",
-            "netbox_inventory.inventoryitemgroup": "hidden",
         },
     },
 }
 ```
+
+Look at [netbox-attachments](https://github.com/Kani999/netbox-attachments)
+documentation for more configuration examples.
 
 Here is what it looks like when viewing a purchase:
 
