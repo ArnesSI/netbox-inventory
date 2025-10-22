@@ -231,7 +231,7 @@ class Asset(NamedModel, ImageAttachmentsMixin):
         help_text='Where is this asset stored when not in use',
         to='dcim.Location',
         on_delete=models.PROTECT,
-        related_name='+',
+        related_name='assets',
         blank=True,
         null=True,
         verbose_name='Storage Location',
