@@ -7,6 +7,7 @@ from netbox.models import NestedGroupModel
 from netbox.models.features import ImageAttachmentsMixin
 
 from ..choices import AssetStatusChoices, HardwareKindChoices
+from ..managers import AssetManager
 from ..utils import (
     asset_clear_old_hw,
     asset_set_new_hw,
@@ -105,6 +106,8 @@ class Asset(NamedModel, ImageAttachmentsMixin):
     An asset that is in use, can be assigned to a Device, Module, InventoryItem or
     Rack.
     """
+
+    objects = AssetManager()
 
     #
     # fields that identify asset
