@@ -5,6 +5,7 @@ from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType
 from extras.choices import *
 from extras.models import *
 from netbox.forms import NetBoxModelBulkEditForm
+from netbox.forms.mixins import ChangelogMessageMixin
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BulkEditForm, add_blank_choice
 from utilities.forms.fields import (
@@ -377,7 +378,7 @@ class AuditFlowBulkEditForm(NetBoxModelBulkEditForm):
     )
 
 
-class AuditFlowPageAssignmentBulkEditForm(BulkEditForm):
+class AuditFlowPageAssignmentBulkEditForm(ChangelogMessageMixin, BulkEditForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=AuditFlowPageAssignment.objects.all(),
         widget=forms.MultipleHiddenInput,
