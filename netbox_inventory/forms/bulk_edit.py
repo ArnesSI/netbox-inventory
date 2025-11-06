@@ -241,6 +241,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         'contact',
         'warranty_start',
         'warranty_end',
+        'storage_location',
     )
 
 
