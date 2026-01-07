@@ -1,6 +1,6 @@
 import strawberry_django
 
-from netbox.graphql.filter_mixins import BaseFilterMixin
+from netbox.graphql.filters import PrimaryModelFilter, NestedGroupModelFilter
 
 from netbox_inventory import models
 
@@ -15,30 +15,30 @@ __all__ = (
 
 
 @strawberry_django.filter(models.Asset, lookups=True)
-class AssetFilter(BaseFilterMixin):
+class AssetFilter(PrimaryModelFilter):
     pass
 
 
 @strawberry_django.filter(models.Supplier, lookups=True)
-class SupplierFilter(BaseFilterMixin):
+class SupplierFilter(PrimaryModelFilter):
     pass
 
 
 @strawberry_django.filter(models.Purchase, lookups=True)
-class PurchaseFilter(BaseFilterMixin):
+class PurchaseFilter(PrimaryModelFilter):
     pass
 
 
 @strawberry_django.filter(models.Delivery, lookups=True)
-class DeliveryFilter(BaseFilterMixin):
+class DeliveryFilter(PrimaryModelFilter):
     pass
 
 
 @strawberry_django.filter(models.InventoryItemType, lookups=True)
-class InventoryItemTypeFilter(BaseFilterMixin):
+class InventoryItemTypeFilter(PrimaryModelFilter):
     pass
 
 
 @strawberry_django.filter(models.InventoryItemGroup, lookups=True)
-class InventoryItemGroupFilter(BaseFilterMixin):
+class InventoryItemGroupFilter(NestedGroupModelFilter):
     pass
