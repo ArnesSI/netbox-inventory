@@ -1,3 +1,5 @@
+from rest_framework.routers import APIRootView
+
 from dcim.api.views import DeviceViewSet, InventoryItemViewSet, ModuleViewSet
 from netbox.api.viewsets import NetBoxModelViewSet
 from utilities.query import count_related
@@ -21,6 +23,12 @@ __all__ = (
     'PurchaseViewSet',
     'SupplierViewSet',
 )
+
+
+class NetboxInventoryRootView(APIRootView):
+    def get_view_name(self):
+        return "Inventory"
+
 
 #
 # Assets

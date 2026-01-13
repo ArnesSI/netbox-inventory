@@ -5,6 +5,7 @@ from . import views
 app_name = 'netbox_inventory'
 
 router = NetBoxRouter()
+router.APIRootView = views.NetboxInventoryRootView
 
 # Assets
 router.register('assets', views.AssetViewSet)
