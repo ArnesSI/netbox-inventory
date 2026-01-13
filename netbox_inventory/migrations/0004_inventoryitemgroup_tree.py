@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 
 def rebuild_tree(apps, schema_editor):
-    from ..models import InventoryItemGroup
+    InventoryItemGroup = apps.get_model('netbox_inventory', 'InventoryItemGroup')
 
     if hasattr(InventoryItemGroup, '_tree_manager'):
         InventoryItemGroup._tree_manager.rebuild()
