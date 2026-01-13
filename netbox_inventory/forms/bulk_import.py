@@ -122,7 +122,7 @@ class AssetImportForm(NetBoxModelImportForm):
         help_text='Location where is this asset stored when not in use. It must exist before import.',
         required=False,
     )
-    owner = CSVModelChoiceField(
+    owning_tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name='name',
         help_text='Tenant that owns this asset. It must exist before import.',
@@ -188,7 +188,7 @@ class AssetImportForm(NetBoxModelImportForm):
             'model_comments',
             'storage_site',
             'storage_location',
-            'owner',
+            'owning_tenant',
             'supplier',
             'purchase',
             'purchase_date',
@@ -390,9 +390,9 @@ class AssetImportForm(NetBoxModelImportForm):
             ):
                 self._get_or_create_related('tenant')
             if get_plugin_setting('asset_import_create_tenant') and self.data.get(
-                'owner'
+                'owning_tenant'
             ):
-                self._get_or_create_related('owner')
+                self._get_or_create_related('owning_tenant')
         except forms.ValidationError:
             # ValidationErrors are raised by _clean_fields() method
             # this will be called later in the code and will be bound

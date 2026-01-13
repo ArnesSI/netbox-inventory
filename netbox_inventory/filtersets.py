@@ -295,21 +295,21 @@ class AssetFilterSet(NetBoxModelFilterSet):
         field_name='contact',
         label='Contact (ID)',
     )
-    owner_id = django_filters.ModelMultipleChoiceFilter(
+    owning_tenant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        field_name='owner',
-        label='Owner (ID)',
+        field_name='owning_tenant',
+        label='Owning tenant (ID)',
     )
-    owner = django_filters.ModelMultipleChoiceFilter(
+    owning_tenant = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),
-        field_name='owner__slug',
+        field_name='owning_tenant__slug',
         to_field_name='slug',
-        label='Owner (slug)',
+        label='Owning tenant (slug)',
     )
-    owner_name = filters.MultiValueCharFilter(
-        field_name='owner__name',
+    owning_tenant_name = filters.MultiValueCharFilter(
+        field_name='owning_tenant__name',
         lookup_expr='icontains',
-        label='Owner (name)',
+        label='Owning tenant (name)',
     )
     delivery_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Delivery.objects.all(),
@@ -432,7 +432,7 @@ class AssetFilterSet(NetBoxModelFilterSet):
             | Q(purchase__name__icontains=value)
             | Q(purchase__supplier__name__icontains=value)
             | Q(tenant__name__icontains=value)
-            | Q(owner__name__icontains=value)
+            | Q(owning_tenant__name__icontains=value)
         )
         custom_field_filters = get_asset_custom_fields_search_filters()
         for custom_field_filter in custom_field_filters:
@@ -499,13 +499,13 @@ class AssetFilterSet(NetBoxModelFilterSet):
         return query_located(queryset, name, value)
 
     def filter_tenant_any(self, queryset, name, value):
-        # filter OR for owner and tenant fields
+        # filter OR for owning_tenant and tenant fields
         if name == 'slug':
             q_list = (
-                Q(tenant__slug__iexact=n) | Q(owner__slug__iexact=n) for n in value
+                Q(tenant__slug__iexact=n) | Q(owning_tenant__slug__iexact=n) for n in value
             )
         elif name == 'id':
-            q_list = (Q(tenant__pk=n) | Q(owner__pk=n) for n in value)
+            q_list = (Q(tenant__pk=n) | Q(owning_tenant__pk=n) for n in value)
         q_list = reduce(lambda a, b: a | b, q_list)
         return queryset.filter(q_list)
 

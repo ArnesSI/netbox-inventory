@@ -143,10 +143,10 @@ class AssetForm(NetBoxModelForm):
             'manufacturer_id': '$manufacturer',
         },
     )
-    owner = DynamicModelChoiceField(
+    owning_tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
-        help_text=Asset._meta.get_field('owner').help_text,
-        required=not Asset._meta.get_field('owner').blank,
+        help_text=Asset._meta.get_field('owning_tenant').help_text,
+        required=not Asset._meta.get_field('owning_tenant').blank,
     )
     purchase = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
@@ -211,7 +211,7 @@ class AssetForm(NetBoxModelForm):
             name='Hardware',
         ),
         FieldSet(
-            'owner',
+            'owning_tenant',
             'purchase',
             'delivery',
             'warranty_start',
@@ -235,7 +235,7 @@ class AssetForm(NetBoxModelForm):
             'inventoryitem_type',
             'rack_type',
             'storage_location',
-            'owner',
+            'owning_tenant',
             'purchase',
             'delivery',
             'warranty_start',

@@ -131,10 +131,10 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         disabled=True,
         required=False,
     )
-    owner = DynamicModelChoiceField(
+    owning_tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
-        help_text=Asset._meta.get_field('owner').help_text,
-        required=not Asset._meta.get_field('owner').blank,
+        help_text=Asset._meta.get_field('owning_tenant').help_text,
+        required=not Asset._meta.get_field('owning_tenant').blank,
     )
     purchase = DynamicModelChoiceField(
         queryset=Purchase.objects.all(),
@@ -203,7 +203,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
             name='Hardware',
         ),
         FieldSet(
-            'owner',
+            'owning_tenant',
             'purchase',
             'delivery',
             'warranty_start',
@@ -227,7 +227,7 @@ class AssetBulkEditForm(NetBoxModelBulkEditForm):
         'device',
         'module',
         'rack',
-        'owner',
+        'owning_tenant',
         'purchase',
         'delivery',
         'tenant',

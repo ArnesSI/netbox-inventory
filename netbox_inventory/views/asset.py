@@ -50,7 +50,7 @@ class AssetListView(generic.ObjectListView):
         'module__module_type',
         'inventoryitem__role',
         'rack__role',
-        'owner',
+        'owning_tenant',
         'purchase__supplier',
         'delivery',
         'storage_location',

@@ -115,7 +115,7 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         ),
         FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
         FieldSet(
-            'owner_id',
+            'owning_tenant_id',
             'delivery_id',
             'purchase_id',
             'supplier_id',
@@ -234,11 +234,11 @@ class AssetFilterForm(NetBoxModelFilterSetForm):
         },
         label='Contact',
     )
-    owner_id = DynamicModelMultipleChoiceField(
+    owning_tenant_id = DynamicModelMultipleChoiceField(
         queryset=Tenant.objects.all(),
         required=False,
         null_option='None',
-        label='Owner',
+        label='Owning tenant',
     )
     delivery_id = DynamicModelMultipleChoiceField(
         queryset=Delivery.objects.all(),

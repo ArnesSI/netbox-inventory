@@ -162,7 +162,7 @@ class AssetSerializer(NetBoxModelSerializer):
         allow_null=True,
         default=None,
     )
-    owner = TenantSerializer(
+    owning_tenant = TenantSerializer(
         nested=True,
         required=False,
         allow_null=True,
@@ -203,7 +203,7 @@ class AssetSerializer(NetBoxModelSerializer):
             'tenant',
             'contact',
             'storage_location',
-            'owner',
+            'owning_tenant',
             'delivery',
             'purchase',
             'warranty_start',

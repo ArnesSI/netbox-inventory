@@ -175,7 +175,7 @@ class AssetTable(NetBoxTable):
     storage_location = tables.Column(
         linkify=True,
     )
-    owner = tables.Column(
+    owning_tenant = tables.Column(
         linkify=True,
     )
     supplier = tables.Column(
@@ -377,7 +377,7 @@ class AssetTable(NetBoxTable):
             'storage_location',
             'current_site',
             'current_location',
-            'owner',
+            'owning_tenant',
             'supplier',
             'purchase',
             'delivery',

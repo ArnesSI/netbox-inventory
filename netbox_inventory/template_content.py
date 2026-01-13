@@ -231,9 +231,9 @@ class TenantAssetCounts(PluginTemplateExtension):
                 },
                 {
                     'label': 'Owned',
-                    'filter_field': 'owner_id',
+                    'filter_field': 'owning_tenant_id',
                     'count': Asset.objects.restrict(user, 'view')
-                    .filter(owner=object)
+                    .filter(owning_tenant=object)
                     .count(),
                 },
             ],

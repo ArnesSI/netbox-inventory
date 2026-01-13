@@ -34,8 +34,8 @@
       <td>{% badge asset.get_status_display bg_color=asset.get_status_color %}</a></td>
     </tr>
     <tr>
-      <th scope="row">Owner</th>
-      <td>{{ asset.owner|linkify|placeholder }}</td>
+      <th scope="row">Owning tenant</th>
+      <td>{{ asset.owning_tenant|linkify|placeholder }}</td>
     </tr>
     <tr>
       <th scope="row">Purchase</th>
