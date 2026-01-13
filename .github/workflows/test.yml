@@ -38,7 +38,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@main
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Checkout netbox ${{ matrix.netbox-version }}
         uses: actions/checkout@v4
