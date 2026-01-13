@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType
 from extras.choices import *
 from extras.models import *
-from netbox.forms import NetBoxModelBulkEditForm
+from netbox.forms import NetBoxModelBulkEditForm, PrimaryModelBulkEditForm
 from netbox.forms.mixins import ChangelogMessageMixin
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BulkEditForm, add_blank_choice
@@ -34,16 +34,9 @@ __all__ = (
 #
 
 
-class InventoryItemGroupBulkEditForm(NetBoxModelBulkEditForm):
+class InventoryItemGroupBulkEditForm(PrimaryModelBulkEditForm):
     parent = DynamicModelChoiceField(
         queryset=InventoryItemGroup.objects.all(),
-        required=False,
-    )
-    description = forms.CharField(
-        max_length=200,
-        required=False,
-    )
-    comments = CommentField(
         required=False,
     )
 

@@ -21,7 +21,7 @@ from dcim.models import (
     RackType,
     Site,
 )
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import NetBoxModelFilterSet, PrimaryModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
@@ -53,7 +53,7 @@ __all__ = (
 #
 
 
-class InventoryItemGroupFilterSet(NetBoxModelFilterSet):
+class InventoryItemGroupFilterSet(PrimaryModelFilterSet):
     parent_id = django_filters.ModelMultipleChoiceFilter(
         queryset=InventoryItemGroup.objects.all(),
         label='Parent group (ID)',

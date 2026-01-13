@@ -34,6 +34,7 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
             'name',
             'parent',
             'description',
+            'owner',
             'comments',
             'tags',
             'custom_fields',

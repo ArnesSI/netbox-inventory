@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
-from netbox.forms import NetBoxModelImportForm
+from netbox.forms import NetBoxModelImportForm, PrimaryModelImportForm
 from tenancy.models import Contact, Tenant
 from utilities.forms.fields import (
     CSVChoiceField,
@@ -37,7 +37,7 @@ __all__ = (
 #
 
 
-class InventoryItemGroupImportForm(NetBoxModelImportForm):
+class InventoryItemGroupImportForm(PrimaryModelImportForm):
     parent = CSVModelChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
@@ -47,7 +47,7 @@ class InventoryItemGroupImportForm(NetBoxModelImportForm):
 
     class Meta:
         model = InventoryItemGroup
-        fields = ('name', 'parent', 'description', 'comments', 'tags')
+        fields = ('name', 'parent', 'description', 'owner', 'comments', 'tags')
 
 
 class InventoryItemTypeImportForm(NetBoxModelImportForm):

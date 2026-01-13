@@ -1,3 +1,4 @@
+from users.models import Owner
 from utilities.testing import ViewTestCases
 
 from netbox_inventory.models import InventoryItemGroup
@@ -16,6 +17,7 @@ class InventoryItemGroupTestCase(
         iig1 = InventoryItemGroup.objects.create(name='IIG1')
         iig2 = InventoryItemGroup.objects.create(name='IIG2')
         iig3 = InventoryItemGroup.objects.create(name='IIG3')
+        owner1 = Owner.objects.create(name='owner1')
 
         cls.form_data = {
             'name': 'InventoryItemGroup',
@@ -34,4 +36,5 @@ class InventoryItemGroupTestCase(
         )
         cls.bulk_edit_data = {
             'comments': 'updated',
+            'owner': owner1.pk,
         }

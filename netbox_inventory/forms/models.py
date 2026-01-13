@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import ObjectType
 from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType, Site
-from netbox.forms import NetBoxModelForm
+from netbox.forms import NetBoxModelForm, PrimaryModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms.fields import (
     CommentField,
@@ -38,13 +38,12 @@ __all__ = (
 #
 
 
-class InventoryItemGroupForm(NetBoxModelForm):
+class InventoryItemGroupForm(PrimaryModelForm):
     parent = DynamicModelChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
         label='Parent',
     )
-    comments = CommentField()
 
     fieldsets = (
         FieldSet(
@@ -62,6 +61,7 @@ class InventoryItemGroupForm(NetBoxModelForm):
             'name',
             'parent',
             'description',
+            'owner',
             'tags',
             'comments',
         )

@@ -15,7 +15,7 @@ from dcim.models import (
     RackType,
     Site,
 )
-from netbox.forms import NetBoxModelFilterSetForm
+from netbox.forms import NetBoxModelFilterSetForm, PrimaryModelFilterSetForm
 from tenancy.forms import ContactModelFilterForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
@@ -49,13 +49,14 @@ __all__ = (
 #
 
 
-class InventoryItemGroupFilterForm(NetBoxModelFilterSetForm):
+class InventoryItemGroupFilterForm(PrimaryModelFilterSetForm):
     model = InventoryItemGroup
     fieldsets = (
         FieldSet(
             'q',
             'filter_id',
             'tag',
+            'owner_id',
             'parent_id',
         ),
     )
