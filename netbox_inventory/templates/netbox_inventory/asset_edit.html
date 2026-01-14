@@ -2,15 +2,16 @@
 {% load static %}
 {% load form_helpers %}
 {% load helpers %}
+{% load i18n %}
 
 {% block tabs %}
   {% include 'netbox_inventory/inc/asset_edit_header.html' with active_tab='add' %}
 {% endblock tabs %}
 
 {% block form %}
-    <div class="field-group my-5">
-        <div class="row mb-2">
-          <h5 class="offset-sm-3">General</h5>
+    <div class="field-group mb-5">
+        <div class="row">
+          <h2 class="col-9 offset-3">General</h2>
         </div>
         {% render_field form.name %}
         {% render_field form.asset_tag %}
@@ -19,14 +20,15 @@
         {% render_field form.status %}
     </div>
 
-    <div class="field-group my-5">
-        <div class="row mb-2">
-          <h5 class="offset-sm-3">Hardware</h5>
+    <div class="field-group mb-5">
+        <div class="row">
+          <h2 class="col-9 offset-3">Hardware</h2>
         </div>
         {% render_field form.serial %}
         {% render_field form.manufacturer %}
-        <div class="row mb-2 offset-sm-3">
-          <ul class="nav nav-pills" role="tablist">
+        <div class="row">
+          <div class="col-9 offset-3">
+          <ul class="nav nav-pills mb-1" role="tablist">
             <li role="presentation" class="nav-item">
                 <a class="nav-link{% if form.initial.device_type or form.no_hardware_type %} active{% endif %}" href="#device_type" role="tab" data-bs-toggle="tab">Device</a>
               </li>
@@ -40,6 +42,7 @@
                 <a class="nav-link{% if form.initial.rack_type %} active{% endif %}" href="#rack_type" role="tab" data-bs-toggle="tab">Rack</a>
               </li>
           </ul>
+          </div>
         </div>
         <div class="tab-content p-0 border-0">
           <div class="tab-pane{% if form.initial.device_type or form.no_hardware_type %} active{% endif %}" id="device_type">
@@ -57,9 +60,9 @@
         </div>
     </div>
 
-    <div class="field-group my-5">
-        <div class="row mb-2">
-          <h5 class="offset-sm-3">Purchase</h5>
+    <div class="field-group mb-5">
+        <div class="row">
+          <h2 class="col-9 offset-3">Purchase</h2>
         </div>
         {% render_field form.owner %}
         {% render_field form.purchase %}
@@ -68,35 +71,36 @@
         {% render_field form.warranty_end %}
     </div>
 
-    <div class="field-group my-5">
-        <div class="row mb-2">
-          <h5 class="offset-sm-3">Assigned to</h5>
+    <div class="field-group mb-5">
+        <div class="row">
+          <h2 class="col-9 offset-3">Assigned to</h2>
         </div>
         {% render_field form.tenant %}
         {% render_field form.contact_group %}
         {% render_field form.contact %}
     </div>
 
-    <div class="field-group my-5">
-        <div class="row mb-2">
-          <h5 class="offset-sm-3">Location</h5>
+    <div class="field-group mb-5">
+        <div class="row">
+          <h2 class="col-9 offset-3">Location</h2>
         </div>
         {% render_field form.storage_site %}
         {% render_field form.storage_location %}
     </div>
 
     {% if form.custom_fields %}
-        <div class="field-group my-5">
-            <div class="row mb-2">
-              <h5 class="offset-sm-3">Custom Fields</h5>
+        <div class="field-group mb-5">
+            <div class="row">
+              <h2 class="col-9 offset-3">{% trans "Custom Fields" %}</h2>
             </div>
             {% render_custom_fields form %}
         </div>
     {% endif %}
 
-    <div class="field-group mb-5">
-        <h5 class="text-center">Comments</h5>
-        {% render_field form.comments %}
-    </div>
+    {% if form.comments %}
+        <div class="field-group mb-5">
+            {% render_field form.comments %}
+        </div>
+    {% endif %}
 
 {% endblock %}
