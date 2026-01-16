@@ -722,6 +722,7 @@ asset_count = columns.LinkedCountColumn(
     url_params={'device_type_id': 'pk'},
     verbose_name=_('Assets'),
     accessor='assets__count',
+    orderable=False,
 )
 
 register_table_column(asset_count, 'assets', DeviceTypeTable)
@@ -732,6 +733,7 @@ asset_count = columns.LinkedCountColumn(
     url_params={'module_type_id': 'pk'},
     verbose_name=_('Assets'),
     accessor='assets__count',
+    orderable=False,
 )
 
 register_table_column(asset_count, 'assets', ModuleTypeTable)
@@ -742,6 +744,7 @@ asset_count = columns.LinkedCountColumn(
     url_params={'rack_type_id': 'pk'},
     verbose_name=_('Assets'),
     accessor='assets__count',
+    orderable=False,
 )
 
 register_table_column(asset_count, 'assets', RackTypeTable)
@@ -753,6 +756,7 @@ asset_count = columns.LinkedCountColumn(
     verbose_name=_('Assets'),
     # accessor='assets__count',
     accessor=tables.A('assets__count_with_children'),
+    orderable=False,
 )
 
 register_table_column(asset_count, 'assets', LocationTable)
