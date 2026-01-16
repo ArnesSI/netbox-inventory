@@ -639,6 +639,7 @@ class AuditTrailSourceTable(PrimaryModelTable):
     name = tables.Column(
         linkify=True,
     )
+    tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
         model = AuditTrailSource
@@ -647,6 +648,7 @@ class AuditTrailSourceTable(PrimaryModelTable):
             'id',
             'name',
             'description',
+            'tags',
             'comments',
             'actions',
         )
