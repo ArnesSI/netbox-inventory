@@ -509,6 +509,7 @@ class AuditTrailSourceForm(PrimaryModelForm):
             'name',
             'slug',
             'description',
+            'tags',
         ),
     )
 
@@ -520,4 +521,5 @@ class AuditTrailSourceForm(PrimaryModelForm):
             'description',
             'owner',
             'comments',
+            'tags',
         )
