@@ -121,14 +121,21 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
 
 
 class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
-    device = DynamicModelChoiceField(
+    site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        initial_params={'devices__modules': '$module'},
+    )
+    on_device = DynamicModelChoiceField(
         queryset=Device.objects.all(),
+        query_params={'site_id': '$site'},
         selector=True,
         required=False,
+        initial_params={'modules': '$module'},
     )
     module = DynamicModelChoiceField(
         queryset=Module.objects.all(),
-        query_params={'module_type_id': '$module_type', 'device_id': '$device'},
+        query_params={'module_type_id': '$module_type', 'device_id': '$on_device'},
         label='Module',
         required=False,
         help_text='Set to empty to unassign asset from module',
@@ -142,18 +149,22 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
 
     fieldsets = (
         FieldSet('name', name='Asset'),
-        FieldSet('device', 'module', name='Module'),
+        FieldSet('site', 'on_device', 'module', name='Module'),
         FieldSet('tenant', 'contact', name='Tenancy'),
     )
 
     class Meta:
         model = Asset
-        fields = ('module_type', 'name', 'device', 'module', 'tenant', 'contact')
+        fields = (
+            'module_type',
+            'name',
+            'site',
+            'on_device',
+            'module',
+            'tenant',
+            'contact',
+        )
         widgets = {'module_type': forms.HiddenInput()}
-
-    def clean_device(self):
-        # prevents trying to set asset.device
-        return None
 
     def clean_module_type(self):
         return self._clean_hardware_type('module')
@@ -163,16 +174,23 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
 
 
 class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
-    device = DynamicModelChoiceField(
+    site = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        initial_params={'devices__inventoryitems': '$inventoryitem'},
+    )
+    on_device = DynamicModelChoiceField(
         queryset=Device.objects.all(),
+        query_params={'site_id': '$site'},
         selector=True,
         required=False,
+        initial_params={'inventoryitems': '$inventoryitem'},
     )
     inventoryitem = DynamicModelChoiceField(
         queryset=InventoryItem.objects.all(),
         # we can't filter on inventoryitem_type because inventoryitem doesn't
         # have relation to inventoryitem_type
-        query_params={'device_id': '$device'},
+        query_params={'device_id': '$on_device'},
         label='Inventory item',
         required=False,
         help_text='Set to empty to unassign asset from inventory item',
@@ -186,7 +204,7 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
 
     fieldsets = (
         FieldSet('name', name='Asset'),
-        FieldSet('device', 'inventoryitem', name='Inventory Item'),
+        FieldSet('site', 'on_device', 'inventoryitem', name='Inventory Item'),
         FieldSet('tenant', 'contact', name='Tenancy'),
     )
 
@@ -195,16 +213,12 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
         fields = (
             'inventoryitem_type',
             'name',
-            'device',
+            'on_device',
             'inventoryitem',
             'tenant',
             'contact',
         )
         widgets = {'inventoryitem_type': forms.HiddenInput()}
-
-    def clean_device(self):
-        # prevents trying to set asset.device
-        return None
 
     def clean_inventoryitem_type(self):
         return self._clean_hardware_type('inventoryitem')
