@@ -18,7 +18,9 @@ from ..models import *
 __all__ = (
     'AssetBulkEditForm',
     'AuditFlowBulkEditForm',
+    'AuditFlowPageBulkEditForm',
     'AuditFlowPageAssignmentBulkEditForm',
+    'AuditTrailSourceBulkEditForm',
     'DeliveryBulkEditForm',
     'InventoryItemGroupBulkEditForm',
     'PurchaseBulkEditForm',
@@ -336,6 +338,19 @@ class AuditFlowBulkEditForm(PrimaryModelBulkEditForm):
     )
 
 
+class AuditFlowPageBulkEditForm(PrimaryModelBulkEditForm):
+    model = AuditFlowPage
+
+    fieldsets = (
+        FieldSet(
+            'description',
+            name=_('Attributes'),
+        ),
+    )
+    nullable_fields = (
+        'description',
+    )
+
 class AuditFlowPageAssignmentBulkEditForm(ChangelogMessageMixin, BulkEditForm):
     pk = forms.ModelMultipleChoiceField(
         queryset=AuditFlowPageAssignment.objects.all(),
@@ -350,4 +365,17 @@ class AuditFlowPageAssignmentBulkEditForm(ChangelogMessageMixin, BulkEditForm):
             'weight',
             name=_('Attributes'),
         ),
+    )
+
+class AuditTrailSourceBulkEditForm(PrimaryModelBulkEditForm):
+    model = AuditTrailSource
+
+    fieldsets = (
+        FieldSet(
+            'description',
+            name=_('Attributes'),
+        ),
+    )
+    nullable_fields = (
+        'description',
     )
