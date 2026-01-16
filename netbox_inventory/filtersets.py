@@ -26,6 +26,7 @@ from tenancy.filtersets import ContactModelFilterSet
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities import filters
 from utilities.filters import ContentTypeFilter, TreeNodeMultipleChoiceFilter
+from utilities.filtersets import register_filterset
 
 from .choices import AssetStatusChoices, HardwareKindChoices, PurchaseStatusChoices
 from .models import *
@@ -53,6 +54,7 @@ __all__ = (
 #
 
 
+@register_filterset
 class InventoryItemGroupFilterSet(PrimaryModelFilterSet):
     parent_id = django_filters.ModelMultipleChoiceFilter(
         queryset=InventoryItemGroup.objects.all(),
@@ -78,6 +80,7 @@ class InventoryItemGroupFilterSet(PrimaryModelFilterSet):
         return queryset.filter(query)
 
 
+@register_filterset
 class InventoryItemTypeFilterSet(PrimaryModelFilterSet):
     manufacturer_id = django_filters.ModelMultipleChoiceFilter(
         field_name='manufacturer',
@@ -118,6 +121,7 @@ class InventoryItemTypeFilterSet(PrimaryModelFilterSet):
         return queryset.filter(query)
 
 
+@register_filterset
 class AssetFilterSet(PrimaryModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=AssetStatusChoices,
@@ -541,6 +545,7 @@ class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
 #
 
 
+@register_filterset
 class SupplierFilterSet(PrimaryModelFilterSet, ContactModelFilterSet):
     class Meta:
         model = Supplier
@@ -560,6 +565,7 @@ class SupplierFilterSet(PrimaryModelFilterSet, ContactModelFilterSet):
         return queryset.filter(query)
 
 
+@register_filterset
 class PurchaseFilterSet(PrimaryModelFilterSet):
     supplier_id = django_filters.ModelMultipleChoiceFilter(
         field_name='supplier',
@@ -584,6 +590,7 @@ class PurchaseFilterSet(PrimaryModelFilterSet):
         return queryset.filter(query)
 
 
+@register_filterset
 class DeliveryFilterSet(PrimaryModelFilterSet):
     purchase_id = django_filters.ModelMultipleChoiceFilter(
         field_name='purchase',
@@ -659,6 +666,7 @@ class BaseFlowFilterSet(PrimaryModelFilterSet):
         )
 
 
+@register_filterset
 class AuditFlowPageFilterSet(BaseFlowFilterSet):
     assigned_flow_id = django_filters.ModelMultipleChoiceFilter(
         queryset=AuditFlow.objects.all(),
@@ -671,6 +679,7 @@ class AuditFlowPageFilterSet(BaseFlowFilterSet):
         fields = BaseFlowFilterSet.Meta.fields + ('assigned_flow_id',)
 
 
+@register_filterset
 class AuditFlowFilterSet(BaseFlowFilterSet):
     page_id = django_filters.ModelMultipleChoiceFilter(
         queryset=AuditFlowPage.objects.all(),
@@ -686,6 +695,7 @@ class AuditFlowFilterSet(BaseFlowFilterSet):
         )
 
 
+@register_filterset
 class AuditTrailSourceFilterSet(PrimaryModelFilterSet):
     class Meta:
         model = AuditTrailSource
@@ -706,6 +716,7 @@ class AuditTrailSourceFilterSet(PrimaryModelFilterSet):
         )
 
 
+@register_filterset
 class AuditTrailFilterSet(NetBoxModelFilterSet):
     # Disable inherited filters for nonexistent fields.
     tag = None
