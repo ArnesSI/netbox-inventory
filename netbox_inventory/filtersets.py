@@ -78,7 +78,7 @@ class InventoryItemGroupFilterSet(PrimaryModelFilterSet):
         return queryset.filter(query)
 
 
-class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
+class InventoryItemTypeFilterSet(PrimaryModelFilterSet):
     manufacturer_id = django_filters.ModelMultipleChoiceFilter(
         field_name='manufacturer',
         queryset=Manufacturer.objects.all(),
@@ -118,7 +118,7 @@ class InventoryItemTypeFilterSet(NetBoxModelFilterSet):
         return queryset.filter(query)
 
 
-class AssetFilterSet(NetBoxModelFilterSet):
+class AssetFilterSet(PrimaryModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=AssetStatusChoices,
     )
@@ -540,7 +540,7 @@ class InventoryItemAssetFilterSet(HasAssetFilterMixin, InventoryItemFilterSet):
 #
 
 
-class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
+class SupplierFilterSet(PrimaryModelFilterSet, ContactModelFilterSet):
     class Meta:
         model = Supplier
         fields = (
@@ -559,7 +559,7 @@ class SupplierFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
         return queryset.filter(query)
 
 
-class PurchaseFilterSet(NetBoxModelFilterSet):
+class PurchaseFilterSet(PrimaryModelFilterSet):
     supplier_id = django_filters.ModelMultipleChoiceFilter(
         field_name='supplier',
         queryset=Supplier.objects.all(),
@@ -583,7 +583,7 @@ class PurchaseFilterSet(NetBoxModelFilterSet):
         return queryset.filter(query)
 
 
-class DeliveryFilterSet(NetBoxModelFilterSet):
+class DeliveryFilterSet(PrimaryModelFilterSet):
     purchase_id = django_filters.ModelMultipleChoiceFilter(
         field_name='purchase',
         queryset=Purchase.objects.all(),
@@ -633,7 +633,7 @@ class DeliveryFilterSet(NetBoxModelFilterSet):
 #
 
 
-class BaseFlowFilterSet(NetBoxModelFilterSet):
+class BaseFlowFilterSet(PrimaryModelFilterSet):
     """
     Internal base filterset class for audit flow models.
     """
@@ -685,7 +685,7 @@ class AuditFlowFilterSet(BaseFlowFilterSet):
         )
 
 
-class AuditTrailSourceFilterSet(NetBoxModelFilterSet):
+class AuditTrailSourceFilterSet(PrimaryModelFilterSet):
     class Meta:
         model = AuditTrailSource
         fields = (

@@ -50,7 +50,7 @@ class InventoryItemGroupImportForm(PrimaryModelImportForm):
         fields = ('name', 'parent', 'description', 'owner', 'comments', 'tags')
 
 
-class InventoryItemTypeImportForm(NetBoxModelImportForm):
+class InventoryItemTypeImportForm(PrimaryModelImportForm):
     manufacturer = CSVModelChoiceField(
         queryset=Manufacturer.objects.all(),
         to_field_name='name',
@@ -73,12 +73,13 @@ class InventoryItemTypeImportForm(NetBoxModelImportForm):
             'description',
             'part_number',
             'inventoryitem_group',
+            'owner',
             'comments',
             'tags',
         )
 
 
-class AssetImportForm(NetBoxModelImportForm):
+class AssetImportForm(PrimaryModelImportForm):
     hardware_kind = CSVChoiceField(
         choices=HardwareKindChoices,
         required=True,
@@ -198,6 +199,7 @@ class AssetImportForm(NetBoxModelImportForm):
             'receiving_contact',
             'warranty_start',
             'warranty_end',
+            'owner',
             'comments',
             'tenant',
             'contact',
@@ -444,13 +446,13 @@ class AssetImportForm(NetBoxModelImportForm):
 #
 
 
-class SupplierImportForm(NetBoxModelImportForm):
+class SupplierImportForm(PrimaryModelImportForm):
     class Meta:
         model = Supplier
-        fields = ('name', 'slug', 'description', 'comments', 'tags')
+        fields = ('name', 'slug', 'description', 'owner', 'comments', 'tags')
 
 
-class PurchaseImportForm(NetBoxModelImportForm):
+class PurchaseImportForm(PrimaryModelImportForm):
     supplier = CSVModelChoiceField(
         queryset=Supplier.objects.all(),
         to_field_name='name',
@@ -470,12 +472,13 @@ class PurchaseImportForm(NetBoxModelImportForm):
             'status',
             'supplier',
             'description',
+            'owner',
             'comments',
             'tags',
         )
 
 
-class DeliveryImportForm(NetBoxModelImportForm):
+class DeliveryImportForm(PrimaryModelImportForm):
     purchase = CSVModelChoiceField(
         queryset=Purchase.objects.all(),
         to_field_name='id',
@@ -497,6 +500,7 @@ class DeliveryImportForm(NetBoxModelImportForm):
             'purchase',
             'receiving_contact',
             'description',
+            'owner',
             'comments',
             'tags',
         )
@@ -507,7 +511,7 @@ class DeliveryImportForm(NetBoxModelImportForm):
 #
 
 
-class BaseFlowImportForm(NetBoxModelImportForm):
+class BaseFlowImportForm(PrimaryModelImportForm):
     """
     Internal base bulk import class for audit flow models.
     """
@@ -521,6 +525,7 @@ class BaseFlowImportForm(NetBoxModelImportForm):
         fields = (
             'name',
             'description',
+            'owner',
             'tags',
             'object_type',
             'object_filter',
@@ -547,19 +552,24 @@ class AuditFlowImportForm(BaseFlowImportForm):
         fields = BaseFlowImportForm.Meta.fields + ('enabled',)
 
 
-class AuditTrailSourceImportForm(NetBoxModelImportForm):
+class AuditTrailSourceImportForm(PrimaryModelImportForm):
     class Meta:
         model = AuditTrailSource
         fields = (
             'name',
             'slug',
             'description',
+            'owner',
             'tags',
             'comments',
         )
 
 
-class AuditTrailImportForm(BaseFlowImportForm):
+class AuditTrailImportForm(NetBoxModelImportForm):
+    object_type = CSVContentTypeField(
+        queryset=ObjectType.objects.public(),
+        help_text=_('Object Type'),
+    )
     source = CSVModelChoiceField(
         queryset=AuditTrailSource.objects.all(),
         to_field_name='slug',

@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from netbox.api.serializers import NetBoxModelSerializer
+from netbox.api.serializers import PrimaryModelSerializer
 from tenancy.api.serializers import ContactSerializer
 
 from .nested import *
 from netbox_inventory.models import Delivery, Purchase, Supplier
 
 
-class SupplierSerializer(NetBoxModelSerializer):
+class SupplierSerializer(PrimaryModelSerializer):
     asset_count = serializers.IntegerField(read_only=True)
     purchase_count = serializers.IntegerField(read_only=True)
     delivery_count = serializers.IntegerField(read_only=True)
@@ -21,6 +21,7 @@ class SupplierSerializer(NetBoxModelSerializer):
             'name',
             'slug',
             'description',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
@@ -33,7 +34,7 @@ class SupplierSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
 
 
-class PurchaseSerializer(NetBoxModelSerializer):
+class PurchaseSerializer(PrimaryModelSerializer):
     supplier = SupplierSerializer(nested=True)
     asset_count = serializers.IntegerField(read_only=True)
     delivery_count = serializers.IntegerField(read_only=True)
@@ -49,6 +50,7 @@ class PurchaseSerializer(NetBoxModelSerializer):
             'status',
             'date',
             'description',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
@@ -69,7 +71,7 @@ class PurchaseSerializer(NetBoxModelSerializer):
         )
 
 
-class DeliverySerializer(NetBoxModelSerializer):
+class DeliverySerializer(PrimaryModelSerializer):
     purchase = PurchaseSerializer(nested=True)
     receiving_contact = ContactSerializer(
         nested=True, required=False, allow_null=True, default=None
@@ -86,6 +88,7 @@ class DeliverySerializer(NetBoxModelSerializer):
             'name',
             'date',
             'description',
+            'owner',
             'comments',
             'receiving_contact',
             'tags',

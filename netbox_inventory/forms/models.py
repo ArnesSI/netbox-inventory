@@ -5,7 +5,6 @@ from dcim.models import DeviceType, Location, Manufacturer, ModuleType, RackType
 from netbox.forms import NetBoxModelForm, PrimaryModelForm
 from tenancy.models import Contact, ContactGroup, Tenant
 from utilities.forms.fields import (
-    CommentField,
     ContentTypeChoiceField,
     DynamicModelChoiceField,
     JSONField,
@@ -67,14 +66,13 @@ class InventoryItemGroupForm(PrimaryModelForm):
         )
 
 
-class InventoryItemTypeForm(NetBoxModelForm):
+class InventoryItemTypeForm(PrimaryModelForm):
     slug = SlugField(slug_source='model')
     inventoryitem_group = DynamicModelChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
         label='Inventory item group',
     )
-    comments = CommentField()
 
     fieldsets = (
         FieldSet(
@@ -98,12 +96,13 @@ class InventoryItemTypeForm(NetBoxModelForm):
             'description',
             'part_number',
             'inventoryitem_group',
+            'owner',
             'tags',
             'comments',
         )
 
 
-class AssetForm(NetBoxModelForm):
+class AssetForm(PrimaryModelForm):
     manufacturer = DynamicModelChoiceField(
         queryset=Manufacturer.objects.all(),
         required=False,
@@ -197,7 +196,6 @@ class AssetForm(NetBoxModelForm):
             'site_id': '$storage_site',
         },
     )
-    comments = CommentField()
 
     fieldsets = (
         FieldSet('name', 'asset_tag', 'description', 'tags', 'status', name='General'),
@@ -244,6 +242,7 @@ class AssetForm(NetBoxModelForm):
             'contact_group',
             'contact',
             'tags',
+            'owner',
             'description',
             'comments',
             'storage_site',
@@ -314,9 +313,8 @@ class AssetForm(NetBoxModelForm):
 #
 
 
-class SupplierForm(NetBoxModelForm):
+class SupplierForm(PrimaryModelForm):
     slug = SlugField(slug_source='name')
-    comments = CommentField()
 
     fieldsets = (FieldSet('name', 'slug', 'description', 'tags', name='Supplier'),)
 
@@ -328,12 +326,11 @@ class SupplierForm(NetBoxModelForm):
             'description',
             'comments',
             'tags',
+            'owner',
         )
 
 
-class PurchaseForm(NetBoxModelForm):
-    comments = CommentField()
-
+class PurchaseForm(PrimaryModelForm):
     fieldsets = (
         FieldSet(
             'supplier', 'name', 'status', 'date', 'description', 'tags', name='Purchase'
@@ -350,13 +347,14 @@ class PurchaseForm(NetBoxModelForm):
             'description',
             'comments',
             'tags',
+            'owner',
         )
         widgets = {
             'date': DatePicker(),
         }
 
 
-class DeliveryForm(NetBoxModelForm):
+class DeliveryForm(PrimaryModelForm):
     contact_group = DynamicModelChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
@@ -375,8 +373,6 @@ class DeliveryForm(NetBoxModelForm):
             'group_id': '$contact_group',
         },
     )
-
-    comments = CommentField()
 
     fieldsets = (
         FieldSet(
@@ -402,6 +398,7 @@ class DeliveryForm(NetBoxModelForm):
             'description',
             'comments',
             'tags',
+            'owner',
         )
         widgets = {
             'date': DatePicker(),
@@ -413,7 +410,7 @@ class DeliveryForm(NetBoxModelForm):
 #
 
 
-class BaseFlowForm(NetBoxModelForm):
+class BaseFlowForm(PrimaryModelForm):
     """
     Internal base form class for audit flow models.
     """
@@ -428,7 +425,6 @@ class BaseFlowForm(NetBoxModelForm):
             'mapping attributes to values.'
         ),
     )
-    comments = CommentField()
 
     fieldsets = (
         FieldSet(
@@ -450,6 +446,7 @@ class BaseFlowForm(NetBoxModelForm):
             'tags',
             'object_type',
             'object_filter',
+            'owner',
             'comments',
         )
 
@@ -504,9 +501,8 @@ class AuditFlowPageAssignmentForm(NetBoxModelForm):
         )
 
 
-class AuditTrailSourceForm(NetBoxModelForm):
+class AuditTrailSourceForm(PrimaryModelForm):
     slug = SlugField()
-    comments = CommentField()
 
     fieldsets = (
         FieldSet(
@@ -522,5 +518,6 @@ class AuditTrailSourceForm(NetBoxModelForm):
             'name',
             'slug',
             'description',
+            'owner',
             'comments',
         )

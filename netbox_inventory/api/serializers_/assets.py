@@ -11,7 +11,7 @@ from dcim.api.serializers import (
     RackSerializer,
     RackTypeSerializer,
 )
-from netbox.api.serializers import NestedGroupModelSerializer, NetBoxModelSerializer
+from netbox.api.serializers import NestedGroupModelSerializer, PrimaryModelSerializer
 from tenancy.api.serializers import ContactSerializer, TenantSerializer
 
 from .deliveries import *
@@ -46,7 +46,7 @@ class InventoryItemGroupSerializer(NestedGroupModelSerializer):
         brief_fields = ('id', 'url', 'display', 'name', 'description', '_depth')
 
 
-class InventoryItemTypeSerializer(NetBoxModelSerializer):
+class InventoryItemTypeSerializer(PrimaryModelSerializer):
     manufacturer = ManufacturerSerializer(nested=True)
     inventoryitem_group = InventoryItemGroupSerializer(
         nested=True, required=False, allow_null=True, default=None
@@ -65,6 +65,7 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
             'part_number',
             'inventoryitem_group',
             'description',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
@@ -83,7 +84,7 @@ class InventoryItemTypeSerializer(NetBoxModelSerializer):
         )
 
 
-class AssetSerializer(NetBoxModelSerializer):
+class AssetSerializer(PrimaryModelSerializer):
     device_type = DeviceTypeSerializer(
         nested=True,
         required=False,
@@ -208,6 +209,7 @@ class AssetSerializer(NetBoxModelSerializer):
             'purchase',
             'warranty_start',
             'warranty_end',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
