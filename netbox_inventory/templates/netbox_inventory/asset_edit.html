@@ -64,7 +64,7 @@
         <div class="row">
           <h2 class="col-9 offset-3">Purchase</h2>
         </div>
-        {% render_field form.owner %}
+        {% render_field form.owning_tenant %}
         {% render_field form.purchase %}
         {% render_field form.delivery %}
         {% render_field form.warranty_start %}
@@ -94,6 +94,15 @@
               <h2 class="col-9 offset-3">{% trans "Custom Fields" %}</h2>
             </div>
             {% render_custom_fields form %}
+        </div>
+    {% endif %}
+  
+    {% if form.owner %}
+        <div class="field-group mb-5">
+            <div class="row">
+                <h2 class="col-9 offset-3">{% trans "Ownership" %}</h2>
+            </div>
+            {% render_field form.owner %}
         </div>
     {% endif %}
 

@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from core.models import ObjectType
 from netbox.api.fields import ContentTypeField
-from netbox.api.serializers import NetBoxModelSerializer
+from netbox.api.serializers import NetBoxModelSerializer, PrimaryModelSerializer
 from utilities.api import get_serializer_for_model
 
 from netbox_inventory.models import (
@@ -24,7 +24,7 @@ __all__ = (
 )
 
 
-class BaseFlowSerializer(NetBoxModelSerializer):
+class BaseFlowSerializer(PrimaryModelSerializer):
     """
     Internal base serializer for audit flow models.
     """
@@ -43,6 +43,7 @@ class BaseFlowSerializer(NetBoxModelSerializer):
             'description',
             'object_type',
             'object_filter',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
@@ -97,7 +98,7 @@ class AuditFlowPageAssignmentSerializer(NetBoxModelSerializer):
         )
 
 
-class AuditTrailSourceSerializer(NetBoxModelSerializer):
+class AuditTrailSourceSerializer(PrimaryModelSerializer):
     class Meta:
         model = AuditTrailSource
         fields = (
@@ -108,6 +109,7 @@ class AuditTrailSourceSerializer(NetBoxModelSerializer):
             'name',
             'slug',
             'description',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
