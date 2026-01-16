@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
 from core.models import ObjectType
+from netbox.object_actions import BulkDelete, BulkExport, BulkImport
 from netbox.views import generic
 from utilities.views import (
     ConditionalLoginRequiredMixin,
@@ -40,6 +41,7 @@ class AuditTrailListView(generic.ObjectListView):
     table = tables.AuditTrailTable
     filterset = filtersets.AuditTrailFilterSet
     filterset_form = forms.AuditTrailFilterForm
+    actions = (BulkImport, BulkExport, BulkDelete)
 
 
 @register_model_view(models.AuditTrail, 'delete')
