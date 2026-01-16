@@ -347,9 +347,8 @@ class AuditFlowPageBulkEditForm(PrimaryModelBulkEditForm):
             name=_('Attributes'),
         ),
     )
-    nullable_fields = (
-        'description',
-    )
+    nullable_fields = ('description',)
+
 
 class AuditFlowPageAssignmentBulkEditForm(ChangelogMessageMixin, BulkEditForm):
     pk = forms.ModelMultipleChoiceField(
@@ -367,6 +366,7 @@ class AuditFlowPageAssignmentBulkEditForm(ChangelogMessageMixin, BulkEditForm):
         ),
     )
 
+
 class AuditTrailSourceBulkEditForm(PrimaryModelBulkEditForm):
     model = AuditTrailSource
 
@@ -376,6 +376,4 @@ class AuditTrailSourceBulkEditForm(PrimaryModelBulkEditForm):
             name=_('Attributes'),
         ),
     )
-    nullable_fields = (
-        'description',
-    )
+    nullable_fields = ('description',)

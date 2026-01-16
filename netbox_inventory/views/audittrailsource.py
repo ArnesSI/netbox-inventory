@@ -74,12 +74,7 @@ class AuditTrailSourceBulkImportView(generic.BulkImportView):
     model_form = forms.AuditTrailSourceImportForm
 
 
-@register_model_view(
-    models.AuditTrailSource,
-    'bulk_edit',
-    path='edit',
-    detail=False
-)
+@register_model_view(models.AuditTrailSource, 'bulk_edit', path='edit', detail=False)
 class AuditTrailSourceBulkEditView(generic.BulkEditView):
     queryset = models.AuditTrailSource.objects.all()
     filterset = filtersets.AuditTrailSourceFilterSet
