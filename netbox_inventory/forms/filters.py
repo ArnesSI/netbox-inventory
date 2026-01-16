@@ -63,6 +63,7 @@ class InventoryItemGroupFilterForm(PrimaryModelFilterSetForm):
     parent_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
+        null_option='None',
         label='Parent group',
     )
     tag = TagFilterField(model)
@@ -86,6 +87,7 @@ class InventoryItemTypeFilterForm(PrimaryModelFilterSetForm):
     inventoryitem_group_id = DynamicModelMultipleChoiceField(
         queryset=InventoryItemGroup.objects.all(),
         required=False,
+        null_option='None',
         label='Inventory Item Group',
     )
     tag = TagFilterField(model)
@@ -251,6 +253,7 @@ class AssetFilterForm(PrimaryModelFilterSetForm):
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
+        null_option='None',
         label='Supplier',
     )
     delivery_date_after = forms.DateField(
@@ -459,6 +462,7 @@ class DeliveryFilterForm(PrimaryModelFilterSetForm):
         query_params={
             'group_id': '$contact_group_id',
         },
+        null_option='None',
         label='Receiving contact',
     )
     date_after = forms.DateField(
@@ -495,6 +499,7 @@ class AuditFlowPageFilterForm(BaseFlowFilterForm):
     assigned_flow_id = DynamicModelMultipleChoiceField(
         queryset=AuditFlow.objects.all(),
         required=False,
+        null_option='None',
         label=_('Audit flow'),
     )
 
@@ -539,6 +544,7 @@ class AuditTrailFilterForm(NetBoxModelFilterSetForm):
     source_id = DynamicModelMultipleChoiceField(
         queryset=AuditTrailSource.objects.all(),
         required=False,
+        null_option='None',
         label='Source',
     )
     created__gte = forms.DateTimeField(
