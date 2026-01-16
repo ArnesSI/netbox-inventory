@@ -117,14 +117,10 @@ class AssetFilterForm(PrimaryModelFilterSetForm):
             'delivery_id',
             'purchase_id',
             'supplier_id',
-            'delivery_date_after',
-            'delivery_date_before',
-            'purchase_date_after',
-            'purchase_date_before',
-            'warranty_start_after',
-            'warranty_start_before',
-            'warranty_end_after',
-            'warranty_end_before',
+            'delivery_date',
+            'purchase_date',
+            'warranty_start',
+            'warranty_end',
             name='Purchase',
         ),
         FieldSet(
@@ -256,44 +252,24 @@ class AssetFilterForm(PrimaryModelFilterSetForm):
         null_option='None',
         label='Supplier',
     )
-    delivery_date_after = forms.DateField(
+    delivery_date = forms.DateField(
         required=False,
-        label='Delivered on or after',
+        label='Delivery date',
         widget=DatePicker,
     )
-    delivery_date_before = forms.DateField(
+    purchase_date = forms.DateField(
         required=False,
-        label='Delivered on or before',
+        label='Purchase date',
         widget=DatePicker,
     )
-    purchase_date_after = forms.DateField(
+    warranty_start = forms.DateField(
         required=False,
-        label='Purchased on or after',
+        label='Warranty start',
         widget=DatePicker,
     )
-    purchase_date_before = forms.DateField(
+    warranty_end = forms.DateField(
         required=False,
-        label='Purchased on or before',
-        widget=DatePicker,
-    )
-    warranty_start_after = forms.DateField(
-        required=False,
-        label='Warranty starts on or after',
-        widget=DatePicker,
-    )
-    warranty_start_before = forms.DateField(
-        required=False,
-        label='Warranty starts on or before',
-        widget=DatePicker,
-    )
-    warranty_end_after = forms.DateField(
-        required=False,
-        label='Warranty ends on or after',
-        widget=DatePicker,
-    )
-    warranty_end_before = forms.DateField(
-        required=False,
-        label='Warranty ends on or before',
+        label='Warranty end',
         widget=DatePicker,
     )
     storage_site_id = DynamicModelMultipleChoiceField(
@@ -400,7 +376,7 @@ class PurchaseFilterForm(PrimaryModelFilterSetForm):
     model = Purchase
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
-        FieldSet('supplier_id', 'status', 'date_after', 'date_before', name='Purchase'),
+        FieldSet('supplier_id', 'status', 'date', name='Purchase'),
     )
 
     supplier_id = DynamicModelMultipleChoiceField(
@@ -412,16 +388,7 @@ class PurchaseFilterForm(PrimaryModelFilterSetForm):
         choices=PurchaseStatusChoices,
         required=False,
     )
-    date_after = forms.DateField(
-        required=False,
-        label='Purchased on or after',
-        widget=DatePicker,
-    )
-    date_before = forms.DateField(
-        required=False,
-        label='Purchased on or before',
-        widget=DatePicker,
-    )
+    date = forms.DateField(label=_('Purchase date'), required=False, widget=DatePicker)
     tag = TagFilterField(model)
 
 
@@ -434,8 +401,7 @@ class DeliveryFilterForm(PrimaryModelFilterSetForm):
             'supplier_id',
             'contact_group_id',
             'receiving_contact_id',
-            'date_after',
-            'date_before',
+            'date',
             name='Delivery',
         ),
     )
@@ -465,16 +431,7 @@ class DeliveryFilterForm(PrimaryModelFilterSetForm):
         null_option='None',
         label='Receiving contact',
     )
-    date_after = forms.DateField(
-        required=False,
-        label='Delivered on or after',
-        widget=DatePicker,
-    )
-    date_before = forms.DateField(
-        required=False,
-        label='Delivered on or before',
-        widget=DatePicker,
-    )
+    date = forms.DateField(label=_('Delivery date'), required=False, widget=DatePicker)
     tag = TagFilterField(model)
 
 

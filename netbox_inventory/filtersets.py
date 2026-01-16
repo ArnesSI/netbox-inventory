@@ -345,12 +345,10 @@ class AssetFilterSet(PrimaryModelFilterSet):
         lookup_expr='iexact',
         label='Supplier (name)',
     )
-    warranty_start = django_filters.DateFromToRangeFilter()
-    warranty_end = django_filters.DateFromToRangeFilter()
-    delivery_date = django_filters.DateFromToRangeFilter(
+    delivery_date = filters.MultiValueDateFilter(
         field_name='delivery__date',
     )
-    purchase_date = django_filters.DateFromToRangeFilter(
+    purchase_date = filters.MultiValueDateFilter(
         field_name='purchase__date',
     )
     storage_site_id = django_filters.ModelMultipleChoiceFilter(
@@ -416,7 +414,15 @@ class AssetFilterSet(PrimaryModelFilterSet):
 
     class Meta:
         model = Asset
-        fields = ('id', 'name', 'serial', 'asset_tag', 'description')
+        fields = (
+            'id',
+            'name',
+            'serial',
+            'asset_tag',
+            'description',
+            'warranty_start',
+            'warranty_end',
+        )
 
     def search(self, queryset, name, value):
         query = (
@@ -575,7 +581,6 @@ class PurchaseFilterSet(PrimaryModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=PurchaseStatusChoices,
     )
-    date = django_filters.DateFromToRangeFilter()
 
     class Meta:
         model = Purchase
@@ -612,7 +617,6 @@ class DeliveryFilterSet(PrimaryModelFilterSet):
         queryset=Contact.objects.all(),
         label='Contact (ID)',
     )
-    date = django_filters.DateFromToRangeFilter()
 
     class Meta:
         model = Delivery
