@@ -8,7 +8,7 @@ from dcim.tables import (
     ModuleTypeTable,
     RackTypeTable,
 )
-from netbox.tables import NetBoxTable, columns
+from netbox.tables import NetBoxTable, PrimaryModelTable, columns
 from tenancy.tables import ContactsColumnMixin
 from utilities.tables import register_table_column
 
@@ -34,7 +34,7 @@ __all__ = (
 #
 
 
-class InventoryItemGroupTable(NetBoxTable):
+class InventoryItemGroupTable(PrimaryModelTable):
     name = columns.MPTTColumn(
         linkify=True,
     )
@@ -48,7 +48,6 @@ class InventoryItemGroupTable(NetBoxTable):
         url_params={'inventoryitem_group_id': 'pk'},
         verbose_name='Inventory Item Types',
     )
-    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
@@ -73,7 +72,7 @@ class InventoryItemGroupTable(NetBoxTable):
         )
 
 
-class InventoryItemTypeTable(NetBoxTable):
+class InventoryItemTypeTable(PrimaryModelTable):
     manufacturer = tables.Column(
         linkify=True,
     )
@@ -88,7 +87,6 @@ class InventoryItemTypeTable(NetBoxTable):
         url_params={'inventoryitem_type_id': 'pk'},
         verbose_name='Assets',
     )
-    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
@@ -116,7 +114,7 @@ class InventoryItemTypeTable(NetBoxTable):
         )
 
 
-class AssetTable(NetBoxTable):
+class AssetTable(PrimaryModelTable):
     name = tables.Column(
         linkify=True,
     )
@@ -212,7 +210,6 @@ class AssetTable(NetBoxTable):
         # orderable=False,
         verbose_name='Warranty remaining',
     )
-    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
     actions = columns.ActionsColumn(
         extra_buttons="""
@@ -412,7 +409,7 @@ class AssetTable(NetBoxTable):
 #
 
 
-class SupplierTable(ContactsColumnMixin, NetBoxTable):
+class SupplierTable(ContactsColumnMixin, PrimaryModelTable):
     name = tables.Column(
         linkify=True,
     )
@@ -431,7 +428,6 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
         url_params={'supplier_id': 'pk'},
         verbose_name='Assets',
     )
-    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
@@ -458,7 +454,7 @@ class SupplierTable(ContactsColumnMixin, NetBoxTable):
         )
 
 
-class PurchaseTable(NetBoxTable):
+class PurchaseTable(PrimaryModelTable):
     supplier = tables.Column(
         linkify=True,
     )
@@ -476,7 +472,6 @@ class PurchaseTable(NetBoxTable):
         url_params={'purchase_id': 'pk'},
         verbose_name='Assets',
     )
-    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
@@ -505,7 +500,7 @@ class PurchaseTable(NetBoxTable):
         )
 
 
-class DeliveryTable(NetBoxTable):
+class DeliveryTable(PrimaryModelTable):
     supplier = tables.Column(
         accessor=columns.Accessor('purchase__supplier'),
         linkify=True,
@@ -531,7 +526,6 @@ class DeliveryTable(NetBoxTable):
         url_params={'delivery_id': 'pk'},
         verbose_name='Assets',
     )
-    comments = columns.MarkdownColumn()
     tags = columns.TagColumn()
 
     class Meta(NetBoxTable.Meta):
@@ -566,7 +560,7 @@ class DeliveryTable(NetBoxTable):
 #
 
 
-class BaseFlowTable(NetBoxTable):
+class BaseFlowTable(PrimaryModelTable):
     """
     Internal base table class for audit flow models.
     """
@@ -641,7 +635,7 @@ class AuditFlowPageAssignmentTable(NetBoxTable):
         )
 
 
-class AuditTrailSourceTable(NetBoxTable):
+class AuditTrailSourceTable(PrimaryModelTable):
     name = tables.Column(
         linkify=True,
     )
