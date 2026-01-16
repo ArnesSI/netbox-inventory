@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        netbox-version: ["v4.4.4"]
+        netbox-version: ["v4.5.0"]
     services:
       redis:
         image: redis
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@main
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Checkout netbox ${{ matrix.netbox-version }}
         uses: actions/checkout@v4
@@ -57,6 +57,7 @@ jobs:
         run: |
           ln -s $(pwd)/../netbox-inventory/testing/configuration.testing.py netbox/netbox/configuration.py
           python -m pip install --upgrade pip
+          python -m pip install tblib
           pip install -r requirements.txt -U
 
       - name: Check for missing migrations
