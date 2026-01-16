@@ -9,6 +9,7 @@ __all__ = (
     'AuditFlowPageEditView',
     'AuditFlowPageDeleteView',
     'AuditFlowPageBulkImportView',
+    'AuditFlowPageBulkEditView',
     'AuditFlowPageBulkDeleteView',
 )
 
@@ -42,6 +43,14 @@ class AuditFlowPageDeleteView(generic.ObjectDeleteView):
 class AuditFlowPageBulkImportView(generic.BulkImportView):
     queryset = models.AuditFlowPage.objects.all()
     model_form = forms.AuditFlowPageImportForm
+
+
+@register_model_view(models.AuditFlowPage, 'bulk_edit', path='edit', detail=False)
+class AuditFlowPageBulkEditView(generic.BulkEditView):
+    queryset = models.AuditFlowPage.objects.all()
+    filterset = filtersets.AuditFlowPageFilterSet
+    table = tables.AuditFlowPageTable
+    form = forms.AuditFlowPageBulkEditForm
 
 
 @register_model_view(models.AuditFlowPage, 'bulk_delete', path='delete', detail=False)
