@@ -57,7 +57,12 @@ class InventoryItemGroupFilterForm(PrimaryModelFilterSetForm):
             'filter_id',
             'tag',
             'owner_id',
+        ),
+        FieldSet(
             'parent_id',
+            'name',
+            'description',
+            name='Attributes',
         ),
     )
     parent_id = DynamicModelMultipleChoiceField(
@@ -65,6 +70,14 @@ class InventoryItemGroupFilterForm(PrimaryModelFilterSetForm):
         required=False,
         null_option='None',
         label='Parent group',
+    )
+    name = forms.CharField(
+        required=False,
+        label=_('Name'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
     )
     tag = TagFilterField(model)
 
@@ -74,10 +87,20 @@ class InventoryItemTypeFilterForm(PrimaryModelFilterSetForm):
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
         FieldSet(
+            'slug',
+            'description',
             'manufacturer_id',
             'inventoryitem_group_id',
-            name='Inventory Item Type',
+            name='Attributes',
         ),
+    )
+    slug = forms.CharField(
+        required=False,
+        label=_('Slug'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
     )
     manufacturer_id = DynamicModelMultipleChoiceField(
         queryset=Manufacturer.objects.all(),
@@ -96,8 +119,16 @@ class InventoryItemTypeFilterForm(PrimaryModelFilterSetForm):
 class AssetFilterForm(PrimaryModelFilterSetForm):
     model = Asset
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag', 'owner_id', 'status'),
+        FieldSet('q', 'filter_id', 'tag', 'owner_id'),
         FieldSet(
+            'status',
+            'name',
+            'description',
+            'asset_tag',
+            name='Attributes',
+        ),
+        FieldSet(
+            'serial',
             'kind',
             'manufacturer_id',
             'device_type_id',
@@ -139,6 +170,22 @@ class AssetFilterForm(PrimaryModelFilterSetForm):
     status = forms.MultipleChoiceField(
         choices=AssetStatusChoices,
         required=False,
+    )
+    name = forms.CharField(
+        required=False,
+        label=_('Name'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
+    )
+    asset_tag = forms.CharField(
+        required=False,
+        label=_('Asset tag'),
+    )
+    serial = forms.CharField(
+        required=False,
+        label=_('Serial number'),
     )
     kind = forms.MultipleChoiceField(
         choices=HardwareKindChoices,
@@ -350,9 +397,22 @@ class SupplierFilterForm(ContactModelFilterForm, PrimaryModelFilterSetForm):
     model = Supplier
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
+        FieldSet('name', 'slug', 'description', name='Attributes'),
         FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
     )
 
+    name = forms.CharField(
+        required=False,
+        label=_('Name'),
+    )
+    slug = forms.CharField(
+        required=False,
+        label=_('Slug'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
+    )
     contact_group = DynamicModelMultipleChoiceField(
         queryset=ContactGroup.objects.all(),
         required=False,
@@ -376,9 +436,19 @@ class PurchaseFilterForm(PrimaryModelFilterSetForm):
     model = Purchase
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
-        FieldSet('supplier_id', 'status', 'date', name='Purchase'),
+        FieldSet(
+            'name', 'description', 'supplier_id', 'status', 'date', name='Attributes'
+        ),
     )
 
+    name = forms.CharField(
+        required=False,
+        label=_('Name'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
+    )
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
@@ -397,24 +467,37 @@ class DeliveryFilterForm(PrimaryModelFilterSetForm):
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
         FieldSet(
-            'purchase_id',
+            'name',
+            'description',
             'supplier_id',
+            'purchase_id',
             'contact_group_id',
             'receiving_contact_id',
             'date',
-            name='Delivery',
+            name='Attributes',
         ),
     )
 
-    purchase_id = DynamicModelMultipleChoiceField(
-        queryset=Purchase.objects.all(),
+    name = forms.CharField(
         required=False,
-        label='Purchase',
+        label=_('Name'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
     )
     supplier_id = DynamicModelMultipleChoiceField(
         queryset=Supplier.objects.all(),
         required=False,
         label='Supplier',
+    )
+    purchase_id = DynamicModelMultipleChoiceField(
+        queryset=Purchase.objects.all(),
+        required=False,
+        query_params={
+            'supplier_id': '$supplier_id',
+        },
+        label='Purchase',
     )
     contact_group_id = DynamicModelMultipleChoiceField(
         queryset=ContactGroup.objects.all(),
@@ -445,6 +528,14 @@ class BaseFlowFilterForm(PrimaryModelFilterSetForm):
     Internal base filter form class for audit flow models.
     """
 
+    name = forms.CharField(
+        required=False,
+        label=_('Name'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
+    )
     object_type_id = ContentTypeChoiceField(
         queryset=ObjectType.objects.public(),
         required=False,
@@ -453,6 +544,8 @@ class BaseFlowFilterForm(PrimaryModelFilterSetForm):
 
 
 class AuditFlowPageFilterForm(BaseFlowFilterForm):
+    model = AuditFlowPage
+
     assigned_flow_id = DynamicModelMultipleChoiceField(
         queryset=AuditFlow.objects.all(),
         required=False,
@@ -460,10 +553,9 @@ class AuditFlowPageFilterForm(BaseFlowFilterForm):
         label=_('Audit flow'),
     )
 
-    model = AuditFlowPage
-
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
+        FieldSet('name', 'description', name='Attributes'),
         FieldSet(
             'object_type_id',
             'assigned_flow_id',
@@ -475,8 +567,15 @@ class AuditFlowPageFilterForm(BaseFlowFilterForm):
 class AuditFlowFilterForm(BaseFlowFilterForm):
     model = AuditFlow
 
+    enabled = forms.NullBooleanField(
+        required=False,
+        label='Enabled',
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+    )
+
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
+        FieldSet('name', 'description', 'enabled', name='Attributes'),
         FieldSet(
             'object_type_id',
             name='Assignment',
@@ -487,7 +586,24 @@ class AuditFlowFilterForm(BaseFlowFilterForm):
 class AuditTrailSourceFilterForm(PrimaryModelFilterSetForm):
     model = AuditTrailSource
 
-    fields = (FieldSet('q', 'filter_id', 'tag', 'owner_id'),)
+    name = forms.CharField(
+        required=False,
+        label=_('Name'),
+    )
+    slug = forms.CharField(
+        required=False,
+        label=_('Slug'),
+    )
+    description = forms.CharField(
+        required=False,
+        label=_('Description'),
+    )
+    tag = TagFilterField(model)
+
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag', 'owner_id'),
+        FieldSet('name', 'slug', 'description', name='Attributes'),
+    )
 
 
 class AuditTrailFilterForm(NetBoxModelFilterSetForm):
