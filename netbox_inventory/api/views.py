@@ -27,7 +27,7 @@ __all__ = (
 
 class NetboxInventoryRootView(APIRootView):
     def get_view_name(self):
-        return "Inventory"
+        return 'Inventory'
 
 
 #

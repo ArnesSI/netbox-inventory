@@ -502,7 +502,8 @@ class AssetFilterSet(PrimaryModelFilterSet):
         # filter OR for owning_tenant and tenant fields
         if name == 'slug':
             q_list = (
-                Q(tenant__slug__iexact=n) | Q(owning_tenant__slug__iexact=n) for n in value
+                Q(tenant__slug__iexact=n) | Q(owning_tenant__slug__iexact=n)
+                for n in value
             )
         elif name == 'id':
             q_list = (Q(tenant__pk=n) | Q(owning_tenant__pk=n) for n in value)
