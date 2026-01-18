@@ -49,9 +49,101 @@ To disable automatically changing status, set these two config parameters to `No
 
 ### Prevent unwanted changes for tagged assets
 
-With `asset_disable_editing_fields_for_tags` and `asset_disable_deletion_for_tags` you can prevent changes to specified asset data for assets that have certain tags attached. Changes are only prevented via web interface. API modifications are allowed.
+Past versions of netbox-inventory contained functionality to prevent users 
+from making changes to assets that had a specific tag applied. The idea is 
+that an external system uses some assets stored in netbox-inventory, and you 
+want to prevent accidental changes to data directly in the NetBox web 
+interface. Only that external system should modify the data.
 
-The idea is that an external system uses some assets stored in netbox_inventory, and you want to prevent accidental changes to data directly in NetBox web interface. Only that external system should modify the data.
+This functionality was removed in netbox-inventory 2.5.1 and newer. The same 
+function can be achieved using NetBox's [Custom Validation rules](https://netboxlabs.com/docs/netbox/customization/custom-validation).
+
+Here is an example that prevents changing `serial` and `asset_tag` fields for 
+assets that have the `no-edit` tag applied. Deletion of these assets is also 
+prevented. Restrictions apply only to web interface changes. Deletions and 
+modifications via API are possible.
+
+<details>
+<summary>Asset validator example</summary>
+
+```py
+from extras.validators import CustomValidator
+from utilities.data import shallow_compare_dict
+
+
+class TagEditProtector(CustomValidator):
+    def __init__(self, protection_tag, protected_fields=None):
+        super().__init__(validation_rules=None)
+        self.protection_tag = protection_tag
+        self.protected_fields = protected_fields
+
+    def validate(self, instance, request):
+        print(request.path)
+        # permit changes via API
+        if request and request.path.startswith('/api/'):
+            return
+        # permit changes via import
+        if request and '/import/' in request.path:
+            return
+        # see ChangeLoggingMixin.snapshot()
+        exclude = [
+            'last_updated',
+        ]
+        if not instance.pk:
+            # creating new object
+            return
+        if self.protection_tag not in instance.tags.all().values_list('slug', flat=True):
+            # if not tagged with protection_tag, no limitations
+            return
+        fail_msg = f'Cannot change {instance}. Protected by tag {self.protection_tag}'
+        violation = None
+        if not self.protected_fields:
+            # consider all fields protected
+            violation = fail_msg
+        else:
+            # Get fields that were changed
+            prechange_data = instance._prechange_snapshot
+            postchange_data = instance.serialize_object(exclude=exclude)
+            diff = shallow_compare_dict(prechange_data, postchange_data)
+            violated_fields = set(diff.keys()).intersection(self.protected_fields)
+            if violated_fields:
+                violation = dict(map(lambda f: (f, fail_msg), violated_fields))
+        if violation:
+            self.fail(violation)
+
+
+class TagDeleteProtector(CustomValidator):
+    def __init__(self, protection_tag):
+        super().__init__(validation_rules=None)
+        self.protection_tag = protection_tag
+
+    def validate(self, instance, request):
+        if request and request.path.startswith('/api/'):
+            return
+        if self.protection_tag not in instance.tags.all().values_list('slug', flat=True):
+            # if not tagged with protection_tag, no limitations
+            return
+        self.fail(f'Cannot delete {instance}. Protected by tag {self.protection_tag}')
+
+
+CUSTOM_VALIDATORS = {
+    'netbox_inventory.asset': [
+        TagEditProtector('no-edit', ('serial', 'asset_tag')),
+    ],
+}
+
+PROTECTION_RULES = {
+    'netbox_inventory.asset': [
+        TagDeleteProtector('no-edit'),
+    ]
+}
+```
+</details>
+
+Place the above code snippet into your NetBox configuration file and restart 
+the NetBox web and worker processes.
+
+You can of course modify the above example to suit your needs.
 
 ### Audit
 
@@ -261,8 +353,6 @@ PLUGINS_CONFIG = {
 | `asset_import_create_inventoryitem_type` | `False` | When importing an inventory type asset, automatically create manufacturer and/or inventory item type if it doesn't exist |
 | `asset_import_create_rack_type` | `False` | When importing a rack type asset, automatically create manufacturer and/or rack type if it doesn't exist |
 | `asset_import_create_tenant` | `False` | When importing an asset, with owner or tenant, automatically create tenant if it doesn't exist |
-| `asset_disable_editing_fields_for_tags` | `{}` | A dictionary of tags and fields that should be disabled for editing. This is useful if you want to prevent editing of certain fields for certain assets. The dictionary is in the form of `{tag: [field1, field2]}`. Example: `{'no-edit': ['serial_number', 'asset_tag']}`. This only affects the UI, the API can still be used to edit the fields. |
-| `asset_disable_deletion_for_tags` | `[]` | List of tags that will disable deletion of assets. This only affects the UI, not the API. |
 | `asset_custom_fields_search_filters` | `{}` | A dictionary of custom fields and lookup types that will be added to the search filters for assets. The dictionary is in the form of `{field: [lookup_type]}`. Example: `{'asset_mac': ['icontains', 'exact']}`. |
 | `asset_warranty_expire_warning_days` | `90` | Days from warranty expiration to show as warning in Warranty remaining field |
 | `prefill_asset_name_create_inventoryitem` | `False` | When hardware inventory item is created from an asset, prefill the InventoryItem name to match the asset name. |
