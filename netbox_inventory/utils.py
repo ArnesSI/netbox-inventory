@@ -55,37 +55,6 @@ def get_all_statuses_for(status):
     return list(status_names)
 
 
-def get_tags_that_protect_asset_from_deletion():
-    """Return a list of tags that prevent an asset from being deleted.
-
-    Which tags prevent deletion is defined in the plugin configuration,
-    under the key ``asset_disable_deletion_for_tags``.
-
-    Returns:
-        list: list of tag slug strings
-    """
-    return get_plugin_setting('asset_disable_deletion_for_tags')
-
-
-def get_tags_and_edit_protected_asset_fields():
-    """Return a dict of tags and fields that prevent editing specified fields.
-
-    Which tags prevent editing is defined in the plugin configuration,
-    under the key ``asset_disable_editing_fields_for_tags``.
-
-    Structure of the dict is::
-
-        {
-            'tag_slug': ['field1', 'field2'],
-            'tag_slug2': ['field1', 'field4'],
-        }
-
-    Returns:
-        dict: dict of tag slug strings and list of field names
-    """
-    return get_plugin_setting('asset_disable_editing_fields_for_tags')
-
-
 def asset_clear_old_hw(old_hw):
     # need to temporarily disconnect signal receiver that prevents update of device serial if asset assigned
     from .signals import prevent_update_serial_asset_tag

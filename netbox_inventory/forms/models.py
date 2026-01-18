@@ -15,7 +15,6 @@ from utilities.forms.widgets import DatePicker
 
 from ..constants import AUDITFLOW_OBJECT_TYPE_CHOICES
 from ..models import *
-from ..utils import get_tags_and_edit_protected_asset_fields
 from netbox_inventory.choices import HardwareKindChoices
 
 __all__ = (
@@ -255,8 +254,6 @@ class AssetForm(PrimaryModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._disable_fields_by_tags()
-
         # Used for picking the default active tab for hardware type selection
         self.no_hardware_type = True
         if self.instance:
@@ -278,26 +275,6 @@ class AssetForm(PrimaryModelForm):
             self.fields['manufacturer'].disabled = True
             for kind in HardwareKindChoices.values():
                 self.fields[f'{kind}_type'].disabled = True
-
-    def _disable_fields_by_tags(self):
-        """
-        We need to disable fields that are not editable based on the tags that are assigned to the asset.
-        """
-        if not self.instance.pk:
-            # If we are creating a new asset we can't disable fields
-            return
-
-        # Disable fields that should not be edited
-        tags = self.instance.tags.all().values_list('slug', flat=True)
-        tags_and_disabled_fields = get_tags_and_edit_protected_asset_fields()
-
-        for tag in tags:
-            if tag not in tags_and_disabled_fields:
-                continue
-
-            for field in tags_and_disabled_fields[tag]:
-                if field in self.fields:
-                    self.fields[field].disabled = True
 
     def clean(self):
         super().clean()
