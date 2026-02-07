@@ -6,7 +6,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from core.models import ObjectChange, ObjectType
+from core.models import ObjectChange
 from dcim.models import Location, Rack, Site
 from netbox.models import NestedGroupModel
 from netbox.models.features import (
@@ -42,7 +42,7 @@ class BaseFlow(NamedModel):
     """
 
     object_type = models.ForeignKey(
-        ObjectType,
+        to='contenttypes.ContentType',
         related_name='+',
         on_delete=models.PROTECT,
     )
@@ -140,7 +140,7 @@ class AuditFlow(BaseFlow):
     # Restrict inherited object_type to those object types that represent physical
     # locations.
     object_type = models.ForeignKey(
-        ObjectType,
+        to='contenttypes.ContentType',
         related_name='+',
         on_delete=models.PROTECT,
         limit_choices_to=AUDITFLOW_OBJECT_TYPE_CHOICES,
