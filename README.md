@@ -78,7 +78,6 @@ class TagEditProtector(CustomValidator):
         self.protected_fields = protected_fields
 
     def validate(self, instance, request):
-        print(request.path)
         # permit changes via API
         if request and request.path.startswith('/api/'):
             return
