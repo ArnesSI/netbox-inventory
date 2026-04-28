@@ -28,11 +28,29 @@
           </tr>
           <tr>
             <th scope="row">Asset Tag</th>
-            <td class="font-monospace">{{ object.asset_tag|placeholder }}</td>
+            <td class="font-monospace d-flex justify-content-between align-items-center">
+              {% if object.asset_tag %}
+                <span id="attr_asset_tag">{{ object.asset_tag }}</span>
+                <a class="btn btn-sm btn-primary copy-content" data-clipboard-target="#attr_asset_tag" title="Copy to clipboard">
+                  <i class="mdi mdi-content-copy"></i>
+                </a>
+              {% else %}
+                {{ ''|placeholder }}
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <th scope="row">Serial Number</th>
-            <td class="font-monospace">{{ object.serial|placeholder }}</td>
+            <td class="font-monospace d-flex justify-content-between align-items-center">
+              {% if object.serial %}
+                <span id="attr_serial">{{ object.serial }}</span>
+                <a class="btn btn-sm btn-primary copy-content" data-clipboard-target="#attr_serial" title="Copy to clipboard">
+                  <i class="mdi mdi-content-copy"></i>
+                </a>
+              {% else %}
+                {{ ''|placeholder }}
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <th scope="row">Status</th>
