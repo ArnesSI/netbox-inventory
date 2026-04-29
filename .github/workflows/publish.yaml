@@ -2,9 +2,9 @@
 name: Publish Python package to PyPI
 
 on:
-  release:
-    types:
-      - created # runs on draft releases too
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   validate:
@@ -45,17 +45,3 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
-
-  publish-release:
-    name: Make release public
-    needs: publish
-    if: github.repository == 'ArnesSI/netbox-inventory'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Publish draft release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release edit "${{ github.ref_name }}" --draft=false --repo "${{ github.repository }}"
