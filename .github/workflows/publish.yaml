@@ -23,6 +23,7 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: validate
+    if: github.repository == 'ArnesSI/netbox-inventory'
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -48,6 +49,7 @@ jobs:
   publish-release:
     name: Make release public
     needs: publish
+    if: github.repository == 'ArnesSI/netbox-inventory'
     runs-on: ubuntu-latest
     permissions:
       contents: write
