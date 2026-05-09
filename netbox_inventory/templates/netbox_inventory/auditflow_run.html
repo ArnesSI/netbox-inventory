@@ -30,6 +30,8 @@
   <ul class="nav nav-tabs" role="tablist">
     {% for page in flow_pages %}
       <li class="nav-item" role="presentation">
+        {# FIXME "querystring request ..." -> "querystring ..." under netbox v4.7 #}
+        {# https://github.com/netbox-community/netbox/issues/21331 #}
         <a class="nav-link{% if tab == page.pk %} active{% endif %}" href="{% querystring request tab=page.pk page=None per_page=None %}">{{ page.page.name }}</a>
       </li>
     {% endfor %}

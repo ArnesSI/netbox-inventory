@@ -1,11 +1,10 @@
-{% load helpers %}
 {# renders tab navbar for asset form #}
 
 <ul class="nav nav-tabs px-3">
   <li class="nav-item">
       <a
           class="nav-link {% if active_tab == 'add' %}active{% endif %}"
-          href="{% url 'plugins:netbox_inventory:asset_add' %}{% querystring request %}"
+          href="{% url 'plugins:netbox_inventory:asset_add' %}{% querystring %}"
       >
           {% if object.pk %}Edit{% else %}Create{% endif %}
       </a>
@@ -14,7 +13,7 @@
   <li class="nav-item">
       <a
           class="nav-link {% if active_tab == 'bulk_add' %}active{% endif %}"
-          href="{% url 'plugins:netbox_inventory:asset_bulk_add' %}{% querystring request %}"
+          href="{% url 'plugins:netbox_inventory:asset_bulk_add' %}{% querystring %}"
       >
           Bulk Create
       </a>
