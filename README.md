@@ -272,6 +272,7 @@ support older netbox version as per table below:
 |       4.3      |      2.4.0     |
 |       4.4      |    >=2.4.1     |
 |       4.5      |      2.5.x     |
+|       4.6      |      2.6.x     |
 
 ## Installing
 
