@@ -4,7 +4,7 @@ from django.db import models
 from django.forms import ValidationError
 
 from netbox.models import NestedGroupModel
-from netbox.models.features import ImageAttachmentsMixin
+from netbox.models.features import ContactsMixin, ImageAttachmentsMixin
 
 from ..choices import AssetStatusChoices, HardwareKindChoices
 from ..managers import AssetManager
@@ -92,7 +92,7 @@ class InventoryItemType(NamedModel, ImageAttachmentsMixin):
         return self.model
 
 
-class Asset(NamedModel, ImageAttachmentsMixin):
+class Asset(NamedModel, ImageAttachmentsMixin, ContactsMixin):
     """
     An Asset represents a piece of hardware we want to keep track of. It has a
     make (model, part number) that is one of: Device Type, Module Type,
