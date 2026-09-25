@@ -253,9 +253,10 @@ class ContactAssetCounts(PluginTemplateExtension):
             'asset_stats': [
                 {
                     'label': 'Assigned',
-                    'filter_field': 'contact_id',
+                    'filter_field': 'contact',
                     'count': Asset.objects.restrict(user, 'view')
-                    .filter(contact=object)
+                    .filter(contacts__contact=object)
+                    .distinct()
                     .count(),
                 },
             ],

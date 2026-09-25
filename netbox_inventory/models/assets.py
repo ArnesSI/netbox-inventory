@@ -234,14 +234,6 @@ class Asset(NamedModel, ImageAttachmentsMixin, ContactsMixin):
         blank=True,
         null=True,
     )
-    contact = models.ForeignKey(
-        help_text='Contact using this asset',
-        to='tenancy.Contact',
-        on_delete=models.PROTECT,
-        related_name='+',
-        blank=True,
-        null=True,
-    )
 
     storage_location = models.ForeignKey(
         help_text='Where is this asset stored when not in use',
@@ -306,7 +298,6 @@ class Asset(NamedModel, ImageAttachmentsMixin, ContactsMixin):
         'warranty_start',
         'warranty_end',
         'tenant',
-        'contact',
         'storage_location',
         'comments',
     ]

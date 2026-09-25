@@ -149,7 +149,7 @@ class InventoryItemTypeFilterSet(PrimaryModelFilterSet):
 
 
 @register_filterset
-class AssetFilterSet(PrimaryModelFilterSet):
+class AssetFilterSet(PrimaryModelFilterSet, ContactModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=AssetStatusChoices,
     )
@@ -326,16 +326,6 @@ class AssetFilterSet(PrimaryModelFilterSet):
         field_name='tenant__name',
         lookup_expr='icontains',
         label='Tenant (name)',
-    )
-    contact_group_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=ContactGroup.objects.all(),
-        field_name='contact__groups',
-        label='Contact Group (ID)',
-    )
-    contact_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=Contact.objects.all(),
-        field_name='contact',
-        label='Contact (ID)',
     )
     owning_tenant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),

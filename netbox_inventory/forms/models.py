@@ -195,24 +195,6 @@ class AssetForm(PrimaryModelForm):
         help_text=Asset._meta.get_field('tenant').help_text,
         required=not Asset._meta.get_field('tenant').blank,
     )
-    contact_group = DynamicModelChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-        help_text='Filter contacts by group',
-        initial_params={
-            'contact': '$contact',
-        },
-    )
-    contact = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
-        help_text=Asset._meta.get_field('contact').help_text,
-        required=not Asset._meta.get_field('contact').blank,
-        query_params={
-            'group_id': '$contact_group',
-        },
-    )
     storage_site = DynamicModelChoiceField(
         queryset=Site.objects.all(),
         required=False,
@@ -262,7 +244,7 @@ class AssetForm(PrimaryModelForm):
             'warranty_end',
             name='Purchase',
         ),
-        FieldSet('tenant', 'contact_group', 'contact', name='Assigned to'),
+        FieldSet('tenant', name='Assigned to'),
         FieldSet('storage_site', 'storage_location', name='Location'),
     )
 
@@ -286,8 +268,6 @@ class AssetForm(PrimaryModelForm):
             'warranty_start',
             'warranty_end',
             'tenant',
-            'contact_group',
-            'contact',
             'tags',
             'owner',
             'description',

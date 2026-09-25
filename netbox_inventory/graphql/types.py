@@ -38,7 +38,7 @@ from netbox_inventory.models import (
 
 
 @strawberry_django.type(Asset, fields='__all__', filters=AssetFilter)
-class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
+class AssetType(ContactsMixin, ImageAttachmentsMixin, NetBoxObjectType):
     device_type: (
         Annotated['DeviceTypeType', strawberry.lazy('dcim.graphql.types')] | None
     )
@@ -55,7 +55,6 @@ class AssetType(ImageAttachmentsMixin, NetBoxObjectType):
     tenant: Annotated['TenantType', strawberry.lazy('tenancy.graphql.types')] | None
     device: Annotated['DeviceType', strawberry.lazy('dcim.graphql.types')] | None
     module: Annotated['ModuleType', strawberry.lazy('dcim.graphql.types')] | None
-    contact: Annotated['ContactType', strawberry.lazy('tenancy.graphql.types')] | None
     inventoryitem: (
         Annotated['InventoryItemType', strawberry.lazy('dcim.graphql.types')] | None
     )

@@ -131,15 +131,6 @@
             </td>
           </tr>
           <tr>
-            <th scope="row">Contact</th>
-            <td>
-              {% if object.contact.group %}
-                {{ object.contact.group|linkify }} /
-              {% endif %}
-              {{ object.contact|linkify|placeholder }}
-            </td>
-          </tr>
-          <tr>
             <th scope="row">{{ object.get_kind_display }}</th>
             <td>{{ object.hardware|linkify|placeholder }}</td>
           </tr>
