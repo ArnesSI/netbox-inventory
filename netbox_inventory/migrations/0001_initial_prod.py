@@ -11,9 +11,9 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('tenancy', '0007_contact_link'),
-        ('extras', '0077_customlink_extend_text_and_url'),
-        ('dcim', '0161_cabling_cleanup'),
+        ('tenancy', '0002_squashed_0011'),
+        ('extras', '0060_squashed_0086'),
+        ('dcim', '0160_squashed_0166'),
     ]
 
     operations = [
