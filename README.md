@@ -260,7 +260,7 @@ class AuditReportMissing(Script):
 
 ## Compatibility
 
-This plugin requires netbox version 4.5 to work. Older versions of the plugin
+This plugin requires netbox version 4.7 to work. Older versions of the plugin
 support older netbox version as per table below:
 
 | NetBox Version | Plugin Version |
@@ -273,6 +273,7 @@ support older netbox version as per table below:
 |       4.4      |    >=2.4.1     |
 |       4.5      |      2.5.x     |
 |       4.6      |      2.6.x     |
+|       4.7      |      2.7.x     |
 
 ## Installing
 
@@ -455,3 +456,19 @@ Suppliers - Individual View
 Inventory Item Type - List View
 
 ![Asset - List View](docs/img/inventoryitem_type_list.png)
+
+## Development
+
+Mostly reffer to netbox's own development docs. Especially the [Getting started](https://netboxlabs.com/docs/netbox/development/getting-started/) chapter.
+
+### Running tests
+
+Edit `netbox/configuration_testing.py` and add `netbox_inventory` to `PLUGINS`. Then run
+
+```
+cd netbox/ # top level directory of netbox git repo
+source venv/bin/activate
+export NETBOX_CONFIGURATION=netbox.configuration_testing
+python netbox/manage.py test netbox_inventory --keepdb
+```
+
