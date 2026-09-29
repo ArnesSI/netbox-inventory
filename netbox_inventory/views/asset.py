@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from django.template import Template
+from django.utils.translation import gettext as _
 
 from netbox.views import generic
 from utilities.views import register_model_view
@@ -67,9 +68,39 @@ class AssetBulkCreateView(generic.BulkCreateView):
 
         return self._create_objects_by_count(form, request, form.cleaned_data['count'])
 
+    def _add_model_form_errors(self, form, model_form, value, pattern_field=None):
+        """
+        Copy validation errors from a single generated object's model form back onto
+        the outer bulk-add form so they are shown to the user, instead of being
+        silently discarded (#298). ``pattern_field``, if given, is bound to the
+        'pattern' input instead of listed generically, mirroring how the base
+        BulkCreateView.add_model_form_errors() treats its own pattern_target.
+        """
+        errors = model_form.errors.as_data()
+
+        if pattern_field and errors.get(pattern_field):
+            form.add_error('pattern', errors.pop(pattern_field))
+
+        for field_name, field_errors in errors.items():
+            if field_name == '__all__':
+                field_label = _('General')
+            elif field_name in model_form.fields:
+                field_label = model_form.fields[field_name].label
+            else:
+                field_label = field_name
+
+            for error in field_errors:
+                for message in error.messages:
+                    form.add_error(
+                        None,
+                        _('{value}: {field}: {error}').format(
+                            value=value, field=field_label, error=message,
+                        )
+                    )
+
     def _create_objects_by_count(self, form, request, count):
         new_objects = []
-        for _ in range(count):
+        for i in range(count):
             # Reinstantiate the model form each time to avoid overwriting the same instance. Use a mutable
             # copy of the POST QueryDict so that we can update the target field value.
             model_form = self.model_form(request.POST.copy())
@@ -81,6 +112,7 @@ class AssetBulkCreateView(generic.BulkCreateView):
                 obj = model_form.save()
                 new_objects.append(obj)
             else:
+                self._add_model_form_errors(form, model_form, i + 1)
                 # Raise an IntegrityError to break the for loop and abort the transaction.
                 raise IntegrityError()
 
@@ -100,9 +132,7 @@ class AssetBulkCreateView(generic.BulkCreateView):
                 obj = model_form.save()
                 new_objects.append(obj)
             else:
-                errors = model_form.errors.as_data()
-                if errors.get('asset_tag'):
-                    form.add_error('pattern', errors['asset_tag'])
+                self._add_model_form_errors(form, model_form, value, pattern_field='asset_tag')
                 raise IntegrityError()
 
         return new_objects

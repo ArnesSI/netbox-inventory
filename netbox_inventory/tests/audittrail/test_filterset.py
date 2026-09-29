@@ -4,13 +4,13 @@ from core.models import ObjectType
 from dcim.models import DeviceType, Manufacturer
 from tenancy.filtersets import *
 from tenancy.models import *
-from utilities.testing import ChangeLoggedFilterSetTests
+from utilities.testing import ChangeLoggedFilterSetTestMixin
 
 from netbox_inventory.filtersets import AuditTrailFilterSet
 from netbox_inventory.models import Asset, AuditTrail, AuditTrailSource
 
 
-class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTests):
+class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTestMixin):
     queryset = AuditTrail.objects.all()
     filterset = AuditTrailFilterSet
 

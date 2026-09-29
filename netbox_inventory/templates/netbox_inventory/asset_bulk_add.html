@@ -11,6 +11,7 @@
 
 
 {% block form %}
+  {% render_errors form %}
   {% render_field form.count %}
   {% render_field form.pattern %}
   {% with model_form as form %}

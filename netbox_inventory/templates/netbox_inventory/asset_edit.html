@@ -9,6 +9,7 @@
 {% endblock tabs %}
 
 {% block form %}
+    {% render_errors form %}
     <div class="field-group mb-5">
         <div class="row">
           <h2 class="col-9 offset-3">General</h2>
@@ -110,6 +111,12 @@
     {% if form.comments %}
         <div class="field-group mb-5">
             {% render_field form.comments %}
+        </div>
+    {% endif %}
+
+    {% if form.changelog_message %}
+        <div class="bg-primary-subtle border border-primary rounded-1 pt-3 px-3 mb-3">
+            {% render_field form.changelog_message %}
         </div>
     {% endif %}
 

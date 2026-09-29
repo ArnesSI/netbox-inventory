@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from tenancy.filtersets import *
 from tenancy.models import *
-from utilities.testing import ChangeLoggedFilterSetTests
+from utilities.testing import ChangeLoggedFilterSetTestMixin
 
 from netbox_inventory.filtersets import AuditTrailSourceFilterSet
 from netbox_inventory.models import (
@@ -10,7 +10,7 @@ from netbox_inventory.models import (
 )
 
 
-class AuditTrailSourceTestCase(TestCase, ChangeLoggedFilterSetTests):
+class AuditTrailSourceTestCase(TestCase, ChangeLoggedFilterSetTestMixin):
     queryset = AuditTrailSource.objects.all()
     filterset = AuditTrailSourceFilterSet
 

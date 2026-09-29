@@ -4,7 +4,7 @@ from core.models import ObjectType
 from dcim.models import Location, Site
 from tenancy.filtersets import *
 from tenancy.models import *
-from utilities.testing import ChangeLoggedFilterSetTests
+from utilities.testing import ChangeLoggedFilterSetTestMixin
 
 from netbox_inventory.filtersets import AuditFlowFilterSet
 from netbox_inventory.models import (
@@ -15,7 +15,7 @@ from netbox_inventory.models import (
 )
 
 
-class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTests):
+class AuditFlowTestCase(TestCase, ChangeLoggedFilterSetTestMixin):
     queryset = AuditFlow.objects.all()
     filterset = AuditFlowFilterSet
     ignore_fields = (

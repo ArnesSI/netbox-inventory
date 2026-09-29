@@ -1,1 +1,2 @@
 recursive-include netbox_inventory/templates *.html
+include netbox_inventory/tests/query_counts.json
