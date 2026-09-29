@@ -9,7 +9,7 @@ from utilities.json import CustomFieldJSONEncoder
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('extras', '0077_customlink_extend_text_and_url'),
+        ('extras', '0060_squashed_0086'),
         ('netbox_inventory', '0002_alter_asset_serial'),
     ]
 
