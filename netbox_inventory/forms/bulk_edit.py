@@ -155,21 +155,6 @@ class AssetBulkEditForm(PrimaryModelBulkEditForm):
         help_text=Asset._meta.get_field('tenant').help_text,
         required=not Asset._meta.get_field('tenant').blank,
     )
-    contact_group = DynamicModelChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-        help_text='Filter contacts by group',
-    )
-    contact = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
-        help_text=Asset._meta.get_field('contact').help_text,
-        required=not Asset._meta.get_field('contact').blank,
-        query_params={
-            'group_id': '$contact_group',
-        },
-    )
     storage_location = DynamicModelChoiceField(
         queryset=Location.objects.all(),
         help_text=Asset._meta.get_field('storage_location').help_text,
@@ -204,8 +189,6 @@ class AssetBulkEditForm(PrimaryModelBulkEditForm):
         ),
         FieldSet(
             'tenant',
-            'contact_group',
-            'contact',
             name='Assigned to',
         ),
         FieldSet(
@@ -224,7 +207,6 @@ class AssetBulkEditForm(PrimaryModelBulkEditForm):
         'purchase',
         'delivery',
         'tenant',
-        'contact',
         'warranty_start',
         'warranty_end',
         'storage_location',

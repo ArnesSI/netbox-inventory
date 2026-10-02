@@ -148,7 +148,7 @@ class InventoryItemTypeFilterForm(PrimaryModelFilterSetForm):
     tag = TagFilterField(model)
 
 
-class AssetFilterForm(PrimaryModelFilterSetForm):
+class AssetFilterForm(ContactModelFilterForm, PrimaryModelFilterSetForm):
     model = Asset
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag', 'owner_id'),
@@ -175,7 +175,8 @@ class AssetFilterForm(PrimaryModelFilterSetForm):
             'is_assigned',
             name='Hardware',
         ),
-        FieldSet('tenant_id', 'contact_group_id', 'contact_id', name='Usage'),
+        FieldSet('tenant_id', name='Usage'),
+        FieldSet('contact_group', 'contact_role', 'contact', name='Contacts'),
         FieldSet(
             'owning_tenant_id',
             'delivery_id',
@@ -298,21 +299,6 @@ class AssetFilterForm(PrimaryModelFilterSetForm):
         required=False,
         null_option='None',
         label='Tenant',
-    )
-    contact_group_id = DynamicModelMultipleChoiceField(
-        queryset=ContactGroup.objects.all(),
-        required=False,
-        null_option='None',
-        label='Contact Group',
-    )
-    contact_id = DynamicModelMultipleChoiceField(
-        queryset=Contact.objects.all(),
-        required=False,
-        null_option='None',
-        query_params={
-            'group_id': '$contact_group_id',
-        },
-        label='Contact',
     )
     owning_tenant_id = DynamicModelMultipleChoiceField(
         queryset=Tenant.objects.all(),

@@ -12,7 +12,7 @@ from dcim.api.serializers import (
     RackTypeSerializer,
 )
 from netbox.api.serializers import NestedGroupModelSerializer, PrimaryModelSerializer
-from tenancy.api.serializers import ContactSerializer, TenantSerializer
+from tenancy.api.serializers import TenantSerializer
 
 from .deliveries import *
 from .nested import *
@@ -188,12 +188,6 @@ class AssetSerializer(PrimaryModelSerializer):
         allow_null=True,
         default=None,
     )
-    contact = ContactSerializer(
-        nested=True,
-        required=False,
-        allow_null=True,
-        default=None,
-    )
     owning_tenant = TenantSerializer(
         nested=True,
         required=False,
@@ -240,7 +234,6 @@ class AssetSerializer(PrimaryModelSerializer):
             'rack_type',
             'rack',
             'tenant',
-            'contact',
             'storage_location',
             'owning_tenant',
             'delivery',
