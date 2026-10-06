@@ -62,7 +62,13 @@ class AssetType(ContactsMixin, ImageAttachmentsMixin, PrimaryObjectType):
     storage_location: (
         Annotated['LocationType', strawberry.lazy('dcim.graphql.types')] | None
     )
-    owner: Annotated['TenantType', strawberry.lazy('tenancy.graphql.types')] | None
+    owning_tenant: (
+        Annotated['TenantType', strawberry.lazy('tenancy.graphql.types')] | None
+    )
+    role: (
+        Annotated['AssetRoleType', strawberry.lazy('netbox_inventory.graphql.types')]
+        | None
+    )
     delivery: (
         Annotated['DeliveryType', strawberry.lazy('netbox_inventory.graphql.types')]
         | None
