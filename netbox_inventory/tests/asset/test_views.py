@@ -225,6 +225,11 @@ class AssetBulkAddTestCase(
             action = 'bulk_add'
         return super()._get_url(action, instance)
 
+    def test_create_multiple_objects_addanother(self):
+        # written for NetBox's ComponentCreateView, which treats device_type as a parent to keep in
+        # the "Create & Add Another" redirect; BulkCreateView redirects to an empty form
+        self.skipTest('Not applicable to BulkCreateView')
+
     def test_bulk_create_objects_with_asset_tag_pattern(self):
         obj_perm = ObjectPermission(name='test-asset-bulk-add-pattern', actions=['add'])
         obj_perm.save()
