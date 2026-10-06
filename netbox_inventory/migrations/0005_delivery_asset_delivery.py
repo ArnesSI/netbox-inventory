@@ -9,8 +9,8 @@ import utilities.json
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('tenancy', '0010_tenant_relax_uniqueness'),
-        ('extras', '0092_delete_jobresult'),
+        ('tenancy', '0002_squashed_0011'),
+        ('extras', '0087_squashed_0098'),
         ('netbox_inventory', '0004_inventoryitemgroup_tree'),
     ]
 
