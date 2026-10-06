@@ -2,6 +2,7 @@ import strawberry_django
 from strawberry_django.filters import FilterLookup
 
 from netbox.graphql.filters import BaseModelFilter
+from tenancy.graphql.filter_mixins import ContactFilterMixin
 
 from netbox_inventory import models
 
@@ -17,7 +18,7 @@ __all__ = (
 
 
 @strawberry_django.filter(models.Asset, lookups=True)
-class AssetFilter(BaseModelFilter):
+class AssetFilter(ContactFilterMixin, BaseModelFilter):
     pass
 
 @strawberry_django.filter(models.AssetRole, lookups=True)

@@ -173,12 +173,6 @@ class AssetImportForm(PrimaryModelImportForm):
         help_text='Tenant using this asset. See "Import settings" for more info.',
         required=False,
     )
-    contact = CSVModelChoiceField(
-        queryset=Contact.objects.all(),
-        to_field_name='name',
-        help_text='Contact using this asset. It must exist before import.',
-        required=False,
-    )
 
     class Meta:
         model = Asset
@@ -210,7 +204,6 @@ class AssetImportForm(PrimaryModelImportForm):
             'owner',
             'comments',
             'tenant',
-            'contact',
             'tags',
         )
 

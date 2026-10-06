@@ -115,7 +115,7 @@ class InventoryItemTypeTable(PrimaryModelTable):
         )
 
 
-class AssetTable(PrimaryModelTable):
+class AssetTable(ContactsColumnMixin, PrimaryModelTable):
     name = tables.Column(
         linkify=True,
     )
@@ -169,9 +169,6 @@ class AssetTable(PrimaryModelTable):
         verbose_name='Installed Device',
     )
     tenant = tables.Column(
-        linkify=True,
-    )
-    contact = tables.Column(
         linkify=True,
     )
     storage_location = tables.Column(
@@ -374,7 +371,7 @@ class AssetTable(PrimaryModelTable):
             'installed_rack',
             'installed_device',
             'tenant',
-            'contact',
+            'contacts',
             'storage_site',
             'storage_location',
             'current_site',

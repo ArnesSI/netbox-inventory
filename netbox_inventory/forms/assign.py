@@ -2,7 +2,7 @@ from django import forms
 
 from dcim.models import Device, InventoryItem, Location, Module, Rack, Site
 from netbox.forms import NetBoxModelForm
-from tenancy.models import Contact, Tenant
+from tenancy.models import Tenant
 from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import APISelect
@@ -28,12 +28,6 @@ class AssetAssignMixin(forms.Form):
         selector=True,
         required=False,
         help_text=Asset._meta.get_field('tenant').help_text,
-    )
-    contact = DynamicModelChoiceField(
-        queryset=Contact.objects.all(),
-        selector=True,
-        required=False,
-        help_text=Asset._meta.get_field('contact').help_text,
     )
 
     def _clean_hardware_type(self, kind):
@@ -105,12 +99,12 @@ class AssetDeviceAssignForm(AssetAssignMixin, NetBoxModelForm):
     fieldsets = (
         FieldSet('name', name='Asset'),
         FieldSet('site', 'device', name='Device'),
-        FieldSet('tenant', 'contact', name='Assigned to'),
+        FieldSet('tenant', name='Assigned to'),
     )
 
     class Meta:
         model = Asset
-        fields = ('device_type', 'name', 'site', 'device', 'tenant', 'contact')
+        fields = ('device_type', 'name', 'site', 'device', 'tenant')
         widgets = {'device_type': forms.HiddenInput()}
 
     def clean_device_type(self):
@@ -150,7 +144,7 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
     fieldsets = (
         FieldSet('name', name='Asset'),
         FieldSet('site', 'on_device', 'module', name='Module'),
-        FieldSet('tenant', 'contact', name='Tenancy'),
+        FieldSet('tenant', name='Tenancy'),
     )
 
     class Meta:
@@ -162,7 +156,6 @@ class AssetModuleAssignForm(AssetAssignMixin, NetBoxModelForm):
             'on_device',
             'module',
             'tenant',
-            'contact',
         )
         widgets = {'module_type': forms.HiddenInput()}
 
@@ -205,7 +198,7 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
     fieldsets = (
         FieldSet('name', name='Asset'),
         FieldSet('site', 'on_device', 'inventoryitem', name='Inventory Item'),
-        FieldSet('tenant', 'contact', name='Tenancy'),
+        FieldSet('tenant', name='Tenancy'),
     )
 
     class Meta:
@@ -216,7 +209,6 @@ class AssetInventoryItemAssignForm(AssetAssignMixin, NetBoxModelForm):
             'on_device',
             'inventoryitem',
             'tenant',
-            'contact',
         )
         widgets = {'inventoryitem_type': forms.HiddenInput()}
 
@@ -266,12 +258,12 @@ class AssetRackAssignForm(AssetAssignMixin, NetBoxModelForm):
     fieldsets = (
         FieldSet('name', name='Asset'),
         FieldSet('site', 'location', 'rack', name='Rack'),
-        FieldSet('tenant', 'contact', name='Tenancy'),
+        FieldSet('tenant', name='Tenancy'),
     )
 
     class Meta:
         model = Asset
-        fields = ('rack_type', 'name', 'site', 'location', 'rack', 'tenant', 'contact')
+        fields = ('rack_type', 'name', 'site', 'location', 'rack', 'tenant')
         widgets = {'rack_type': forms.HiddenInput()}
 
     def clean_rack_type(self):
