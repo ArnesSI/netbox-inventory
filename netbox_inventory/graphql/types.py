@@ -76,6 +76,7 @@ class AssetType(ContactsMixin, ImageAttachmentsMixin, NetBoxObjectType):
     AssetRole, fields='__all__', filters=AssetRoleFilter
 )
 class AssetRoleType(OrganizationalObjectType):
+    color: str
     parent: (
         Annotated[
             'AssetRoleType', strawberry.lazy('netbox_inventory.graphql.types')
