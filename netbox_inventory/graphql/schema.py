@@ -10,73 +10,45 @@ from .types import (
     PurchaseType,
     SupplierType,
 )
-from netbox_inventory.models import (
-    Asset,
-    AssetRole,
-    Delivery,
-    InventoryItemGroup,
-    InventoryItemType,
-    Purchase,
-    Supplier,
-)
 
 
-@strawberry.type
+@strawberry.type(name='Query')
 class AssetQuery:
-    @strawberry.field
-    def asset(self, id: int) -> AssetType:
-        return Asset.objects.get(pk=id)
-
+    asset: AssetType = strawberry_django.field()
     asset_list: list[AssetType] = strawberry_django.field()
 
-@strawberry.type
-class AssetRoleQuery:
-    @strawberry.field
-    def asset_role(self, id: int) -> AssetRoleType:
-        return AssetRole.objects.get(pk=id)
 
+@strawberry.type(name='Query')
+class AssetRoleQuery:
+    asset_role: AssetRoleType = strawberry_django.field()
     asset_role_list: list[AssetRoleType] = strawberry_django.field()
 
-@strawberry.type
-class SupplierQuery:
-    @strawberry.field
-    def supplier(self, id: int) -> SupplierType:
-        return Supplier.objects.get(pk=id)
 
+@strawberry.type(name='Query')
+class SupplierQuery:
+    supplier: SupplierType = strawberry_django.field()
     supplier_list: list[SupplierType] = strawberry_django.field()
 
 
-@strawberry.type
+@strawberry.type(name='Query')
 class PurchaseQuery:
-    @strawberry.field
-    def purchase(self, id: int) -> PurchaseType:
-        return Purchase.objects.get(pk=id)
-
+    purchase: PurchaseType = strawberry_django.field()
     purchase_list: list[PurchaseType] = strawberry_django.field()
 
 
-@strawberry.type
+@strawberry.type(name='Query')
 class DeliveryQuery:
-    @strawberry.field
-    def delivery(self, id: int) -> DeliveryType:
-        return Delivery.objects.get(pk=id)
-
+    delivery: DeliveryType = strawberry_django.field()
     delivery_list: list[DeliveryType] = strawberry_django.field()
 
 
-@strawberry.type
+@strawberry.type(name='Query')
 class InventoryItemTypeQuery:
-    @strawberry.field
-    def inventory_item_type(self, id: int) -> InventoryItemTypeType:
-        return InventoryItemType.objects.get(pk=id)
-
+    inventory_item_type: InventoryItemTypeType = strawberry_django.field()
     inventory_item_type_list: list[InventoryItemTypeType] = strawberry_django.field()
 
 
-@strawberry.type
+@strawberry.type(name='Query')
 class InventoryItemGroupQuery:
-    @strawberry.field
-    def inventory_item_group(self, id: int) -> InventoryItemGroupType:
-        return InventoryItemGroup.objects.get(pk=id)
-
+    inventory_item_group: InventoryItemGroupType = strawberry_django.field()
     inventory_item_group_list: list[InventoryItemGroupType] = strawberry_django.field()
