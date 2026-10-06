@@ -1,6 +1,7 @@
+from django.test import TestCase
+
 from core.models import ObjectType
 from dcim.models import DeviceType, Manufacturer
-from django.test import TestCase
 from tenancy.choices import ContactPriorityChoices
 from tenancy.models import Contact, ContactAssignment, ContactGroup, ContactRole
 
