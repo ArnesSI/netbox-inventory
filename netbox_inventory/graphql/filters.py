@@ -9,11 +9,11 @@ from netbox_inventory import models
 __all__ = (
     'AssetFilter',
     'AssetRoleFilter',
-    'SupplierFilter',
-    'PurchaseFilter',
     'DeliveryFilter',
-    'InventoryItemTypeFilter',
     'InventoryItemGroupFilter',
+    'InventoryItemTypeFilter',
+    'PurchaseFilter',
+    'SupplierFilter',
 )
 
 
