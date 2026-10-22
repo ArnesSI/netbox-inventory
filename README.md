@@ -186,8 +186,10 @@ View permissions are also required for the object from which the audit flow is i
 Audited objects within the audit flow can be viewed without additional permissions.
 However, permissions are required to add, edit, or delete audited objects.
 
-To mark an object as seen (i.e. to create an audit trail), the `add` and `delete`
-permissions should be granted on the audit trail model.
+To mark one or more objects as seen (i.e. to create audit trails), users need the `add`
+permission on the audit trail model. The `delete` permission on audit trails allows them
+to undo marking an object as seen. Neither per-row nor bulk audit actions require
+permissions to edit or delete the audited objects.
 
 #### Creating Audit Trails
 
