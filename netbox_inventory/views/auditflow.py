@@ -21,6 +21,7 @@ from django_tables2 import TemplateColumn
 
 from core.models import ObjectType
 from dcim.models import Location, Rack, Site
+from netbox.object_actions import ObjectAction
 from netbox.plugins import get_plugin_config
 from netbox.tables import NetBoxTable
 from netbox.views import generic
@@ -119,6 +120,21 @@ class AuditFlowBulkDeleteView(generic.BulkDeleteView):
 #
 
 
+class BulkMarkSeen(ObjectAction):
+    name = 'bulk_add'
+    label = _('Mark seen')
+    multi = True
+    template_name = 'netbox_inventory/inc/buttons/audittrail_bulk_add.html'
+
+    @classmethod
+    def get_url(cls, obj):
+        return reverse('plugins:netbox_inventory:audittrail_bulk_add')
+
+    @classmethod
+    def get_context(cls, context, model):
+        return {'child_model': model}
+
+
 @register_model_view(models.AuditFlow, 'run')
 class AuditFlowRunView(generic.ObjectChildrenView):
     """
@@ -130,6 +146,13 @@ class AuditFlowRunView(generic.ObjectChildrenView):
 
     def get_required_permission(self):
         return 'netbox_inventory.run_auditflow'
+
+    def get_permitted_actions(self, user, model=None):
+        actions = super().get_permitted_actions(user, model)
+        # Audit permissions apply to audit trails, not to the objects being audited.
+        if user.has_perm('netbox_inventory.add_audittrail'):
+            actions.insert(0, BulkMarkSeen)
+        return actions
 
     @staticmethod
     def get_current_page(

@@ -257,6 +257,10 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, MessagesTestMixin, TestCase):
             reverse('plugins:netbox_inventory:audittrail_bulk_add'),
             str(response.content),
         )
+        self.assertHttpStatus(
+            self.client.post(reverse('plugins:netbox_inventory:audittrail_bulk_add')),
+            403,
+        )
 
     def test_audit_trail_button(self) -> None:
         self.add_permissions('netbox_inventory.add_audittrail')
@@ -316,6 +320,10 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, MessagesTestMixin, TestCase):
         audit_flow = AuditFlow.objects.first()
 
         response = self._run_audit_flow(audit_flow, site)
+        self.assertFalse(self.user.has_perm('netbox_inventory.change_asset'))
+        self.assertFalse(self.user.has_perm('netbox_inventory.delete_asset'))
+        self.assertTrue(response.context['table'].columns['pk'].visible)
+        self.assertContains(response, 'Mark seen', count=1)
         self.assertEqual(
             str(response.content).count(
                 reverse('plugins:netbox_inventory:audittrail_bulk_add'),
@@ -337,6 +345,31 @@ class AuditFlowRunTest(AuditFlowTestDataMixin, MessagesTestMixin, TestCase):
                     ),
                     str(response.content),
                 )
+
+        # Audit-only users can submit the bulk action without asset edit permissions.
+        return_url = response.request['PATH_INFO'] + f'?object_id={site.pk}'
+        response = self.client.post(
+            reverse('plugins:netbox_inventory:audittrail_bulk_add')
+            + f'?return_url={return_url}',
+            data=post_data(
+                {
+                    'object_type_id': ObjectType.objects.get_for_model(Asset).pk,
+                    'pk': [asset.pk for asset in assets],
+                },
+            ),
+        )
+        self.assertRedirects(response, return_url)
+        self.assertEqual(AuditTrail.objects.count(), len(audit_trails) + len(assets))
+        self.assertEqual(
+            AuditTrail.objects.filter(object_id=assets[2].pk).count(),
+            1,
+        )
+
+        response = self._run_audit_flow(audit_flow, site)
+        self.assertContains(response, 'Mark seen', count=1)
+        for asset in response.context['table'].data:
+            with self.subTest(audited_asset=asset.pk):
+                self.assertIsNotNone(asset.audit_trail)
 
     def test_quick_search_mark_seen(self) -> None:
         self.add_permissions('netbox_inventory.add_audittrail')

@@ -1,0 +1,9 @@
+{% load helpers %}
+
+<input type="hidden" name="object_type_id" value="{{ child_model|content_type_id }}" />
+<button type="submit"
+  {% formaction %}="{{ url }}?{{ url_params.urlencode }}"
+  class="btn btn-primary">
+  <i class="mdi mdi-eye" aria-hidden="true"></i>
+  {{ label }}
+</button>
